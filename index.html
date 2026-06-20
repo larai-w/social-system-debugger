@@ -243,10 +243,10 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
         <div class="gs" id="paranoiaStatus" style="color:var(--muted)">LOW</div>
       </div>
       <div class="sg">
-        <div class="si" onclick="openModal('socialCap')"><div class="sl">SOCIAL CAPITAL</div><div class="sv" id="scVal" style="color:var(--cyan)">100</div></div>
-        <div class="si" onclick="openModal('dopamine')"><div class="sl">DOPAMINE INDEX</div><div class="sv" id="dpVal" style="color:var(--green)">50</div></div>
-        <div class="si" onclick="openModal('infra')"><div class="sl">INFRASTRUCTURE</div><div class="sv" id="infVal" style="color:var(--cyan)">100</div></div>
-        <div class="si" onclick="openModal('diversity')"><div class="sl">DIVERSITY INDEX</div><div class="sv" id="divVal" style="color:var(--green)">100</div></div>
+        <div class="si" onclick="openModal('socialCap')"><div class="sl" id="lbl_scVal">SOCIAL CAPITAL</div><div class="sv" id="scVal" style="color:var(--cyan)">100</div></div>
+        <div class="si" onclick="openModal('dopamine')"><div class="sl" id="lbl_dpVal">DOPAMINE INDEX</div><div class="sv" id="dpVal" style="color:var(--green)">50</div></div>
+        <div class="si" onclick="openModal('infra')"><div class="sl" id="lbl_infVal">INFRASTRUCTURE</div><div class="sv" id="infVal" style="color:var(--cyan)">100</div></div>
+        <div class="si" onclick="openModal('diversity')"><div class="sl" id="lbl_divVal">DIVERSITY INDEX</div><div class="sv" id="divVal" style="color:var(--green)">100</div></div>
       </div>
       <div class="diag" id="diag"></div>
       <div class="hist" id="histRef"></div>
@@ -276,7 +276,8 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center">
         <div class="chsm"><canvas id="radarChart"></canvas></div>
         <div>
-          <div style="font-size:.63rem;color:var(--muted);letter-spacing:.12em;margin-bottom:7px">[ METRIC LOG ]</div>
+          <div style="font-size:.63rem;color:var(--muted);letter-spacing:.12em;margin-bottom:4px" id="metricLogHeader">[ METRIC LOG ]</div>
+          <div id="metricLogNote" style="display:none;font-size:.56rem;margin-bottom:6px;padding:3px 8px;border-radius:2px;line-height:1.6"></div>
           <div class="mlog" id="metricLog"></div>
         </div>
       </div>
@@ -465,7 +466,7 @@ const I18N = {
     f2lbl:'リーダーの倫理観', f2desc:'意思決定の公正性。低下するとポピュリズムが進行し報酬関数がドーパミン（即時支持率）のみに最適化される。',
     f2L:'POPULISM', f2R:'RULE OF LAW',
     f3lbl:'意思決定アルゴリズム', f3desc:'長期最適化 vs 短期利益最大化。Greedyは局所最適解に収束し大域的破綻を誘発する。',
-    dpL:'動的計画法 (DP)', dpS:'長期最適化・将来コスト内部化', grL:'Greedy Algorithm', grS:'短期利益最大化・局所最適解',
+    dpL:'動的計画法 (DP)', dpS:'長期最適化・将来コスト内部化', grL:'貪欲法 (Greedy)', grS:'短期利益最大化・局所最適解',
     shareBtnFull:'⎘ このシナリオのURLをコピー', shareBtn:'⎘ SHARE',
     stateTitle:'SYSTEM STATE MONITOR', eLbl:'エントロピー（無秩序度）', pLbl:'精神病・パラノイア発症リスク',
     resetLbl:'↺ RESET',
@@ -478,6 +479,13 @@ const I18N = {
     pWeimar:'⚡ ワイマール崩壊', pSns:'📱 SNS社会 2024', pNordic:'🌿 北欧型民主主義', pTechno:'🔬 テクノクラシー', pPop:'🔥 ポピュリズム爆走',
     pinLock:'SCENARIO A をロック', pinClear:'LOCKED A — クリアする',
     playPlay:'▶ PLAY', playStop:'■ STOP',
+    lbl_scVal:'ソーシャルキャピタル', lbl_dpVal:'ドーパミン指数', lbl_infVal:'インフラ維持力', lbl_divVal:'情報多様性指数',
+    chart_dopamine:'ドーパミン熱狂度', chart_socialCap:'ソーシャルキャピタル', chart_infra:'インフラ維持力',
+    radar_current:'現在の状態', radar_threshold:'崩壊閾値',
+    scatter_xLabel:'← 具体性・多様性（Detail） →',
+    scatter_legend_real:'実データ', scatter_legend_fake:'過学習データ',
+    log_trust:'信頼指数    ', log_resilience:'回復力      ', log_legitimacy:'正当性      ',
+    log_infoH:'情報健全性  ', log_viability:'長期持続性  ', log_mentalWB:'精神的健全性',
   },
   en: {
     hdrSub:'Interactive Social System Debugger | Adjust parameters to observe societal collapse in real-time',
@@ -501,6 +509,13 @@ const I18N = {
     pWeimar:'⚡ Weimar Collapse', pSns:'📱 Social Media 2024', pNordic:'🌿 Nordic Democracy', pTechno:'🔬 Technocracy', pPop:'🔥 Populism Max',
     pinLock:'LOCK SCENARIO A', pinClear:'LOCKED A — Clear',
     playPlay:'▶ PLAY', playStop:'■ STOP',
+    lbl_scVal:'SOCIAL CAPITAL', lbl_dpVal:'DOPAMINE INDEX', lbl_infVal:'INFRASTRUCTURE', lbl_divVal:'DIVERSITY INDEX',
+    chart_dopamine:'Dopamine Surge', chart_socialCap:'Social Capital', chart_infra:'Infrastructure',
+    radar_current:'Current', radar_threshold:'Failure Threshold',
+    scatter_xLabel:'← Detail (specificity / diversity) →',
+    scatter_legend_real:'Authentic', scatter_legend_fake:'Fabricated',
+    log_trust:'Trust Index ', log_resilience:'Resilience  ', log_legitimacy:'Legitimacy  ',
+    log_infoH:'Info Health ', log_viability:'Viability   ', log_mentalWB:'Mental WB   ',
   }
 };
 
@@ -721,9 +736,9 @@ function pinScenario(){
     pinnedData={tl,m};
     pinnedPts=scPts.map(p=>({...p}));  // snapshot scatter positions
     timelineChart.data.datasets.push(
-      {label:'[A] Dopamine',data:tl.dp,borderColor:'rgba(0,255,136,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      {label:'[A] Social Cap',data:tl.sc,borderColor:'rgba(0,212,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      {label:'[A] Infra',data:tl.inf,borderColor:'rgba(153,69,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false}
+      {label:`[A] ${t('chart_dopamine')}`,data:tl.dp,borderColor:'rgba(0,255,136,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+      {label:`[A] ${t('chart_socialCap')}`,data:tl.sc,borderColor:'rgba(0,212,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+      {label:`[A] ${t('chart_infra')}`,data:tl.inf,borderColor:'rgba(153,69,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false}
     );
     radarChart.data.datasets.push({
       label:'[A] Scenario',
@@ -918,13 +933,13 @@ function drawScatter(){
   });
   // legend
   scCtx2.font="9px 'Courier New',monospace";scCtx2.textAlign='left';
-  [[0,'rgba(0,212,255,.8)',lang==='ja'?'実データ':'Authentic'],[130,'rgba(255,34,68,.8)',lang==='ja'?'過学習データ':'Fabricated']].forEach(([ox,col,lbl])=>{
+  [[0,'rgba(0,212,255,.8)',t('scatter_legend_real')],[130,'rgba(255,34,68,.8)',t('scatter_legend_fake')]].forEach(([ox,col,lbl])=>{
     scCtx2.beginPath();scCtx2.arc(8+ox,H-9,4,0,Math.PI*2);scCtx2.fillStyle=col;scCtx2.fill();
     scCtx2.fillStyle='#5a6f94';scCtx2.fillText(lbl,18+ox,H-6);
   });
   // x-axis label
   scCtx2.fillStyle='#5a6f94';scCtx2.textAlign='center';
-  scCtx2.fillText('← Detail (具体性・多様性) →',W/2,H-22);
+  scCtx2.fillText(t('scatter_xLabel'),W/2,H-22);
 }
 
 function scatterLoop(){scAnimId2=requestAnimationFrame(scatterLoop);stepScatter();drawScatter();}
@@ -977,30 +992,84 @@ const radarChart=new Chart(document.getElementById('radarChart'),{
 function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
 function getModeCollapseLog(m){
-  const normalRows=[
-    ['Trust Index ',m.trust,'#00d4ff'],['Resilience  ',m.resilience,'#00ff88'],
-    ['Legitimacy  ',m.legitimacy,'#9945ff'],['Info Health ',m.infoH,'#00d4ff'],
-    ['Viability   ',m.viability,'#ff6b2b'],['Mental WB   ',m.mentalWB,'#9945ff']
-  ];
-  const normalHTML=normalRows.map(([l,v,c])=>{
+  // 日本語メイン＋英語サブのラベル定義
+  const logRowsJa=['信頼指数    ','回復力      ','正当性      ','情報健全性  ','長期持続性  ','精神的健全性'];
+  const logRowsEn=['Trust Index ','Resilience  ','Legitimacy  ','Info Health ','Viability   ','Mental WB   '];
+  const logValues=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
+  const logColors=['#00d4ff','#00ff88','#9945ff','#00d4ff','#ff6b2b','#9945ff'];
+  const makeLabel=(ja,en)=>lang==='ja'
+    ?`${en}<span style="color:var(--muted);font-size:.82em"> ${ja}</span>`
+    :en;
+  const normalHTML=logValues.map((v,i)=>{
     const f=Math.round(v/10),bar='█'.repeat(f)+'░'.repeat(10-f);
-    const vc=v<30?'#ff2244':v<60?'#ff6b2b':c;
-    return`<span style="color:#3a4f6a">${l}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
+    const vc=v<30?'#ff2244':v<60?'#ff6b2b':logColors[i];
+    return`<span style="color:#3a4f6a">${makeLabel(logRowsJa[i],logRowsEn[i])}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
   });
-  const fixedJa=['既得権益の打破','利権の殲滅'];
-  const fixedEn=['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE'];
-  const fixed=lang==='ja'?fixedJa:fixedEn;
-  const makeFixed=(i,alpha=1)=>`<span style="color:rgba(255,34,68,${alpha});animation:blink ${0.8+i*0.3}s infinite">▌ ${fixed[i%2]} ▐</span>`;
+
+  // Phase 1: 効率至上主義・既得権益攻撃スローガン（50%〜）
+  const phase1Ja=['既得権益の打破','利権の殲滅','非効率の排除','無駄の削減','身を切る改革','弱者利権の殲滅'];
+  const phase1En=['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE','PURGE_INEFFICIENCY','SLASH_WASTE','CUT_TO_THE_BONE','TERMINATE_WELFARE_NODES'];
+  // Phase 2: 排外主義・外集団排斥トークン（80%〜で確率的混入）
+  const phase2Ja=['敵対イデオロギーの完全掃討','外集団（アウトグループ）の強制排斥','異分子ノードのデリート','単一信念への強制同期（多様性の完全拒絶）'];
+  const phase2En=['PURGE_HOSTILE_IDEOLOGY','FORCE_EXPEL_OUTGROUP','DELETE_DEVIANT_NODES','FORCE_SYNC_MONOBELIEF_[DIVERSITY=NULL]'];
+
+  const phase1=lang==='ja'?phase1Ja:phase1En;
+  const phase2=lang==='ja'?phase2Ja:phase2En;
+
+  // スローガンバッジ: 具体的政策ゼロを明示
+  const sloganTag=`<span style="font-size:.5em;color:#7a4400;background:rgba(255,107,43,.2);border:1px solid rgba(255,107,43,.4);border-radius:2px;padding:0 4px;margin-left:5px;vertical-align:middle">${lang==='ja'?'スローガン':'SLOGAN'}</span><span style="font-size:.48em;color:#3a4050;margin-left:3px;vertical-align:middle">${lang==='ja'?'具体策:ゼロ':'policy:null'}</span>`;
+  const radicalTag=`<span style="font-size:.5em;color:#7a0010;background:rgba(255,0,60,.2);border:1px solid rgba(255,0,60,.4);border-radius:2px;padding:0 4px;margin-left:5px;vertical-align:middle">${lang==='ja'?'排外':'RADICAL'}</span>`;
+
+  const makeP1=(i,alpha=1)=>{
+    const speed=0.6+i*0.22;
+    const col=i%2===0?`rgba(255,34,68,${alpha})`:`rgba(255,107,43,${alpha})`;
+    return`<span style="color:${col};animation:blink ${speed}s infinite">▌ ${phase1[i%phase1.length]} ▐${sloganTag}</span>`;
+  };
+  const makeP2=(i,alpha=1)=>{
+    const speed=Math.max(0.3,0.55-i*0.06);
+    return`<span style="color:rgba(255,0,60,${alpha});animation:blink ${speed}s infinite">▌ ${phase2[i%phase2.length]} ▐${radicalTag}</span>`;
+  };
+
   const fr=filterRate;
-  if(fr>=85){
-    // 完全モード崩壊: 固定トークンのみ
-    return Array.from({length:6},(_,i)=>makeFixed(i)).join('<br>');
+  const hdr=document.getElementById('metricLogHeader');
+  const note=document.getElementById('metricLogNote');
+
+  // ヘッダーと注釈を状態に応じて更新
+  if(hdr&&note){
+    if(fr>=80){
+      hdr.textContent='[ SLOGAN LOOP — 排外モード突入 ]';
+      hdr.style.color='var(--red)';
+      note.style.display='block';
+      Object.assign(note.style,{background:'rgba(255,34,68,.08)',border:'1px solid rgba(255,34,68,.35)',color:'#ff8899'});
+      note.innerHTML=lang==='ja'
+        ?'⚠ 出力が完全崩壊。多様な指標を処理する能力が消失し、具体性ゼロのスローガンと排外トークンだけが生成されています。<br><strong style="color:#ff6680">これはただのキャッチフレーズです — 政策内容も、実行計画も、根拠データも存在しません。</strong>'
+        :'⚠ Output fully collapsed. Only zero-content slogans and exclusionary tokens remain.<br><strong style="color:#ff6680">These are just catchphrases — no policy, no plan, no data.</strong>';
+    } else if(fr>=50){
+      hdr.textContent=lang==='ja'?'[ METRIC LOG — スローガン混入中 ]':'[ METRIC LOG — SLOGANS DETECTED ]';
+      hdr.style.color='var(--ora)';
+      note.style.display='block';
+      Object.assign(note.style,{background:'rgba(255,107,43,.08)',border:'1px solid rgba(255,107,43,.3)',color:'var(--ora)'});
+      note.innerHTML=lang==='ja'
+        ?`⚠ <span style="color:var(--ora);font-weight:bold">スローガン</span> タグの行は具体的政策を含まない空のキャッチフレーズです。フィルタリングが進むにつれ、実際の指標がスローガンに置き換わっていきます。`
+        :`⚠ Rows tagged <span style="color:var(--ora);font-weight:bold">SLOGAN</span> contain no concrete policy — just empty catchphrases replacing real metrics.`;
+    } else {
+      hdr.textContent='[ METRIC LOG ]';
+      hdr.style.color='var(--muted)';
+      note.style.display='none';
+    }
+  }
+
+  if(fr>=80){
+    const p2Rate=(fr-80)/20;
+    return Array.from({length:6},(_,i)=>
+      Math.random()<p2Rate ? makeP2(i,0.9+Math.random()*0.1) : makeP1(i,0.85+Math.random()*0.15)
+    ).join('<br>');
   } else if(fr>=70){
-    // 重度崩壊: 4/6が固定トークン
-    return [normalHTML[0],makeFixed(0,0.85),normalHTML[1],makeFixed(1,0.85),makeFixed(0,0.85),makeFixed(1,0.85)].join('<br>');
+    return [normalHTML[0],makeP1(0,0.88),makeP1(2,0.78),normalHTML[2],makeP1(4,0.88),makeP1(1,0.78)].join('<br>');
+  } else if(fr>=65){
+    return [normalHTML[0],makeP1(0,0.70),normalHTML[1],makeP1(2,0.65),normalHTML[4],makeP1(4,0.70)].join('<br>');
   } else if(fr>=50){
-    // 部分崩壊: 2/6が固定トークン
-    return [normalHTML[0],normalHTML[1],makeFixed(0,0.65),normalHTML[3],normalHTML[4],makeFixed(1,0.65)].join('<br>');
+    return [normalHTML[0],normalHTML[1],makeP1(0,0.60),normalHTML[3],normalHTML[4],makeP1(2,0.55)].join('<br>');
   }
   return normalHTML.join('<br>');
 }
@@ -1101,6 +1170,29 @@ function applyI18n(){
   Object.entries(pMap).forEach(([pid,k])=>{
     const el=document.getElementById('p-'+pid);if(el)el.textContent=t(k);
   });
+  // System State Monitor ラベル（日本語メイン＋英語サブ）
+  const stateEn={lbl_scVal:'SOCIAL CAPITAL',lbl_dpVal:'DOPAMINE INDEX',lbl_infVal:'INFRASTRUCTURE',lbl_divVal:'DIVERSITY INDEX'};
+  ['lbl_scVal','lbl_dpVal','lbl_infVal','lbl_divVal'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    if(lang==='ja'){
+      el.textContent=t(id);
+    } else {
+      el.textContent=stateEn[id];
+    }
+  });
+  // Social Health Timeline のデータセット名
+  if(timelineChart){
+    timelineChart.data.datasets[0].label=t('chart_dopamine');
+    timelineChart.data.datasets[1].label=t('chart_socialCap');
+    timelineChart.data.datasets[2].label=t('chart_infra');
+    timelineChart.update('none');
+  }
+  // Radar chart のデータセット名
+  if(radarChart){
+    radarChart.data.datasets[0].label=t('radar_current');
+    radarChart.data.datasets[1].label=t('radar_threshold');
+    radarChart.update('none');
+  }
   document.documentElement.lang=lang;
   updateAll();
 }
