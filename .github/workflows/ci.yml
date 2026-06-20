@@ -28,8 +28,8 @@ jobs:
 
       - name: Check for required sections
         run: |
-          for keyword in "Chart.js" "agentCanvas" "filterRate" "ethicsScore"; do
-            if grep -q "$keyword" index.html; then
+          for keyword in "chart.js" "agentCanvas" "filterRate" "ethicsScore"; do
+            if grep -qi "$keyword" index.html; then
               echo "✅ Found: $keyword"
             else
               echo "❌ Missing: $keyword"
