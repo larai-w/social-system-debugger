@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Social System Debugger v2.0</title>
+<title>社会＆地域インフラ・デバッガー v3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -15,7 +15,13 @@
 body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
 .wrap{max-width:1700px;margin:0 auto;padding:16px 20px 30px;position:relative;z-index:1}
-.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--bdr);margin-bottom:14px;gap:12px;flex-wrap:wrap}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--bdr);margin-bottom:0;gap:12px;flex-wrap:wrap}
+.tab-bar{display:flex;gap:0;border-bottom:1px solid var(--bdr);margin:10px 0 14px}
+.tab-btn{padding:10px 28px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:inherit;font-size:.72rem;letter-spacing:.14em;cursor:pointer;transition:all .2s;margin-bottom:-1px}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.4)}
+.tab-btn:hover:not(.active){color:var(--txt)}
+.page{display:none}
+.page.active{display:block}
 .hdr-c{flex:1;text-align:center}
 .hdr h1{font-size:1.5rem;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.45);letter-spacing:.12em}
 .hdr p{color:var(--muted);font-size:.7rem;margin-top:4px;letter-spacing:.05em}
@@ -104,6 +110,25 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .mbd strong{color:var(--cyan)}
 .mfo{margin-top:11px;padding:9px 13px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--pur);font-size:.63rem;color:var(--pur);font-family:inherit}
 .foot{text-align:center;padding-top:18px;font-size:.56rem;color:var(--muted);letter-spacing:.12em;border-top:1px solid var(--bdr);margin-top:6px}
+/* P2 スタイル */
+input[type=range].ora-range{background:linear-gradient(90deg,var(--ora) var(--pct,30%),var(--bdr) var(--pct,30%))}
+input[type=range].ora-range::-webkit-slider-thumb{background:var(--ora);box-shadow:0 0 8px var(--ora)}
+input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0 0 8px var(--ora);border:none}
+.tb.red-on{background:var(--red)!important;color:#fff!important}
+.tb.green-on{background:var(--green)!important;color:#040810!important}
+.heli-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-size:.62rem;letter-spacing:.1em;font-weight:bold;margin-top:4px}
+.heli-on{background:rgba(0,255,136,.12);border:1px solid var(--green);color:var(--green)}
+.heli-off{background:rgba(255,34,68,.12);border:1px solid var(--red);color:var(--red);animation:blink .8s infinite}
+.cpu-meter{margin:10px 0;padding:10px 12px;background:var(--bg1);border-radius:3px;border:1px solid var(--bdr)}
+.cpu-label{font-size:.6rem;color:var(--muted);letter-spacing:.12em;margin-bottom:8px}
+.cpu-bar-wrap{height:14px;background:var(--bdr);border-radius:3px;overflow:hidden;position:relative}
+.cpu-repair-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:3px;transition:width .5s ease;position:absolute;left:0;top:0}
+.cpu-blame-fill{height:100%;background:linear-gradient(90deg,var(--ora),var(--red));transition:width .5s ease;position:absolute;right:0;top:0}
+.cpu-nums{display:flex;justify-content:space-between;margin-top:5px;font-size:.58rem}
+.deadlock-panel{margin-top:10px;padding:9px 12px;border-radius:3px;font-size:.62rem;line-height:1.8;transition:all .4s}
+.deadlock-off{background:var(--bg1);border:1px solid var(--bdr);color:var(--muted)}
+.deadlock-on{background:rgba(255,34,68,.1);border:1px solid var(--red);color:#ff8899;animation:ap 1.2s infinite}
+.p2log{font-size:.6rem;line-height:2;max-height:160px;overflow:hidden;padding:4px 0}
 @media(max-width:1100px){.main{grid-template-columns:1fr}.charts-top{grid-template-columns:1fr}}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg0)}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
 </style>
@@ -116,7 +141,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
   </div>
   <div class="hdr-c">
-    <h1>[ SOCIAL SYSTEM DEBUGGER v2.0 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v3.0 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -125,6 +150,12 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
   </div>
 </div>
 
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab1Btn" onclick="switchTab(1)" id="tab1Btn">▶ PAGE 1: INFORMATION SPACE</button>
+  <button class="tab-btn" id="tab2Btn" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
+</div>
+
+<div id="page1" class="page active">
 <div class="preset-bar">
   <span class="pl" id="presetLbl">SCENARIOS ▶</span>
   <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
@@ -163,6 +194,16 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
         <div class="pd" id="f2desc">意思決定の公正性。低下するとポピュリズムが進行し報酬関数がドーパミン（即時支持率）のみに最適化される。</div>
         <input type="range" id="ethicsScore" min="0" max="100" value="100">
         <div class="rl"><span id="f2L">POPULISM</span><span id="f2R">RULE OF LAW</span></div>
+      </div>
+      <hr class="div">
+      <div style="margin-bottom:12px">
+        <div class="pl2">
+          <span class="pn" id="f4lbl">歴史的免疫値 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">IMMUNITY</span></span>
+          <span class="pv" id="immunityVal" style="color:var(--pur)">50%</span>
+        </div>
+        <div class="pd" id="f4desc">法的・歴史的アーカイブへの参照能力。高いとファクトチェッカーの消滅を防ぎ、誤判定（False Positive）に抵抗できる。</div>
+        <input type="range" id="historicalImmunity" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
+        <div class="rl"><span id="f4L">歴史の忘却</span><span id="f4R">論理と法のアーカイブ</span></div>
       </div>
       <hr class="div">
       <div>
@@ -264,7 +305,143 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
   </div>
 </div>
 
-<div class="foot">SOCIAL SYSTEM DEBUGGER v2.0 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Network &nbsp;|&nbsp; Educational Tool</div>
+</div><!-- /#page1 -->
+
+<div id="page2" class="page">
+
+<div class="alert" id="alertBannerP2">
+  <div class="at">⚠ &nbsp;SYSTEM CRASH — SECTOR-T COLLAPSE&nbsp; ⚠</div>
+  <div class="am" id="alertMsgP2"></div>
+</div>
+
+<div class="main">
+  <!-- LEFT: P2 Input + State -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" style="border-color:rgba(255,107,43,.3)">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span><span>INPUT PARAMETERS — SECTOR-T</span></div></div>
+      <div class="cs">人口減少が進む地方都市（Sector-T）の財政・実務パラメーター。スライダーを操作してシミュレートせよ。</div>
+      <hr class="div">
+      <!-- Shrink Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">30%</span></div>
+        <div class="pd">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
+        <input type="range" id="shrinkRate" min="0" max="100" value="30" class="ora-range">
+        <div class="rl"><span>レガシー全面延命</span><span>拠点集約・周辺廃止</span></div>
+      </div>
+      <hr class="div">
+      <!-- DX Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
+        <div class="pd">スマート農業・自動化による地域ブランド産業の持続化投資。低いと高齢職人依存が継続し後継者断絶が起きる。</div>
+        <input type="range" id="dxRate" min="0" max="100" value="30">
+        <div class="rl"><span>高齢農家の職人依存</span><span>スマート自動化</span></div>
+      </div>
+      <hr class="div">
+      <!-- Leader Ethics P2 -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">60</span></div>
+        <div class="pd">低いとエラー発生時に「他責化（Blame-Shifting）」が始まり、行政CPUが実務ではなく責任回避に100%割かれる。</div>
+        <input type="range" id="ethicsScoreP2" min="0" max="100" value="60">
+        <div class="rl"><span>他責・責任回避</span><span>実務・法治</span></div>
+      </div>
+      <hr class="div">
+      <!-- Budget Strategy -->
+      <div>
+        <div class="pl2" style="margin-bottom:5px"><span class="pn">予算配分戦略 <span class="tag to">STRATEGY</span></span></div>
+        <div class="pd">Greedy=既得権益・観光利権最優先。DP=救命医療・コア産業を最優先。</div>
+        <div class="tog">
+          <button class="tb" id="btnDPP2" onclick="setAlgoP2('dp')">
+            <span>DP戦略</span><br><span style="font-size:.57em;opacity:.7">救命医療・コア産業最優先</span>
+          </button>
+          <button class="tb on red-on" id="btnGreedyP2" onclick="setAlgoP2('greedy')">
+            <span>Greedy戦略</span><br><span style="font-size:.57em;opacity:.7">既得権益・観光利権最優先</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 State Monitor -->
+    <div class="card" style="border-color:rgba(255,107,43,.3)">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span><span>SECTOR-T SYSTEM STATE</span></div></div>
+      <!-- Infra gauge -->
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl">インフラ維持力 INFRASTRUCTURE</span><span class="gn" id="p2InfraNum" style="color:var(--cyan)">100</span></div>
+        <div class="gt"><div class="gf" id="p2InfraBar" style="width:100%;background:var(--cyan)"></div></div>
+        <div class="gs" id="p2InfraStatus" style="color:var(--muted)">STABLE</div>
+      </div>
+      <!-- Status grid -->
+      <div class="sg">
+        <div class="si"><div class="sl">RESCUE HELI</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
+        <div class="si"><div class="sl">BRAND INDUSTRY</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
+        <div class="si"><div class="sl">MUNICIPAL BUDGET</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
+        <div class="si"><div class="sl">DEADLOCK STATUS</div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
+      </div>
+      <!-- CPU Allocation -->
+      <div class="cpu-meter">
+        <div class="cpu-label">▌ CPU ALLOCATION MATRIX</div>
+        <div class="cpu-bar-wrap">
+          <div class="cpu-repair-fill" id="p2CpuRepair" style="width:80%"></div>
+          <div class="cpu-blame-fill" id="p2CpuBlame" style="width:20%"></div>
+        </div>
+        <div class="cpu-nums">
+          <span style="color:var(--cyan)">REPAIR: <span id="p2CpuRepairPct">80</span>%</span>
+          <span style="color:var(--red)">BLAME-SHIFT: <span id="p2CpuBlamePct">20</span>%</span>
+        </div>
+      </div>
+      <div class="deadlock-panel deadlock-off" id="p2DeadlockPanel">
+        DEADLOCK INACTIVE — 実務・修復処理が正常稼働中
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: P2 Charts -->
+  <div class="charts">
+    <div class="card">
+      <div class="ct" style="color:var(--ora)">
+        <div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>① SECTOR-T INFRASTRUCTURE TIMELINE</div>
+        <button class="ibtn" id="playBtnP2" onclick="playAnimationP2()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+      </div>
+      <div class="cs">地域インフラの時系列シミュレーション。他責デッドロック発生時、インフラ維持力は3倍速で崩壊する。</div>
+      <div class="ch" style="height:230px"><canvas id="timelineChartP2"></canvas></div>
+    </div>
+
+    <div class="charts-top">
+      <div class="card">
+        <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>② RESCUE HELI STATUS</div></div>
+        <div class="cs">救命ヘリの稼働状況。インフラ維持力が35%を下回るか他責デッドロックが起きると長期運休に入る。</div>
+        <div style="text-align:center;padding:20px 0">
+          <div id="p2HeliIcon" style="font-size:3rem;filter:drop-shadow(0 0 12px var(--green));transition:filter .5s">🚁</div>
+          <div id="p2HeliLabel" style="color:var(--green);font-size:.75rem;letter-spacing:.18em;margin-top:10px">OPERATIONAL — 常時稼働中</div>
+          <div style="margin-top:12px">
+            <div class="gt"><div class="gf" id="p2HeliBar" style="width:100%;background:var(--green)"></div></div>
+            <div class="gs" id="p2HeliDetail" style="color:var(--muted);margin-top:4px">Dispatch Ready</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>③ BRAND INDUSTRY HEALTH</div></div>
+        <div class="cs">地域ブランド産業（農業・特産品）の持続性。DX投資が低いと後継者断絶で崩壊危機に入る。</div>
+        <div style="padding:14px 0">
+          <div class="gr"><span style="font-size:.64rem;color:var(--muted)">BRAND HEALTH INDEX</span><span class="gn" id="p2BrandLarge" style="color:var(--green)">70</span></div>
+          <div class="gt" style="height:10px"><div class="gf" id="p2BrandBar" style="width:70%;background:var(--green)"></div></div>
+          <div class="gs" id="p2BrandStatus" style="color:var(--muted);margin-top:5px">SUSTAINABLE</div>
+          <div style="margin-top:12px;padding:8px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--ora);font-size:.6rem;color:var(--muted);line-height:1.7" id="p2BrandDiag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 Operation Log -->
+    <div class="card">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>④ SECTOR-T OPERATION LOG</div></div>
+      <div class="cs">行政CPUのリアルタイム処理ログ。他責デッドロック中はBLAME_SHIFT処理で埋め尽くされる。</div>
+      <div class="p2log" id="p2Log"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#page2 -->
+
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v3.0 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
 <div class="mo" id="modal" onclick="closeModalIf(event)">
@@ -407,7 +584,7 @@ const MDATA = {
   }
 };
 
-let algo = 'greedy', filterRate = 0, ethicsScore = 100, lang = 'ja';
+let algo = 'greedy', filterRate = 0, ethicsScore = 100, historicalImmunity = 50, lang = 'ja';
 let activePreset = null;
 let animPlaying = false, animStep = 0, animTimer = null, fullTimeline = null;
 let pinnedData = null;
@@ -595,12 +772,19 @@ function stepAgents(){
     if(diff>0)nc[j]=Math.min(1,nc[j]+diff*rate);
     else nc[i]=Math.min(1,nc[i]+(-diff)*rate);
   });
+  const immunity=historicalImmunity/100;
   nodes.forEach((n,i)=>{
     if(!n.isFC)return;
-    nc[i]=Math.max(0,nc[i]-e*0.015);
+    // 歴史的免疫値が高いほどファクトチェッカーの汚染抵抗が強くなる
+    nc[i]=Math.max(0,nc[i]-e*0.015*(1+immunity*1.5));
     edges.filter(ed=>ed[0]===i||ed[1]===i).forEach(([a,b])=>{
-      nc[a===i?b:a]=Math.max(0,nc[a===i?b:a]-e*0.005);
+      nc[a===i?b:a]=Math.max(0,nc[a===i?b:a]-e*0.005*(1+immunity));
     });
+    // False Positive: フィルタリング率70%超でFCが「敵」と誤判定されFC自体が汚染される
+    if(filterRate>70&&immunity<0.5){
+      const fpPressure=(filterRate-70)/30*(0.5-immunity);
+      nc[i]=Math.min(1,nc[i]+fpPressure*0.008);
+    }
   });
   if(isG){
     nc[0]=Math.min(1,nc[0]+(1-e)*0.009);
@@ -635,6 +819,28 @@ function drawAgents(){
     agCtx.strokeStyle=active?cColor((ni.c+nj.c)/2,0.22-f*0.08):`rgba(23,35,64,0.04)`;
     agCtx.lineWidth=active?1.1:0.5;agCtx.stroke();
   });
+  // False Positive: エコーチェンバーノードがFCを「敵」と誤判定して攻撃エッジを伸ばす
+  if(filterRate>70){
+    const fpIntensity=(filterRate-70)/30*(1-historicalImmunity/100);
+    const echoNodes=nodes.filter(n=>!n.isFC&&n.c>0.62);
+    const fcNodes=nodes.filter(n=>n.isFC);
+    echoNodes.forEach(en=>{
+      fcNodes.forEach(fn=>{
+        agCtx.beginPath();agCtx.moveTo(en.x*cW,en.y*cH);agCtx.lineTo(fn.x*cW,fn.y*cH);
+        agCtx.strokeStyle=`rgba(255,34,68,${(fpIntensity*0.55).toFixed(2)})`;
+        agCtx.lineWidth=1.8*fpIntensity;
+        agCtx.setLineDash([4,5]);agCtx.stroke();agCtx.setLineDash([]);
+      });
+    });
+    // FPレート表示更新
+    document.getElementById('agSt1').textContent=`ECHO EXPOSURE: ${(nodes.reduce((s,n)=>s+n.c,0)/N*100).toFixed(1)}%`;
+    if(fpIntensity>0.1){
+      document.getElementById('agSt2').textContent=`FALSE POSITIVE: ${(fpIntensity*100).toFixed(0)}% [FC誤攻撃中]`;
+      document.getElementById('agSt2').style.color='var(--red)';
+    }
+  } else {
+    document.getElementById('agSt2').style.color='var(--muted)';
+  }
   nodes.forEach(n=>{
     const x=n.x*cW,y=n.y*cH,r=n.isLeader?9:n.isFC?7:5;
     const col=n.isFC&&ethicsScore>50?'#00ff88':cColor(n.c);
@@ -770,6 +976,35 @@ const radarChart=new Chart(document.getElementById('radarChart'),{
 
 function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
+function getModeCollapseLog(m){
+  const normalRows=[
+    ['Trust Index ',m.trust,'#00d4ff'],['Resilience  ',m.resilience,'#00ff88'],
+    ['Legitimacy  ',m.legitimacy,'#9945ff'],['Info Health ',m.infoH,'#00d4ff'],
+    ['Viability   ',m.viability,'#ff6b2b'],['Mental WB   ',m.mentalWB,'#9945ff']
+  ];
+  const normalHTML=normalRows.map(([l,v,c])=>{
+    const f=Math.round(v/10),bar='█'.repeat(f)+'░'.repeat(10-f);
+    const vc=v<30?'#ff2244':v<60?'#ff6b2b':c;
+    return`<span style="color:#3a4f6a">${l}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
+  });
+  const fixedJa=['既得権益の打破','利権の殲滅'];
+  const fixedEn=['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE'];
+  const fixed=lang==='ja'?fixedJa:fixedEn;
+  const makeFixed=(i,alpha=1)=>`<span style="color:rgba(255,34,68,${alpha});animation:blink ${0.8+i*0.3}s infinite">▌ ${fixed[i%2]} ▐</span>`;
+  const fr=filterRate;
+  if(fr>=85){
+    // 完全モード崩壊: 固定トークンのみ
+    return Array.from({length:6},(_,i)=>makeFixed(i)).join('<br>');
+  } else if(fr>=70){
+    // 重度崩壊: 4/6が固定トークン
+    return [normalHTML[0],makeFixed(0,0.85),normalHTML[1],makeFixed(1,0.85),makeFixed(0,0.85),makeFixed(1,0.85)].join('<br>');
+  } else if(fr>=50){
+    // 部分崩壊: 2/6が固定トークン
+    return [normalHTML[0],normalHTML[1],makeFixed(0,0.65),normalHTML[3],normalHTML[4],makeFixed(1,0.65)].join('<br>');
+  }
+  return normalHTML.join('<br>');
+}
+
 function updateAll(){
   const m=metrics(filterRate,ethicsScore,algo);
 
@@ -831,12 +1066,7 @@ function updateAll(){
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
   } else ab.classList.remove('on');
 
-  const logD=[['Trust Index ',m.trust,'#00d4ff'],['Resilience  ',m.resilience,'#00ff88'],['Legitimacy  ',m.legitimacy,'#9945ff'],['Info Health ',m.infoH,'#00d4ff'],['Viability   ',m.viability,'#ff6b2b'],['Mental WB   ',m.mentalWB,'#9945ff']];
-  document.getElementById('metricLog').innerHTML=logD.map(([l,v,c])=>{
-    const f=Math.round(v/10),bar='█'.repeat(f)+'░'.repeat(10-f);
-    const vc=v<30?'#ff2244':v<60?'#ff6b2b':c;
-    return`<span style="color:#3a4f6a">${l}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
-  }).join('<br>');
+  document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
 }
 
 function getDiag(m){
@@ -951,7 +1181,246 @@ document.getElementById('ethicsScore').addEventListener('input',function(){
   activePreset=null;updateAll();
 });
 
+document.getElementById('historicalImmunity').addEventListener('input',function(){
+  historicalImmunity=+this.value;
+  document.getElementById('immunityVal').textContent=historicalImmunity+'%';
+  const pct=(historicalImmunity/100*100)+'%';
+  this.style.background=`linear-gradient(90deg,var(--pur) ${pct},var(--bdr) ${pct})`;
+});
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+
+let currentTab = 1;
+function switchTab(n){
+  currentTab = n;
+  document.getElementById('page1').classList.toggle('active', n===1);
+  document.getElementById('page2').classList.toggle('active', n===2);
+  document.getElementById('tab1Btn').classList.toggle('active', n===1);
+  document.getElementById('tab2Btn').classList.toggle('active', n===2);
+  if(n===2) updateAllP2();
+}
+
+// ── PAGE 2 STATE ──────────────────────────────────────────
+let shrinkRate=30, dxRate=30, algoP2='greedy', ethicsP2=60;
+let p2AnimPlaying=false, p2AnimTimer=null, p2AnimStep=0, p2FullTimeline=null;
+let p2LogEntries=[];
+let p2LogTimer=null;
+
+const P2_LOG_NORMAL_JA=[
+  'INFRA_MAINT_SCHEDULED ........ OK','HELI_DISPATCH_STATUS ......... ONLINE',
+  'BRAND_PRODUCTION ............. ACTIVE','BUDGET_ALLOCATION ............ BALANCED',
+  'SMART_SHRINK_OPS ............. RUNNING','DX_PIPELINE .................. SYNCED',
+  'MAINTENANCE_QUEUE ............ CLEAR','SECTOR_T_STATUS .............. GREEN',
+];
+const P2_LOG_WARN_JA=[
+  'INFRA_DEGRADATION ............ WARNING','BUDGET_DEFICIT_DETECTED ...... ALERT',
+  'HELI_FUEL_RESERVE ............ LOW','MAINTENANCE_DEFERRED ......... QUEUED',
+  'REPAIR_QUEUE_OVERFLOW ........ HIGH','COST_OVERRUN_DETECTED ........ TRUE',
+];
+const P2_LOG_BLAME_JA=[
+  'BLAME_SHIFT_INITIATED ........ PRESS_CONF','RESPONSIBILITY_MATRIX ........ DENIED',
+  'FAULT_VECTOR_ASSIGNED ........ EXTERNAL','ADMIN_CPU_REROUTED ........... →BLAME_100%',
+  'REPAIR_QUEUE ................. SUSPENDED','INFRA_MAINT_STATUS ........... ABANDONED',
+  'ACCOUNTABILITY_CHECK ......... REFUSED','EXTERNAL_CAUSE_CITED ......... LOOP_x99',
+];
+
+function metricsP2(s,d,al,e){
+  const sf=s/100,df=d/100,isG=al==='greedy',ef=e/100;
+  const infraBase=clamp(100-(1-sf)*35-(1-df)*15-(isG?(1-ef)*28:6),0,100);
+  const infraError=infraBase<65;
+  const deadlock=ef<0.4&&isG&&infraError;
+  const cpuBlame=deadlock?100:clamp((1-ef)*22+(isG?14:0),0,75);
+  const cpuRepair=100-cpuBlame;
+  const infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14,0,100);
+  const heliOp=infra>35&&cpuRepair>25;
+  const brand=clamp(df*65+sf*18+(isG?-14:14)+ef*8,0,100);
+  const budget=clamp(100-(1-sf)*44-(isG?(1-ef)*38:8)+df*14,0,100);
+  const crash=(!heliOp&&infra<20)||budget<8;
+  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError};
+}
+
+function simTimelineP2(s,d,al,e,steps=65){
+  const sf=s/100,df=d/100,isG=al==='greedy',ef=e/100;
+  const infra=[],brand=[],budgetArr=[],heli=[];
+  const n=()=>randn(0,1.8);
+  for(let i=0;i<steps;i++){
+    const tn=i/steps;
+    if(isG&&ef<0.4){
+      const col=tn>0.25?Math.pow((tn-0.25)/0.75,1.4):0;
+      const iv=clamp(92-col*96+n(),0,100);
+      infra.push(iv); brand.push(clamp(50+df*18-col*72+n(),0,100));
+      budgetArr.push(clamp(86-col*94+n(),0,100)); heli.push(clamp(iv>35?100-col*118:0+n(),0,100));
+    } else if(!isG&&ef>0.55&&sf>0.45&&df>0.45){
+      const g=1-Math.exp(-2.8*tn);
+      infra.push(clamp(55+g*40*sf+n(),0,100)); brand.push(clamp(44+g*48*df+n(),0,100));
+      budgetArr.push(clamp(50+g*44*sf+n(),0,100)); heli.push(clamp(72+g*24+n(),0,100));
+    } else {
+      const decay=(1-sf)*0.22+(1-df)*0.18+(isG?(1-ef)*0.28:0.06);
+      infra.push(clamp(88-decay*tn*80+n(),0,100)); brand.push(clamp(62-(1-df)*tn*45+n(),0,100));
+      budgetArr.push(clamp(78-decay*tn*70+n(),0,100)); heli.push(clamp(82-decay*tn*88+n(),0,100));
+    }
+  }
+  return{infra,brand,budget:budgetArr,heli};
+}
+
+function updateAllP2(){
+  const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
+  // Infra gauge
+  const ic=m.infra<30?'#ff2244':m.infra<60?'#ff6b2b':'#00d4ff';
+  document.getElementById('p2InfraNum').textContent=Math.round(m.infra);
+  document.getElementById('p2InfraNum').style.color=ic;
+  document.getElementById('p2InfraBar').style.cssText=`width:${m.infra}%;background:${ic}`;
+  const iStatus=m.infra<30?'CRITICAL — インフラが臨界点以下':m.infra<60?'WARNING — 劣化進行中':'STABLE';
+  document.getElementById('p2InfraStatus').textContent=iStatus;
+  document.getElementById('p2InfraStatus').style.color=ic;
+  // Heli
+  const hs=document.getElementById('p2HeliStatus');
+  const hl=document.getElementById('p2HeliLabel');
+  const hi=document.getElementById('p2HeliIcon');
+  const hb=document.getElementById('p2HeliBar');
+  const hd=document.getElementById('p2HeliDetail');
+  hs.className='heli-badge '+(m.heliOp?'heli-on':'heli-off');
+  hs.textContent=m.heliOp?'● ONLINE':'■ SUSPENDED';
+  hl.style.color=m.heliOp?'var(--green)':'var(--red)';
+  hl.textContent=m.heliOp?'OPERATIONAL — 常時稼働中':'LONG-TERM SUSPENSION — 救命ヘリ長期運休';
+  hi.style.filter=m.heliOp?'drop-shadow(0 0 12px var(--green))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
+  hb.style.cssText=`width:${m.heliOp?100:5}%;background:${m.heliOp?'var(--green)':'var(--red)'}`;
+  hd.textContent=m.heliOp?'Dispatch Ready — 出動待機中':'MALFUNCTION — 修復予算なし（他責処理中）';
+  hd.style.color=m.heliOp?'var(--muted)':'var(--red)';
+  // Brand
+  const bc=m.brand<30?'#ff2244':m.brand<60?'#ff6b2b':'#00ff88';
+  document.getElementById('p2BrandNum').textContent=Math.round(m.brand);
+  document.getElementById('p2BrandNum').style.color=bc;
+  document.getElementById('p2BrandLarge').textContent=Math.round(m.brand);
+  document.getElementById('p2BrandLarge').style.color=bc;
+  document.getElementById('p2BrandBar').style.cssText=`width:${m.brand}%;background:${bc}`;
+  const bs=m.brand<30?'COLLAPSE RISK — 後継者断絶危機':m.brand<60?'DEGRADING — DX投資不足':'SUSTAINABLE — ブランド持続中';
+  document.getElementById('p2BrandStatus').textContent=bs;
+  document.getElementById('p2BrandStatus').style.color=bc;
+  document.getElementById('p2BrandDiag').textContent=getP2BrandDiag(m);
+  // Budget
+  const budc=m.budget<20?'#ff2244':m.budget<50?'#ff6b2b':'#00d4ff';
+  document.getElementById('p2BudgetNum').textContent=m.budget<8?'BANKRUPT':Math.round(m.budget);
+  document.getElementById('p2BudgetNum').style.color=budc;
+  // CPU
+  document.getElementById('p2CpuRepair').style.width=m.cpuRepair+'%';
+  document.getElementById('p2CpuBlame').style.width=m.cpuBlame+'%';
+  document.getElementById('p2CpuRepairPct').textContent=m.cpuRepair;
+  document.getElementById('p2CpuBlamePct').textContent=m.cpuBlame;
+  // Deadlock
+  const dp=document.getElementById('p2DeadlockPanel');
+  const db=document.getElementById('p2DeadlockBadge');
+  if(m.deadlock){
+    dp.className='deadlock-panel deadlock-on';
+    dp.textContent='⚠ 他責デッドロック発動中 — 行政CPUが100%「責任回避・他者攻撃」に割当。修復処理ゼロ。インフラ崩壊速度3倍。';
+    db.textContent='⚠ DEADLOCK'; db.style.color='var(--red)';
+  } else {
+    dp.className='deadlock-panel deadlock-off';
+    dp.textContent=m.infraError?'STRESS MODE — インフラがエラー域。Greedy×低倫理が続くとデッドロックへ突入する。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中';
+    db.textContent=m.infraError?'STRESS':'INACTIVE'; db.style.color=m.infraError?'var(--ora)':'var(--muted)';
+  }
+  // Timeline
+  if(!p2AnimPlaying&&timelineChartP2){
+    const tl=simTimelineP2(shrinkRate,dxRate,algoP2,ethicsP2);
+    timelineChartP2.data.datasets[0].data=tl.infra;
+    timelineChartP2.data.datasets[1].data=tl.heli;
+    timelineChartP2.data.datasets[2].data=tl.brand;
+    timelineChartP2.data.datasets[3].data=tl.budget;
+    timelineChartP2.update();
+  }
+  // Crash banner
+  const ab2=document.getElementById('alertBannerP2');
+  if(m.crash){
+    ab2.classList.add('on');
+    const parts=[];
+    if(!m.heliOp&&m.infra<20) parts.push('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達');
+    if(m.budget<8) parts.push('自治体財政ショート — 予算が枯渇し行政機能停止');
+    if(m.deadlock) parts.push('他責デッドロックによりシステムが自滅状態に突入');
+    document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
+  } else ab2.classList.remove('on');
+  // Operation log
+  updateP2Log(m);
+}
+
+function getP2BrandDiag(m){
+  if(m.brand<20) return '[ FATAL ] 地域ブランド産業が崩壊。後継者ゼロ・自動化ゼロ。産業消滅。';
+  if(m.brand<50&&dxRate<40) return '[ WARNING ] DX投資不足で職人高齢化が加速中。5年以内に後継者断絶リスク。';
+  if(m.brand>75&&dxRate>60) return '[ OPTIMAL ] スマート自動化によりブランド品質維持と後継問題を同時解決。持続的成長軌道。';
+  return '[ OK ] ブランド産業は現状維持中。DX投資を増やすと長期持続性が向上する。';
+}
+
+let p2LogTick=0;
+function updateP2Log(m){
+  p2LogTick++;
+  const now=new Date();
+  const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  let src,cls;
+  if(m.deadlock){
+    src=P2_LOG_BLAME_JA[p2LogTick%P2_LOG_BLAME_JA.length]; cls='p2log-blame';
+  } else if(m.infraError||m.budget<40){
+    src=(p2LogTick%3===0?P2_LOG_WARN_JA:P2_LOG_NORMAL_JA)[p2LogTick%7]; cls='p2log-warn';
+  } else {
+    src=P2_LOG_NORMAL_JA[p2LogTick%P2_LOG_NORMAL_JA.length]; cls='p2log-normal';
+  }
+  p2LogEntries.push(`<span class="${cls}">${ts} ${src}</span>`);
+  if(p2LogEntries.length>7) p2LogEntries.shift();
+  document.getElementById('p2Log').innerHTML=p2LogEntries.join('<br>');
+}
+
+function playAnimationP2(){
+  const btn=document.getElementById('playBtnP2');
+  if(p2AnimPlaying){
+    clearInterval(p2AnimTimer); p2AnimPlaying=false; p2AnimTimer=null;
+    btn.textContent='▶ PLAY'; btn.classList.remove('play-on');
+    updateAllP2(); return;
+  }
+  p2FullTimeline=simTimelineP2(shrinkRate,dxRate,algoP2,ethicsP2);
+  p2AnimStep=0; p2AnimPlaying=true;
+  btn.textContent='■ STOP'; btn.classList.add('play-on');
+  if(timelineChartP2){
+    timelineChartP2.data.datasets.forEach(d=>d.data=[]);
+    timelineChartP2.update('none');
+  }
+  p2AnimTimer=setInterval(()=>{
+    p2AnimStep++;
+    if(p2AnimStep>65){
+      clearInterval(p2AnimTimer); p2AnimPlaying=false; p2AnimTimer=null;
+      btn.textContent='▶ PLAY'; btn.classList.remove('play-on'); return;
+    }
+    if(timelineChartP2){
+      timelineChartP2.data.datasets[0].data=p2FullTimeline.infra.slice(0,p2AnimStep);
+      timelineChartP2.data.datasets[1].data=p2FullTimeline.heli.slice(0,p2AnimStep);
+      timelineChartP2.data.datasets[2].data=p2FullTimeline.brand.slice(0,p2AnimStep);
+      timelineChartP2.data.datasets[3].data=p2FullTimeline.budget.slice(0,p2AnimStep);
+      timelineChartP2.update('none');
+    }
+  },70);
+}
+
+function setAlgoP2(a){
+  algoP2=a;
+  document.getElementById('btnDPP2').classList.toggle('on',a==='dp');
+  document.getElementById('btnDPP2').classList.toggle('green-on',a==='dp');
+  document.getElementById('btnGreedyP2').classList.toggle('on',a==='greedy');
+  document.getElementById('btnGreedyP2').classList.toggle('red-on',a==='greedy');
+  updateAllP2();
+}
+
+// P2 sliders
+document.getElementById('shrinkRate').addEventListener('input',function(){
+  shrinkRate=+this.value; document.getElementById('shrinkVal').textContent=shrinkRate+'%';
+  setPct(this); updateAllP2();
+});
+document.getElementById('dxRate').addEventListener('input',function(){
+  dxRate=+this.value; document.getElementById('dxVal').textContent=dxRate+'%';
+  setPct(this); updateAllP2();
+});
+document.getElementById('ethicsScoreP2').addEventListener('input',function(){
+  ethicsP2=+this.value; document.getElementById('ethicsP2Val').textContent=ethicsP2;
+  setPct(this); updateAllP2();
+});
+
+let timelineChartP2=null;
 
 (function init(){
   const p=new URLSearchParams(location.search);
@@ -969,6 +1438,29 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
   applyI18n();
   startScatter();
   startAgents();
+
+  // P2 timeline chart 初期化
+  timelineChartP2=new Chart(document.getElementById('timelineChartP2'),{
+    type:'line',
+    data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+      {label:'Infrastructure',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+      {label:'Rescue Heli',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+      {label:'Brand Industry',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+      {label:'Municipal Budget',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+      plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+      scales:{
+        x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+        y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+      }
+    }
+  });
+  // P2 初期描画
+  setAlgoP2('greedy');
+  setPct(document.getElementById('shrinkRate'));
+  setPct(document.getElementById('dxRate'));
+  setPct(document.getElementById('ethicsScoreP2'));
 })();
 </script>
 </body>
