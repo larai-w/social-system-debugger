@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check index.html exists and is non-empty
+        run: |
+          if [ ! -f index.html ]; then
+            echo "❌ index.html not found"
+            exit 1
+          fi
+          SIZE=$(wc -c < index.html)
+          echo "✅ index.html found (${SIZE} bytes)"
+          if [ "$SIZE" -lt 1000 ]; then
+            echo "❌ index.html is too small (${SIZE} bytes) — something may be wrong"
+            exit 1
+          fi
+
+      - name: Check for required sections
+        run: |
+          for keyword in "chart.js" "agentCanvas" "filterRate" "ethicsScore"; do
+            if grep -qi "$keyword" index.html; then
+              echo "✅ Found: $keyword"
+            else
+              echo "❌ Missing: $keyword"
+              exit 1
+            fi
+          done
+
+      - name: Report file size
+        run: |
+          SIZE=$(wc -c < index.html)
+          LINES=$(wc -l < index.html)
+          echo "📦 index.html — ${SIZE} bytes / ${LINES} lines"
