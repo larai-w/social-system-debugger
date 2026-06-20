@@ -15,8 +15,6 @@
 body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
 .wrap{max-width:1700px;margin:0 auto;padding:16px 20px 30px;position:relative;z-index:1}
-
-/* HEADER */
 .hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--bdr);margin-bottom:14px;gap:12px;flex-wrap:wrap}
 .hdr-c{flex:1;text-align:center}
 .hdr h1{font-size:1.5rem;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.45);letter-spacing:.12em}
@@ -25,32 +23,24 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:3px 12px;border:1px solid var(--green);color:var(--green);font-size:.6rem;letter-spacing:.18em;text-shadow:0 0 10px rgba(0,255,136,.5)}
 .bdot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-
-/* BUTTONS */
 .ibtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.65rem;cursor:pointer;transition:all .2s;letter-spacing:.08em;white-space:nowrap}
 .ibtn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.2)}
 .ibtn.on{border-color:var(--cyan);color:var(--cyan)}
-
-/* PRESETS */
+.ibtn.play-on{border-color:var(--green)!important;color:var(--green)!important;box-shadow:0 0 8px rgba(0,255,136,.3)}
+.ibtn.pin-on{border-color:var(--yel)!important;color:var(--yel)!important;box-shadow:0 0 8px rgba(255,204,0,.3)}
 .preset-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .pl{font-size:.6rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap}
 .pbtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;transition:all .2s;white-space:nowrap}
 .pbtn:hover{border-color:var(--ora);color:var(--ora)}
 .pbtn.sel{border-color:var(--ora);color:var(--ora);background:rgba(255,107,43,.1)}
-
-/* ALERT */
 .alert{display:none;background:rgba(255,34,68,.12);border:1px solid var(--red);border-radius:3px;padding:14px 20px;text-align:center;margin-bottom:14px;animation:ap 1.1s infinite}
 .alert.on{display:block}
 @keyframes ap{0%,100%{box-shadow:0 0 14px rgba(255,34,68,.4)}50%{box-shadow:none}}
 .at{color:var(--red);font-size:.92rem;font-weight:bold;letter-spacing:.2em;text-shadow:0 0 16px rgba(255,34,68,.7)}
 .am{color:#ff8899;font-size:.67rem;margin-top:6px;line-height:1.7}
-
-/* LAYOUT */
 .main{display:grid;grid-template-columns:305px 1fr;gap:16px;align-items:start}
 .charts{display:grid;gap:16px}
 .charts-top{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-
-/* CARD */
 .card{background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;padding:16px;position:relative;overflow:hidden}
 .card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.5}
 .ct{display:flex;align-items:center;gap:8px;font-size:.68rem;color:var(--cyan);letter-spacing:.16em;text-transform:uppercase;margin-bottom:4px;justify-content:space-between}
@@ -58,8 +48,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 7px var(--cyan);animation:blink 2.4s infinite;flex-shrink:0}
 .cs{font-size:.63rem;color:var(--muted);margin-bottom:12px;line-height:1.6}
 .div{border:none;border-top:1px solid var(--bdr);margin:11px 0}
-
-/* SLIDER */
 .pl2{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
 .pn{font-size:.7rem;color:var(--txt)}
 .pv{font-size:.88rem;font-weight:bold;color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,.6);min-width:38px;text-align:right}
@@ -68,20 +56,14 @@ input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);cursor:pointer}
 input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan);border:none;cursor:pointer}
 .rl{display:flex;justify-content:space-between;font-size:.57rem;color:var(--muted);margin-top:3px}
-
-/* TOGGLE */
 .tog{display:flex;border:1px solid var(--bdr);border-radius:3px;overflow:hidden}
 .tb{flex:1;padding:9px 5px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:.65rem;letter-spacing:.04em;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
 .tb.on{background:var(--cyan);color:#040810;font-weight:bold}
 .tb:hover:not(.on){background:rgba(0,212,255,.1);color:var(--cyan)}
-
-/* TAG */
 .tag{display:inline-block;padding:1px 5px;font-size:.55rem;border-radius:2px;letter-spacing:.1em}
 .tc{background:rgba(0,212,255,.12);color:var(--cyan);border:1px solid rgba(0,212,255,.3)}
 .tg{background:rgba(0,255,136,.12);color:var(--green);border:1px solid rgba(0,255,136,.3)}
 .to{background:rgba(255,107,43,.12);color:var(--ora);border:1px solid rgba(255,107,43,.3)}
-
-/* GAUGES */
 .gr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
 .gl{font-size:.64rem;color:var(--muted);cursor:pointer;transition:color .2s}
 .gl:hover{color:var(--cyan)}
@@ -90,27 +72,19 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .gt{height:7px;background:var(--bdr);border-radius:4px;overflow:hidden;margin-bottom:4px}
 .gf{height:100%;border-radius:4px;transition:width .45s ease,background .45s ease}
 .gs{font-size:.59rem}
-
-/* STATE GRID */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .si{background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;padding:8px 10px;cursor:pointer;transition:border-color .2s}
 .si:hover{border-color:rgba(0,212,255,.3)}
 .sl{font-size:.55rem;color:var(--muted);letter-spacing:.1em;margin-bottom:2px}
 .sv{font-size:1.1rem;font-weight:bold}
-
-/* DIAG */
 .diag{margin-top:10px;padding:9px 12px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--cyan);font-size:.61rem;color:var(--muted);line-height:1.7;transition:border-color .3s}
-
-/* SHARE */
+.hist{margin-top:8px;padding:9px 12px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--pur);font-size:.6rem;color:#b07fff;line-height:1.7}
 .sbtn{width:100%;padding:8px;margin-top:10px;background:transparent;border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;transition:all .2s;letter-spacing:.1em}
 .sbtn:hover{border-color:var(--cyan);color:var(--cyan)}
 .sbtn.ok{border-color:var(--green);color:var(--green)}
-
-/* CHARTS */
+.sbtn.pin-on{border-color:var(--yel)!important;color:var(--yel)!important}
 .ch{position:relative;height:222px}
 .chsm{position:relative;height:198px}
-
-/* AGENT */
 .ag-wrap{position:relative;width:100%;height:296px;background:var(--bg1);border-radius:2px;overflow:hidden}
 #agentCanvas{width:100%;height:100%;display:block}
 .ag-ov{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
@@ -118,11 +92,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .ag-leg{position:absolute;bottom:9px;left:10px;display:flex;gap:12px}
 .li{display:flex;align-items:center;gap:5px;font-size:.57rem;color:var(--muted)}
 .ld{width:8px;height:8px;border-radius:50%}
-
-/* METRIC LOG */
 .mlog{font-size:.61rem;line-height:2.1}
-
-/* MODAL */
 .mo{display:none;position:fixed;inset:0;background:rgba(7,11,20,.88);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
 .mo.on{display:flex}
 .mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2)}
@@ -133,10 +103,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .mbd{font-size:.68rem;color:var(--muted);line-height:1.9}
 .mbd strong{color:var(--cyan)}
 .mfo{margin-top:11px;padding:9px 13px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--pur);font-size:.63rem;color:var(--pur);font-family:inherit}
-
-/* FOOTER */
 .foot{text-align:center;padding-top:18px;font-size:.56rem;color:var(--muted);letter-spacing:.12em;border-top:1px solid var(--bdr);margin-top:6px}
-
 @media(max-width:1100px){.main{grid-template-columns:1fr}.charts-top{grid-template-columns:1fr}}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg0)}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
 </style>
@@ -144,7 +111,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 <body>
 <div class="wrap">
 
-<!-- HEADER -->
 <div class="hdr">
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
@@ -159,7 +125,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
   </div>
 </div>
 
-<!-- PRESETS -->
 <div class="preset-bar">
   <span class="pl" id="presetLbl">SCENARIOS ▶</span>
   <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
@@ -169,15 +134,12 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
   <button class="pbtn" id="p-populism" onclick="setPreset('populism')">🔥 ポピュリズム爆走</button>
 </div>
 
-<!-- ALERT -->
 <div class="alert" id="alertBanner">
   <div class="at">⚠ &nbsp;SYSTEM CRASH DETECTED&nbsp; ⚠</div>
   <div class="am" id="alertMsg"></div>
 </div>
 
-<!-- MAIN -->
 <div class="main">
-  <!-- LEFT -->
   <div style="display:flex;flex-direction:column;gap:14px">
     <div class="card">
       <div class="ct"><div class="ct-l"><span class="dot"></span><span id="paramTitle">INPUT PARAMETERS</span></div></div>
@@ -218,6 +180,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
         </div>
       </div>
       <button class="sbtn" id="shareBtnFull" onclick="shareURL()">⎘ このシナリオのURLをコピー</button>
+      <button class="sbtn" id="pinBtn" onclick="pinScenario()">📌 <span id="pinLabel">SCENARIO A をロック</span></button>
     </div>
 
     <div class="card">
@@ -245,10 +208,10 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
         <div class="si" onclick="openModal('diversity')"><div class="sl">DIVERSITY INDEX</div><div class="sv" id="divVal" style="color:var(--green)">100</div></div>
       </div>
       <div class="diag" id="diag"></div>
+      <div class="hist" id="histRef"></div>
     </div>
   </div>
 
-  <!-- RIGHT: CHARTS -->
   <div class="charts">
     <div class="charts-top">
       <div class="card">
@@ -257,7 +220,10 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
         <div class="ch"><canvas id="scatterChart"></canvas></div>
       </div>
       <div class="card">
-        <div class="ct"><div class="ct-l"><span class="dot"></span>② SOCIAL HEALTH TIMELINE</div></div>
+        <div class="ct">
+          <div class="ct-l"><span class="dot"></span>② SOCIAL HEALTH TIMELINE</div>
+          <button class="ibtn" id="playBtn" onclick="playAnimation()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+        </div>
         <div class="cs" id="s2sub">時系列シミュレーション。Greedy×低倫理 → ドーパミン爆発後に崩壊。DP×高倫理 → 持続的安定成長。</div>
         <div class="ch"><canvas id="timelineChart"></canvas></div>
       </div>
@@ -301,7 +267,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 <div class="foot">SOCIAL SYSTEM DEBUGGER v2.0 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Network &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
-<!-- MODAL -->
 <div class="mo" id="modal" onclick="closeModalIf(event)">
   <div class="mb">
     <button class="mc" onclick="closeModal()">✕</button>
@@ -313,9 +278,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-// I18N
-// ══════════════════════════════════════════════
 const I18N = {
   ja: {
     hdrSub:'インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測',
@@ -337,6 +299,8 @@ const I18N = {
     leg1:'健全 Healthy', leg2:'感染中 Contaminating', leg3:'エコーチェンバー', leg4:'ファクトチェッカー',
     langBtn:'EN',
     pWeimar:'⚡ ワイマール崩壊', pSns:'📱 SNS社会 2024', pNordic:'🌿 北欧型民主主義', pTechno:'🔬 テクノクラシー', pPop:'🔥 ポピュリズム爆走',
+    pinLock:'SCENARIO A をロック', pinClear:'LOCKED A — クリアする',
+    playPlay:'▶ PLAY', playStop:'■ STOP',
   },
   en: {
     hdrSub:'Interactive Social System Debugger | Adjust parameters to observe societal collapse in real-time',
@@ -358,12 +322,38 @@ const I18N = {
     leg1:'Healthy', leg2:'Contaminating', leg3:'Echo Chamber', leg4:'Fact-Checker',
     langBtn:'日本語',
     pWeimar:'⚡ Weimar Collapse', pSns:'📱 Social Media 2024', pNordic:'🌿 Nordic Democracy', pTechno:'🔬 Technocracy', pPop:'🔥 Populism Max',
+    pinLock:'LOCK SCENARIO A', pinClear:'LOCKED A — Clear',
+    playPlay:'▶ PLAY', playStop:'■ STOP',
   }
 };
 
-// ══════════════════════════════════════════════
-// PRESETS
-// ══════════════════════════════════════════════
+const HIST_REF = [
+  { match:(f,e,a)=>f>80&&e<20&&a==='greedy',
+    ja:'📍 ワイマール共和国末期（1932–33年） — 情報統制×ポピュリスト指導者×短期政治が複合。制度への信頼が消滅し3年でシステムが全崩壊した。',
+    en:'📍 Late Weimar Republic (1932–33) — Info control × populist leader × short-termism combined. Institutional trust vanished; full collapse within 3 years.' },
+  { match:(f,e,a)=>f>60&&e<30&&a==='greedy',
+    ja:'📍 現代ポピュリズム（ハンガリー2010〜 / ブラジル2018〜） — 選挙で選ばれた指導者による制度の内部侵食。司法・メディア・選挙管理が順番に無力化された。',
+    en:'📍 Modern Populism (Hungary 2010–, Brazil 2018–) — Institutional erosion by elected leaders. Courts, media, and electoral bodies systematically neutralized.' },
+  { match:(f,e,a)=>f>65&&e<50,
+    ja:'📍 1930年代ファシズム台頭期（イタリア/ドイツ） — エコーチェンバーが反知性主義と外集団嫌悪を増幅。中程度の倫理観は崩壊を遅らせたが止められなかった。',
+    en:'📍 Rise of Fascism 1930s (Italy/Germany) — Echo chambers amplified anti-intellectualism and outgroup hatred. Moderate ethics slowed but could not stop collapse.' },
+  { match:(f,e,a)=>f>50&&e>=45&&e<72,
+    ja:'📍 SNS時代の情報分断（2016年〜） — アルゴリズム的フィルターバブルが政治的二極化を加速。社会的粘着性が年率3–5%で低下中。',
+    en:'📍 Social Media Polarization (2016–) — Algorithmic filter bubbles accelerated polarization. Social cohesion declining 3–5%/year.' },
+  { match:(f,e,a)=>f>45&&e>=70&&a==='dp',
+    ja:'📍 テクノクラシー（シンガポール1980年代〜） — 強い情報管理と高行政倫理の共存。短期的安定は高いが情報多様性が犠牲になり長期イノベーション力が減退する。',
+    en:'📍 Technocracy (Singapore 1980s–) — Strong info control with high administrative ethics. High stability, but diversity sacrificed, reducing long-term innovation.' },
+  { match:(f,e,a)=>f<30&&e>=80&&a==='dp',
+    ja:'📍 北欧型社会民主主義（1970年代〜） — 低フィルタリング×高倫理×長期最適化の実在例。現存する最も持続可能な社会モデルの一つ。信頼資本が自己強化ループを形成。',
+    en:'📍 Nordic Social Democracy (1970s–) — Low filtering × high ethics × DP in practice. One of the most sustainable social models. Trust capital forms a self-reinforcing loop.' },
+  { match:(f,e,a)=>f<35&&e>=68&&a==='greedy',
+    ja:'📍 新自由主義的民主主義（1990年代） — 情報は比較的開放的だが短期経済優先。所得格差が拡大し始めソーシャルキャピタルが緩やかに侵食されるパターン。',
+    en:'📍 Neoliberal Democracy (1990s) — Relatively open information but short-term economic focus. Income inequality grew; social capital gradually eroded.' },
+  { match:()=>true,
+    ja:'📍 パラメーターを変化させると、類似する歴史的事例が参照されます。',
+    en:'📍 Adjust parameters to see matching historical case references.' },
+];
+
 const PRESETS = {
   weimar:  { f:88, e:12,  a:'greedy' },
   sns:     { f:72, e:48,  a:'greedy' },
@@ -372,22 +362,19 @@ const PRESETS = {
   populism:{ f:65, e:8,   a:'greedy' },
 };
 
-// ══════════════════════════════════════════════
-// MODAL CONTENT
-// ══════════════════════════════════════════════
 const MDATA = {
   entropy:{
     tag:'METRIC · ENTROPY',
     jaTitle:'エントロピー（社会的無秩序度）', enTitle:'Entropy (Social Disorder)',
     jaBody:`<strong>エントロピー</strong>は情報理論の無秩序度概念を社会システムに応用したメトリクスです。<br><br>エコーチェンバーが進行すると、<strong>ボルツマン的無秩序</strong>（社会の混乱度）が増大します。高い値は社会的コンセンサスの崩壊、制度への不信、法の形骸化を示します。<br><br>過学習したモデルが現実のデータを正しく処理できないように、エントロピーが高い社会は外部ショックに対応できなくなります。`,
-    enBody:`<strong>Entropy</strong> applies information theory's disorder concept to social systems.<br><br>As echo chambers advance, <strong>Boltzmann-style disorder</strong> (social chaos level) increases. High values indicate breakdown of social consensus, institutional distrust, and failure of rule of law.<br><br>Just as an overfitted model can't process real-world data, a high-entropy society loses the ability to respond to external shocks.`,
+    enBody:`<strong>Entropy</strong> applies information theory's disorder concept to social systems.<br><br>As echo chambers advance, <strong>Boltzmann-style disorder</strong> increases. High values indicate breakdown of social consensus, institutional distrust, and failure of rule of law.<br><br>Just as an overfitted model can't process real-world data, a high-entropy society loses the ability to respond to external shocks.`,
     formula:'H = 0.42·FilterRate + 0.38·(1−Ethics) + 0.20·GreedyPenalty'
   },
   paranoia:{
     tag:'METRIC · MENTAL HEALTH',
     jaTitle:'精神病・パラノイア発症リスク（ノイズ蓄積度）', enTitle:'Paranoia Risk (Noise Accumulation)',
     jaBody:`エコーチェンバー内では<strong>確証バイアス</strong>が増幅され、外部情報（反証）が拒絶されます。<br><br>これは<strong>ニューラルネットワークの過学習</strong>と同じ構造です。訓練データのノイズまで学習したモデルが実世界の入力を正しく処理できなくなるように、長期的なフィルタリングは集団的パラノイアと陰謀論の蔓延を引き起こします。`,
-    enBody:`Inside echo chambers, <strong>confirmation bias</strong> amplifies and counter-evidence is rejected.<br><br>This mirrors <strong>neural network overfitting</strong>: a model that learns training noise can no longer process real-world inputs correctly. Long-term filtering causes collective paranoia and the spread of conspiracy theories.`,
+    enBody:`Inside echo chambers, <strong>confirmation bias</strong> amplifies and counter-evidence is rejected.<br><br>This mirrors <strong>neural network overfitting</strong>: a model that learns training noise can no longer process real-world inputs correctly. Long-term filtering causes collective paranoia and conspiracy theories.`,
     formula:'P = 0.48·FilterRate + 0.33·(1−Ethics) + 0.14·GreedyPenalty'
   },
   socialCap:{
@@ -400,35 +387,31 @@ const MDATA = {
   dopamine:{
     tag:'METRIC · REWARD FUNCTION',
     jaTitle:'ドーパミンインデックス（即時報酬強度）', enTitle:'Dopamine Index (Immediate Reward Intensity)',
-    jaBody:`ポピュリスト的コミュニケーションは複雑な政策議論より<strong>感情的・刺激的コンテンツ</strong>を優先し、脳内ドーパミン報酬系を直接刺激します。<br><br>Greedyアルゴリズムはこの即時報酬を最大化しますが、<strong>ドーパミン耐性</strong>が生じより強い刺激が必要になります。これがポピュリズムの「過激化スパイラル」の数学的モデルです。<br><br>短期的に高い値は、長期的システム崩壊の前兆であることが多い。`,
-    enBody:`Populist communication prioritizes <strong>emotionally stimulating content</strong>, directly triggering the brain's dopamine reward system.<br><br>The Greedy algorithm maximizes immediate reward, but <strong>dopamine tolerance</strong> builds, requiring stronger stimuli — the mathematical model of populism's "radicalization spiral."<br><br>Short-term high values are often a precursor to long-term system collapse.`,
+    jaBody:`ポピュリスト的コミュニケーションは複雑な政策議論より<strong>感情的・刺激的コンテンツ</strong>を優先し、脳内ドーパミン報酬系を直接刺激します。<br><br>Greedyアルゴリズムはこの即時報酬を最大化しますが、<strong>ドーパミン耐性</strong>が生じより強い刺激が必要になります。これがポピュリズムの「過激化スパイラル」の数学的モデルです。`,
+    enBody:`Populist communication prioritizes <strong>emotionally stimulating content</strong>, directly triggering the brain's dopamine reward system.<br><br>The Greedy algorithm maximizes immediate reward, but <strong>dopamine tolerance</strong> builds, requiring stronger stimuli — the mathematical model of populism's "radicalization spiral."`,
     formula:'D = 52 + (1−E/2)·35 [Greedy] | 30 + E·38 [DP]'
   },
   infra:{
     tag:'METRIC · INFRASTRUCTURE',
     jaTitle:'インフラ維持力（医療・交通・教育）', enTitle:'Infrastructure Health',
     jaBody:`公共インフラは<strong>長期的投資の典型例</strong>です。DPモデルでは将来コストを内部化し、今の整備が将来のコスト削減に繋がることを計算します。<br><br>Greedyモードでは予算が短期的支持率を上げる<strong>バラマキ政策</strong>に流用され、メンテナンスが後回しになります。インフラが臨界値を下回ると正のフィードバックループで崩壊が加速します。`,
-    enBody:`Public infrastructure is the classic example of <strong>long-term investment</strong>. DP internalizes future costs, calculating how today's maintenance reduces tomorrow's expenses.<br><br>Under Greedy, budgets are redirected to short-term populist spending. Below critical threshold, <strong>positive feedback loops</strong> accelerate collapse (bridge fails → logistics stop → tax revenue drops → no repair funds).`,
+    enBody:`Public infrastructure is the classic example of <strong>long-term investment</strong>. DP internalizes future costs.<br><br>Under Greedy, budgets are redirected to short-term populist spending. Below critical threshold, <strong>positive feedback loops</strong> accelerate collapse.`,
     formula:'I = 100 − (1−E)·52 − FR·0.20 − GP·0.28'
   },
   diversity:{
     tag:'METRIC · GENERALIZATION',
     jaTitle:'情報多様性インデックス（汎化性能の代理指標）', enTitle:'Information Diversity (Generalization Proxy)',
-    jaBody:`機械学習において<strong>訓練データの多様性</strong>はモデルの汎化性能に直結します。社会においても情報多様性は「どれだけ多様な現実シナリオに対応できるか」を示します。<br><br>フィルタリング率が高いほど同質情報が支配的になりこの指数は急落します。これは散布図で確認できます：<strong>青点（多様な実データ）</strong>が消え<strong>赤点（エコーデータ）</strong>がクラスターを形成する状態です。<br><br>多様性が低いシステムは<strong>ブラックスワン・イベント</strong>に致命的に脆弱です。`,
-    enBody:`In ML, <strong>training data diversity</strong> directly correlates with generalization. Socially, information diversity indicates how well a society handles varied real-world scenarios.<br><br>Higher filtering causes homogeneous information dominance and this index crashes — visible in the scatter plot as <strong>blue points</strong> (diverse, authentic) disappear and <strong>red clusters</strong> (echo data) form.<br><br>Low-diversity systems become fatally vulnerable to <strong>black swan events</strong>.`,
+    jaBody:`機械学習において<strong>訓練データの多様性</strong>はモデルの汎化性能に直結します。社会においても情報多様性は「どれだけ多様な現実シナリオに対応できるか」を示します。<br><br>フィルタリング率が高いほど同質情報が支配的になりこの指数は急落します。多様性が低いシステムは<strong>ブラックスワン・イベント</strong>に致命的に脆弱です。`,
+    enBody:`In ML, <strong>training data diversity</strong> directly correlates with generalization. Socially, information diversity indicates how well a society handles varied real-world scenarios.<br><br>Higher filtering causes homogeneous information dominance. Low-diversity systems become fatally vulnerable to <strong>black swan events</strong>.`,
     formula:'DI = max(0, 100 − FilterRate·0.82)'
   }
 };
 
-// ══════════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════════
 let algo = 'greedy', filterRate = 0, ethicsScore = 100, lang = 'ja';
 let activePreset = null;
+let animPlaying = false, animStep = 0, animTimer = null, fullTimeline = null;
+let pinnedData = null;
 
-// ══════════════════════════════════════════════
-// UTILS
-// ══════════════════════════════════════════════
 function randn(mu, s) {
   let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();
   return mu + s * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
@@ -438,9 +421,6 @@ function lerp(a,b,t){return a+(b-a)*t}
 function seedRng(seed){let s=seed>>>0;return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/2**32}}
 function t(k){return I18N[lang][k]||k}
 
-// ══════════════════════════════════════════════
-// SIMULATION
-// ══════════════════════════════════════════════
 function genScatter(fr){
   const f=fr/100, tot=130, rN=Math.max(5,Math.floor(tot*(1-f*0.88)));
   const real=[], fake=[];
@@ -455,8 +435,8 @@ function genScatter(fr){
 function simTimeline(fr,es,al,steps=65){
   const f=fr/100,e=es/100,isG=al==='greedy';
   const dp=[],sc=[],inf=[];
-  for(let t=0;t<steps;t++){
-    const tn=t/steps, n=()=>randn(0,2.4);
+  for(let i=0;i<steps;i++){
+    const tn=i/steps, n=()=>randn(0,2.4);
     if(isG){
       const bell=Math.exp(-Math.pow((tn-0.22)*7,2));
       const col=tn>0.38?Math.pow((tn-0.38)/0.62,1.6)*(1-e*0.4):0;
@@ -491,16 +471,102 @@ function metrics(fr,es,al){
   return{entropy,paranoia,socialCap,dopamine,infra,diversity,trust,resilience,legitimacy,infoH,viability,mentalWB,crash};
 }
 
-// ══════════════════════════════════════════════
-// AGENT NETWORK
-// ══════════════════════════════════════════════
+function getHistRef(f,e,a){
+  for(const r of HIST_REF){if(r.match(f,e,a))return lang==='ja'?r.ja:r.en;}
+  return '';
+}
+
+function updateHistRef(){
+  const el=document.getElementById('histRef');
+  if(el) el.textContent=getHistRef(filterRate,ethicsScore,algo);
+}
+
+function playAnimation(){
+  const btn=document.getElementById('playBtn');
+  if(animPlaying){
+    clearInterval(animTimer);
+    animPlaying=false; animTimer=null;
+    btn.textContent=t('playPlay');
+    btn.classList.remove('play-on');
+    const tl=simTimeline(filterRate,ethicsScore,algo);
+    timelineChart.data.datasets[0].data=tl.dp;
+    timelineChart.data.datasets[1].data=tl.sc;
+    timelineChart.data.datasets[2].data=tl.inf;
+    timelineChart.update();
+    return;
+  }
+  fullTimeline=simTimeline(filterRate,ethicsScore,algo);
+  animStep=0; animPlaying=true;
+  btn.textContent=t('playStop');
+  btn.classList.add('play-on');
+  timelineChart.data.datasets[0].data=[];
+  timelineChart.data.datasets[1].data=[];
+  timelineChart.data.datasets[2].data=[];
+  timelineChart.update('none');
+  animTimer=setInterval(()=>{
+    animStep++;
+    if(animStep>65){
+      clearInterval(animTimer); animPlaying=false; animTimer=null;
+      btn.textContent=t('playPlay'); btn.classList.remove('play-on');
+      return;
+    }
+    timelineChart.data.datasets[0].data=fullTimeline.dp.slice(0,animStep);
+    timelineChart.data.datasets[1].data=fullTimeline.sc.slice(0,animStep);
+    timelineChart.data.datasets[2].data=fullTimeline.inf.slice(0,animStep);
+    timelineChart.update('none');
+  },70);
+}
+
+function stopAnimation(){
+  if(!animPlaying) return;
+  clearInterval(animTimer); animPlaying=false; animTimer=null;
+  const btn=document.getElementById('playBtn');
+  if(btn){btn.textContent=t('playPlay');btn.classList.remove('play-on');}
+}
+
+function pinScenario(){
+  const btn=document.getElementById('pinBtn');
+  const lbl=document.getElementById('pinLabel');
+  if(pinnedData){
+    pinnedData=null;
+    scatterChart.data.datasets=scatterChart.data.datasets.slice(0,2);
+    timelineChart.data.datasets=timelineChart.data.datasets.slice(0,3);
+    radarChart.data.datasets=radarChart.data.datasets.slice(0,2);
+    scatterChart.update(); timelineChart.update(); radarChart.update();
+    btn.classList.remove('pin-on');
+    lbl.textContent=t('pinLock');
+  } else {
+    const sc=genScatter(filterRate);
+    const tl=simTimeline(filterRate,ethicsScore,algo);
+    const m=metrics(filterRate,ethicsScore,algo);
+    pinnedData={sc,tl,m};
+    scatterChart.data.datasets.push(
+      {label:'[A] Authentic',data:sc.real,backgroundColor:'rgba(0,212,255,.2)',pointRadius:3.5,pointStyle:'circle'},
+      {label:'[A] Fabricated',data:sc.fake,backgroundColor:'rgba(255,34,68,.2)',pointRadius:3.5,pointStyle:'circle'}
+    );
+    timelineChart.data.datasets.push(
+      {label:'[A] Dopamine',data:tl.dp,borderColor:'rgba(0,255,136,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+      {label:'[A] Social Cap',data:tl.sc,borderColor:'rgba(0,212,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+      {label:'[A] Infra',data:tl.inf,borderColor:'rgba(153,69,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false}
+    );
+    radarChart.data.datasets.push({
+      label:'[A] Scenario',
+      data:[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB],
+      backgroundColor:'rgba(255,204,0,.07)',borderColor:'rgba(255,204,0,.5)',
+      borderWidth:1.5,borderDash:[5,4],pointBackgroundColor:'rgba(255,204,0,.6)',pointRadius:2
+    });
+    scatterChart.update(); timelineChart.update(); radarChart.update();
+    btn.classList.add('pin-on');
+    lbl.textContent=t('pinClear');
+  }
+}
+
 const N=48;
 let nodes=[],edges=[],agCtx,cW,cH,animId;
 
 function initAgents(){
   const r=seedRng(1337);
-  // Build 3 opinion clusters + scatter
-  nodes=Array.from({length:N},(_, i)=>{
+  nodes=Array.from({length:N},(_,i)=>{
     let x,y,belief;
     if(i<16){belief=r()*0.32;x=0.15+r()*0.28;y=0.1+r()*0.8}
     else if(i<32){belief=0.34+r()*0.32;x=0.35+r()*0.3;y=0.1+r()*0.8}
@@ -509,7 +575,6 @@ function initAgents(){
     y=clamp(y+randn(0,0.05),0.04,0.96);
     return{x,y,belief,c:i<4?0.85:r()*0.08,isLeader:i===0,isFC:i===1||i===2};
   });
-  // k-NN edges
   edges=[];
   for(let i=0;i<N;i++){
     const dists=nodes.map((n,j)=>({j,d:Math.hypot(nodes[i].x-n.x,nodes[i].y-n.y)}))
@@ -519,9 +584,7 @@ function initAgents(){
 }
 
 function edgeActive(ni,nj){
-  const diff=Math.abs(ni.belief-nj.belief);
-  const thr=1.0-(filterRate/100)*0.85;
-  return diff<=thr;
+  return Math.abs(ni.belief-nj.belief)<=1.0-(filterRate/100)*0.85;
 }
 
 function stepAgents(){
@@ -529,21 +592,17 @@ function stepAgents(){
   const nc=nodes.map(n=>n.c);
   edges.forEach(([i,j])=>{
     if(!edgeActive(nodes[i],nodes[j]))return;
-    const diff=nodes[i].c-nodes[j].c;
-    const rate=0.007+f*0.013;
+    const diff=nodes[i].c-nodes[j].c, rate=0.007+f*0.013;
     if(diff>0)nc[j]=Math.min(1,nc[j]+diff*rate);
     else nc[i]=Math.min(1,nc[i]+(-diff)*rate);
   });
-  // Fact checkers
   nodes.forEach((n,i)=>{
     if(!n.isFC)return;
     nc[i]=Math.max(0,nc[i]-e*0.015);
     edges.filter(ed=>ed[0]===i||ed[1]===i).forEach(([a,b])=>{
-      const nb=a===i?b:a;
-      nc[nb]=Math.max(0,nc[nb]-e*0.005);
+      nc[a===i?b:a]=Math.max(0,nc[a===i?b:a]-e*0.005);
     });
   });
-  // Leader
   if(isG){
     nc[0]=Math.min(1,nc[0]+(1-e)*0.009);
     edges.filter(ed=>ed[0]===0||ed[1]===0).forEach(([a,b])=>{
@@ -553,8 +612,7 @@ function stepAgents(){
   } else {
     nc[0]=Math.max(0,nc[0]-e*0.013);
     edges.filter(ed=>ed[0]===0||ed[1]===0).forEach(([a,b])=>{
-      const nb=a===0?b:a;
-      nc[nb]=Math.max(0,nc[nb]-e*0.006);
+      nc[a===0?b:a]=Math.max(0,nc[a===0?b:a]-e*0.006);
     });
   }
   nodes.forEach((n,i)=>n.c=nc[i]);
@@ -571,75 +629,51 @@ function drawAgents(){
   if(!agCtx)return;
   agCtx.clearRect(0,0,cW,cH);
   const f=filterRate/100;
-  // Edges
   edges.forEach(([i,j])=>{
     const ni=nodes[i],nj=nodes[j],active=edgeActive(ni,nj);
     if(!active&&f>0.25)return;
-    const avg=(ni.c+nj.c)/2;
-    agCtx.beginPath();
-    agCtx.moveTo(ni.x*cW,ni.y*cH);
-    agCtx.lineTo(nj.x*cW,nj.y*cH);
-    agCtx.strokeStyle=active?cColor(avg,0.22-f*0.08):`rgba(23,35,64,0.04)`;
-    agCtx.lineWidth=active?1.1:0.5;
-    agCtx.stroke();
+    agCtx.beginPath();agCtx.moveTo(ni.x*cW,ni.y*cH);agCtx.lineTo(nj.x*cW,nj.y*cH);
+    agCtx.strokeStyle=active?cColor((ni.c+nj.c)/2,0.22-f*0.08):`rgba(23,35,64,0.04)`;
+    agCtx.lineWidth=active?1.1:0.5;agCtx.stroke();
   });
-  // Nodes
   nodes.forEach(n=>{
     const x=n.x*cW,y=n.y*cH,r=n.isLeader?9:n.isFC?7:5;
     const col=n.isFC&&ethicsScore>50?'#00ff88':cColor(n.c);
-    // Glow
     const grd=agCtx.createRadialGradient(x,y,0,x,y,r*3);
     grd.addColorStop(0,n.isFC&&ethicsScore>50?'rgba(0,255,136,0.25)':cColor(n.c,0.22));
     grd.addColorStop(1,'rgba(0,0,0,0)');
     agCtx.beginPath();agCtx.arc(x,y,r*3,0,Math.PI*2);agCtx.fillStyle=grd;agCtx.fill();
-    // Node
     agCtx.beginPath();agCtx.arc(x,y,r,0,Math.PI*2);agCtx.fillStyle=col;agCtx.fill();
-    // Leader ring
-    if(n.isLeader){
-      agCtx.beginPath();agCtx.arc(x,y,r+4,0,Math.PI*2);
-      agCtx.strokeStyle=col;agCtx.lineWidth=1.5;agCtx.stroke();
-    }
-    // FC ring
-    if(n.isFC){
-      agCtx.beginPath();agCtx.arc(x,y,r+3,0,Math.PI*2);
-      agCtx.strokeStyle='#00ff88';agCtx.lineWidth=1;
-      agCtx.setLineDash([3,3]);agCtx.stroke();agCtx.setLineDash([]);
-    }
+    if(n.isLeader){agCtx.beginPath();agCtx.arc(x,y,r+4,0,Math.PI*2);agCtx.strokeStyle=col;agCtx.lineWidth=1.5;agCtx.stroke();}
+    if(n.isFC){agCtx.beginPath();agCtx.arc(x,y,r+3,0,Math.PI*2);agCtx.strokeStyle='#00ff88';agCtx.lineWidth=1;agCtx.setLineDash([3,3]);agCtx.stroke();agCtx.setLineDash([]);}
   });
-  // Stats
   const avgC=nodes.reduce((s,n)=>s+n.c,0)/N;
-  const inEC=nodes.filter(n=>n.c>0.6).length;
   document.getElementById('agSt1').textContent=`ECHO EXPOSURE: ${(avgC*100).toFixed(1)}%`;
-  document.getElementById('agSt2').textContent=`IN ECHO CHAMBER: ${inEC}/${N}`;
+  document.getElementById('agSt2').textContent=`IN ECHO CHAMBER: ${nodes.filter(n=>n.c>0.6).length}/${N}`;
 }
 
 function agentLoop(){animId=requestAnimationFrame(agentLoop);stepAgents();drawAgents()}
 
 function startAgents(){
   if(animId)cancelAnimationFrame(animId);
-  const cv=document.getElementById('agentCanvas');
-  const wrap=cv.parentElement;
+  const cv=document.getElementById('agentCanvas'),wrap=cv.parentElement;
   cW=wrap.clientWidth||700;cH=wrap.clientHeight||296;
-  cv.width=cW;cv.height=cH;
-  agCtx=cv.getContext('2d');
+  cv.width=cW;cv.height=cH;agCtx=cv.getContext('2d');
   initAgents();agentLoop();
 }
 
 function restartAgents(){startAgents()}
 
-// ══════════════════════════════════════════════
-// CHARTS INIT
-// ══════════════════════════════════════════════
 Chart.defaults.color='#5a6f94';Chart.defaults.borderColor='#172340';
 Chart.defaults.font.family="'Courier New', monospace";Chart.defaults.font.size=10;
 
 const scatterChart=new Chart(document.getElementById('scatterChart'),{
   type:'scatter',
   data:{datasets:[
-    {label:lang==='ja'?'実データ (Authentic)':'Authentic Data',data:[],backgroundColor:'rgba(0,212,255,.65)',pointRadius:4.5,pointHoverRadius:7},
-    {label:lang==='ja'?'過学習データ (Fabricated)':'Fabricated Data',data:[],backgroundColor:'rgba(255,34,68,.72)',pointRadius:4.5,pointHoverRadius:7}
+    {label:'実データ (Authentic)',data:[],backgroundColor:'rgba(0,212,255,.65)',pointRadius:4.5,pointHoverRadius:7},
+    {label:'過学習データ (Fabricated)',data:[],backgroundColor:'rgba(255,34,68,.72)',pointRadius:4.5,pointHoverRadius:7}
   ]},
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+  options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},
     plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}},
       tooltip:{callbacks:{label:c=>`Detail: ${c.raw.x.toFixed(1)}  Consistency: ${c.raw.y.toFixed(1)}`}}},
     scales:{
@@ -680,24 +714,23 @@ const radarChart=new Chart(document.getElementById('radarChart'),{
   }
 });
 
-// ══════════════════════════════════════════════
-// UPDATE
-// ══════════════════════════════════════════════
 function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
 function updateAll(){
   const m=metrics(filterRate,ethicsScore,algo);
   const sc=genScatter(filterRate);
-  const tl=simTimeline(filterRate,ethicsScore,algo);
 
   scatterChart.data.datasets[0].data=sc.real;
   scatterChart.data.datasets[1].data=sc.fake;
   scatterChart.update();
 
-  timelineChart.data.datasets[0].data=tl.dp;
-  timelineChart.data.datasets[1].data=tl.sc;
-  timelineChart.data.datasets[2].data=tl.inf;
-  timelineChart.update();
+  if(!animPlaying){
+    const tl=simTimeline(filterRate,ethicsScore,algo);
+    timelineChart.data.datasets[0].data=tl.dp;
+    timelineChart.data.datasets[1].data=tl.sc;
+    timelineChart.data.datasets[2].data=tl.inf;
+    timelineChart.update();
+  }
 
   radarChart.data.datasets[0].data=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
   const avg=(m.trust+m.resilience+m.legitimacy+m.infoH+m.viability+m.mentalWB)/6;
@@ -707,27 +740,22 @@ function updateAll(){
   radarChart.data.datasets[0].pointBackgroundColor=rc;
   radarChart.update();
 
-  // Entropy
   const ep=Math.round(m.entropy);
   const ec=ep<40?'#00ff88':ep<70?'#ff6b2b':'#ff2244';
   document.getElementById('entropyNum').textContent=ep+'%';
   document.getElementById('entropyNum').style.color=ec;
   document.getElementById('entropyBar').style.cssText=`width:${ep}%;background:${ec}`;
-  const ems=ep<40?'STABLE — システム秩序は保たれています':ep<65?'WARNING — 局所的な秩序の乱れを検出':ep<80?'CRITICAL — 社会的コンセンサスが崩壊しつつあります':'CHAOS — 全秩序崩壊。過学習により現実OSとの互換性が消失';
-  document.getElementById('entropyStatus').textContent=ems;
+  document.getElementById('entropyStatus').textContent=ep<40?'STABLE — システム秩序は保たれています':ep<65?'WARNING — 局所的な秩序の乱れを検出':ep<80?'CRITICAL — 社会的コンセンサスが崩壊しつつあります':'CHAOS — 全秩序崩壊。過学習により現実OSとの互換性が消失';
   document.getElementById('entropyStatus').style.color=ec;
 
-  // Paranoia
   const pp=Math.round(m.paranoia);
   const pc=pp<40?'#9945ff':pp<68?'#ff6b2b':'#ff2244';
   document.getElementById('paranoiaNum').textContent=pp+'%';
   document.getElementById('paranoiaNum').style.color=pc;
   document.getElementById('paranoiaBar').style.cssText=`width:${pp}%;background:${pc}`;
-  const pms=pp<40?'LOW — ノイズ蓄積は正常範囲内':pp<60?'ELEVATED — 認知バイアスの増幅を検出':pp<80?'HIGH — 集団パラノイアの発生確率が上昇':'CRITICAL — メンタルヘルス・インフラが臨界点に到達';
-  document.getElementById('paranoiaStatus').textContent=pms;
+  document.getElementById('paranoiaStatus').textContent=pp<40?'LOW — ノイズ蓄積は正常範囲内':pp<60?'ELEVATED — 認知バイアスの増幅を検出':pp<80?'HIGH — 集団パラノイアの発生確率が上昇':'CRITICAL — メンタルヘルス・インフラが臨界点に到達';
   document.getElementById('paranoiaStatus').style.color=pc;
 
-  // State items
   ['scVal','infVal'].forEach((id,i)=>{
     const v=i===0?m.socialCap:m.infra;
     document.getElementById(id).textContent=Math.round(v);
@@ -738,11 +766,11 @@ function updateAll(){
   document.getElementById('divVal').textContent=dv;
   document.getElementById('divVal').style.color=dv<30?'#ff2244':dv<60?'#ff6b2b':'#00ff88';
 
-  // Diagnosis
   document.getElementById('diag').textContent=getDiag(m);
   document.getElementById('diag').style.borderLeftColor=m.crash?'#ff2244':avg<55?'#ff6b2b':'#00d4ff';
 
-  // Alert
+  updateHistRef();
+
   const ab=document.getElementById('alertBanner');
   if(m.crash){
     ab.classList.add('on');
@@ -754,7 +782,6 @@ function updateAll(){
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
   } else ab.classList.remove('on');
 
-  // Metric log
   const logD=[['Trust Index ',m.trust,'#00d4ff'],['Resilience  ',m.resilience,'#00ff88'],['Legitimacy  ',m.legitimacy,'#9945ff'],['Info Health ',m.infoH,'#00d4ff'],['Viability   ',m.viability,'#ff6b2b'],['Mental WB   ',m.mentalWB,'#9945ff']];
   document.getElementById('metricLog').innerHTML=logD.map(([l,v,c])=>{
     const f=Math.round(v/10),bar='█'.repeat(f)+'░'.repeat(10-f);
@@ -773,9 +800,6 @@ function getDiag(m){
   return'[ OK ] システムは安定動作中。パラメーターを操作して崩壊シナリオをシミュレートできます。';
 }
 
-// ══════════════════════════════════════════════
-// LANGUAGE
-// ══════════════════════════════════════════════
 function applyI18n(){
   ['hdrSub','simLbl','presetLbl','paramTitle','paramDesc','f1desc','f1L','f1R','f2desc','f2L','f2R',
    'f3desc','dpL','dpS','grL','grS','shareBtnFull','stateTitle','eLbl','pLbl','resetLbl',
@@ -784,14 +808,16 @@ function applyI18n(){
   });
   document.getElementById('langBtn').textContent=t('langBtn');
   document.getElementById('shareBtn').textContent=t('shareBtn');
-  // Param names (contain tags)
+  const pb=document.getElementById('playBtn');
+  if(pb) pb.textContent=animPlaying?t('playStop'):t('playPlay');
+  const pl=document.getElementById('pinLabel');
+  if(pl) pl.textContent=pinnedData?t('pinClear'):t('pinLock');
   ['f1lbl','f2lbl','f3lbl'].forEach(id=>{
     const el=document.getElementById(id);if(!el)return;
     const key=id.replace('lbl','');
     const tagMap={f1:'<span class="tag tc">OVERFITTING</span>',f2:'<span class="tag tg">GOVERNANCE</span>',f3:'<span class="tag to">STRATEGY</span>'};
-    el.innerHTML=t(id)+' '+tagMap[key]||'';
+    el.innerHTML=t(id)+' '+tagMap[key];
   });
-  // Preset button names
   const pMap={weimar:'pWeimar',sns:'pSns',nordic:'pNordic',techno:'pTechno',populism:'pPop'};
   Object.entries(pMap).forEach(([pid,k])=>{
     const el=document.getElementById('p-'+pid);if(el)el.textContent=t(k);
@@ -800,14 +826,8 @@ function applyI18n(){
   updateAll();
 }
 
-function toggleLang(){
-  lang=lang==='ja'?'en':'ja';
-  applyI18n();
-}
+function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();}
 
-// ══════════════════════════════════════════════
-// PRESET
-// ══════════════════════════════════════════════
 function setPreset(id){
   const p=PRESETS[id];if(!p)return;
   filterRate=p.f;ethicsScore=p.e;algo=p.a;
@@ -821,19 +841,15 @@ function setPreset(id){
   Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
   document.getElementById('p-'+id)?.classList.add('sel');
   activePreset=id;
+  stopAnimation();
   restartAgents();
   updateAll();
 }
 
-// ══════════════════════════════════════════════
-// SHARE URL
-// ══════════════════════════════════════════════
 function shareURL(){
   const url=new URL(location.href);
-  url.searchParams.set('f',filterRate);
-  url.searchParams.set('e',ethicsScore);
-  url.searchParams.set('a',algo);
-  url.searchParams.set('l',lang);
+  url.searchParams.set('f',filterRate);url.searchParams.set('e',ethicsScore);
+  url.searchParams.set('a',algo);url.searchParams.set('l',lang);
   try{
     navigator.clipboard.writeText(url.toString()).then(()=>{
       ['shareBtn','shareBtnFull'].forEach(id=>{
@@ -846,9 +862,6 @@ function shareURL(){
   }catch(e){prompt('Copy this URL:',url.toString())}
 }
 
-// ══════════════════════════════════════════════
-// MODAL
-// ══════════════════════════════════════════════
 function openModal(key){
   const d=MDATA[key];if(!d)return;
   document.getElementById('mTag').textContent=d.tag;
@@ -860,12 +873,7 @@ function openModal(key){
 function closeModal(){document.getElementById('modal').classList.remove('on')}
 function closeModalIf(e){if(e.target===document.getElementById('modal'))closeModal()}
 
-// ══════════════════════════════════════════════
-// EVENTS
-// ══════════════════════════════════════════════
-function setPct(el){
-  el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%');
-}
+function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
 
 function setAlgoUI(a){
   document.getElementById('btnDP').classList.toggle('on',a==='dp');
@@ -875,8 +883,7 @@ function setAlgoUI(a){
 function setAlgo(a){
   algo=a;setAlgoUI(a);
   Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
-  activePreset=null;
-  updateAll();
+  activePreset=null;updateAll();
 }
 
 document.getElementById('filterRate').addEventListener('input',function(){
@@ -884,8 +891,7 @@ document.getElementById('filterRate').addEventListener('input',function(){
   document.getElementById('filterVal').textContent=filterRate+'%';
   setPct(this);
   Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
-  activePreset=null;
-  updateAll();
+  activePreset=null;updateAll();
 });
 
 document.getElementById('ethicsScore').addEventListener('input',function(){
@@ -893,23 +899,17 @@ document.getElementById('ethicsScore').addEventListener('input',function(){
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(this);
   Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
-  activePreset=null;
-  updateAll();
+  activePreset=null;updateAll();
 });
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-// ══════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════
 (function init(){
-  // Load URL params
   const p=new URLSearchParams(location.search);
   if(p.has('f'))filterRate=clamp(+p.get('f'),0,100);
   if(p.has('e'))ethicsScore=clamp(+p.get('e'),0,100);
   if(p.has('a')&&['dp','greedy'].includes(p.get('a')))algo=p.get('a');
   if(p.has('l')&&['ja','en'].includes(p.get('l')))lang=p.get('l');
-
   document.getElementById('filterRate').value=filterRate;
   document.getElementById('ethicsScore').value=ethicsScore;
   document.getElementById('filterVal').textContent=filterRate+'%';
@@ -917,7 +917,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
   setPct(document.getElementById('filterRate'));
   setPct(document.getElementById('ethicsScore'));
   setAlgoUI(algo);
-
   applyI18n();
   startAgents();
 })();
