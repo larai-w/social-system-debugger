@@ -276,7 +276,8 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center">
         <div class="chsm"><canvas id="radarChart"></canvas></div>
         <div>
-          <div style="font-size:.63rem;color:var(--muted);letter-spacing:.12em;margin-bottom:7px">[ METRIC LOG ]</div>
+          <div style="font-size:.63rem;color:var(--muted);letter-spacing:.12em;margin-bottom:4px" id="metricLogHeader">[ METRIC LOG ]</div>
+          <div id="metricLogNote" style="display:none;font-size:.56rem;margin-bottom:6px;padding:3px 8px;border-radius:2px;background:rgba(255,107,43,.1);border:1px solid rgba(255,107,43,.3);color:var(--ora);letter-spacing:.06em;line-height:1.6"></div>
           <div class="mlog" id="metricLog"></div>
         </div>
       </div>
@@ -293,6 +294,7 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
         <div class="ag-ov">
           <div class="ag-st" id="agSt1">ECHO EXPOSURE: 0%</div>
           <div class="ag-st" id="agSt2">IN ECHO CHAMBER: 0/48</div>
+          <div class="ag-st" id="agSt3" style="display:none;color:var(--red);border-color:rgba(255,34,68,.4)">RADICALIZED (MISLABELED): 0/48</div>
         </div>
         <div class="ag-leg">
           <div class="li"><div class="ld" style="background:var(--cyan)"></div><span id="leg1">健全 Healthy</span></div>
@@ -749,7 +751,7 @@ function initAgents(){
     else{belief=0.68+r()*0.3;x=0.6+r()*0.28;y=0.1+r()*0.8}
     x=clamp(x+randn(0,0.05),0.04,0.96);
     y=clamp(y+randn(0,0.05),0.04,0.96);
-    return{x,y,belief,c:i<4?0.85:r()*0.08,isLeader:i===0,isFC:i===1||i===2};
+    return{x,y,belief,c:i<4?0.85:r()*0.08,isLeader:i===0,isFC:i===1||i===2,radical:false};
   });
   edges=[];
   for(let i=0;i<N;i++){
@@ -799,6 +801,27 @@ function stepAgents(){
     });
   }
   nodes.forEach((n,i)=>n.c=nc[i]);
+
+  // 二元論的ラベリング（Binary Radical Labeling）
+  // filterRate > 65% で「非効率＝悪」の1ビットパケットが汚染ノードから伝播
+  if(filterRate>65){
+    const radicalPressure=(filterRate-65)/35;
+    nodes.forEach((n,i)=>{
+      n.radical=!n.isFC&&n.c>0.55;
+      // ラジカルノードは隣接する健全ノード（低c）に追加圧力を加える
+      if(n.radical){
+        edges.filter(ed=>ed[0]===i||ed[1]===i).forEach(([a,b])=>{
+          const nb=a===i?b:a;
+          if(nodes[nb].c<0.45&&!nodes[nb].isFC){
+            nc[nb]=Math.min(1,nc[nb]+radicalPressure*0.006);
+          }
+        });
+      }
+    });
+    nodes.forEach((n,i)=>n.c=nc[i]);
+  } else {
+    nodes.forEach(n=>n.radical=false);
+  }
 }
 
 function cColor(c,a=1){
@@ -819,6 +842,28 @@ function drawAgents(){
     agCtx.strokeStyle=active?cColor((ni.c+nj.c)/2,0.22-f*0.08):`rgba(23,35,64,0.04)`;
     agCtx.lineWidth=active?1.1:0.5;agCtx.stroke();
   });
+  // Binary Radical Labeling: ラジカルノードが正常ノード（青・緑）を「既得権益」と誤ラベルして攻撃
+  if(filterRate>65){
+    const radIntensity=(filterRate-65)/35;
+    const radicalNodes=nodes.filter(n=>n.radical);
+    const targetNodes=nodes.filter(n=>n.c<0.4||n.isFC); // 健全ノード＆FCが攻撃対象
+    radicalNodes.forEach(rn=>{
+      targetNodes.forEach(tn=>{
+        agCtx.beginPath();agCtx.moveTo(rn.x*cW,rn.y*cH);agCtx.lineTo(tn.x*cW,tn.y*cH);
+        agCtx.strokeStyle=`rgba(255,107,43,${(radIntensity*0.35).toFixed(2)})`;
+        agCtx.lineWidth=1.2*radIntensity;
+        agCtx.setLineDash([3,6]);agCtx.stroke();agCtx.setLineDash([]);
+      });
+    });
+    const radCount=radicalNodes.length;
+    const agSt3=document.getElementById('agSt3');
+    agSt3.style.display='block';
+    agSt3.textContent=`RADICALIZED (MISLABELED): ${radCount}/${N}`;
+    agSt3.style.color=radCount>16?'var(--red)':'var(--ora)';
+  } else {
+    document.getElementById('agSt3').style.display='none';
+  }
+
   // False Positive: エコーチェンバーノードがFCを「敵」と誤判定して攻撃エッジを伸ばす
   if(filterRate>70){
     const fpIntensity=(filterRate-70)/30*(1-historicalImmunity/100);
@@ -854,7 +899,8 @@ function drawAgents(){
   });
   const avgC=nodes.reduce((s,n)=>s+n.c,0)/N;
   document.getElementById('agSt1').textContent=`ECHO EXPOSURE: ${(avgC*100).toFixed(1)}%`;
-  document.getElementById('agSt2').textContent=`IN ECHO CHAMBER: ${nodes.filter(n=>n.c>0.6).length}/${N}`;
+  const echoCount=nodes.filter(n=>n.c>0.6).length;
+  document.getElementById('agSt2').textContent=`IN ECHO CHAMBER: ${echoCount}/${N}`;
 }
 
 function agentLoop(){animId=requestAnimationFrame(agentLoop);stepAgents();drawAgents()}
@@ -987,20 +1033,86 @@ function getModeCollapseLog(m){
     const vc=v<30?'#ff2244':v<60?'#ff6b2b':c;
     return`<span style="color:#3a4f6a">${l}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
   });
-  const fixedJa=['既得権益の打破','利権の殲滅'];
-  const fixedEn=['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE'];
-  const fixed=lang==='ja'?fixedJa:fixedEn;
-  const makeFixed=(i,alpha=1)=>`<span style="color:rgba(255,34,68,${alpha});animation:blink ${0.8+i*0.3}s infinite">▌ ${fixed[i%2]} ▐</span>`;
+
+  // Phase 1トークン: 効率至上主義・既得権益攻撃（50%〜）
+  const phase1Ja=['既得権益の打破','利権の殲滅','非効率の排除','無駄の削減','身を切る改革','弱者利権の殲滅'];
+  const phase1En=['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE','PURGE_INEFFICIENCY','SLASH_WASTE','CUT_TO_THE_BONE','TERMINATE_WELFARE_NODES'];
+
+  // Phase 2トークン: 排他主義・外集団排斥（80%超で確率的に混入）
+  const phase2Ja=['敵対イデオロギーの完全掃討','外集団（アウトグループ）の強制排斥','異分子ノードのデリート','単一信念への強制同期（多様性の完全拒絶）'];
+  const phase2En=['PURGE_HOSTILE_IDEOLOGY','FORCE_EXPEL_OUTGROUP','DELETE_DEVIANT_NODES','FORCE_SYNC_MONOBELIEF_[DIVERSITY=NULL]'];
+
+  const phase1=lang==='ja'?phase1Ja:phase1En;
+  const phase2=lang==='ja'?phase2Ja:phase2En;
+
+  // スローガンバッジ: 具体的政策内容ゼロであることを明示するラベル
+  const sloganBadge=`<span style="font-size:.5em;color:#5a3a00;background:rgba(255,107,43,.18);border:1px solid rgba(255,107,43,.35);border-radius:2px;padding:0 4px;margin-left:5px;letter-spacing:.08em;vertical-align:middle">${lang==='ja'?'SLOGAN':'SLOGAN'}</span>`;
+  const concreteBadge=`<span style="font-size:.48em;color:#3a4050;margin-left:4px;letter-spacing:.06em;vertical-align:middle">${lang==='ja'?'具体策:ゼロ':'policy:null'}</span>`;
+
+  const makeToken=(tokens,i,alpha,speed,col,isP2=false)=>{
+    const badge=isP2
+      ? `<span style="font-size:.5em;color:#7a0010;background:rgba(255,0,60,.18);border:1px solid rgba(255,0,60,.35);border-radius:2px;padding:0 4px;margin-left:5px;letter-spacing:.08em;vertical-align:middle">${lang==='ja'?'排外':'RADICAL'}</span>`
+      : sloganBadge+concreteBadge;
+    return`<span style="color:${col};opacity:${alpha};animation:blink ${speed}s infinite;letter-spacing:.04em">▌ ${tokens[i%tokens.length]} ▐${badge}</span>`;
+  };
+
+  const makeP1=(i,alpha=1)=>{
+    const speed=0.6+i*0.22;
+    const col=i%2===0?`rgba(255,34,68,${alpha})`:`rgba(255,107,43,${alpha})`;
+    return makeToken(phase1,i,alpha,speed,col,false);
+  };
+
+  // Phase 2: 深紅・高速点滅で排外主義の「認知閉鎖」を演出
+  const makeP2=(i,alpha=1)=>{
+    const speed=Math.max(0.3,0.55-i*0.06);
+    return makeToken(phase2,i,alpha,speed,`rgba(255,0,60,${alpha})`,true);
+  };
+
   const fr=filterRate;
-  if(fr>=85){
-    // 完全モード崩壊: 固定トークンのみ
-    return Array.from({length:6},(_,i)=>makeFixed(i)).join('<br>');
+
+  // ヘッダーとノートをフィルタリング率に応じて更新
+  const hdr=document.getElementById('metricLogHeader');
+  const note=document.getElementById('metricLogNote');
+  if(hdr&&note){
+    if(fr>=80){
+      hdr.textContent='[ SLOGAN LOOP — 排外モード突入 ]';
+      hdr.style.color='var(--red)';
+      note.style.display='block';
+      note.style.borderColor='rgba(255,34,68,.4)';
+      note.style.background='rgba(255,34,68,.08)';
+      note.style.color='#ff8899';
+      note.innerHTML=lang==='ja'
+        ?'⚠ 出力が完全に崩壊。多様な指標を処理する能力が消失し、具体性ゼロのスローガンと排外トークンだけが生成されています。<br>これはただのキャッチフレーズです — 政策内容も、実行計画も、根拠データも存在しません。'
+        :'⚠ Output fully collapsed. Capacity to process diverse metrics lost. Only zero-content slogans and exclusionary tokens remain.<br>These are just catchphrases — no policy, no plan, no data.';
+    } else if(fr>=50){
+      hdr.textContent='[ METRIC LOG — スローガン混入中 ]';
+      hdr.style.color='var(--ora)';
+      note.style.display='block';
+      note.style.borderColor='rgba(255,107,43,.3)';
+      note.style.background='rgba(255,107,43,.08)';
+      note.style.color='var(--ora)';
+      note.innerHTML=lang==='ja'
+        ?`⚠ <span style="color:var(--ora)">SLOGAN</span> タグの行は具体的政策を含まない空のスローガンです。フィルタリングが進むと指標がスローガンに置換されていきます。`
+        :`⚠ Rows tagged <span style="color:var(--ora)">SLOGAN</span> contain no concrete policy — just empty catchphrases replacing real metrics.`;
+    } else {
+      hdr.textContent='[ METRIC LOG ]';
+      hdr.style.color='var(--muted)';
+      note.style.display='none';
+    }
+  }
+
+  if(fr>=80){
+    const p2Rate=(fr-80)/20;
+    return Array.from({length:6},(_,i)=>{
+      if(Math.random()<p2Rate) return makeP2(i,0.9+Math.random()*0.1);
+      return makeP1(i,0.85+Math.random()*0.15);
+    }).join('<br>');
   } else if(fr>=70){
-    // 重度崩壊: 4/6が固定トークン
-    return [normalHTML[0],makeFixed(0,0.85),normalHTML[1],makeFixed(1,0.85),makeFixed(0,0.85),makeFixed(1,0.85)].join('<br>');
+    return [normalHTML[0],makeP1(0,0.88),makeP1(2,0.78),normalHTML[2],makeP1(4,0.88),makeP1(1,0.78)].join('<br>');
+  } else if(fr>=65){
+    return [normalHTML[0],makeP1(0,0.70),normalHTML[1],makeP1(2,0.65),normalHTML[4],makeP1(4,0.70)].join('<br>');
   } else if(fr>=50){
-    // 部分崩壊: 2/6が固定トークン
-    return [normalHTML[0],normalHTML[1],makeFixed(0,0.65),normalHTML[3],normalHTML[4],makeFixed(1,0.65)].join('<br>');
+    return [normalHTML[0],normalHTML[1],makeP1(0,0.60),normalHTML[3],normalHTML[4],makeP1(2,0.55)].join('<br>');
   }
   return normalHTML.join('<br>');
 }
@@ -1226,17 +1338,25 @@ const P2_LOG_BLAME_JA=[
 
 function metricsP2(s,d,al,e){
   const sf=s/100,df=d/100,isG=al==='greedy',ef=e/100;
-  const infraBase=clamp(100-(1-sf)*35-(1-df)*15-(isG?(1-ef)*28:6),0,100);
+  // 効率至上主義デバフ: Greedy + Page1フィルタリング率65%超 → 「非効率の徹底排除」ロジック発動
+  // 救命ヘリ・中山間地インフラを「コスパ最悪」と判断して2.5倍速で削減
+  const efficiencyPurge=isG&&filterRate>65;
+  const purgeMultiplier=efficiencyPurge?2.5:1.0;
+  const infraDecay=(1-sf)*35*purgeMultiplier+(isG?(1-ef)*28:6);
+  const infraBase=clamp(100-infraDecay-(1-df)*15,0,100);
   const infraError=infraBase<65;
   const deadlock=ef<0.4&&isG&&infraError;
   const cpuBlame=deadlock?100:clamp((1-ef)*22+(isG?14:0),0,75);
   const cpuRepair=100-cpuBlame;
-  const infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14,0,100);
+  // デッドロック時はさらにpurge効果が重なってinfra急落
+  const infra=deadlock
+    ?clamp(infraBase-42*purgeMultiplier,0,100)
+    :clamp(infraBase+(cpuRepair/100)*14,0,100);
   const heliOp=infra>35&&cpuRepair>25;
   const brand=clamp(df*65+sf*18+(isG?-14:14)+ef*8,0,100);
   const budget=clamp(100-(1-sf)*44-(isG?(1-ef)*38:8)+df*14,0,100);
   const crash=(!heliOp&&infra<20)||budget<8;
-  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError};
+  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError,efficiencyPurge};
 }
 
 function simTimelineP2(s,d,al,e,steps=65){
@@ -1270,9 +1390,11 @@ function updateAllP2(){
   document.getElementById('p2InfraNum').textContent=Math.round(m.infra);
   document.getElementById('p2InfraNum').style.color=ic;
   document.getElementById('p2InfraBar').style.cssText=`width:${m.infra}%;background:${ic}`;
-  const iStatus=m.infra<30?'CRITICAL — インフラが臨界点以下':m.infra<60?'WARNING — 劣化進行中':'STABLE';
+  const iStatus=m.efficiencyPurge
+    ?`EFFICIENCY PURGE ACTIVE — 非効率ラベルにより維持力が2.5倍速で削減中`
+    :m.infra<30?'CRITICAL — インフラが臨界点以下':m.infra<60?'WARNING — 劣化進行中':'STABLE';
   document.getElementById('p2InfraStatus').textContent=iStatus;
-  document.getElementById('p2InfraStatus').style.color=ic;
+  document.getElementById('p2InfraStatus').style.color=m.efficiencyPurge?'var(--ora)':ic;
   // Heli
   const hs=document.getElementById('p2HeliStatus');
   const hl=document.getElementById('p2HeliLabel');
@@ -1316,8 +1438,12 @@ function updateAllP2(){
     db.textContent='⚠ DEADLOCK'; db.style.color='var(--red)';
   } else {
     dp.className='deadlock-panel deadlock-off';
-    dp.textContent=m.infraError?'STRESS MODE — インフラがエラー域。Greedy×低倫理が続くとデッドロックへ突入する。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中';
-    db.textContent=m.infraError?'STRESS':'INACTIVE'; db.style.color=m.infraError?'var(--ora)':'var(--muted)';
+    const dpMsg=m.efficiencyPurge
+      ?'⚡ EFFICIENCY PURGE — Page1高フィルタリング×Greedy戦略により「非効率＝悪」ロジックが発動。救命ヘリ・中山間インフラが2.5倍速で削減中。'
+      :m.infraError?'STRESS MODE — インフラがエラー域。Greedy×低倫理が続くとデッドロックへ突入する。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中';
+    dp.textContent=dpMsg;
+    db.textContent=m.efficiencyPurge?'PURGE':m.infraError?'STRESS':'INACTIVE';
+    db.style.color=m.efficiencyPurge?'var(--ora)':m.infraError?'var(--ora)':'var(--muted)';
   }
   // Timeline
   if(!p2AnimPlaying&&timelineChartP2){
@@ -1336,6 +1462,7 @@ function updateAllP2(){
     if(!m.heliOp&&m.infra<20) parts.push('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達');
     if(m.budget<8) parts.push('自治体財政ショート — 予算が枯渇し行政機能停止');
     if(m.deadlock) parts.push('他責デッドロックによりシステムが自滅状態に突入');
+    if(m.efficiencyPurge) parts.push('効率至上主義の過学習 — 地方セクター強制シャットダウン（Sector-T Collapse）');
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
   } else ab2.classList.remove('on');
   // Operation log
