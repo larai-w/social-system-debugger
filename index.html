@@ -412,6 +412,10 @@ let activePreset = null;
 let animPlaying = false, animStep = 0, animTimer = null, fullTimeline = null;
 let pinnedData = null;
 
+// SCATTER DRIFT STATE
+const SC_N = 130;
+let scPts = [], scCtx2, scW2, scH2, scAnimId2, pinnedPts = null;
+
 function randn(mu, s) {
   let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();
   return mu + s * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
@@ -528,22 +532,17 @@ function pinScenario(){
   const btn=document.getElementById('pinBtn');
   const lbl=document.getElementById('pinLabel');
   if(pinnedData){
-    pinnedData=null;
-    scatterChart.data.datasets=scatterChart.data.datasets.slice(0,2);
+    pinnedData=null; pinnedPts=null;
     timelineChart.data.datasets=timelineChart.data.datasets.slice(0,3);
     radarChart.data.datasets=radarChart.data.datasets.slice(0,2);
-    scatterChart.update(); timelineChart.update(); radarChart.update();
+    timelineChart.update(); radarChart.update();
     btn.classList.remove('pin-on');
     lbl.textContent=t('pinLock');
   } else {
-    const sc=genScatter(filterRate);
     const tl=simTimeline(filterRate,ethicsScore,algo);
     const m=metrics(filterRate,ethicsScore,algo);
-    pinnedData={sc,tl,m};
-    scatterChart.data.datasets.push(
-      {label:'[A] Authentic',data:sc.real,backgroundColor:'rgba(0,212,255,.2)',pointRadius:3.5,pointStyle:'circle'},
-      {label:'[A] Fabricated',data:sc.fake,backgroundColor:'rgba(255,34,68,.2)',pointRadius:3.5,pointStyle:'circle'}
-    );
+    pinnedData={tl,m};
+    pinnedPts=scPts.map(p=>({...p}));  // snapshot scatter positions
     timelineChart.data.datasets.push(
       {label:'[A] Dopamine',data:tl.dp,borderColor:'rgba(0,255,136,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
       {label:'[A] Social Cap',data:tl.sc,borderColor:'rgba(0,212,255,.35)',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
@@ -555,7 +554,7 @@ function pinScenario(){
       backgroundColor:'rgba(255,204,0,.07)',borderColor:'rgba(255,204,0,.5)',
       borderWidth:1.5,borderDash:[5,4],pointBackgroundColor:'rgba(255,204,0,.6)',pointRadius:2
     });
-    scatterChart.update(); timelineChart.update(); radarChart.update();
+    timelineChart.update(); radarChart.update();
     btn.classList.add('pin-on');
     lbl.textContent=t('pinClear');
   }
@@ -664,24 +663,79 @@ function startAgents(){
 
 function restartAgents(){startAgents()}
 
+// ══════════════════════════════════════════════
+// SCATTER DRIFT (Canvas)
+// ══════════════════════════════════════════════
+function initScatter(){
+  const r=seedRng(8675309);
+  scPts=Array.from({length:SC_N},()=>({
+    hx:clamp(r()*92+4,4,96), hy:clamp(r()*88+4,4,96),
+    ex:clamp(r()*28+2,2,34), ey:clamp(r()*20+68,65,97),
+    x:0, y:0, c:0
+  }));
+  scPts.forEach(p=>{p.x=p.hx;p.y=p.hy;});
+}
+
+function stepScatter(){
+  const healthyN=Math.max(5,Math.floor(SC_N*(1-filterRate/100*0.88)));
+  scPts.forEach((p,i)=>{
+    const tc=i<healthyN?0:1;
+    p.c+=(tc-p.c)*0.035;
+    p.x+=(lerp(p.hx,p.ex,p.c)-p.x)*0.055;
+    p.y+=(lerp(p.hy,p.ey,p.c)-p.y)*0.055;
+  });
+}
+
+function drawScatter(){
+  if(!scCtx2)return;
+  const W=scW2,H=scH2;
+  scCtx2.clearRect(0,0,W,H);
+  // grid
+  scCtx2.strokeStyle='rgba(23,35,64,.6)';scCtx2.lineWidth=0.5;
+  for(let i=1;i<4;i++){
+    scCtx2.beginPath();scCtx2.moveTo(W*i/4,0);scCtx2.lineTo(W*i/4,H);scCtx2.stroke();
+    scCtx2.beginPath();scCtx2.moveTo(0,H*i/4);scCtx2.lineTo(W,H*i/4);scCtx2.stroke();
+  }
+  // pinned ghost
+  if(pinnedPts){
+    pinnedPts.forEach(p=>{
+      const r2=Math.round(lerp(0,255,p.c)),g2=Math.round(lerp(212,34,p.c)),b2=Math.round(lerp(255,68,p.c));
+      scCtx2.beginPath();scCtx2.arc((p.x/100)*W,(1-p.y/100)*H,3.5,0,Math.PI*2);
+      scCtx2.fillStyle=`rgba(${r2},${g2},${b2},0.18)`;scCtx2.fill();
+    });
+  }
+  // live points
+  scPts.forEach(p=>{
+    const r2=Math.round(lerp(0,255,p.c)),g2=Math.round(lerp(212,34,p.c)),b2=Math.round(lerp(255,68,p.c));
+    scCtx2.beginPath();scCtx2.arc((p.x/100)*W,(1-p.y/100)*H,4.5,0,Math.PI*2);
+    scCtx2.fillStyle=`rgba(${r2},${g2},${b2},0.72)`;scCtx2.fill();
+  });
+  // legend
+  scCtx2.font="9px 'Courier New',monospace";scCtx2.textAlign='left';
+  [[0,'rgba(0,212,255,.8)',lang==='ja'?'実データ':'Authentic'],[130,'rgba(255,34,68,.8)',lang==='ja'?'過学習データ':'Fabricated']].forEach(([ox,col,lbl])=>{
+    scCtx2.beginPath();scCtx2.arc(8+ox,H-9,4,0,Math.PI*2);scCtx2.fillStyle=col;scCtx2.fill();
+    scCtx2.fillStyle='#5a6f94';scCtx2.fillText(lbl,18+ox,H-6);
+  });
+  // x-axis label
+  scCtx2.fillStyle='#5a6f94';scCtx2.textAlign='center';
+  scCtx2.fillText('← Detail (具体性・多様性) →',W/2,H-22);
+}
+
+function scatterLoop(){scAnimId2=requestAnimationFrame(scatterLoop);stepScatter();drawScatter();}
+
+function startScatter(){
+  if(scAnimId2)cancelAnimationFrame(scAnimId2);
+  const cv=document.getElementById('scatterChart'),wrap=cv.parentElement;
+  scW2=wrap.clientWidth||400;scH2=wrap.clientHeight||222;
+  cv.width=scW2;cv.height=scH2;
+  scCtx2=cv.getContext('2d');
+  initScatter();scatterLoop();
+}
+
 Chart.defaults.color='#5a6f94';Chart.defaults.borderColor='#172340';
 Chart.defaults.font.family="'Courier New', monospace";Chart.defaults.font.size=10;
 
-const scatterChart=new Chart(document.getElementById('scatterChart'),{
-  type:'scatter',
-  data:{datasets:[
-    {label:'実データ (Authentic)',data:[],backgroundColor:'rgba(0,212,255,.65)',pointRadius:4.5,pointHoverRadius:7},
-    {label:'過学習データ (Fabricated)',data:[],backgroundColor:'rgba(255,34,68,.72)',pointRadius:4.5,pointHoverRadius:7}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:600},
-    plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}},
-      tooltip:{callbacks:{label:c=>`Detail: ${c.raw.x.toFixed(1)}  Consistency: ${c.raw.y.toFixed(1)}`}}},
-    scales:{
-      x:{title:{display:true,text:'← Detail (具体性・多様性) →',color:'#5a6f94',font:{size:9}},min:0,max:100,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:6}},
-      y:{title:{display:true,text:'← Consistency (同質性) →',color:'#5a6f94',font:{size:9}},min:0,max:100,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:6}}
-    }
-  }
-});
+// scatterChart is now Canvas-driven via startScatter()
 
 const timelineChart=new Chart(document.getElementById('timelineChart'),{
   type:'line',
@@ -718,11 +772,6 @@ function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
 function updateAll(){
   const m=metrics(filterRate,ethicsScore,algo);
-  const sc=genScatter(filterRate);
-
-  scatterChart.data.datasets[0].data=sc.real;
-  scatterChart.data.datasets[1].data=sc.fake;
-  scatterChart.update();
 
   if(!animPlaying){
     const tl=simTimeline(filterRate,ethicsScore,algo);
@@ -918,6 +967,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
   setPct(document.getElementById('ethicsScore'));
   setAlgoUI(algo);
   applyI18n();
+  startScatter();
   startAgents();
 })();
 </script>
