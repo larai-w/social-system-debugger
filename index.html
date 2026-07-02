@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v5.2</title>
+<title>社会＆地域インフラ・デバッガー v6.0</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -175,7 +175,81 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 .il-arrow{text-align:center;font-size:.55rem;color:var(--muted);letter-spacing:.08em;padding:1px 0}
 .link-badge{display:inline-flex;align-items:center;gap:3px;padding:1px 6px;font-size:.53rem;border-radius:2px;letter-spacing:.06em;background:rgba(0,255,136,.1);color:var(--green);border:1px dashed rgba(0,255,136,.45);cursor:pointer;vertical-align:middle;font-family:inherit;transition:background .2s}
 .link-badge:hover{background:rgba(0,255,136,.22)}
+/* v5.3: カスケード崩壊演出 */
+@keyframes cascadeRed{0%,100%{border-color:rgba(255,34,68,.95);box-shadow:0 0 20px rgba(255,34,68,.55)}50%{border-color:rgba(255,34,68,.3);box-shadow:0 0 4px rgba(255,34,68,.12)}}
+.cascade-stress{animation:cascadeRed .55s infinite!important}
+@keyframes cascadeHack{0%,100%{border-color:rgba(153,69,255,.95);box-shadow:0 0 20px rgba(255,34,68,.45)}50%{border-color:rgba(255,34,68,.55);box-shadow:0 0 6px rgba(153,69,255,.2)}}
+.cascade-hack{animation:cascadeHack .8s infinite!important}
+/* v5.3: 監査報告書 */
+.audit-btn{padding:12px 32px;background:rgba(0,255,136,.08);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:inherit;font-size:.74rem;letter-spacing:.14em;cursor:pointer;font-weight:bold;animation:auditGlow 1.6s infinite;transition:background .2s}
+@keyframes auditGlow{0%,100%{box-shadow:0 0 22px rgba(0,255,136,.55)}50%{box-shadow:0 0 6px rgba(0,255,136,.15)}}
+.audit-btn:hover{background:rgba(0,255,136,.18)}
+.audit-ta{width:100%;height:260px;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.62rem;line-height:1.7;padding:10px;resize:vertical}
+.x-btn{border-color:#666!important;color:#fff!important}
+.x-btn:hover{border-color:#fff!important;box-shadow:0 0 10px rgba(255,255,255,.25)!important}
 @media(max-width:1100px){.main{grid-template-columns:1fr}.charts-top{grid-template-columns:1fr}}
+/* v6.0: モバイル最適化 — 縦積み・タッチ操作性・ログ可読性 */
+@media(max-width:640px){
+  .wrap{padding:10px 10px 24px}
+  .hdr{flex-direction:column;gap:8px;padding-bottom:10px}
+  .hdr h1{font-size:1.02rem;letter-spacing:.06em}
+  .hdr p{font-size:.6rem;line-height:1.6}
+  .hdr-acts{width:100%;justify-content:center}
+  .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .tab-bar::-webkit-scrollbar{display:none}
+  .tab-btn{padding:11px 14px;font-size:.62rem;white-space:nowrap;flex-shrink:0}
+  .preset-bar{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;padding-bottom:5px;scrollbar-width:none}
+  .preset-bar::-webkit-scrollbar{display:none}
+  .pbtn,.pl{flex-shrink:0}
+  .pbtn{padding:9px 13px;font-size:.66rem}
+  .card{padding:13px 12px}
+  /* タッチ操作性: スライダーとその周辺 */
+  input[type=range]{height:6px;margin:10px 0 6px}
+  input[type=range]::-webkit-slider-thumb{width:22px;height:22px}
+  input[type=range]::-moz-range-thumb{width:22px;height:22px}
+  .pl2{margin-bottom:7px;gap:8px}
+  .pn{font-size:.76rem;line-height:1.5}
+  .pv{font-size:.95rem}
+  .pd{font-size:.66rem;line-height:1.65;margin-bottom:8px}
+  .rl{font-size:.62rem;margin-top:6px}
+  hr.div{margin:15px 0}
+  .tb{padding:12px 5px;font-size:.68rem}
+  /* ゲージ・ステータス */
+  .gl{font-size:.68rem;line-height:1.5}
+  .gn{font-size:1.3rem}
+  .gs{font-size:.63rem;line-height:1.55}
+  .sv{font-size:1rem}
+  .sl{font-size:.58rem;line-height:1.5}
+  .si{padding:9px 10px}
+  .cs{font-size:.66rem;line-height:1.65}
+  .diag,.hist{font-size:.65rem;line-height:1.7}
+  /* ログ可読性: 重なり解消＋スクロール */
+  .p2log{font-size:.66rem;line-height:1.95;max-height:210px;overflow-y:auto}
+  .mlog{font-size:.64rem;line-height:2.0}
+  /* Canvas: 横幅フィット＋高さ抑制（インラインstyleを上書き） */
+  .ag-wrap{height:240px!important}
+  .ch{height:200px!important}
+  .chsm{height:180px}
+  .ag-leg{flex-wrap:wrap;gap:5px 10px;max-width:72%}
+  .li{font-size:.58rem}
+  .ag-st{font-size:.55rem;padding:3px 6px}
+  .cpu-nums{font-size:.6rem}
+  /* モーダル */
+  .mb{padding:18px 16px;max-height:88vh;overflow-y:auto}
+  .mti{font-size:.9rem}
+  .mbd{font-size:.66rem}
+  .intro-layer{padding:9px 11px}
+  .il-title{font-size:.78rem}
+  .il-desc{font-size:.58rem}
+  .audit-btn{padding:12px 18px;font-size:.66rem;letter-spacing:.08em}
+  .audit-ta{height:220px;font-size:.6rem}
+  .recover-btn,.shock-btn{padding:13px;font-size:.7rem}
+  .sbtn{padding:12px;font-size:.68rem}
+  .alert{padding:11px 12px}
+  .at{font-size:.78rem;letter-spacing:.1em}
+  .am{font-size:.62rem}
+  .foot{font-size:.5rem;line-height:1.9}
+}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg0)}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
 </style>
 </head>
@@ -188,7 +262,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v5.2 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.0 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -382,7 +456,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Shrink Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">30%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">30%</span></div>
         <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
         <input type="range" id="shrinkRate" min="0" max="100" value="30" class="ora-range">
         <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
@@ -390,7 +464,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- DX Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
         <div class="pd" data-i18n="p2_dx_d">スマート農業・自動化による地域ブランド産業の持続化投資。低いと高齢職人依存が継続し後継者断絶が起きる。</div>
         <input type="range" id="dxRate" min="0" max="100" value="30">
         <div class="rl"><span data-i18n="p2_dx_l">高齢農家の職人依存</span><span data-i18n="p2_dx_r">スマート自動化</span></div>
@@ -398,7 +472,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Leader Ethics P2 -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">60</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">60</span></div>
         <div class="pd" data-i18n="p2_ethics_d">低下するとシステム目的関数が『生活者の生存』から『自己保身』へ乗っ取られ、実務を完全放棄して他責化処理にCPUが100%占有されます。</div>
         <input type="range" id="ethicsScoreP2" min="0" max="100" value="60">
         <div class="rl"><span data-i18n="p2_ethics_l">他責・責任回避</span><span data-i18n="p2_ethics_r">実務・法治</span></div>
@@ -406,7 +480,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Budget Strategy -->
       <div>
-        <div class="pl2" style="margin-bottom:5px"><span class="pn">予算配分戦略 <span class="tag to">STRATEGY</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 反証許容度</span></span></div>
+        <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f4n">予算配分戦略 <span class="tag to">STRATEGY</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 反証許容度</span></span></div>
         <div class="pd" data-i18n="p2_strat_d">Greedy=自己保身・ネット選挙ゲーム最優先。DP=救命医療・コア産業を最優先。</div>
         <div class="tog">
           <button class="tb" id="btnDPP2" onclick="setAlgoP2('dp')">
@@ -420,7 +494,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Public Reboot Mode -->
       <div style="margin-bottom:12px">
-        <div class="pl2" style="margin-bottom:5px"><span class="pn">公共性リブート <span class="tag tc">PUBLIC REBOOT</span></span></div>
+        <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f5n">公共性リブート <span class="tag tc">PUBLIC REBOOT</span></span></div>
         <div class="pd" data-i18n="p2_reboot_d">再公営化・リダンダンシーの確保。ONにすると市場原理の効率主義を停止し公共性を最優先します。インフラ劣化速度を半減・救命ヘリを常時稼働させますが、自治体財政コストが増大します。</div>
         <div class="tog">
           <button class="tb on" id="btnRebootOff" onclick="setPublicReboot(false)">
@@ -441,7 +515,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     </div>
 
     <!-- P2 State Monitor -->
-    <div class="card" style="border-color:rgba(255,107,43,.3)">
+    <div class="card" id="p2StateCard" style="border-color:rgba(255,107,43,.3)">
       <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span><span>SECTOR-T SYSTEM STATE</span></div></div>
       <!-- Infra gauge -->
       <div style="margin-bottom:10px">
@@ -533,7 +607,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
   <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
-  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 老害フリーズ</button>
+  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 思考凍結</button>
   <button class="pbtn" id="p3-fasting" onclick="setPresetP3('fasting')" data-i18n="p3_pr_fast">📵 SNS断食</button>
   <button class="pbtn" id="p3-debugger" onclick="setPresetP3('debugger')" data-i18n="p3_pr_debug">🔍 完全デバッガー</button>
   <span class="pl" style="opacity:.6" data-i18n="p3_pr_hint">→ Canvasの毒入れ攻撃の変化を観測せよ</span>
@@ -547,13 +621,13 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="main">
   <!-- LEFT: P3 Input + State -->
   <div style="display:flex;flex-direction:column;gap:14px">
-    <div class="card" style="border-color:rgba(153,69,255,.35)">
+    <div class="card" id="p3InputCard" style="border-color:rgba(153,69,255,.35)">
       <div class="ct" style="color:var(--pur)"><div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span><span>INPUT PARAMETERS — COGNITIVE LAYER</span></div></div>
       <div class="cs" data-i18n="p3_cs_input">認知ハックの手口を見抜き、現実世界へ回帰（デバッグ）するための思考探索パラメーター。</div>
       <hr class="div">
       <!-- Search Depth -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">2</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">2</span></div>
         <div class="pd" data-i18n="p3_depth_d">思考の探索段数。3以下ではバズへの脊髄反射で偽装ノードに騙される。7以上で多次元の因果関係を検証してから判断する。</div>
         <input type="range" id="searchDepth" min="1" max="10" value="2" class="pur-range">
         <div class="rl"><span data-i18n="p3_depth_l">脊髄反射・バズ即応</span><span data-i18n="p3_depth_r">多次元因果検証</span></div>
@@ -561,7 +635,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Grounding Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
         <div class="pd" data-i18n="p3_ground_d">物理現実との接続率。高いほどSNS断食・実世界の一次情報により認知の過学習（ノイズ蓄積）が洗い流される。</div>
         <input type="range" id="groundingRate" min="0" max="100" value="20">
         <div class="rl"><span data-i18n="p3_ground_l">ネット常時接続</span><span data-i18n="p3_ground_r">物理現実回帰・SNS断食</span></div>
@@ -569,10 +643,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Learning Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
         <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
         <input type="range" id="learningRate" min="0" max="100" value="40">
-        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・老害モード</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
+        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・思考凍結モード</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
       </div>
       <hr class="div">
       <!-- Recovery Actions -->
@@ -673,7 +747,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- External Traffic -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">20%</span></div>
         <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
         <input type="range" id="extTraffic" min="0" max="100" value="20" class="red-range">
         <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
@@ -681,7 +755,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Gamification -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">20%</span></div>
         <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
         <input type="range" id="gamification" min="0" max="100" value="20" class="yel-range">
         <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
@@ -755,7 +829,25 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 </div><!-- /#page4 -->
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v5.2 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div id="auditBar" style="display:none;text-align:center;margin-top:16px">
+  <button class="audit-btn" onclick="openAuditReport()" data-i18n="audit_btn">⎘ GENERATE AUDIT REPORT（監査報告書生成）</button>
+  <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
+</div>
+
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.0 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+</div>
+
+<div class="mo" id="auditModal" onclick="closeAuditIf(event)">
+  <div class="mb" style="max-width:640px;border-color:var(--green);box-shadow:0 0 40px rgba(0,255,136,.25)">
+    <button class="mc" onclick="closeAudit()">✕</button>
+    <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
+    <div class="mti" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
+    <textarea id="auditText" readonly class="audit-ta"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
+      <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
+    </div>
+  </div>
 </div>
 
 <div class="mo" id="introModal" onclick="closeIntroIf(event)">
@@ -895,7 +987,7 @@ const I18N = {
     p3_ground_d:'Connection rate to physical reality. Higher values wash out cognitive overfitting via SNS fasting and first-hand information.',
     p3_ground_l:'Always online', p3_ground_r:'Reality return / SNS fast',
     p3_lr_d:'Willingness to self-correct on new evidence. At 0%, model updates stop entirely — no amount of facts removes contamination.',
-    p3_lr_l:'Frozen / stubborn mode', p3_lr_r:'Flexible updating',
+    p3_lr_l:'Update halt / Cognitive Freeze Mode', p3_lr_r:'Flexible updating',
     p3_drop_d:'Force grounding to 100% for 3 seconds — rapidly resets contamination of all echo-chambered nodes.',
     p3_es_d:'Detect overfitting, halt processing, and roll the whole system back to its healthiest state.',
     p3_root_d:'Apply the judiciary/parliament "regularization brake" to physical infrastructure (Page 2), so no leader can run <span style="color:var(--red)">sudo rm -rf</span> alone. <span class="link-badge" onclick="switchTab(2)">⇄ applies to P2</span>',
@@ -906,7 +998,7 @@ const I18N = {
     p3_cs_chart:'Time-series forecast of justice dopamine vs. cognitive integrity, driven by search depth and grounding.',
     p3_leg_fake:'Disguised node (self-proclaimed fair)', p3_leg_gen:'Ordinary node', p3_leg_neu:'Neutral node (facts)',
     p3_pr_hint:'→ Watch the poisoning attack change on canvas',
-    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Frozen Elder', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
+    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Frozen Mind', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
     // ── v5.2: P4 static ──
     p4_cs_input:'Network parameters controlling the asymmetry between stakeholders (5.3M residents) and outsider traffic.',
     p4_ext_d:'Influx of outsiders & fandom accounts. Higher values flood 1-bit-minded spam nodes that jam residents\' communication links.',
@@ -935,6 +1027,22 @@ const I18N = {
     intro_l4t:'Stakeholder Voice', intro_l4d:'Outsider floods & gamification — 5.3M real voices get dropped',
     intro_tip:'💡 Some parameters are linked across pages — look for the green "⇄" badges (click to jump).',
     intro_start:'▶ Start debugging',
+    // ── v6.0: slider names (pn) ──
+    p2_f1n:'Infra Consolidation <span class="tag to">SMART SHRINK</span>',
+    p2_f2n:'Industrial DX Investment <span class="tag tc">AUTOMATION</span>',
+    p2_f3n:'Leader Ethics Score <span class="tag tg">GOVERNANCE</span>',
+    p2_f4n:'Budget Allocation Strategy <span class="tag to">STRATEGY</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 falsifiability</span>',
+    p2_f5n:'Public Reboot <span class="tag tc">PUBLIC REBOOT</span>',
+    p3_f1n:'Search Depth <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span>',
+    p3_f2n:'Grounding Rate <span class="tag tc">GROUNDING / DROPOUT</span>',
+    p3_f3n:'Learning Rate <span class="tag tg">LEARNING RATE</span>',
+    p4_f1n:'External Traffic Rate <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span>',
+    p4_f2n:'Objective Gamification <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span>',
+    // ── v5.3: audit report ──
+    audit_btn:'⎘ GENERATE AUDIT REPORT',
+    audit_hint:'✓ GRAND OPTIMAL — all layers healthy. Export your debugging achievement as a report',
+    audit_title:'Debug complete — the Social OS reached the global optimum',
+    audit_copy:'⎘ Copy Markdown',
   }
 };
 
@@ -1115,6 +1223,7 @@ function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 function lerp(a,b,t){return a+(b-a)*t}
 function seedRng(seed){let s=seed>>>0;return()=>{s=(Math.imul(1664525,s)+1013904223)>>>0;return s/2**32}}
 function t(k){return I18N[lang][k]||k}
+function tt(ja,en){return lang==='ja'?ja:en}
 
 function genScatter(fr){
   const f=fr/100, tot=130, rN=Math.max(5,Math.floor(tot*(1-f*0.88)));
@@ -1536,7 +1645,7 @@ function getModeCollapseLog(m){
   // ヘッダーと注釈を状態に応じて更新
   if(hdr&&note){
     if(fr>=80){
-      hdr.textContent='[ SLOGAN LOOP — 排外モード突入 ]';
+      hdr.textContent=tt('[ SLOGAN LOOP — 排外モード突入 ]','[ SLOGAN LOOP — EXCLUSION MODE ]');
       hdr.style.color='var(--red)';
       note.style.display='block';
       Object.assign(note.style,{background:'rgba(255,34,68,.08)',border:'1px solid rgba(255,34,68,.35)',color:'#ff8899'});
@@ -1597,7 +1706,7 @@ function updateAll(){
   document.getElementById('entropyNum').textContent=ep+'%';
   document.getElementById('entropyNum').style.color=ec;
   document.getElementById('entropyBar').style.cssText=`width:${ep}%;background:${ec}`;
-  document.getElementById('entropyStatus').textContent=ep<40?'STABLE — システム秩序は保たれています':ep<65?'WARNING — 局所的な秩序の乱れを検出':ep<80?'CRITICAL — 社会的コンセンサスが崩壊しつつあります':'CHAOS — 全秩序崩壊。過学習により現実OSとの互換性が消失';
+  document.getElementById('entropyStatus').textContent=ep<40?tt('STABLE — システム秩序は保たれています','STABLE — system order is holding'):ep<65?tt('WARNING — 局所的な秩序の乱れを検出','WARNING — local disorder detected'):ep<80?tt('CRITICAL — 社会的コンセンサスが崩壊しつつあります','CRITICAL — social consensus is collapsing'):tt('CHAOS — 全秩序崩壊。過学習により現実OSとの互換性が消失','CHAOS — total collapse. Overfitting severed compatibility with the real-world OS');
   document.getElementById('entropyStatus').style.color=ec;
 
   const pp=Math.round(m.paranoia);
@@ -1605,7 +1714,7 @@ function updateAll(){
   document.getElementById('paranoiaNum').textContent=pp+'%';
   document.getElementById('paranoiaNum').style.color=pc;
   document.getElementById('paranoiaBar').style.cssText=`width:${pp}%;background:${pc}`;
-  document.getElementById('paranoiaStatus').textContent=pp<40?'LOW — ノイズ蓄積は正常範囲内':pp<60?'ELEVATED — 認知バイアスの増幅を検出':pp<80?'HIGH — 集団パラノイアの発生確率が上昇':'CRITICAL — メンタルヘルス・インフラが臨界点に到達';
+  document.getElementById('paranoiaStatus').textContent=pp<40?tt('LOW — ノイズ蓄積は正常範囲内','LOW — noise accumulation within normal range'):pp<60?tt('ELEVATED — 認知バイアスの増幅を検出','ELEVATED — cognitive bias amplification detected'):pp<80?tt('HIGH — 集団パラノイアの発生確率が上昇','HIGH — collective paranoia risk rising'):tt('CRITICAL — メンタルヘルス・インフラが臨界点に到達','CRITICAL — mental-health infrastructure at critical point');
   document.getElementById('paranoiaStatus').style.color=pc;
 
   ['scVal','infVal'].forEach((id,i)=>{
@@ -1627,10 +1736,10 @@ function updateAll(){
   if(m.crash){
     ab.classList.add('on');
     const parts=[];
-    if(m.entropy>76)parts.push(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`);
-    if(m.infra<18)parts.push(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`);
-    if(m.socialCap<18)parts.push(`ソーシャルキャピタル ${Math.round(m.socialCap)} — 相互信頼が消滅`);
-    parts.push('過学習により現実世界のOSとの互換性が失われました。');
+    if(m.entropy>76)parts.push(tt(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`,`Entropy ${Math.round(m.entropy)}% — social order breached critical threshold`));
+    if(m.infra<18)parts.push(tt(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`,`Infrastructure ${Math.round(m.infra)} — medical & transport networks down`));
+    if(m.socialCap<18)parts.push(tt(`ソーシャルキャピタル ${Math.round(m.socialCap)} — 相互信頼が消滅`,`Social capital ${Math.round(m.socialCap)} — mutual trust vanished`));
+    parts.push(tt('過学習により現実世界のOSとの互換性が失われました。','Overfitting severed compatibility with the real-world OS.'));
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
   } else ab.classList.remove('on');
 
@@ -1638,13 +1747,13 @@ function updateAll(){
 }
 
 function getDiag(m){
-  if(m.crash)return'[ FATAL ] 社会システムが崩壊状態に入りました。過学習によりOSと現実の互換性が完全消失。再起動不能な状態です。';
-  if(filterRate>70&&ethicsScore<30)return'[ CRITICAL ] エコーチェンバー×ポピュリズムの複合障害。外部入力を全拒絶する自己参照ループが進行中。';
-  if(filterRate>65)return'[ WARNING ] 過学習が進行中。訓練データ（支持者）への過適合が進み、現実世界への対応力が急落しています。';
-  if(ethicsScore<35)return`[ WARNING ] ${algo==='greedy'?'Greedyモードで':'DPモードでも'}倫理スコアが危険域に入りました。短期ドーパミン最大化が長期コストとして蓄積中。`;
-  if(algo==='greedy'&&ethicsScore<65)return'[ NOTICE ] Greedyアルゴリズムが局所最適解に収束中。社会的コストが水面下で蓄積、将来的な急落リスクが上昇中。';
-  if(algo==='dp'&&ethicsScore>70&&filterRate<30)return'[ OPTIMAL ] DP + 高倫理 + 低フィルタリング。長期最適解への収束が見込まれます。システムは良好。';
-  return'[ OK ] システムは安定動作中。パラメーターを操作して崩壊シナリオをシミュレートできます。';
+  if(m.crash)return tt('[ FATAL ] 社会システムが崩壊状態に入りました。過学習によりOSと現実の互換性が完全消失。再起動不能な状態です。','[ FATAL ] The social system has collapsed. Overfitting fully severed OS-reality compatibility. Reboot impossible.');
+  if(filterRate>70&&ethicsScore<30)return tt('[ CRITICAL ] エコーチェンバー×ポピュリズムの複合障害。外部入力を全拒絶する自己参照ループが進行中。','[ CRITICAL ] Compound failure: echo chamber × populism. A self-referential loop rejecting all external input is underway.');
+  if(filterRate>65)return tt('[ WARNING ] 過学習が進行中。訓練データ（支持者）への過適合が進み、現実世界への対応力が急落しています。','[ WARNING ] Overfitting in progress. Over-adaptation to training data (supporters) is crashing real-world responsiveness.');
+  if(ethicsScore<35)return tt(`[ WARNING ] ${algo==='greedy'?'Greedyモードで':'DPモードでも'}倫理スコアが危険域に入りました。短期ドーパミン最大化が長期コストとして蓄積中。`,`[ WARNING ] Ethics entered the danger zone ${algo==='greedy'?'under Greedy':'even under DP'}. Short-term dopamine maximization is accruing long-term cost.`);
+  if(algo==='greedy'&&ethicsScore<65)return tt('[ NOTICE ] Greedyアルゴリズムが局所最適解に収束中。社会的コストが水面下で蓄積、将来的な急落リスクが上昇中。','[ NOTICE ] Greedy is converging on a local optimum. Social costs accumulate beneath the surface; crash risk rising.');
+  if(algo==='dp'&&ethicsScore>70&&filterRate<30)return tt('[ OPTIMAL ] DP + 高倫理 + 低フィルタリング。長期最適解への収束が見込まれます。システムは良好。','[ OPTIMAL ] DP + high ethics + low filtering. Convergence to the global optimum expected. System healthy.');
+  return tt('[ OK ] システムは安定動作中。パラメーターを操作して崩壊シナリオをシミュレートできます。','[ OK ] System stable. Adjust parameters to simulate collapse scenarios.');
 }
 
 function applyI18n(){
@@ -1695,6 +1804,7 @@ function applyI18n(){
   applyI18nAuto();
   document.documentElement.lang=lang;
   updateAll();
+  updateAllP2(); // 動的ステータス文の言語を即時反映
 }
 
 // v5.2: data-i18n属性ベースの自動翻訳（日本語原文は初回にDOMからキャッシュ）
@@ -1790,7 +1900,7 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
   this.style.background=`linear-gradient(90deg,var(--pur) ${pct},var(--bdr) ${pct})`;
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}});
 
 let currentTab = 1;
 function switchTab(n){
@@ -1802,6 +1912,7 @@ function switchTab(n){
   if(n===2) updateAllP2();
   if(n===3) startP3();
   if(n===4) startP4();
+  refitCanvases(); // 非表示中の画面回転・リサイズに追従
 }
 
 // ── PAGE 2 STATE ──────────────────────────────────────────
@@ -1910,7 +2021,7 @@ function updateAllP2(){
   document.getElementById('p2InfraNum').textContent=Math.round(m.infra);
   document.getElementById('p2InfraNum').style.color=ic;
   document.getElementById('p2InfraBar').style.cssText=`width:${m.infra}%;background:${ic}`;
-  const iStatus=m.infra<30?'CRITICAL — インフラが臨界点以下':m.infra<60?'WARNING — 劣化進行中':'STABLE';
+  const iStatus=m.infra<30?tt('CRITICAL — インフラが臨界点以下','CRITICAL — infrastructure below critical point'):m.infra<60?tt('WARNING — 劣化進行中','WARNING — degradation in progress'):'STABLE';
   document.getElementById('p2InfraStatus').textContent=iStatus;
   document.getElementById('p2InfraStatus').style.color=ic;
   // Heli
@@ -1922,10 +2033,10 @@ function updateAllP2(){
   hs.className='heli-badge '+(m.heliOp?'heli-on':'heli-off');
   hs.textContent=m.heliOp?'● ONLINE':'■ SUSPENDED';
   hl.style.color=m.heliOp?'var(--green)':'var(--red)';
-  hl.textContent=m.heliOp?'OPERATIONAL — 常時稼働中':'LONG-TERM SUSPENSION — 救命ヘリ長期運休';
+  hl.textContent=m.heliOp?tt('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):tt('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded');
   hi.style.filter=m.heliOp?'drop-shadow(0 0 12px var(--green))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
   hb.style.cssText=`width:${m.heliOp?100:5}%;background:${m.heliOp?'var(--green)':'var(--red)'}`;
-  hd.textContent=m.heliOp?'Dispatch Ready — 出動待機中':'MALFUNCTION — 修復予算なし（他責処理中）';
+  hd.textContent=m.heliOp?tt('Dispatch Ready — 出動待機中','Dispatch Ready'):tt('MALFUNCTION — 修復予算なし（他責処理中）','MALFUNCTION — no repair budget (blame-shifting in progress)');
   hd.style.color=m.heliOp?'var(--muted)':'var(--red)';
   // Brand
   const bc=m.brand<30?'#ff2244':m.brand<60?'#ff6b2b':'#00ff88';
@@ -1934,7 +2045,7 @@ function updateAllP2(){
   document.getElementById('p2BrandLarge').textContent=Math.round(m.brand);
   document.getElementById('p2BrandLarge').style.color=bc;
   document.getElementById('p2BrandBar').style.cssText=`width:${m.brand}%;background:${bc}`;
-  const bs=m.brand<30?'COLLAPSE RISK — 後継者断絶危機':m.brand<60?'DEGRADING — DX投資不足':'SUSTAINABLE — ブランド持続中';
+  const bs=m.brand<30?tt('COLLAPSE RISK — 後継者断絶危機','COLLAPSE RISK — successor extinction'):m.brand<60?tt('DEGRADING — DX投資不足','DEGRADING — DX under-investment'):tt('SUSTAINABLE — ブランド持続中','SUSTAINABLE — brand holding');
   document.getElementById('p2BrandStatus').textContent=bs;
   document.getElementById('p2BrandStatus').style.color=bc;
   document.getElementById('p2BrandDiag').textContent=getP2BrandDiag(m);
@@ -1952,15 +2063,15 @@ function updateAllP2(){
   const db=document.getElementById('p2DeadlockBadge');
   if(m.deadlock){
     dp.className='deadlock-panel deadlock-on';
-    dp.textContent='⚠ 他責デッドロック発動中 — 行政CPUが100%「責任回避・他者攻撃」に割当。修復処理ゼロ。インフラ崩壊速度3倍。';
+    dp.textContent=tt('⚠ 他責デッドロック発動中 — 行政CPUが100%「責任回避・他者攻撃」に割当。修復処理ゼロ。インフラ崩壊速度3倍。','⚠ BLAME-SHIFT DEADLOCK ACTIVE — 100% of admin CPU allocated to blame & attack. Zero repair. Infrastructure collapsing 3× faster.');
     db.textContent='⚠ DEADLOCK'; db.style.color='var(--red)';
   } else if(rootRestricted){
     dp.className='deadlock-panel deadlock-off';
-    dp.textContent='🛡 ROOT RESTRICTED — 司法・議会の正則化ブレーキ有効。単独の破壊的コマンド（sudo rm -rf）は多重承認によりブロック中。他責デッドロックは発動不能。';
+    dp.textContent=tt('🛡 ROOT RESTRICTED — 司法・議会の正則化ブレーキ有効。単独の破壊的コマンド（sudo rm -rf）は多重承認によりブロック中。他責デッドロックは発動不能。','🛡 ROOT RESTRICTED — judiciary/parliament regularization brake active. Unilateral destructive commands (sudo rm -rf) blocked by multi-sig. Deadlock cannot trigger.');
     db.textContent='🛡 PROTECTED'; db.style.color='var(--green)';
   } else {
     dp.className='deadlock-panel deadlock-off';
-    dp.textContent=m.infraError?'STRESS MODE — インフラがエラー域。Greedy×低倫理が続くとデッドロックへ突入する。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中';
+    dp.textContent=m.infraError?tt('STRESS MODE — インフラがエラー域。Greedy×低倫理が続くとデッドロックへ突入する。','STRESS MODE — infrastructure in error zone. Sustained Greedy × low ethics leads to deadlock.'):tt('DEADLOCK INACTIVE — 実務・修復処理が正常稼働中','DEADLOCK INACTIVE — repair operations running normally');
     db.textContent=m.infraError?'STRESS':'INACTIVE'; db.style.color=m.infraError?'var(--ora)':'var(--muted)';
   }
   // Timeline
@@ -1977,10 +2088,10 @@ function updateAllP2(){
   if(m.crash){
     ab2.classList.add('on');
     const parts=[];
-    if(!m.heliOp&&m.infra<20) parts.push('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達');
-    if(m.budget<8) parts.push('自治体財政ショート — 予算が枯渇し行政機能停止');
-    if(m.deadlock) parts.push('他責デッドロックによりシステムが自滅状態に突入');
-    if(shockState?.type==='crash') parts.push(`⚡ ブラックスワン注入 — Redundancy Buffer ${shockState.rb}% で致命的崩壊（System Crash）`);
+    if(!m.heliOp&&m.infra<20) parts.push(tt('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達','Rescue heli suspended — infrastructure below critical point'));
+    if(m.budget<8) parts.push(tt('自治体財政ショート — 予算が枯渇し行政機能停止','Municipal budget exhausted — administration halted'));
+    if(m.deadlock) parts.push(tt('他責デッドロックによりシステムが自滅状態に突入','Blame-shift deadlock has driven the system into self-destruction'));
+    if(shockState?.type==='crash') parts.push(tt(`⚡ ブラックスワン注入 — Redundancy Buffer ${shockState.rb}% で致命的崩壊（System Crash）`,`⚡ Black swan injected — fatal System Crash at Redundancy Buffer ${shockState.rb}%`));
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
   } else ab2.classList.remove('on');
   // Redundancy Buffer
@@ -1989,13 +2100,13 @@ function updateAllP2(){
   document.getElementById('p2RedundancyNum').textContent=rb;
   document.getElementById('p2RedundancyNum').style.color=rbc;
   document.getElementById('p2RedundancyBar').style.cssText=`width:${rb}%;background:${rbc}`;
-  const rbStatus=rb<30?'CRITICAL — 効率最優先・ショックで即崩壊':rb<60?'WARNING — 余力不足。大規模ショックに脆弱':'RESILIENT — 冗長性確保。ショック耐性あり';
+  const rbStatus=rb<30?tt('CRITICAL — 効率最優先・ショックで即崩壊','CRITICAL — efficiency-maxed; a shock means instant collapse'):rb<60?tt('WARNING — 余力不足。大規模ショックに脆弱','WARNING — insufficient slack; vulnerable to major shocks'):tt('RESILIENT — 冗長性確保。ショック耐性あり','RESILIENT — redundancy secured; shock-tolerant');
   document.getElementById('p2RedundancyStatus').textContent=rbStatus;
   document.getElementById('p2RedundancyStatus').style.color=rbc;
   // Reboot indicator
   const ri=document.getElementById('p2RebootIndicator');
   if(ri){
-    ri.textContent=publicReboot?'● PUBLIC REBOOT MODE: ACTIVE — 公共性最優先':'○ PUBLIC REBOOT MODE: OFF — 市場原理';
+    ri.textContent=publicReboot?tt('● PUBLIC REBOOT MODE: ACTIVE — 公共性最優先','● PUBLIC REBOOT MODE: ACTIVE — public good first'):tt('○ PUBLIC REBOOT MODE: OFF — 市場原理','○ PUBLIC REBOOT MODE: OFF — market logic');
     Object.assign(ri.style,{color:publicReboot?'var(--cyan)':'var(--muted)',borderColor:publicReboot?'rgba(0,212,255,.4)':'var(--bdr)',background:publicReboot?'rgba(0,212,255,.08)':'var(--bg1)'});
   }
   // Shock result panel
@@ -2005,13 +2116,13 @@ function updateAllP2(){
       sp.style.display='block';
       if(shockState.type==='crash'){
         sp.className='shock-result-panel shock-crashed';
-        sp.innerHTML=`<strong>⚠ SYSTEM CRASH — ブラックスワン発生</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【川上教授のリダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`;
+        sp.innerHTML=tt(`<strong>⚠ SYSTEM CRASH — ブラックスワン発生</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ SYSTEM CRASH — black swan struck</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
       }else if(shockState.type==='survived'){
         sp.className='shock-result-panel shock-survived';
-        sp.innerHTML=`<strong>✓ SURVIVED — ショック吸収成功</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。— 川上浩一</span>`;
+        sp.innerHTML=tt(`<strong>✓ SURVIVED — ショック吸収成功</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ SURVIVED — shock absorbed</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
       }else{
         sp.className='shock-result-panel shock-partial';
-        sp.innerHTML=`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`;
+        sp.innerHTML=tt(`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`,`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30–60%)<br>Moderate redundancy absorbed part of the shock, but infrastructure took damage. Consider enabling Public Reboot.`);
       }
     }else{
       sp.style.display='none';
@@ -2023,10 +2134,10 @@ function updateAllP2(){
 }
 
 function getP2BrandDiag(m){
-  if(m.brand<20) return '[ FATAL ] 地域ブランド産業が崩壊。後継者ゼロ・自動化ゼロ。産業消滅。';
-  if(m.brand<50&&dxRate<40) return '[ WARNING ] DX投資不足で職人高齢化が加速中。5年以内に後継者断絶リスク。';
-  if(m.brand>75&&dxRate>60) return '[ OPTIMAL ] スマート自動化によりブランド品質維持と後継問題を同時解決。持続的成長軌道。';
-  return '[ OK ] ブランド産業は現状維持中。DX投資を増やすと長期持続性が向上する。';
+  if(m.brand<20) return tt('[ FATAL ] 地域ブランド産業が崩壊。後継者ゼロ・自動化ゼロ。産業消滅。','[ FATAL ] Local brand industry collapsed. Zero successors, zero automation. Industry extinct.');
+  if(m.brand<50&&dxRate<40) return tt('[ WARNING ] DX投資不足で職人高齢化が加速中。5年以内に後継者断絶リスク。','[ WARNING ] DX under-investment is accelerating artisan aging. Succession collapse risk within 5 years.');
+  if(m.brand>75&&dxRate>60) return tt('[ OPTIMAL ] スマート自動化によりブランド品質維持と後継問題を同時解決。持続的成長軌道。','[ OPTIMAL ] Smart automation solves quality and succession simultaneously. Sustainable growth trajectory.');
+  return tt('[ OK ] ブランド産業は現状維持中。DX投資を増やすと長期持続性が向上する。','[ OK ] Brand industry holding steady. More DX investment improves long-term viability.');
 }
 
 let p2LogTick=0;
@@ -2139,13 +2250,21 @@ let dropoutActive=false, dropoutTimer=null, dropoutPrevGround=20;
 let timelineChartP3=null;
 
 // 反証不能モデルの言い訳（後付けダミー変数）ログ
-const P3_EXCUSES=[
+const P3_EXCUSES_JA=[
   'ERR#417 ......... 言い訳: タイミングが悪かった',
   'ERR#418 ......... 言い訳: 外部勢力の妨害があった',
   'ERR#419 ......... ダミー変数追加: 景気のせい',
   'ERR#420 ......... 言い訳: メディアの切り取り報道',
   'SELF_EVAL ....... スコア100点（自己採点）',
   'HYPOTHESIS ...... 棄却拒否 [UNFALSIFIABLE]',
+];
+const P3_EXCUSES_EN=[
+  'ERR#417 ......... excuse: the timing was bad',
+  'ERR#418 ......... excuse: external forces sabotaged us',
+  'ERR#419 ......... dummy variable added: blame the economy',
+  'ERR#420 ......... excuse: media quoted us out of context',
+  'SELF_EVAL ....... score 100/100 (self-graded)',
+  'HYPOTHESIS ...... rejection refused [UNFALSIFIABLE]',
 ];
 
 function initP3Nodes(){
@@ -2174,7 +2293,7 @@ function p3Fooling(){
 
 function stepP3(){
   const g=(dropoutActive?100:groundingRate)/100;
-  const lr=learningRate/100; // 0で自己修正が完全停止（老害モード）
+  const lr=learningRate/100; // 0で自己修正が完全停止（思考凍結モード）
   const fool=p3Fooling();
   p3Nodes.forEach(n=>{
     if(n.type!=='general')return;
@@ -2260,13 +2379,13 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   document.getElementById('p3DopNum').textContent=dopR;
   document.getElementById('p3DopNum').style.color=dc;
   document.getElementById('p3DopBar').style.cssText=`width:${dopR}%;background:${dc}`;
-  document.getElementById('p3DopStatus').textContent=dopR<35?'CALM — 認知は安定':dopR<65?'SURGING — 正義感ドーパミン上昇中':'RUNAWAY — 正義感の暴走が攻撃行動へ転化';
+  document.getElementById('p3DopStatus').textContent=dopR<35?tt('CALM — 認知は安定','CALM — cognition stable'):dopR<65?tt('SURGING — 正義感ドーパミン上昇中','SURGING — justice dopamine rising'):tt('RUNAWAY — 正義感の暴走が攻撃行動へ転化','RUNAWAY — runaway justice converting into aggression');
   document.getElementById('p3DopStatus').style.color=dc;
   const icol=integ<35?'#ff2244':integ<65?'#ff6b2b':'#00ff88';
   document.getElementById('p3IntNum').textContent=integ;
   document.getElementById('p3IntNum').style.color=icol;
   document.getElementById('p3IntBar').style.cssText=`width:${integ}%;background:${icol}`;
-  document.getElementById('p3IntStatus').textContent=integ<35?'OVERFITTED — 認知が偽装情報に過適合':integ<65?'DEGRADED — ノイズ蓄積が進行中':'HEALTHY';
+  document.getElementById('p3IntStatus').textContent=integ<35?tt('OVERFITTED — 認知が偽装情報に過適合','OVERFITTED — cognition over-adapted to disguised info'):integ<65?tt('DEGRADED — ノイズ蓄積が進行中','DEGRADED — noise accumulating'):'HEALTHY';
   document.getElementById('p3IntStatus').style.color=icol;
   const atk=document.getElementById('p3AttackBadge');
   if(attackEdges>0){atk.textContent='⚠ ACTIVE';atk.style.color='var(--red)';}
@@ -2286,17 +2405,18 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   if(algoP2==='greedy'){
     falsEl.textContent='0%';falsEl.style.color='var(--red)';
     falsBar.style.cssText='width:4%;background:var(--red)';
-    falsSt.textContent='UNFALSIFIABLE — エラーを後付けダミー変数で言い訳処理中（自己欺瞞）';
+    falsSt.textContent=tt('UNFALSIFIABLE — エラーを後付けダミー変数で言い訳処理中（自己欺瞞）','UNFALSIFIABLE — errors excused via post-hoc dummy variables (self-deception)');
     falsSt.style.color='var(--red)';
     exLog.style.display='block';
+    const EX=lang==='ja'?P3_EXCUSES_JA:P3_EXCUSES_EN;
     const off=Math.floor(Date.now()/900);
-    exLog.innerHTML=[0,1,2].map(i=>P3_EXCUSES[(off+i)%P3_EXCUSES.length]).join('<br>');
+    exLog.innerHTML=[0,1,2].map(i=>EX[(off+i)%EX.length]).join('<br>');
   } else {
     const fals=Math.round(clamp(learningRate*0.55+searchDepth*4.5,0,100));
     const fc=fals<35?'#ff2244':fals<65?'#ff6b2b':'#00d4ff';
     falsEl.textContent=fals+'%';falsEl.style.color=fc;
     falsBar.style.cssText=`width:${fals}%;background:${fc}`;
-    falsSt.textContent=fals<35?'LOW — 反証を受け入れる余地が乏しい':fals<65?'MODERATE — 一部の反証を受理':'HIGH — エラーを仮説棄却として正しく受理';
+    falsSt.textContent=fals<35?tt('LOW — 反証を受け入れる余地が乏しい','LOW — little room to accept counter-evidence'):fals<65?tt('MODERATE — 一部の反証を受理','MODERATE — some counter-evidence accepted'):tt('HIGH — エラーを仮説棄却として正しく受理','HIGH — errors correctly accepted as hypothesis rejection');
     falsSt.style.color=fc;
     exLog.style.display='none';
   }
@@ -2311,28 +2431,28 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   rp.style.color=rootRestricted?'var(--green)':'var(--ora)';
   const diag=document.getElementById('p3Diag');
   if(dropoutActive){
-    diag.textContent='[ DROPOUT ] 物理現実へ強制回帰中。ネットワークから切断され、汚染度が急速に洗い流されています。';
+    diag.textContent=tt('[ DROPOUT ] 物理現実へ強制回帰中。ネットワークから切断され、汚染度が急速に洗い流されています。','[ DROPOUT ] Forced return to physical reality. Disconnected from the network; contamination washing out rapidly.');
     diag.style.borderLeftColor='var(--pur)';
   } else if(learningRate<10&&fooled>0){
-    diag.textContent='[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても汚染が抜けません（老害モード）。学習率を上げて自己修正を許可せよ。';
+    diag.textContent=tt('[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても汚染が抜けません（思考凍結モード）。学習率を上げて自己修正を許可せよ。','[ FROZEN ] Learning rate near zero. Model updates halted — no facts can remove contamination (Cognitive Freeze Mode). Raise the learning rate to permit self-correction.');
     diag.style.borderLeftColor='var(--red)';
   } else if(searchDepth<=3&&fooled>8){
-    diag.textContent='[ CRITICAL ] 探索深度が浅すぎます。偽装ノードの「良識的な語り口」を検証できず、正義感をハックされたノードが事実を述べる中立ノードを攻撃中。';
+    diag.textContent=tt('[ CRITICAL ] 探索深度が浅すぎます。偽装ノードの「良識的な語り口」を検証できず、正義感をハックされたノードが事実を述べる中立ノードを攻撃中。','[ CRITICAL ] Search too shallow. The disguised node\'s "reasonable tone" goes unverified; justice-hacked nodes are attacking fact-stating neutral nodes.');
     diag.style.borderLeftColor='var(--red)';
   } else if(searchDepth<=3){
-    diag.textContent='[ WARNING ] 脊髄反射モード。バズへの即応で偽装ノードへの感染が進行中。探索深度を上げて因果関係を検証せよ。';
+    diag.textContent=tt('[ WARNING ] 脊髄反射モード。バズへの即応で偽装ノードへの感染が進行中。探索深度を上げて因果関係を検証せよ。','[ WARNING ] Spinal-reflex mode. Instant buzz reactions are spreading the infection. Raise search depth to verify causality.');
     diag.style.borderLeftColor='var(--ora)';
   } else if(searchDepth>=7&&fooled===0){
-    diag.textContent='[ DEBUGGED ] 多次元因果検証により偽装を看破。毒入れ攻撃は無効化されました。認知システムは現実OSと同期しています。';
+    diag.textContent=tt('[ DEBUGGED ] 多次元因果検証により偽装を看破。毒入れ攻撃は無効化されました。認知システムは現実OSと同期しています。','[ DEBUGGED ] Multi-dimensional causal verification exposed the disguise. Poisoning attack neutralized. Cognition synced with the real-world OS.');
     diag.style.borderLeftColor='var(--green)';
   } else {
-    diag.textContent='[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。';
+    diag.textContent=tt('[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。','[ RUNNING ] Raise search depth or grounding to progress the debug.');
     diag.style.borderLeftColor='var(--pur)';
   }
   const ab3=document.getElementById('alertBannerP3');
   if(fooled>=12&&attackEdges>0){
     ab3.classList.add('on');
-    document.getElementById('alertMsgP3').textContent='正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。';
+    document.getElementById('alertMsgP3').textContent=tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.');
   } else ab3.classList.remove('on');
 }
 
@@ -2430,7 +2550,7 @@ function executeEarlyStopping(){
   p3Nodes.forEach(n=>{if(n.type==='general'){n.c=0;n.dop=5;}});
   const btn=document.getElementById('earlyStopBtn');
   const orig=btn.textContent;
-  btn.textContent='✓ ROLLBACK COMPLETE — 健全状態へ復帰';
+  btn.textContent=tt('✓ ROLLBACK COMPLETE — 健全状態へ復帰','✓ ROLLBACK COMPLETE — restored to healthy state');
   setTimeout(()=>{btn.textContent=orig;},1800);
   updateP3Chart();
 }
@@ -2470,14 +2590,21 @@ let filterActive=false, filterTimer=null;
 let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0;
 const P4_SPAM_MAX=36;
 
-const P4_LOG_POLICY=[
+const P4_LOG_POLICY_JA=[
   'PACKET: 上下水道の更新要望 ......... QUEUED','PACKET: 通学路の安全対策 ........... QUEUED',
   'PACKET: 医療アクセス改善 ........... QUEUED','PACKET: 農業後継者支援 ............. QUEUED',
   'PACKET: バス路線の維持 ............. QUEUED','PACKET: 保育所の増設 ............... QUEUED',
   'PACKET: 防災インフラ点検 ........... QUEUED','PACKET: 商店街の再生 ............... QUEUED',
 ];
+const P4_LOG_POLICY_EN=[
+  'PACKET: water main renewal ......... QUEUED','PACKET: school route safety ........ QUEUED',
+  'PACKET: medical access ............. QUEUED','PACKET: farm successor support ..... QUEUED',
+  'PACKET: bus route preservation ..... QUEUED','PACKET: childcare expansion ........ QUEUED',
+  'PACKET: disaster infra inspection .. QUEUED','PACKET: shopping street revival .... QUEUED',
+];
 // 低エントロピー・ヘイトトークン（語彙3種のみ＝多様性の消失）
-const P4_LOG_HIJACK=['▌ 〇〇を勝たせろ！ ▐','▌ 敵を許すな！ ▐','▌ 裏切り者を叩け！ ▐'];
+const P4_LOG_HIJACK_JA=['▌ 〇〇を勝たせろ！ ▐','▌ 敵を許すな！ ▐','▌ 裏切り者を叩け！ ▐'];
+const P4_LOG_HIJACK_EN=['▌ MAKE_X_WIN! ▐','▌ NO_MERCY_FOR_ENEMIES! ▐','▌ PURGE_THE_TRAITORS! ▐'];
 
 function initP4Nodes(){
   const r=seedRng(5300000);
@@ -2593,13 +2720,13 @@ function updateP4Monitor(jamRatio){
   document.getElementById('p4DropNum').textContent=drop+'%';
   document.getElementById('p4DropNum').style.color=dc;
   document.getElementById('p4DropBar').style.cssText=`width:${drop}%;background:${dc}`;
-  document.getElementById('p4DropStatus').textContent=drop<35?'NOMINAL — 生活者の声はルーティングされています':drop<70?'CONGESTED — 政策パケットの損失が増加中':'BLACKOUT — サイレントマジョリティの声が完全遮断';
+  document.getElementById('p4DropStatus').textContent=drop<35?tt('NOMINAL — 生活者の声はルーティングされています','NOMINAL — residents\' voices are being routed'):drop<70?tt('CONGESTED — 政策パケットの損失が増加中','CONGESTED — policy packet loss rising'):tt('BLACKOUT — サイレントマジョリティの声が完全遮断','BLACKOUT — the silent majority is fully cut off');
   document.getElementById('p4DropStatus').style.color=dc;
   const rc=ratio<30?'#ff2244':ratio<60?'#ff6b2b':'#00ff88';
   document.getElementById('p4RatioNum').textContent=ratio;
   document.getElementById('p4RatioNum').style.color=rc;
   document.getElementById('p4RatioBar').style.cssText=`width:${ratio}%;background:${rc}`;
-  document.getElementById('p4RatioStatus').textContent=ratio<30?'HOLLOWED — 当事者不在の空洞化':ratio<60?'DILUTED — 部外者比率が上昇中':'GROUNDED — 当事者の声が反映されている';
+  document.getElementById('p4RatioStatus').textContent=ratio<30?tt('HOLLOWED — 当事者不在の空洞化','HOLLOWED — stakeholders absent'):ratio<60?tt('DILUTED — 部外者比率が上昇中','DILUTED — outsider share rising'):tt('GROUNDED — 当事者の声が反映されている','GROUNDED — stakeholder voices reflected');
   document.getElementById('p4RatioStatus').style.color=rc;
   const spamCount=p4Spam.filter(s=>!s.leaving).length;
   const eb=document.getElementById('p4ExtBadge');
@@ -2614,25 +2741,25 @@ function updateP4Monitor(jamRatio){
   fb.style.color=filterActive?'var(--cyan)':'var(--muted)';
   const diag=document.getElementById('p4Diag');
   if(filterActive){
-    diag.textContent='[ FILTERING ] 地域プロトコル保護が作動中。シビル攻撃トラフィックを遮断し、生活者パケットの優先度を100%へ回復しています。';
+    diag.textContent=tt('[ FILTERING ] 地域プロトコル保護が作動中。シビル攻撃トラフィックを遮断し、生活者パケットの優先度を100%へ回復しています。','[ FILTERING ] Regional protocol protection active. Sybil traffic blocked; resident packet priority restored to 100%.');
     diag.style.borderLeftColor='var(--cyan)';
   } else if(gamification>70&&extTraffic>60){
-    diag.textContent='[ CRITICAL ] 目的関数乗っ取り×シビル・フラッドの複合障害。530万人の生活課題が「勝ち負けゲーム」のノイズに完全に埋没しています。';
+    diag.textContent=tt('[ CRITICAL ] 目的関数乗っ取り×シビル・フラッドの複合障害。530万人の生活課題が「勝ち負けゲーム」のノイズに完全に埋没しています。','[ CRITICAL ] Compound failure: objective hijack × sybil flood. 5.3M residents\' issues are buried under win/lose-game noise.');
     diag.style.borderLeftColor='var(--red)';
   } else if(gamification>70){
-    diag.textContent='[ WARNING ] 目的関数が「政策の改善」から「敵味方ゲーム」へ書き換えられました。ログの多様性（エントロピー）が消失しています。';
+    diag.textContent=tt('[ WARNING ] 目的関数が「政策の改善」から「敵味方ゲーム」へ書き換えられました。ログの多様性（エントロピー）が消失しています。','[ WARNING ] The objective function was rewritten from "policy improvement" to a friend-or-foe game. Log entropy has collapsed.');
     diag.style.borderLeftColor='var(--red)';
   } else if(extTraffic>60){
-    diag.textContent='[ WARNING ] 外部ノードの大量流入を検出。生活者クラスターの通信リンクが遮断されつつあります。PACKET_FILTERINGを検討せよ。';
+    diag.textContent=tt('[ WARNING ] 外部ノードの大量流入を検出。生活者クラスターの通信リンクが遮断されつつあります。PACKET_FILTERINGを検討せよ。','[ WARNING ] Mass external influx detected. Resident links are being jammed. Consider PACKET_FILTERING.');
     diag.style.borderLeftColor='var(--ora)';
   } else {
-    diag.textContent='[ OK ] 当事者の声が正常にルーティングされています。パラメーターを操作して非対称性の発生をシミュレートできます。';
+    diag.textContent=tt('[ OK ] 当事者の声が正常にルーティングされています。パラメーターを操作して非対称性の発生をシミュレートできます。','[ OK ] Stakeholder voices routing normally. Adjust parameters to simulate asymmetry.');
     diag.style.borderLeftColor='var(--yel)';
   }
   const ab4=document.getElementById('alertBannerP4');
   if(gamification>70&&drop>60){
     ab4.classList.add('on');
-    document.getElementById('alertMsgP4').textContent='目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失';
+    document.getElementById('alertMsgP4').textContent=tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed');
   } else ab4.classList.remove('on');
 }
 
@@ -2642,16 +2769,18 @@ function updateP4Log(){
   const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
   const hijackTag=`<span style="font-size:.55em;color:#7a0010;background:rgba(255,0,60,.2);border:1px solid rgba(255,0,60,.4);border-radius:2px;padding:0 4px;margin-left:4px;vertical-align:middle">OBJECTIVE HIJACK</span><span style="font-size:.5em;color:#3a4050;margin-left:3px;vertical-align:middle">policy:null</span>`;
   let html;
+  const HIJ=lang==='ja'?P4_LOG_HIJACK_JA:P4_LOG_HIJACK_EN;
+  const POL=lang==='ja'?P4_LOG_POLICY_JA:P4_LOG_POLICY_EN;
   if(gamification>70){
     // 低エントロピー: 90%超では語彙2種のみをループ
     const pool=gamification>=90?2:3;
-    const tok=P4_LOG_HIJACK[p4LogSeq%pool];
+    const tok=HIJ[p4LogSeq%pool];
     html=`<span style="color:var(--red);animation:blink ${(0.4+(p4LogSeq%3)*0.15).toFixed(2)}s infinite">${ts} ${tok}${hijackTag}</span>`;
   } else if(gamification>40&&p4LogSeq%2===0){
-    const tok=P4_LOG_HIJACK[p4LogSeq%3];
+    const tok=HIJ[p4LogSeq%3];
     html=`<span style="color:rgba(255,34,68,.6)">${ts} ${tok}${hijackTag}</span>`;
   } else {
-    const p=P4_LOG_POLICY[p4LogSeq%P4_LOG_POLICY.length];
+    const p=POL[p4LogSeq%POL.length];
     const dropped=Math.random()*100<p4DropCurrent;
     html=dropped
       ?`<span style="color:var(--red)">${ts} ${p.replace('QUEUED','DROPPED ✕')}</span>`
@@ -2775,7 +2904,7 @@ function setPresetP2(id){
 
 const PRESETS_P3={
   reflex:  {dp:1,g:5, lr:50}, // 毒入れ攻撃フル発動
-  frozen:  {dp:8,g:60,lr:0},  // 深度は高いのに汚染が抜けない老害モード
+  frozen:  {dp:8,g:60,lr:0},  // 深度は高いのに汚染が抜けない思考凍結モード
   fasting: {dp:5,g:95,lr:60}, // 物理現実回帰による回復
   debugger:{dp:9,g:70,lr:80}, // 完全デバッグ状態
 };
@@ -2822,6 +2951,128 @@ function closeIntro(){
 }
 function closeIntroIf(e){if(e.target===document.getElementById('introModal'))closeIntro();}
 function introGo(n){closeIntro();switchTab(n);}
+
+// ── v6.0: Canvasの動的リサイズ（回転・ウィンドウ変更対応） ──
+// ノード座標は0-1正規化済みのため、寸法の再設定だけで描画が追従する
+function refitCanvases(){
+  const fit=(id,ctxAlive,apply)=>{
+    const cv=document.getElementById(id);
+    if(!cv||!ctxAlive)return;
+    const w=cv.parentElement.clientWidth,h=cv.parentElement.clientHeight;
+    if(w>0&&h>0)apply(cv,w,h);
+  };
+  fit('scatterChart',scCtx2,(cv,w,h)=>{scW2=w;scH2=h;cv.width=w;cv.height=h;});
+  fit('agentCanvas',agCtx,(cv,w,h)=>{cW=w;cH=h;cv.width=w;cv.height=h;});
+  fit('p3Canvas',p3Ctx,(cv,w,h)=>{p3W=w;p3H=h;cv.width=w;cv.height=h;});
+  fit('p4Canvas',p4Ctx,(cv,w,h)=>{p4W=w;p4H=h;cv.width=w;cv.height=h;});
+}
+let refitTimer=null;
+window.addEventListener('resize',()=>{clearTimeout(refitTimer);refitTimer=setTimeout(refitCanvases,250);});
+
+// ── v5.3: カスケード崩壊（レイヤー間障害連動） ─────────────
+function updateCascadeFX(){
+  // P4 目的関数乗っ取り → P2 物理インフラへの破壊的ストレス
+  const hijack=gamification>70;
+  document.getElementById('p2StateCard')?.classList.toggle('cascade-stress',hijack);
+  document.getElementById('p2DeadlockPanel')?.classList.toggle('cascade-stress',hijack);
+  // P1 情報過学習 → P3 個人の認知へのハッキング侵食
+  const infoHack=filterRate>70;
+  document.getElementById('p3InputCard')?.classList.toggle('cascade-hack',infoHack);
+}
+
+// ── v5.3: 監査報告書（Grand Optimal） ─────────────────────
+function computeAuditSnapshot(){
+  const m1=metrics(filterRate,ethicsScore,algo);
+  const m2=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
+  const g=(dropoutActive?100:groundingRate)/100;
+  const fool=searchDepth<=3?1:searchDepth>=7?0:(7-searchDepth)/4;
+  const stub=1-learningRate/100;
+  const integ=Math.round(clamp(95-78*fool*(1-g*0.6)-stub*42,0,100));
+  const ratio=Math.round(clamp(100-gamification*0.85-extTraffic*0.2,0,100));
+  return{div:Math.round(m1.diversity),crash1:m1.crash,infra:Math.round(m2.infra),crash2:m2.crash,integ,ratio};
+}
+
+function checkGrandOptimal(){
+  const s=computeAuditSnapshot();
+  const ok=s.div>=70&&s.infra>=70&&s.integ>=70&&s.ratio>=70&&!s.crash1&&!s.crash2;
+  const bar=document.getElementById('auditBar');
+  if(bar)bar.style.display=ok?'block':'none';
+}
+
+function buildAuditReport(){
+  const s=computeAuditSnapshot();
+  const now=new Date();
+  const ts=now.toLocaleString(lang==='ja'?'ja-JP':'en-US');
+  if(lang==='ja')return `# 【社会OS・デバッグ監査報告書 / Social OS Audit Report】
+- **ステータス**: GRAND OPTIMAL（大域的最適化に成功）
+- **タイムスタンプ**: ${ts}
+
+## ■ 最終メトリクス
+| レイヤー | 指標 | 値 |
+|---|---|---|
+| L1 情報空間 | 情報多様性 | ${s.div} |
+| L2 物理インフラ | インフラ維持力 | ${s.infra} |
+| L3 個人の認知 | 認知健全性 | ${s.integ} |
+| L4 当事者性 | 真の当事者比率 | ${s.ratio} |
+
+## ■ 適用されたデバッグ・パッチの検証ログ
+1. **情報空間の正則化 (Information Regularization)**: フィルターバブルを抑制し、データ多様性を確保したことで、社会OSの「汎化性能（未知のショックへの耐性）」が回復。
+2. **公共的冗長性の復元 (Public Redundancy Restoration)**: 効率至上主義の過学習を停止し、「非効率な余白（Redundancy Buffer）」を確保したことで、ブラックスワン（環境ショック）に対する社会的耐故障性が確立。
+3. **探索アルゴリズムの深化 (Search Tree Optimization)**: 認知の探索深度を上げることで、自称・良識派ノードによる「正義の毒入れ攻撃（Poisoning Attack）」の看破に成功。
+4. **地域プロトコルの保護 (Sybil Traffic Filtering)**: 外部の部外者によるシビル攻撃を遮断し、530万人の真の生活者（サイレントマジョリティ）のパケット優先度を100%に復元。
+
+## ■ 結論
+本社会システムは、感情の過学習を脱し、論理と法のコード（DP）による持続可能なリブートに成功したことを証明する。`;
+  return `# [Social OS Audit Report]
+- **Status**: GRAND OPTIMAL (global optimization achieved)
+- **Timestamp**: ${ts}
+
+## Final Metrics
+| Layer | Metric | Value |
+|---|---|---|
+| L1 Information Space | Diversity | ${s.div} |
+| L2 Physical Infrastructure | Infrastructure | ${s.infra} |
+| L3 Individual Cognition | Cognitive Integrity | ${s.integ} |
+| L4 Stakeholder Voice | True Stakeholder Ratio | ${s.ratio} |
+
+## Verified Debug Patches
+1. **Information Regularization**: Suppressed filter bubbles and secured data diversity, restoring the social OS's generalization (resilience to unknown shocks).
+2. **Public Redundancy Restoration**: Halted efficiency-maximizing overfitting and secured "inefficient slack" (Redundancy Buffer), establishing fault tolerance against black swans.
+3. **Search Tree Optimization**: Deepened cognitive search, exposing the "poisoning attack" run by the self-proclaimed-fair node.
+4. **Sybil Traffic Filtering**: Blocked outsider sybil attacks and restored packet priority of 5.3M true residents (the silent majority) to 100%.
+
+## Conclusion
+This social system has escaped emotional overfitting and achieved a sustainable reboot on the code of logic and law (DP).`;
+}
+
+function openAuditReport(){
+  document.getElementById('auditText').value=buildAuditReport();
+  document.getElementById('auditModal').classList.add('on');
+}
+function closeAudit(){document.getElementById('auditModal').classList.remove('on');}
+function closeAuditIf(e){if(e.target===document.getElementById('auditModal'))closeAudit();}
+
+function copyAuditReport(){
+  const ta=document.getElementById('auditText');
+  const btn=document.getElementById('auditCopyBtn');
+  try{
+    navigator.clipboard.writeText(ta.value).then(()=>{
+      const orig=btn.textContent;
+      btn.textContent='✓ COPIED!';btn.classList.add('ok');
+      setTimeout(()=>{btn.textContent=orig;btn.classList.remove('ok');},2000);
+    });
+  }catch(e){ta.select();document.execCommand('copy');}
+}
+
+function postAuditToX(){
+  const url=new URL(location.href);
+  url.searchParams.set('f',filterRate);url.searchParams.set('e',ethicsScore);
+  url.searchParams.set('a',algo);url.searchParams.set('l',lang);
+  const txt=lang==='ja'
+    ?`社会OSのデバッグに成功しました。[ステータス: GRAND OPTIMAL]\n適用パッチ: 冗長性の復元 / 思考の再学習 / シビル攻撃の遮断\n\nあなたも狂ったアルゴリズムから社会システムを救い出せ。\n#社会OSデバッガー ${url.toString()}`
+    :`Successfully debugged the Social OS. [STATUS: GRAND OPTIMAL]\nPatches applied: redundancy restored / cognition retrained / sybil attacks filtered\n\nCan you rescue society from its broken algorithms?\n#SocialOSDebugger ${url.toString()}`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
+}
 
 (function init(){
   const p=new URLSearchParams(location.search);
@@ -2871,6 +3122,9 @@ function introGo(n){closeIntro();switchTab(n);}
   setPct(document.getElementById('gamification'));
   // イントロモーダル: 初回訪問時のみ自動表示（ℹ GUIDEでいつでも再表示可）
   try{if(!localStorage.getItem('ssd_intro_seen'))openIntro();}catch(e){}
+  // v5.3: カスケード崩壊判定＋Grand Optimal判定（非表示タブも裏側で監視）
+  setInterval(()=>{updateCascadeFX();checkGrandOptimal();},500);
+  updateCascadeFX();checkGrandOptimal();
 })();
 </script>
 </body>
