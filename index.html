@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.0</title>
+<title>社会＆地域インフラ・デバッガー v6.1</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -262,7 +262,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.0 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.1 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -834,7 +834,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.0 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.1 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1455,14 +1455,6 @@ function drawAgents(){
         agCtx.setLineDash([4,5]);agCtx.stroke();agCtx.setLineDash([]);
       });
     });
-    // FPレート表示更新
-    document.getElementById('agSt1').textContent=`ECHO EXPOSURE: ${(nodes.reduce((s,n)=>s+n.c,0)/N*100).toFixed(1)}%`;
-    if(fpIntensity>0.1){
-      document.getElementById('agSt2').textContent=`FALSE POSITIVE: ${(fpIntensity*100).toFixed(0)}% [FC誤攻撃中]`;
-      document.getElementById('agSt2').style.color='var(--red)';
-    }
-  } else {
-    document.getElementById('agSt2').style.color='var(--muted)';
   }
   nodes.forEach(n=>{
     const x=n.x*cW,y=n.y*cH,r=n.isLeader?9:n.isFC?7:5;
@@ -1477,7 +1469,16 @@ function drawAgents(){
   });
   const avgC=nodes.reduce((s,n)=>s+n.c,0)/N;
   document.getElementById('agSt1').textContent=`ECHO EXPOSURE: ${(avgC*100).toFixed(1)}%`;
-  document.getElementById('agSt2').textContent=`IN ECHO CHAMBER: ${nodes.filter(n=>n.c>0.6).length}/${N}`;
+  // FP発動中はFALSE POSITIVE表示を優先（従来はここで毎フレーム上書きされ表示されなかった）
+  const fpI=filterRate>70?(filterRate-70)/30*(1-historicalImmunity/100):0;
+  const st2=document.getElementById('agSt2');
+  if(fpI>0.1){
+    st2.textContent=tt(`FALSE POSITIVE: ${(fpI*100).toFixed(0)}% [FC誤攻撃中]`,`FALSE POSITIVE: ${(fpI*100).toFixed(0)}% [FC under attack]`);
+    st2.style.color='var(--red)';
+  } else {
+    st2.textContent=`IN ECHO CHAMBER: ${nodes.filter(n=>n.c>0.6).length}/${N}`;
+    st2.style.color='var(--muted)';
+  }
 }
 
 function agentLoop(){animId=requestAnimationFrame(agentLoop);stepAgents();drawAgents()}
@@ -1910,8 +1911,8 @@ function switchTab(n){
     document.getElementById('tab'+i+'Btn').classList.toggle('active', n===i);
   });
   if(n===2) updateAllP2();
-  if(n===3) startP3();
-  if(n===4) startP4();
+  if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
+  if(n===4&&!p4Started) startP4();
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
 }
 
@@ -2056,8 +2057,8 @@ function updateAllP2(){
   // CPU
   document.getElementById('p2CpuRepair').style.width=m.cpuRepair+'%';
   document.getElementById('p2CpuBlame').style.width=m.cpuBlame+'%';
-  document.getElementById('p2CpuRepairPct').textContent=m.cpuRepair;
-  document.getElementById('p2CpuBlamePct').textContent=m.cpuBlame;
+  document.getElementById('p2CpuRepairPct').textContent=Math.round(m.cpuRepair);
+  document.getElementById('p2CpuBlamePct').textContent=Math.round(m.cpuBlame);
   // Deadlock
   const dp=document.getElementById('p2DeadlockPanel');
   const db=document.getElementById('p2DeadlockBadge');
