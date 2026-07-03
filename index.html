@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.2</title>
+<title>社会＆地域インフラ・デバッガー v6.3</title>
 <!-- v6.2: OGP / SNSカード -->
-<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.2">
+<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.3">
 <meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
@@ -301,7 +301,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.2 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.3 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -413,6 +413,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </div>
       <div class="diag" id="diag"></div>
       <div class="hist" id="histRef"></div>
+      <button class="sbtn" id="p1ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP1Result()">▶ この結果を送る</button>
     </div>
   </div>
 
@@ -727,6 +728,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="si"><div class="sl">ROOT PRIVILEGE</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
       </div>
       <div class="diag" id="p3Diag" style="border-left-color:var(--pur)"></div>
+      <button class="sbtn" id="p3ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP3Result()">▶ この結果を送る</button>
     </div>
   </div>
 
@@ -827,6 +829,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="si"><div class="sl">FILTER STATUS</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
       </div>
       <div class="diag" id="p4Diag" style="border-left-color:var(--yel)"></div>
+      <button class="sbtn" id="p4ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP4Result()">▶ この結果を送る</button>
     </div>
   </div>
 
@@ -875,7 +878,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.2 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.3 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -974,6 +977,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </ul>
     </div>
     <div class="mfo" data-i18n="sg_note">*あくまでオススメの使い方です。</div>
+    <button class="sbtn" id="etiquetteSaveBtn" style="margin-top:14px;border-color:var(--cyan);color:var(--cyan)" onclick="saveEtiquetteCard(this)" data-i18n="sg_save">⬇ このカードを保存</button>
   </div>
 </div>
 
@@ -1148,6 +1152,7 @@ const I18N = {
     sg_dont_t:'Do-not list',
     sg_dont:'<li>Do not attach real names</li><li>Do not spell out “this is exactly about ◯◯” (let the receiver discover it)</li><li>Do not paste into threads mid-argument</li><li>Do not use it to persuade anyone — share curiosity only</li>',
     sg_note:'*These are only suggestions.',
+    sg_save:'⬇ Save this card',
   }
 };
 
@@ -1850,6 +1855,19 @@ function updateAll(){
   } else ab.classList.remove('on');
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
+
+  // v6.3: プリセット適用で安定/崩壊が確定した瞬間だけ共有ボタンを出す（P2の shockShareBtn パターン踏襲）
+  const p1b=document.getElementById('p1ShareBtn');
+  if(p1b){
+    if(activePreset){
+      p1ShareState={type:m.crash?'crash':'stable'};
+      p1b.style.display='block';
+      p1b.textContent=tt('▶ この結果を送る','▶ Share this result');
+    }else{
+      p1ShareState=null;
+      p1b.style.display='none';
+    }
+  }
 }
 
 function getDiag(m){
@@ -2027,6 +2045,11 @@ let p2LogEntries=[];
 let p2LogTimer=null;
 let publicReboot=false;
 let shockState=null;
+// v6.3: P1/P3/P4 判定確定ステート（shockStateに相当。null=判定未確定でボタン非表示）
+let p1ShareState=null, p3ShareState=null, p4ShareState=null;
+// v6.3: 結果カード生成用スナップショット（アニメ由来の判定値を保持）
+let p3Snapshot={integ:100,dop:0,fooled:0};
+let p4Snapshot={drop:0,ratio:100};
 
 const P2_LOG_NORMAL_JA=[
   'INFRA_MAINT_SCHEDULED ........ OK','HELI_DISPATCH_STATUS ......... ONLINE',
@@ -2565,6 +2588,19 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     ab3.classList.add('on');
     document.getElementById('alertMsgP3').textContent=tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.');
   } else ab3.classList.remove('on');
+
+  // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
+  p3Snapshot={integ,dop:dopR,fooled};
+  const p3b=document.getElementById('p3ShareBtn');
+  if(p3b){
+    if(attackEdges>0) p3ShareState={type:'poison'};
+    else if(searchDepth>=7&&fooled===0) p3ShareState={type:'restored'};
+    else p3ShareState=null;
+    if(p3ShareState){
+      p3b.style.display='block';
+      p3b.textContent=tt('▶ この結果を送る','▶ Share this result');
+    }else p3b.style.display='none';
+  }
 }
 
 function simTimelineP3(depth,ground,steps=65){
@@ -2872,6 +2908,19 @@ function updateP4Monitor(jamRatio){
     ab4.classList.add('on');
     document.getElementById('alertMsgP4').textContent=tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed');
   } else ab4.classList.remove('on');
+
+  // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
+  p4Snapshot={drop,ratio};
+  const p4b=document.getElementById('p4ShareBtn');
+  if(p4b){
+    if(gamification>70) p4ShareState={type:'hijack'};
+    else if(gamification<=40) p4ShareState={type:'restored'};
+    else p4ShareState=null;
+    if(p4ShareState){
+      p4b.style.display='block';
+      p4b.textContent=tt('▶ この結果を送る','▶ Share this result');
+    }else p4b.style.display='none';
+  }
 }
 
 function updateP4Log(){
@@ -3227,6 +3276,12 @@ function buildShareTemplates(ctx){
     'Honestly fun as a game: tweak a society’s parameters and watch it collapse — or survive.');
   const addDeadlock=()=>add('行政のCPUが100%「責任回避」に回ると救命ヘリが止まる、っていうシミュレーターがあって、ちょっと出来が良すぎる',
     'There’s a simulator where the rescue helicopter stops once the admin CPU hits 100% “blame-avoidance”. It’s a little too well made.');
+  const addEchoChamber=()=>add('1タップで1933年を再現できるんだけど、パラメータ変えたら普通に持ち直した。歴史がゲームになってる',
+    'You can recreate 1933 with one tap — but tweak the parameters and it recovers. History, turned into a game.');
+  const addPoisoning=()=>add('SNSの接続時間を増やすと脳のネットワークが赤く汚染されていくの、可視化されるとけっこう怖い',
+    'Crank up screen time and you can watch the cognitive network turn red in real time. Seeing it visualized is unsettling.');
+  const addHijack=()=>add('外部の声を増やしていくと、当事者の意見が静かにかき消されていくのが数値で見える',
+    'Add more outside noise and you can watch the actual stakeholders’ voices get quietly drowned out, in real time.');
   if(ctx.kind==='shock'){
     if(ctx.type==='crash') add('同じ災害を2回入れて、設定だけで生き残れるか試すやつ。この設定だと落ちた…',
       'A sim where you inject the same disaster twice and see if the settings alone survive. This setup collapsed…');
@@ -3240,6 +3295,27 @@ function buildShareTemplates(ctx){
     add('社会OSのデバッグに成功した。冗長性を戻して思考を再学習させると、社会は生き残れるらしい',
       'Successfully debugged the social OS. Restore redundancy and retrain cognition, and society survives.');
     addGame();addGeneric();
+  }else if(ctx.kind==='p1'){
+    if(ctx.type==='crash') add('パラメータを設定して社会を動かしたら、そのまま崩壊した実験。誰の話でもないのに見覚えがある',
+      'A run where I set the parameters, let the society go — and it collapsed. About nobody, yet so familiar.');
+    else add('パラメータを設定して社会を動かしたら、崩壊せずに安定して回りはじめた実験',
+      'A run where I set the parameters, let the society go — and it stabilized instead of collapsing.');
+    if(metrics(filterRate,ethicsScore,algo).crash)addEchoChamber();else addGame();
+    addGeneric();
+  }else if(ctx.kind==='p3'){
+    if(ctx.type==='poison') add('探索を浅くすると、事実を述べるノードが集団で赤く攻撃されはじめる実験。脳の話であって政治の話じゃない',
+      'A run where, with shallow reasoning, fact-stating nodes get mobbed in red. It’s about brains, not politics.');
+    else add('探索深度を上げたら、毒入れ攻撃が止まって認知ネットワークが元に戻った実験',
+      'A run where raising the search depth stopped the poisoning attack and the cognitive network recovered.');
+    if(ctx.type==='poison')addPoisoning();else addGame();
+    addGeneric();
+  }else if(ctx.kind==='p4'){
+    if(ctx.type==='hijack') add('外部トラフィックを増やすと、当事者の政策パケットがドロップして議論が乗っ取られる実験',
+      'A run where adding outside traffic drops the stakeholders’ policy packets and the debate gets hijacked.');
+    else add('外部トラフィックを絞ると、当事者の声がちゃんとルーティングされて議論が戻る実験',
+      'A run where throttling outside traffic lets the stakeholders’ voices route through and the debate recovers.');
+    if(gamification>70)addHijack();else addGame();
+    addGeneric();
   }else if(ctx.kind==='preset'){
     if(ctx.page===1){
       if(ctx.preset==='weimar')add('1933年の崩壊を1タップで再現できるシミュレーター。パラメータを変えると結末が変わる',
@@ -3315,7 +3391,7 @@ function renderSharePop(){
   // 判定・監査コンテキストのみ: 結果カードPNG
   const row=document.getElementById('shareCardRow');
   row.innerHTML='';
-  if(shareCtx.kind==='shock'||shareCtx.kind==='audit'){
+  if(['shock','audit','p1','p3','p4'].includes(shareCtx.kind)){
     const cb=document.createElement('button');
     cb.className='sbtn';cb.style.cssText='margin-top:8px;border-color:var(--green);color:var(--green)';
     cb.textContent=canShareFiles()
@@ -3344,6 +3420,19 @@ function shareShockResult(){
   if(!shockState)return;
   shareScenario({kind:'shock',type:shockState.type});
 }
+// v6.3: P1/P3/P4 判定共有（shareShockResult をそのまま流用）
+function shareP1Result(){
+  if(!p1ShareState)return;
+  shareScenario({kind:'p1',type:p1ShareState.type,preset:activePreset});
+}
+function shareP3Result(){
+  if(!p3ShareState)return;
+  shareScenario({kind:'p3',type:p3ShareState.type});
+}
+function shareP4Result(){
+  if(!p4ShareState)return;
+  shareScenario({kind:'p4',type:p4ShareState.type});
+}
 
 // ── 結果カードPNG（1200×630, 既存トークン準拠） ──────────────
 function canShareFiles(){
@@ -3354,6 +3443,9 @@ function canShareFiles(){
 
 function cardStamp(ctx){
   if(ctx.kind==='audit')return{txt:'GRAND OPTIMAL',color:'#00ff88'};
+  if(ctx.kind==='p1')return ctx.type==='crash'?{txt:'COLLAPSE',color:'#ff2244'}:{txt:'STABLE',color:'#00ff88'};
+  if(ctx.kind==='p3')return ctx.type==='poison'?{txt:'POISONED',color:'#ff2244'}:{txt:'DEBUGGED',color:'#00ff88'};
+  if(ctx.kind==='p4')return ctx.type==='hijack'?{txt:'HIJACKED',color:'#ff2244'}:{txt:'GROUNDED',color:'#00ff88'};
   if(ctx.type==='crash')return{txt:'COLLAPSE',color:'#ff2244'};
   if(ctx.type==='survived')return{txt:'SURVIVED',color:'#00ff88'};
   return{txt:'PARTIAL DAMAGE',color:'#ff6b2b'};
@@ -3367,6 +3459,19 @@ function cardGauges(ctx){
            {l:'L3 COGNITIVE INTEGRITY',v:s.integ},{l:'L4 STAKEHOLDER RATIO',v:s.ratio}]
            .map(g=>({...g,c:col(g.v)}));
   }
+  if(ctx.kind==='p1'){
+    const m1=metrics(filterRate,ethicsScore,algo);
+    return[{l:'SOCIAL CAPITAL',v:Math.round(m1.socialCap)},{l:'INFRASTRUCTURE',v:Math.round(m1.infra)},
+           {l:'DIVERSITY INDEX',v:Math.round(m1.diversity)}].map(g=>({...g,c:col(g.v)}));
+  }
+  if(ctx.kind==='p3'){
+    return[{l:'COGNITIVE INTEGRITY',v:Math.round(p3Snapshot.integ)},{l:'JUSTICE CALM',v:Math.round(clamp(100-p3Snapshot.dop,0,100))},
+           {l:'SEARCH DEPTH',v:Math.round(clamp(searchDepth*10,0,100))}].map(g=>({...g,c:col(g.v)}));
+  }
+  if(ctx.kind==='p4'){
+    return[{l:'STAKEHOLDER RATIO',v:Math.round(p4Snapshot.ratio)},{l:'VOICE ROUTED',v:Math.round(clamp(100-p4Snapshot.drop,0,100))},
+           {l:'POLICY FOCUS',v:Math.round(clamp(100-gamification,0,100))}].map(g=>({...g,c:col(g.v)}));
+  }
   const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
   const rb=shockState?shockState.rb:m.redundancy;
   return[{l:'REDUNDANCY BUFFER',v:Math.round(rb)},{l:'INFRASTRUCTURE',v:Math.round(m.infra)},
@@ -3375,6 +3480,9 @@ function cardGauges(ctx){
 
 function cardPageLabel(ctx){
   if(ctx.kind==='audit')return tt('SOCIAL OS AUDIT — 全レイヤー健全域','SOCIAL OS AUDIT — ALL LAYERS HEALTHY');
+  if(ctx.kind==='p1')return 'PAGE 1: SOCIAL OS — ECHO CHAMBER';
+  if(ctx.kind==='p3')return 'PAGE 3: INDIVIDUAL COGNITION — POISONING ATTACK';
+  if(ctx.kind==='p4')return 'PAGE 4: STAKEHOLDER TRAFFIC — SYBIL FLOOD';
   return 'PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T';
 }
 
@@ -3393,7 +3501,7 @@ function generateResultCard(ctx){
   // アプリ名 + ページ名
   c.fillStyle='#00d4ff';c.font='bold 32px '+MONO;
   c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.2 ]','[ SOCIAL SYSTEM DEBUGGER v6.2 ]'),56,86);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.3 ]','[ SOCIAL SYSTEM DEBUGGER v6.3 ]'),56,86);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,122);
@@ -3430,23 +3538,153 @@ function generateResultCard(ctx){
   return cv;
 }
 
+// ── 共有作法カード（⇪ 3か条・1200×630, 内容固定 → 初回のみ生成しキャッシュ） ──
+// 文言は shareGuideModal の sg_dont / sg_note と完全一致
+function generateEtiquetteCard(){
+  const W=1200,H=630,MONO='"Courier New",monospace';
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  const rrect=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
+  // 背景 + グリッド（薄シアン48px） + 四隅L字アクセント
+  c.fillStyle='#070b14';c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(0,212,255,.045)';c.lineWidth=1;
+  for(let x=48;x<W;x+=48){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=48;y<H;y+=48){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  c.strokeStyle='#00d4ff';c.lineWidth=3;
+  [[24,24,1,1],[W-24,24,-1,1],[24,H-24,1,-1],[W-24,H-24,-1,-1]].forEach(([x,y,dx,dy])=>{
+    c.beginPath();c.moveTo(x,y+34*dy);c.lineTo(x,y);c.lineTo(x+34*dx,y);c.stroke();});
+  // 見出し（中央寄せ・シアン太字グロー）
+  c.textAlign='center';
+  c.fillStyle='#00d4ff';c.font='bold 30px '+MONO;
+  c.shadowColor='#00d4ff';c.shadowBlur=18;
+  c.fillText(tt('⇪ 共有のつかいかた — 送るときの3か条','⇪ Share Etiquette — 3 rules before you send'),W/2,80);
+  c.shadowBlur=0;
+  // サブ（明るめ白系・太字）
+  c.fillStyle='#d8e4ff';c.font='bold 18px '+MONO;
+  c.fillText(tt('気まずい話題ほど、送り方がすべて。','The touchier the topic, the more delivery is everything.'),W/2,112);
+  // 免責サブライン（ルールではなく推奨）
+  c.fillStyle='#5a6f94';c.font='15px '+MONO;
+  c.fillText(tt('※ これは推奨する共有方法の一例です。必ず守るべきルールではありません。','* A recommended way to share — not a rule you must follow.'),W/2,140);
+  c.textAlign='left';
+  // テキスト折り返し（日本語=文字単位 / 英語=単語単位）
+  const wrap=(text,x,yy,maxW,lh,font,color)=>{
+    c.font=font;c.fillStyle=color;
+    const isJa=lang==='ja';
+    const units=isJa?[...text]:text.split(' ');
+    let line='';
+    for(let i=0;i<units.length;i++){
+      const test=isJa?line+units[i]:(line?line+' ':'')+units[i];
+      if(c.measureText(test).width>maxW&&line){c.fillText(line,x,yy);line=units[i];yy+=lh;}
+      else line=test;
+    }
+    if(line)c.fillText(line,x,yy);
+    return yy+lh;
+  };
+  // 3か条（番号色: 赤/黄/緑）— 各行は角丸ボックス＋発光番号バッジ＋タイトル＋説明
+  // 文言は sg_dont[0/1/3] と完全一致
+  const rules=[
+    {n:'01',color:'#ff2244',h:tt('人名を、添えない。','Don’t attach names.'),
+     d:tt('実在の人名を添えて送らない','Do not attach real names')},
+    {n:'02',color:'#ffcc00',h:tt('答えを、言わない。','Don’t give the answer.'),
+     d:tt('「これがまさに◯◯のこと」と答えを言わない（受け手に発見させる）','Do not spell out “this is exactly about ◯◯” (let the receiver discover it)')},
+    {n:'03',color:'#00ff88',h:tt('好奇心だけ、添える。','Add only curiosity.'),
+     d:tt('相手を説得する道具として使わない（好奇心の共有だけ）','Do not use it to persuade anyone — share curiosity only')},
+  ];
+  rules.forEach((r,i)=>{
+    const y=166+i*118;
+    // ボックス（薄い塗り＋同色枠線）
+    c.fillStyle='rgba(15,24,41,.85)';c.strokeStyle=r.color;c.lineWidth=1.6;
+    rrect(90,y,1020,96,6);c.fill();c.stroke();
+    // 番号バッジ（発光）
+    c.fillStyle=r.color;c.font='bold 40px '+MONO;
+    c.shadowColor=r.color;c.shadowBlur=14;
+    c.fillText(r.n,130,y+62);c.shadowBlur=0;
+    // タイトル
+    c.fillStyle='#d8e4ff';c.font='bold 30px '+MONO;
+    c.fillText(r.h,250,y+40);
+    // 説明（ボックス内幅で折り返し / 最大2行までボックス内に収まる）
+    wrap(r.d,250,y+64,840,22,'18px '+MONO,'#8fa5cc');
+  });
+  // フッター帯（角丸ボックス＋区切り線＋免責文＋アプリ名 v6.3）
+  c.fillStyle='rgba(15,24,41,.9)';c.strokeStyle='#172340';c.lineWidth=1;
+  rrect(90,522,1020,74,6);c.fill();c.stroke();
+  c.strokeStyle='rgba(23,35,64,.9)';c.beginPath();c.moveTo(120,562);c.lineTo(1080,562);c.stroke();
+  c.textAlign='center';
+  c.fillStyle='#5a6f94';c.font='16px '+MONO;
+  c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
+  c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.3 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.3'),W/2,583);
+  c.textAlign='left';
+  return cv;
+}
+
+let _etiquetteCardBlob=null, _etiquetteCardLang=null;
+async function getEtiquetteCardBlob(){
+  if(_etiquetteCardBlob&&_etiquetteCardLang===lang)return _etiquetteCardBlob;
+  const cv=generateEtiquetteCard();
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  _etiquetteCardBlob=blob;_etiquetteCardLang=lang;
+  return blob;
+}
+function canShareMultipleFiles(a,b){
+  if(!navigator.canShare)return false;
+  try{return navigator.canShare({files:[a,b]});}catch(e){return false;}
+}
+
+// 共有ガイド内「⬇ このカードを保存」: 作法カード単体を保存/共有
+async function saveEtiquetteCard(btn){
+  const blob=await getEtiquetteCardBlob();
+  if(!blob)return;
+  // モバイル: 共有シート経由で「画像を保存」できる
+  if(canShareFiles()){
+    const file=new File([blob],'share-etiquette.png',{type:'image/png'});
+    try{await navigator.share({files:[file]});return;}
+    catch(e){if(e&&e.name==='AbortError')return;/* 失敗時はDLへフォールバック */}
+  }
+  // デスクトップ: PNGダウンロード
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='share-etiquette-card.png';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  if(btn){
+    const o=btn.innerHTML;
+    btn.innerHTML=tt('✓ 保存しました','✓ Saved');btn.classList.add('ok');
+    setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('ok');},1800);
+  }
+}
+
+// 結果カード + 作法カードの2枚添付共有（P2ショック / P1・P3・P4 判定 共通）
+async function shareWithEtiquette(resultBlob,message){
+  if(!resultBlob)return false;
+  const url=buildShareURL();
+  const resultFile=new File([resultBlob],'result-card.png',{type:'image/png'});
+  if(canShareFiles()){
+    const etqBlob=await getEtiquetteCardBlob();
+    const etqFile=etqBlob?new File([etqBlob],'share-etiquette.png',{type:'image/png'}):null;
+    if(etqFile&&canShareMultipleFiles(resultFile,etqFile)){
+      // 複数ファイル対応: 結果カード + 作法カードの2枚を同送
+      try{await navigator.share({files:[resultFile,etqFile],text:message+'\n'+url});return true;}
+      catch(e){if(e&&e.name==='AbortError')return true;}
+    }else{
+      // 複数ファイル非対応: 結果カード1枚 + メッセージ末尾にガイド誘導文
+      const tip=tt('\n送り方のコツ → アプリ内の「⇪ 共有ガイド」','\nTip: see the in-app “Share Guide” for how to send this well.');
+      try{await navigator.share({files:[resultFile],text:message+tip+'\n'+url});return true;}
+      catch(e){if(e&&e.name==='AbortError')return true;}
+    }
+  }
+  // ファイル共有非対応: PNGダウンロード（テキストはポップオーバーの他ボタンで別送）
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(resultBlob);a.download='ssd-result-card.png';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  return false;
+}
+
 async function shareResultCard(){
   const cv=generateResultCard(shareCtx||{kind:'generic'});
   const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
   if(!blob)return;
-  // Web Share API Level 2（files対応）: PNGを添付して共有
-  if(canShareFiles()){
-    const file=new File([blob],'result-card.png',{type:'image/png'});
-    try{
-      await navigator.share({files:[file],text:shareMessage()+'\n'+buildShareURL()});
-      return;
-    }catch(e){if(e&&e.name==='AbortError')return;/* 失敗時はDLへフォールバック */}
-  }
-  // 非対応: PNGダウンロード（テキスト共有はポップオーバーの他ボタンで別送）
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='ssd-result-card.png';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  await shareWithEtiquette(blob,shareMessage());
 }
 
 // ── プリセット適用直後の共有トースト ──────────────────────
