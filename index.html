@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.1</title>
+<title>社会＆地域インフラ・デバッガー v6.2</title>
+<!-- v6.2: OGP / SNSカード -->
+<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.2">
+<meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!-- og-image.png 制作仕様（アプリ内の結果カードPNGと同デザイン / generateResultCard 参照）:
+     ・サイズ 1200×630 / 背景 #070b14 + 48pxグリッド線 rgba(0,212,255,.06)
+     ・外枠 #00d4ff 3px + 内枠 rgba(0,212,255,.3) 1px
+     ・左上: [ 社会＆地域インフラ・デバッガー v6.2 ]（#00d4ff / 'Courier New' Bold 32px / シアン発光）
+     ・その下: サブタイトル（#5a6f94 / 20px）
+     ・左中央: 横ゲージバー3本（REDUNDANCY / INFRASTRUCTURE / COGNITION、ベース #172340・塗り #00ff88）
+     ・右中央: 斜めスタンプ風「SIMULATION ACTIVE」（#00ff88 / 二重枠 / -6°回転 / グロー）
+     ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -250,6 +265,30 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .am{font-size:.62rem}
   .foot{font-size:.5rem;line-height:1.9}
 }
+/* v6.2: 共有システム（ポップオーバー・トースト・ガイド） */
+.share-tpls{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.share-tpl{text-align:left;padding:10px 12px;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;line-height:1.7;cursor:pointer;transition:all .2s}
+.share-tpl:hover{border-color:rgba(0,212,255,.4);color:var(--txt)}
+.share-tpl.sel{border-color:var(--cyan);color:var(--txt);background:rgba(0,212,255,.07);box-shadow:0 0 10px rgba(0,212,255,.15)}
+.share-acts{display:flex;gap:8px;flex-wrap:wrap}
+.share-acts .sbtn{flex:1;min-width:130px;margin-top:0}
+.share-toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,14px);opacity:0;pointer-events:none;transition:all .3s;z-index:1100}
+.share-toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.share-toast button{padding:11px 22px;background:var(--bg2);border:1px solid var(--cyan);border-radius:3px;color:var(--cyan);font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.1em;cursor:pointer;box-shadow:0 0 18px rgba(0,212,255,.35)}
+.share-toast button:active{transform:scale(.98)}
+.sg-tblwrap{overflow-x:auto}
+.sg-tbl{width:100%;border-collapse:collapse;font-size:.62rem;line-height:1.6}
+.sg-tbl th{color:var(--cyan);text-align:left;border-bottom:1px solid var(--bdr);padding:6px 8px;font-size:.58rem;letter-spacing:.08em;white-space:nowrap}
+.sg-tbl td{border-bottom:1px solid var(--bdr);padding:7px 8px;color:var(--txt);vertical-align:top}
+.sg-tbl td:first-child{color:var(--muted)}
+.sg-dont{margin:8px 0 0 18px;display:flex;flex-direction:column;gap:5px}
+@media(max-width:640px){
+  .share-acts .sbtn{min-width:0;flex:1 1 46%;padding:12px 6px;font-size:.64rem}
+  .share-tpl{font-size:.64rem}
+  .sg-tbl{font-size:.58rem}
+  .sg-tbl th{padding:5px 5px}
+  .sg-tbl td{padding:6px 5px}
+}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg0)}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
 </style>
 </head>
@@ -262,11 +301,12 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.1 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.2 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
+    <button class="ibtn" id="shareGuideBtn" onclick="openShareGuide()" data-i18n="sg_btn">⇪ 共有ガイド</button>
     <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
   </div>
 </div>
@@ -511,6 +551,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <button class="shock-btn" id="shockBtn" onclick="injectSystemShock()" data-i18n="p2_shock_btn">⚡ 環境ショック注入 (Inject System Shock)</button>
         <div class="pd" style="margin-top:6px" data-i18n="p2_shock_d">災害や未知の環境変化（ブラックスワン・イベント）をシステムに強制注入します。Redundancy Buffer &lt; 30%の社会は即時崩壊。≥ 60%なら生存継続。</div>
         <div class="shock-result-panel" id="shockResultPanel"></div>
+        <button class="sbtn" id="shockShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareShockResult()">▶ この結果を送る</button>
       </div>
     </div>
 
@@ -834,7 +875,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.1 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.2 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -843,9 +884,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
     <div class="mti" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
     <textarea id="auditText" readonly class="audit-ta"></textarea>
-    <div style="display:flex;gap:8px;margin-top:12px">
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
       <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
       <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
+      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="shareScenario({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
     </div>
   </div>
 </div>
@@ -883,6 +925,55 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     </div>
     <div class="mfo" style="border-left-color:var(--green);color:var(--green)" data-i18n="intro_tip">💡 一部のパラメーターはページを跨いで連動します。緑の「⇄」バッジが目印です（クリックで連動先へジャンプ）。</div>
     <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ デバッグを開始する</button>
+  </div>
+</div>
+
+<!-- v6.2: 共有ポップオーバー（テンプレ選択 → OS共有 / LINE / X / コピー） -->
+<div class="mo" id="sharePopModal" onclick="closeSharePopIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeSharePop()">✕</button>
+    <div class="mtag">⇪ SHARE EXPERIMENT</div>
+    <div class="mti" id="sharePopTitle">実験を共有</div>
+    <div class="cs" id="sharePopHint" style="margin-bottom:8px"></div>
+    <div class="share-tpls" id="shareTplList"></div>
+    <div class="share-acts" id="shareActions"></div>
+    <div id="shareCardRow"></div>
+    <div class="mfo" id="sharePopFoot" style="margin-top:10px;border-left-color:var(--cyan);color:var(--muted)"></div>
+  </div>
+</div>
+
+<!-- v6.2: プリセット適用直後の共有トースト -->
+<div class="share-toast" id="shareToast"><button id="shareToastBtn" onclick="shareFromToast()">⎘ このシナリオを送る</button></div>
+
+<!-- v6.2: 共有ガイドモーダル -->
+<div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
+  <div class="mb" style="max-width:640px">
+    <button class="mc" onclick="closeShareGuide()">✕</button>
+    <div class="mtag" data-i18n="sg_tag">SHARE GUIDE — 共有のつかいかた</div>
+    <div class="mti" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
+    <div class="mbd" style="margin-bottom:12px" data-i18n="sg_body">このアプリで共有されるのは主張ではなく、誰でも再現できる実験（パラメータ状態のURL）です。
+      <br> おすすめの送り方:</div>
+    <div class="sg-tblwrap">
+      <table class="sg-tbl">
+        <thead><tr data-i18n="sg_th"><th>相手</th><th>送る実験</th><th>添える一言の型</th></tr></thead>
+        <tbody>
+          <tr data-i18n="sg_r1"><td>特定の情報空間に深く入っている家族</td><td>PAGE 1 エコーチェンバー実験</td><td>「これ自分にも当てはまって笑った」（自分を主語に）</td></tr>
+          <tr data-i18n="sg_r2"><td>騒動の話題に疲れている友人</td><td>PAGE 3 DROP_OUT実験</td><td>「政治の話じゃなくて脳の話」</td></tr>
+          <tr data-i18n="sg_r3"><td>政治に興味がない人</td><td>PAGE 2 ショック対決</td><td>「ゲームとして面白い」</td></tr>
+          <tr data-i18n="sg_r4"><td>職場・グループLINE</td><td>汎用テンプレ</td><td>実験結果だけ。解釈は書かない</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mbd" style="margin-top:12px">
+      <strong style="color:var(--red)" data-i18n="sg_dont_t">やらないことリスト</strong>
+      <ul class="sg-dont" data-i18n="sg_dont">
+        <li>実在の人名を添えて送らない</li>
+        <li>「これがまさに◯◯のこと」と答えを言わない（受け手に発見させる）</li>
+        <li>論争中のスレッドに貼らない</li>
+        <li>相手を説得する道具として使わない（好奇心の共有だけ）</li>
+      </ul>
+    </div>
+    <div class="mfo" data-i18n="sg_note">*あくまでオススメの使い方です。</div>
   </div>
 </div>
 
@@ -1043,6 +1134,20 @@ const I18N = {
     audit_hint:'✓ GRAND OPTIMAL — all layers healthy. Export your debugging achievement as a report',
     audit_title:'Debug complete — the Social OS reached the global optimum',
     audit_copy:'⎘ Copy Markdown',
+    audit_share:'▶ Share with report',
+    // ── v6.2: share system ──
+    sg_btn:'⇪ SHARE GUIDE',
+    sg_tag:'SHARE GUIDE — how to share well',
+    sg_title:'Send an “experiment”, not an “opinion”',
+    sg_body:'What you share from this app is not a claim — it is a reproducible experiment (a URL of the parameter state). Recommended ways to send it:',
+    sg_th:'<th>Recipient</th><th>Experiment to send</th><th>One-liner pattern</th>',
+    sg_r1:'<td>Family deep inside one information space</td><td>PAGE 1 echo-chamber experiment</td><td>“This applied to me too — made me laugh” (make yourself the subject)</td>',
+    sg_r2:'<td>A friend tired of the controversy</td><td>PAGE 3 DROP_OUT experiment</td><td>“It’s about brains, not politics”</td>',
+    sg_r3:'<td>Someone uninterested in politics</td><td>PAGE 2 shock duel</td><td>“It’s fun as a game”</td>',
+    sg_r4:'<td>Work / group chats</td><td>Generic template</td><td>Results only. Add no interpretation.</td>',
+    sg_dont_t:'Do-not list',
+    sg_dont:'<li>Do not attach real names</li><li>Do not spell out “this is exactly about ◯◯” (let the receiver discover it)</li><li>Do not paste into threads mid-argument</li><li>Do not use it to persuade anyone — share curiosity only</li>',
+    sg_note:'*These are only suggestions.',
   }
 };
 
@@ -1836,14 +1941,13 @@ function setPreset(id){
   stopAnimation();
   restartAgents();
   updateAll();
+  showShareToast({kind:'preset',page:1,preset:id});
 }
 
 function shareURL(){
-  const url=new URL(location.href);
-  url.searchParams.set('f',filterRate);url.searchParams.set('e',ethicsScore);
-  url.searchParams.set('a',algo);url.searchParams.set('l',lang);
+  const url=buildShareURL();
   try{
-    navigator.clipboard.writeText(url.toString()).then(()=>{
+    navigator.clipboard.writeText(url).then(()=>{
       ['shareBtn','shareBtnFull'].forEach(id=>{
         const el=document.getElementById(id);if(!el)return;
         const orig=el.textContent;
@@ -1851,7 +1955,7 @@ function shareURL(){
         setTimeout(()=>{el.textContent=orig;el.classList.remove('ok')},2000);
       });
     });
-  }catch(e){prompt('Copy this URL:',url.toString())}
+  }catch(e){prompt('Copy this URL:',url)}
 }
 
 function openModal(key){
@@ -2129,6 +2233,12 @@ function updateAllP2(){
       sp.style.display='none';
       sp.className='shock-result-panel';
     }
+  }
+  // v6.2: 判定直後の文脈共有ボタン（感情のピークに隣接表示）
+  const ssb=document.getElementById('shockShareBtn');
+  if(ssb){
+    ssb.style.display=shockState?'block':'none';
+    if(shockState)ssb.textContent=tt('▶ この結果を送る','▶ Share this result');
   }
   // Operation log
   updateP2Log(m);
@@ -2901,6 +3011,7 @@ function setPresetP2(id){
   clearPresetSelP2();
   document.getElementById('p2-'+id)?.classList.add('sel');
   updateAllP2();
+  showShareToast({kind:'preset',page:2,preset:id});
 }
 
 const PRESETS_P3={
@@ -2922,6 +3033,7 @@ function setPresetP3(id){
   clearPresetSelP3();
   document.getElementById('p3-'+id)?.classList.add('sel');
   updateP3Chart();
+  showShareToast({kind:'preset',page:3,preset:id});
 }
 
 const PRESETS_P4={
@@ -2942,6 +3054,7 @@ function setPresetP4(id){
   clearPresetSelP4();
   document.getElementById('p4-'+id)?.classList.add('sel');
   updateP4Chart();
+  showShareToast({kind:'preset',page:4,preset:id});
 }
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
@@ -3075,12 +3188,310 @@ function postAuditToX(){
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
 }
 
+// ══════════════════════════════════════════════════════════
+// v6.2: 共有コアモジュール
+//   - buildShareURL: 既存シリアライズ(f/e/a/l)を全ページ状態へ拡張
+//   - shareScenario: テンプレ選択 → navigator.share / LINE / X / コピー
+//   - generateResultCard: 結果カードPNG (1200×630, OGP比率)
+// ══════════════════════════════════════════════════════════
+
+function buildShareURL(){
+  const url=new URL(location.href);
+  url.search='';
+  // PAGE 1（既存キーを踏襲 — 旧URLとの後方互換を維持）
+  url.searchParams.set('f',filterRate);url.searchParams.set('e',ethicsScore);
+  url.searchParams.set('a',algo);url.searchParams.set('l',lang);
+  // v6.2: 全ページの状態 + 表示タブ
+  url.searchParams.set('tab',currentTab);
+  url.searchParams.set('s',shrinkRate);url.searchParams.set('dx',dxRate);
+  url.searchParams.set('e2',ethicsP2);url.searchParams.set('a2',algoP2);
+  url.searchParams.set('r',publicReboot?1:0);
+  url.searchParams.set('sd',searchDepth);url.searchParams.set('g',groundingRate);url.searchParams.set('lr',learningRate);
+  url.searchParams.set('ext',extTraffic);url.searchParams.set('gam',gamification);
+  return url.toString();
+}
+
+// 全テンプレート末尾の固定フッター（政治的対称性の担保）
+function shareFooter(){
+  return tt('※特定の誰かではなく、どの社会にも起こる構造の話です',
+            '*Not about anyone specific — this is about structures any society can fall into.');
+}
+
+// 状態別メッセージテンプレート（フック1行＋説明、URL手前まで120字以内）
+function buildShareTemplates(ctx){
+  const T=[];
+  const add=(ja,en)=>{if(T.length<3)T.push(tt(ja,en))};
+  const addGeneric=()=>add('社会が壊れる仕組みをゲームみたいに再現できるアプリ。誰の話もしてないのに、いろいろ思い当たるのが怖い',
+    'An app that recreates how societies break down, like a game. It names nobody, yet so much of it feels familiar.');
+  const addGame=()=>add('ゲームとして普通に面白い。社会のパラメータをいじって、崩壊させたり生き残らせたりできる',
+    'Honestly fun as a game: tweak a society’s parameters and watch it collapse — or survive.');
+  const addDeadlock=()=>add('行政のCPUが100%「責任回避」に回ると救命ヘリが止まる、っていうシミュレーターがあって、ちょっと出来が良すぎる',
+    'There’s a simulator where the rescue helicopter stops once the admin CPU hits 100% “blame-avoidance”. It’s a little too well made.');
+  if(ctx.kind==='shock'){
+    if(ctx.type==='crash') add('同じ災害を2回入れて、設定だけで生き残れるか試すやつ。この設定だと落ちた…',
+      'A sim where you inject the same disaster twice and see if the settings alone survive. This setup collapsed…');
+    else if(ctx.type==='survived') add('同じ災害を2回入れて、パラメータだけで生き残れるか試すやつ。この設定だと生き残った',
+      'A sim where you inject the same disaster twice and see if parameters alone keep society alive. This setup survived.');
+    else add('同じ災害を入れて、設定だけで耐えられるか試すやつ。この設定だと一部損傷で踏みとどまった',
+      'A sim where you inject a disaster and see if settings alone hold. This setup took partial damage but held on.');
+    if(metricsP2(shrinkRate,dxRate,algoP2,ethicsP2).deadlock)addDeadlock();else addGame();
+    addGeneric();
+  }else if(ctx.kind==='audit'){
+    add('社会OSのデバッグに成功した。冗長性を戻して思考を再学習させると、社会は生き残れるらしい',
+      'Successfully debugged the social OS. Restore redundancy and retrain cognition, and society survives.');
+    addGame();addGeneric();
+  }else if(ctx.kind==='preset'){
+    if(ctx.page===1){
+      if(ctx.preset==='weimar')add('1933年の崩壊を1タップで再現できるシミュレーター。パラメータを変えると結末が変わる',
+        'A simulator that recreates the 1933 collapse in one tap. Change the parameters and the ending changes.');
+      else add('社会の崩壊パターンを1タップで再現できるシミュレーター。パラメータを変えると結末が変わる',
+        'A simulator that recreates societal collapse patterns in one tap. Change the parameters and the ending changes.');
+    }else if(ctx.page===2){
+      if(ctx.preset==='deadlock')addDeadlock();
+      else add('人口減少都市のインフラを自分で設計して、災害ショックに耐えられるか試せるシミュレーター',
+        'A simulator where you design a shrinking city’s infrastructure and test whether it survives a disaster shock.');
+    }else if(ctx.page===3){
+      add('怒りが止まらなくなる仕組みを「脳のシミュレーター」として再現するやつ。政治の話じゃなくて脳の話',
+        'A “brain simulator” that recreates why outrage becomes unstoppable. It’s about brains, not politics.');
+    }else{
+      add('当事者の声が観客の歓声にかき消されていく仕組みを再現するシミュレーター。誰の話でもないのに、見覚えがある',
+        'A simulator of how the voices of those actually affected get drowned out by spectators. About nobody — yet familiar.');
+    }
+    addGame();addGeneric();
+  }else{
+    addGeneric();addGame();
+  }
+  return T;
+}
+
+let shareCtx=null, shareTpls=[], shareSelIdx=0;
+
+function shareScenario(ctx){
+  shareCtx=ctx||{kind:'generic'};
+  shareTpls=buildShareTemplates(shareCtx);
+  shareSelIdx=0;
+  document.getElementById('sharePopTitle').textContent=tt('実験を共有','Share this experiment');
+  document.getElementById('sharePopHint').textContent=tt('文面を選んでください。URLには現在のパラメータ状態が含まれ、受け取った人が同じ実験を再現できます。',
+    'Pick a message. The URL carries the current parameter state, so the receiver can reproduce the same experiment.');
+  document.getElementById('sharePopFoot').textContent=tt('末尾に自動で付きます → ','Auto-appended → ')+shareFooter();
+  renderSharePop();
+  document.getElementById('sharePopModal').classList.add('on');
+}
+
+function shareMessage(){return shareTpls[shareSelIdx]+'\n'+shareFooter();}
+
+function renderSharePop(){
+  const list=document.getElementById('shareTplList');
+  list.innerHTML='';
+  shareTpls.forEach((tp,i)=>{
+    const b=document.createElement('button');
+    b.className='share-tpl'+(i===shareSelIdx?' sel':'');
+    b.textContent=(i===shareSelIdx?'▶ ':'○ ')+tp;
+    b.onclick=()=>{shareSelIdx=i;renderSharePop();};
+    list.appendChild(b);
+  });
+  const act=document.getElementById('shareActions');
+  act.innerHTML='';
+  const mk=(label,fn,cls)=>{
+    const b=document.createElement('button');
+    b.className='sbtn'+(cls?' '+cls:'');b.style.marginTop='0';
+    b.textContent=label;b.onclick=fn;act.appendChild(b);return b;
+  };
+  if(navigator.share){
+    // Web Share API: OS共有シート（LINEもここに出る）
+    mk(tt('⇪ 共有…（LINE等）','⇪ Share… (LINE etc.)'),async()=>{
+      try{await navigator.share({text:shareMessage()+'\n'+buildShareURL()});}catch(e){}
+    });
+  }else{
+    // フォールバック: LINE / X の直接リンク
+    mk(tt('💬 LINEで送る','💬 Send via LINE'),()=>{
+      window.open('https://line.me/R/share?text='+encodeURIComponent(shareMessage()+' '+buildShareURL()),'_blank');
+    });
+    mk(tt('𝕏 でポスト','𝕏 Post'),()=>{
+      window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(shareMessage()+'\n'+buildShareURL()),'_blank');
+    },'x-btn');
+  }
+  mk(tt('⎘ リンクをコピー','⎘ Copy link'),ev=>copyShareLink(ev.currentTarget));
+  // 判定・監査コンテキストのみ: 結果カードPNG
+  const row=document.getElementById('shareCardRow');
+  row.innerHTML='';
+  if(shareCtx.kind==='shock'||shareCtx.kind==='audit'){
+    const cb=document.createElement('button');
+    cb.className='sbtn';cb.style.cssText='margin-top:8px;border-color:var(--green);color:var(--green)';
+    cb.textContent=canShareFiles()
+      ?tt('🖼 結果カード（PNG）付きで共有','🖼 Share with result card (PNG)')
+      :tt('🖼 結果カード（PNG）を保存','🖼 Save result card (PNG)');
+    cb.onclick=()=>shareResultCard();
+    row.appendChild(cb);
+  }
+}
+
+function copyShareLink(btn){
+  const url=buildShareURL();
+  const done=()=>{
+    if(!btn)return;
+    const o=btn.textContent;
+    btn.textContent='✓ COPIED!';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1800);
+  };
+  try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
+}
+
+function closeSharePop(){document.getElementById('sharePopModal').classList.remove('on');}
+function closeSharePopIf(e){if(e.target===document.getElementById('sharePopModal'))closeSharePop();}
+
+function shareShockResult(){
+  if(!shockState)return;
+  shareScenario({kind:'shock',type:shockState.type});
+}
+
+// ── 結果カードPNG（1200×630, 既存トークン準拠） ──────────────
+function canShareFiles(){
+  if(!navigator.canShare)return false;
+  try{const f=new File(['x'],'x.png',{type:'image/png'});return navigator.canShare({files:[f]});}
+  catch(e){return false;}
+}
+
+function cardStamp(ctx){
+  if(ctx.kind==='audit')return{txt:'GRAND OPTIMAL',color:'#00ff88'};
+  if(ctx.type==='crash')return{txt:'COLLAPSE',color:'#ff2244'};
+  if(ctx.type==='survived')return{txt:'SURVIVED',color:'#00ff88'};
+  return{txt:'PARTIAL DAMAGE',color:'#ff6b2b'};
+}
+
+function cardGauges(ctx){
+  const col=v=>v<30?'#ff2244':v<60?'#ff6b2b':'#00ff88';
+  if(ctx.kind==='audit'){
+    const s=computeAuditSnapshot();
+    return[{l:'L1 DIVERSITY',v:s.div},{l:'L2 INFRASTRUCTURE',v:s.infra},
+           {l:'L3 COGNITIVE INTEGRITY',v:s.integ},{l:'L4 STAKEHOLDER RATIO',v:s.ratio}]
+           .map(g=>({...g,c:col(g.v)}));
+  }
+  const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
+  const rb=shockState?shockState.rb:m.redundancy;
+  return[{l:'REDUNDANCY BUFFER',v:Math.round(rb)},{l:'INFRASTRUCTURE',v:Math.round(m.infra)},
+         {l:'MUNICIPAL BUDGET',v:Math.round(m.budget)}].map(g=>({...g,c:col(g.v)}));
+}
+
+function cardPageLabel(ctx){
+  if(ctx.kind==='audit')return tt('SOCIAL OS AUDIT — 全レイヤー健全域','SOCIAL OS AUDIT — ALL LAYERS HEALTHY');
+  return 'PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T';
+}
+
+function generateResultCard(ctx){
+  const W=1200,H=630,MONO='"Courier New",monospace';
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  // 背景 + グリッド
+  c.fillStyle='#070b14';c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(0,212,255,.06)';c.lineWidth=1;
+  for(let x=48;x<W;x+=48){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=48;y<H;y+=48){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  // 二重フレーム
+  c.strokeStyle='#00d4ff';c.lineWidth=3;c.strokeRect(16,16,W-32,H-32);
+  c.strokeStyle='rgba(0,212,255,.3)';c.lineWidth=1;c.strokeRect(26,26,W-52,H-52);
+  // アプリ名 + ページ名
+  c.fillStyle='#00d4ff';c.font='bold 32px '+MONO;
+  c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.2 ]','[ SOCIAL SYSTEM DEBUGGER v6.2 ]'),56,86);
+  c.shadowBlur=0;
+  c.fillStyle='#5a6f94';c.font='20px '+MONO;
+  c.fillText(cardPageLabel(ctx),56,122);
+  // 主要ゲージ
+  const gs=cardGauges(ctx);
+  let gy=gs.length>3?184:208;
+  const gh=gs.length>3?80:100;
+  gs.forEach(g=>{
+    c.fillStyle='#5a6f94';c.font='19px '+MONO;
+    c.fillText(g.l,56,gy);
+    c.fillStyle='#172340';c.fillRect(56,gy+14,430,20);
+    c.fillStyle=g.c;c.fillRect(56,gy+14,430*clamp(g.v,0,100)/100,20);
+    c.font='bold 30px '+MONO;c.fillText(String(g.v),508,gy+34);
+    gy+=gh;
+  });
+  // 判定スタンプ（斜め二重枠 + グロー）
+  const st=cardStamp(ctx);
+  c.save();c.translate(880,290);c.rotate(-0.10);
+  const fs=st.txt.length>9?52:74;
+  c.font='bold '+fs+'px '+MONO;c.textAlign='center';
+  const tw=c.measureText(st.txt).width;
+  c.shadowColor=st.color;c.shadowBlur=22;
+  c.strokeStyle=st.color;c.lineWidth=6;
+  c.strokeRect(-tw/2-34,-fs*0.95,tw+68,fs*1.7);
+  c.lineWidth=2;c.strokeRect(-tw/2-44,-fs*1.08,tw+88,fs*1.96);
+  c.fillStyle=st.color;c.fillText(st.txt,0,fs*0.28);
+  c.restore();
+  c.textAlign='left';c.shadowBlur=0;
+  // 固定フッター + URL（小さく）
+  c.fillStyle='#5a6f94';c.font='18px '+MONO;
+  c.fillText(shareFooter(),56,H-84,W-112);
+  c.fillStyle='rgba(90,111,148,.85)';c.font='16px '+MONO;
+  c.fillText(buildShareURL(),56,H-52,W-112);
+  return cv;
+}
+
+async function shareResultCard(){
+  const cv=generateResultCard(shareCtx||{kind:'generic'});
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  if(!blob)return;
+  // Web Share API Level 2（files対応）: PNGを添付して共有
+  if(canShareFiles()){
+    const file=new File([blob],'result-card.png',{type:'image/png'});
+    try{
+      await navigator.share({files:[file],text:shareMessage()+'\n'+buildShareURL()});
+      return;
+    }catch(e){if(e&&e.name==='AbortError')return;/* 失敗時はDLへフォールバック */}
+  }
+  // 非対応: PNGダウンロード（テキスト共有はポップオーバーの他ボタンで別送）
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='ssd-result-card.png';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+
+// ── プリセット適用直後の共有トースト ──────────────────────
+let shareToastTimer=null;
+function showShareToast(ctx){
+  const tst=document.getElementById('shareToast');
+  if(!tst)return;
+  document.getElementById('shareToastBtn').textContent=tt('⎘ このシナリオを送る','⎘ Share this scenario');
+  tst.dataset.ctx=JSON.stringify(ctx||{kind:'generic'});
+  tst.classList.add('on');
+  clearTimeout(shareToastTimer);
+  shareToastTimer=setTimeout(()=>tst.classList.remove('on'),6000);
+}
+function shareFromToast(){
+  const tst=document.getElementById('shareToast');
+  tst.classList.remove('on');clearTimeout(shareToastTimer);
+  let ctx={kind:'generic'};
+  try{ctx=JSON.parse(tst.dataset.ctx||'{}');}catch(e){}
+  shareScenario(ctx);
+}
+
+// ── 共有ガイドモーダル ────────────────────────────────────
+function openShareGuide(){document.getElementById('shareGuideModal').classList.add('on');}
+function closeShareGuide(){document.getElementById('shareGuideModal').classList.remove('on');}
+function closeShareGuideIf(e){if(e.target===document.getElementById('shareGuideModal'))closeShareGuide();}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();}});
+
 (function init(){
   const p=new URLSearchParams(location.search);
   if(p.has('f'))filterRate=clamp(+p.get('f'),0,100);
   if(p.has('e'))ethicsScore=clamp(+p.get('e'),0,100);
   if(p.has('a')&&['dp','greedy'].includes(p.get('a')))algo=p.get('a');
   if(p.has('l')&&['ja','en'].includes(p.get('l')))lang=p.get('l');
+  // v6.2: 共有URLの拡張パラメータ復元（P2〜P4 + 表示タブ）
+  if(p.has('s'))shrinkRate=clamp(+p.get('s'),0,100);
+  if(p.has('dx'))dxRate=clamp(+p.get('dx'),0,100);
+  if(p.has('e2'))ethicsP2=clamp(+p.get('e2'),0,100);
+  if(p.has('a2')&&['dp','greedy'].includes(p.get('a2')))algoP2=p.get('a2');
+  if(p.has('r'))publicReboot=p.get('r')==='1';
+  if(p.has('sd'))searchDepth=clamp(+p.get('sd'),1,10);
+  if(p.has('g'))groundingRate=clamp(+p.get('g'),0,100);
+  if(p.has('lr'))learningRate=clamp(+p.get('lr'),0,100);
+  if(p.has('ext'))extTraffic=clamp(+p.get('ext'),0,100);
+  if(p.has('gam'))gamification=clamp(+p.get('gam'),0,100);
   document.getElementById('filterRate').value=filterRate;
   document.getElementById('ethicsScore').value=ethicsScore;
   document.getElementById('filterVal').textContent=filterRate+'%';
@@ -3109,18 +3520,37 @@ function postAuditToX(){
       }
     }
   });
-  // P2 初期描画
-  setAlgoP2('greedy');
+  // P2 初期描画（URL復元値をスライダー・トグルへ反映）
+  document.getElementById('shrinkRate').value=shrinkRate;
+  document.getElementById('dxRate').value=dxRate;
+  document.getElementById('ethicsScoreP2').value=ethicsP2;
+  document.getElementById('shrinkVal').textContent=shrinkRate+'%';
+  document.getElementById('dxVal').textContent=dxRate+'%';
+  document.getElementById('ethicsP2Val').textContent=ethicsP2;
+  setPublicReboot(publicReboot);
+  setAlgoP2(algoP2);
   setPct(document.getElementById('shrinkRate'));
   setPct(document.getElementById('dxRate'));
   setPct(document.getElementById('ethicsScoreP2'));
   // P3 スライダー初期化（本体はタブ初回表示時に遅延起動）
+  document.getElementById('searchDepth').value=searchDepth;
+  document.getElementById('groundingRate').value=groundingRate;
+  document.getElementById('learningRate').value=learningRate;
+  document.getElementById('depthVal').textContent=searchDepth;
+  document.getElementById('groundVal').textContent=groundingRate+'%';
+  document.getElementById('lrVal').textContent=learningRate+'%';
   setPct(document.getElementById('searchDepth'));
   setPct(document.getElementById('groundingRate'));
   setPct(document.getElementById('learningRate'));
   // P4 スライダー初期化（本体はタブ初回表示時に遅延起動）
+  document.getElementById('extTraffic').value=extTraffic;
+  document.getElementById('gamification').value=gamification;
+  document.getElementById('extVal').textContent=extTraffic+'%';
+  document.getElementById('gamVal').textContent=gamification+'%';
   setPct(document.getElementById('extTraffic'));
   setPct(document.getElementById('gamification'));
+  // v6.2: 共有URLで指定されたタブへ移動
+  if(p.has('tab'))switchTab(clamp(+p.get('tab'),1,4));
   // イントロモーダル: 初回訪問時のみ自動表示（ℹ GUIDEでいつでも再表示可）
   try{if(!localStorage.getItem('ssd_intro_seen'))openIntro();}catch(e){}
   // v5.3: カスケード崩壊判定＋Grand Optimal判定（非表示タブも裏側で監視）
