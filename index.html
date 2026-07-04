@@ -40,7 +40,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .hdr-c{flex:1;text-align:center}
 .hdr h1{font-size:1.5rem;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.45);letter-spacing:.12em}
 .hdr p{color:var(--muted);font-size:.7rem;margin-top:4px;letter-spacing:.05em}
-.hdr-acts{display:flex;gap:8px;align-items:center}
+.hdr-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:3px 12px;border:1px solid var(--green);color:var(--green);font-size:.6rem;letter-spacing:.18em;text-shadow:0 0 10px rgba(0,255,136,.5)}
 .bdot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
@@ -127,7 +127,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .mlog{font-size:.61rem;line-height:2.1}
 .mo{display:none;position:fixed;inset:0;background:rgba(7,11,20,.88);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
 .mo.on{display:flex}
-.mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2)}
+.mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2);max-height:90vh;overflow-y:auto}
 .mc{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;font-family:inherit}
 .mc:hover{color:var(--red)}
 .mtag{font-size:.6rem;color:var(--cyan);letter-spacing:.2em;margin-bottom:7px}
@@ -321,6 +321,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
+    <button class="ibtn" id="pageLinkBtn" onclick="copyPageLink(currentTab,this)" data-i18n="link_btn">🔗 このページへの直接リンク</button>
+    <button class="ibtn" id="feedbackBtn" onclick="openFeedback()" data-i18n="fb_btn">💬 フィードバック</button>
     <button class="ibtn" id="shareGuideBtn" onclick="openShareGuide()" data-i18n="sg_btn">⇪ 共有ガイド</button>
     <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
   </div>
@@ -902,7 +904,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.331 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.332 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1002,6 +1004,41 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     </div>
     <div class="mfo" data-i18n="sg_note">*あくまでオススメの使い方です。</div>
     <button class="sbtn" id="etiquetteSaveBtn" style="margin-top:14px;border-color:var(--cyan);color:var(--cyan)" onclick="saveEtiquetteCard(this)" data-i18n="sg_save">⬇ このカードを保存</button>
+  </div>
+</div>
+
+<!-- v6.332: フィードバックモーダル -->
+<div class="mo" id="feedbackModal" onclick="closeFeedbackIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeFeedback()">✕</button>
+    <div class="mti" data-i18n="fb_title">フィードバック</div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
+      <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
+      <span data-i18n="fb_researcher">🔬 研究者・技術者として表示</span>
+    </label>
+    <!-- researcherMode ON 時に格上げされる開発者導線 -->
+    <div id="fbDevTop" style="display:none;margin-bottom:14px">
+      <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
+    <form id="fbForm" onsubmit="return submitFeedback(event)">
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:.66rem;color:var(--txt)">
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="improvement" checked> <span data-i18n="fb_type_improve">改善案</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
+      </div>
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
+      <textarea id="fbMessage" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
+      <div class="pd" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
+      <input type="email" id="fbEmail" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
+      <button type="submit" class="sbtn" id="fbSubmit" style="margin-top:14px;border-color:var(--green);color:var(--green)" data-i18n="fb_submit">送信</button>
+      <div id="fbStatus" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
+    </form>
+    <hr class="div" style="margin:14px 0">
+    <div class="mfo" id="fbDevNote" style="border-left-color:var(--muted)">
+      <span data-i18n="fb_dev">開発者に直接連絡したい方（研究者・技術者向け）→ </span>
+      <a href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
   </div>
 </div>
 
@@ -1185,6 +1222,20 @@ const I18N = {
     banner_p4:'⚠ &nbsp;YOUR TOWN\'S VOICE IS BEING DROWNED OUT&nbsp; ⚠',
     // v6.331: 詳細設定アコーディオンのラベル
     acc_more:'Advanced settings',
+    // v6.332: フィードバック導線 / 直接リンク
+    link_btn:'🔗 Direct link to this page',
+    fb_btn:'💬 Feedback',
+    fb_title:'Feedback',
+    fb_researcher:'🔬 Show as researcher / engineer',
+    fb_type_label:'Type',
+    fb_type_improve:'Improvement',
+    fb_type_bug:'Bug report',
+    fb_type_other:'Other',
+    fb_msg_label:'Message (required)',
+    fb_email_label:'Email (optional — if you\'d like a reply)',
+    fb_submit:'Send',
+    fb_dev:'Want to reach the developer directly (for researchers/engineers)? → ',
+    fb_dev_link:'Open GitHub Issues',
   }
 };
 
@@ -2077,6 +2128,8 @@ function switchTab(n){
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
   if(n===4&&!p4Started) startP4();
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
+  // v6.332: アドレスバーの tab のみ同期（他のシナリオパラメータ f/e/s/dx… は不変）
+  try{const u=new URL(location.href);u.searchParams.set('tab',n);history.replaceState(null,'',u);}catch(e){}
 }
 
 // ── PAGE 2 STATE ──────────────────────────────────────────
@@ -3773,7 +3826,77 @@ function openShareGuide(){document.getElementById('shareGuideModal').classList.a
 function closeShareGuide(){document.getElementById('shareGuideModal').classList.remove('on');}
 function closeShareGuideIf(e){if(e.target===document.getElementById('shareGuideModal'))closeShareGuide();}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();}});
+// ══════════════════════════════════════════════════════════
+// v6.332: フィードバック導線（既存の共有システムとは独立した別入口）
+// ══════════════════════════════════════════════════════════
+const FEEDBACK_ENDPOINT='https://formspree.io/f/YOUR_FORM_ID'; // ← 後日 Formspree 等の実IDに差し替え
+let researcherMode=false;
+function setResearcherMode(on){
+  researcherMode=!!on;
+  const cb=document.getElementById('fbResearcher'); if(cb)cb.checked=researcherMode;
+  // ON: 開発者導線を上部にボタンとして格上げ / OFF: 下部の控えめな補足リンク
+  const top=document.getElementById('fbDevTop'), note=document.getElementById('fbDevNote');
+  if(top)top.style.display=researcherMode?'block':'none';
+  if(note)note.style.display=researcherMode?'none':'block';
+}
+function openFeedback(){
+  const msg=document.getElementById('fbMessage'), em=document.getElementById('fbEmail');
+  if(msg)msg.placeholder=tt('改善案・気づいたこと・不具合の内容など','Your idea, something you noticed, or a bug…');
+  if(em)em.placeholder=tt('you@example.com（任意）','you@example.com (optional)');
+  const st=document.getElementById('fbStatus'); if(st)st.style.display='none';
+  setResearcherMode(researcherMode); // 開発者導線の表示状態を反映
+  document.getElementById('feedbackModal').classList.add('on');
+}
+function closeFeedback(){document.getElementById('feedbackModal').classList.remove('on');}
+function closeFeedbackIf(e){if(e.target===document.getElementById('feedbackModal'))closeFeedback();}
+async function submitFeedback(e){
+  e.preventDefault();
+  const btn=document.getElementById('fbSubmit'), status=document.getElementById('fbStatus');
+  const message=document.getElementById('fbMessage').value.trim();
+  if(!message)return false;
+  const payload={
+    type:(document.querySelector('input[name="fbType"]:checked')||{}).value||'other',
+    message,
+    email:document.getElementById('fbEmail').value.trim(),
+    tab:currentTab, lang,               // 不具合報告時の文脈（どのページ・言語か）
+    _subject:'[Social OS Debugger] Feedback'
+  };
+  const orig=btn.textContent;
+  btn.disabled=true; btn.textContent=tt('送信中…','Sending…');
+  status.style.display='none';
+  try{
+    const res=await fetch(FEEDBACK_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok)throw new Error('bad status '+res.status);
+    status.style.display='block'; status.style.color='var(--green)';
+    status.textContent=tt('✓ 送信しました。ありがとうございます','✓ Sent. Thank you!');
+    document.getElementById('fbForm').reset();
+    setTimeout(()=>{closeFeedback();btn.disabled=false;btn.textContent=orig;status.style.display='none';},1600);
+  }catch(err){
+    // 失敗: フォーム内容は保持し、再送できるようにする
+    status.style.display='block'; status.style.color='var(--red)';
+    status.textContent=tt('送信に失敗しました。時間をおいて再度お試しください','Sending failed. Please try again later.');
+    btn.disabled=false; btn.textContent=orig;
+  }
+  return false;
+}
+
+// v6.332: 現在ページへのクリーンな直接リンク（シナリオ状態を含まない。既存共有とは別物）
+function copyPageLink(n,btn){
+  const url=location.origin+location.pathname+'?tab='+n;
+  const done=()=>{
+    if(!btn)return;
+    const o=btn.textContent;
+    btn.textContent=tt('✓ コピーしました','✓ Copied!');btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1800);
+  };
+  try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();}});
 
 (function init(){
   const p=new URLSearchParams(location.search);
