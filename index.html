@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.31</title>
+<title>社会＆地域インフラ・デバッガー v6.32</title>
 <!-- v6.2: OGP / SNSカード -->
-<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.31">
+<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.32">
 <meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
@@ -301,8 +301,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.31 ]</h1>
-    <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.32 ]</h1>
+    <p id="hdrSub">あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
@@ -329,7 +329,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div class="alert" id="alertBanner">
-  <div class="at">⚠ &nbsp;SYSTEM CRASH DETECTED&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p1">⚠ &nbsp;あなたの社会が、暴走を始めた&nbsp; ⚠</div>
   <div class="am" id="alertMsg"></div>
 </div>
 
@@ -484,7 +484,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div class="alert" id="alertBannerP2">
-  <div class="at">⚠ &nbsp;SYSTEM CRASH — SECTOR-T COLLAPSE&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p2">⚠ &nbsp;あなたの街は、崩壊しました&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span></div>
   <div class="am" id="alertMsgP2"></div>
 </div>
 
@@ -656,7 +656,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div class="alert" id="alertBannerP3">
-  <div class="at">⚠ &nbsp;POISONING ATTACK IN PROGRESS&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p3">⚠ &nbsp;あなたの正義感が、乗っ取られている&nbsp; ⚠</div>
   <div class="am" id="alertMsgP3"></div>
 </div>
 
@@ -777,7 +777,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div class="alert" id="alertBannerP4">
-  <div class="at">⚠ &nbsp;OBJECTIVE HIJACK — 目的関数乗っ取り&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p4">⚠ &nbsp;あなたの街の声が、かき消されている&nbsp; ⚠</div>
   <div class="am" id="alertMsgP4"></div>
 </div>
 
@@ -878,7 +878,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.31 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.32 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -900,7 +900,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="mc" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
     <div class="mti" data-i18n="intro_title">この社会は、4つのレイヤーが連鎖して崩壊する</div>
-    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">本アプリは社会を1つのOSに見立てた教育用デバッガーです。上の層の障害は下の層へ伝播します。各レイヤーをクリックして、崩壊のメカニズムと回復（デバッグ）手順を体験してください。</div>
+    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">もしあなたの街の社会システムが壊れるとしたら、どこから壊れるだろう。4つのレイヤーは連鎖する — 上の層の障害は、下の層へ伝播する。クリックして、あなた自身の街で試してみてほしい。</div>
     <div class="intro-layers">
       <button class="intro-layer" style="--lc:var(--cyan)" onclick="introGo(1)">
         <span class="il-num">LAYER 1 — INFORMATION SPACE</span>
@@ -994,7 +994,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <script>
 const I18N = {
   ja: {
-    hdrSub:'インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測',
+    hdrSub:'あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい',
     simLbl:'SIMULATION ACTIVE', presetLbl:'SCENARIOS ▶',
     paramTitle:'INPUT PARAMETERS', paramDesc:'社会システムの設計変数。スライダーを動かすとリアルタイムでシステム状態が変化する。',
     f1lbl:'情報フィルタリング率', f1desc:'エコーチェンバー度。高いほど同質情報のみ流通し、現実OSとの互換性が喪失する（過学習）。',
@@ -1024,7 +1024,7 @@ const I18N = {
     log_infoH:'情報健全性  ', log_viability:'長期持続性  ', log_mentalWB:'精神的健全性',
   },
   en: {
-    hdrSub:'Interactive Social System Debugger | Adjust parameters to observe societal collapse in real-time',
+    hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
     simLbl:'SIMULATION ACTIVE', presetLbl:'SCENARIOS ▶',
     paramTitle:'INPUT PARAMETERS', paramDesc:'Social system design variables. Move sliders to see real-time system state changes.',
     f1lbl:'Information Filter Rate', f1desc:'Echo chamber level. Higher values mean only homogeneous info circulates, causing overfitting to supporters and loss of generalization.',
@@ -1112,7 +1112,7 @@ const I18N = {
     // ── v5.2: intro modal ──
     intro_tag:'SYSTEM OVERVIEW — THE 4-LAYER SOCIAL OS',
     intro_title:'This society collapses through four chained layers',
-    intro_body:'This app is an educational debugger that treats society as one OS. Failures propagate downward through the layers. Click a layer to explore its collapse mechanism and recovery procedure.',
+    intro_body:'If your town\'s social system were to break, where would it start? The four layers are linked — a failure in an upper layer cascades to the ones below. Click in and try it on your own town.',
     intro_l1t:'Information Space', intro_l1d:'Echo chambers & overfitting — society\'s input data gets contaminated',
     intro_arrow1:'▼ Contaminated information corrupts decision-making',
     intro_l2t:'Physical Infrastructure', intro_l2d:'Budgets, rescue heli, redundancy — wrong optimization destroys the physical layer',
@@ -1153,6 +1153,12 @@ const I18N = {
     sg_dont:'<li>Do not attach real names</li><li>Do not spell out “this is exactly about ◯◯” (let the receiver discover it)</li><li>Do not paste into threads mid-argument</li><li>Do not use it to persuade anyone — share curiosity only</li>',
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
+    // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
+    footerTxt:'Social System Debugger v6.32 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
+    banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
+    banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
+    banner_p4:'⚠ &nbsp;YOUR TOWN\'S VOICE IS BEING DROWNED OUT&nbsp; ⚠',
   }
 };
 
@@ -2249,13 +2255,13 @@ function updateAllP2(){
       sp.style.display='block';
       if(shockState.type==='crash'){
         sp.className='shock-result-panel shock-crashed';
-        sp.innerHTML=tt(`<strong>⚠ SYSTEM CRASH — ブラックスワン発生</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ SYSTEM CRASH — black swan struck</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
+        sp.innerHTML=tt(`<strong>⚠ あなたの街は、崩壊しました</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ Your town has collapsed</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
       }else if(shockState.type==='survived'){
         sp.className='shock-result-panel shock-survived';
-        sp.innerHTML=tt(`<strong>✓ SURVIVED — ショック吸収成功</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ SURVIVED — shock absorbed</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
+        sp.innerHTML=tt(`<strong>✓ あなたの街は、生き残った</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ Your town survived</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
       }else{
         sp.className='shock-result-panel shock-partial';
-        sp.innerHTML=tt(`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`,`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30–60%)<br>Moderate redundancy absorbed part of the shock, but infrastructure took damage. Consider enabling Public Reboot.`);
+        sp.innerHTML=tt(`<strong>⚡ あなたの街は、なんとか持ちこたえた</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`,`<strong>⚡ Your town barely held on</strong><br>Redundancy Buffer: ${shockState.rb}% (30–60%)<br>Moderate redundancy absorbed part of the shock, but infrastructure took damage. Consider enabling Public Reboot.`);
       }
     }else{
       sp.style.display='none';
@@ -3517,13 +3523,15 @@ function generateResultCard(ctx){
   // 二重フレーム
   c.strokeStyle='#00d4ff';c.lineWidth=3;c.strokeRect(16,16,W-32,H-32);
   c.strokeStyle='rgba(0,212,255,.3)';c.lineWidth=1;c.strokeRect(26,26,W-52,H-52);
-  // アプリ名 + ページ名
-  c.fillStyle='#00d4ff';c.font='bold 32px '+MONO;
+  // メインタイトル（二人称）+ アプリ名（小）+ ページ名
+  c.fillStyle='#00d4ff';c.font='bold 34px '+MONO;
   c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.31 ]','[ SOCIAL SYSTEM DEBUGGER v6.31 ]'),56,86);
+  c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
+  c.fillStyle='#5a6f94';c.font='15px '+MONO;
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.32 ]','[ SOCIAL SYSTEM DEBUGGER v6.32 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
-  c.fillText(cardPageLabel(ctx),56,122);
+  c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
   const gs=cardGauges(ctx);
   let gy=gs.length>3?184:208;
