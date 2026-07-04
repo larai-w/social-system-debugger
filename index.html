@@ -925,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.338 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.339 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1120,6 +1120,7 @@ const I18N = {
     banner_p1_good:'✓ &nbsp;あなたの街の情報空間は、澄んでいる&nbsp; ✓',
     banner_p2_good_steady:'✓ &nbsp;あなたの街は、今のところ平穏です&nbsp; ✓',
     banner_p2_good_survived:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
+    banner_p2_good_solid:'✓ &nbsp;あなたの街は、盤石です&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
     banner_p3_frozen:'⚠ &nbsp;あなたの考えは、更新できなくなっている&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
@@ -1263,7 +1264,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.338 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.339 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1273,6 +1274,7 @@ const I18N = {
     banner_p1_good:'✓ &nbsp;YOUR TOWN\'S INFORMATION SPACE IS CLEAR&nbsp; ✓',
     banner_p2_good_steady:'✓ &nbsp;YOUR TOWN IS CALM, FOR NOW&nbsp; ✓',
     banner_p2_good_survived:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
+    banner_p2_good_solid:'✓ &nbsp;YOUR TOWN IS ROCK-SOLID&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
     banner_p3_frozen:'⚠ &nbsp;YOUR MIND HAS STOPPED UPDATING&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
@@ -2413,10 +2415,15 @@ function updateAllP2(){
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
     discover('d_p2_crash');noteSessionPage(2);
   } else if(p2Good){
-    setVerdictBanner('alertBannerP2','good',p2Survived?'banner_p2_good_survived':'banner_p2_good_steady');
-    document.getElementById('alertMsgP2').textContent=p2Survived
+    // v6.339: 良好を「盤石（冗長性が非常に高い＝redundant都市）」と「平穏（smart/既定など）」で区別
+    const p2Solid=!p2Survived&&m.redundancy>=85;
+    const gkey=p2Survived?'banner_p2_good_survived':(p2Solid?'banner_p2_good_solid':'banner_p2_good_steady');
+    setVerdictBanner('alertBannerP2','good',gkey);
+    document.getElementById('alertMsgP2').textContent = p2Survived
       ? tt(`🚁 ショックを吸収 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 救命ヘリ継続稼働`,`🚁 Shock absorbed · redundancy buffer ${Math.round(m.redundancy)}% · rescue heli still online`)
-      : tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 他責デッドロックなし`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · no blame-shift deadlock`);
+      : p2Solid
+        ? tt(`🛡 冗長性バッファ ${Math.round(m.redundancy)}% ／ 大きなショックが来ても耐えられる盤石な構成`,`🛡 Redundancy buffer ${Math.round(m.redundancy)}% · built to withstand even a major shock`)
+        : tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ ひとまず安定（盤石とまではいかない）`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · stable for now (not rock-solid yet)`);
     if(p2Survived){discover('d_p2_survived');}else{discover('d_p2_steady');}
     noteSessionPage(2);
   } else {
@@ -3860,7 +3867,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.338 ]','[ SOCIAL SYSTEM DEBUGGER v6.338 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.339 ]','[ SOCIAL SYSTEM DEBUGGER v6.339 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3971,7 +3978,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.338 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.338'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.339 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.339'),W/2,583);
   c.textAlign='left';
   return cv;
 }
