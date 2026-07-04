@@ -1,4 +1,4 @@
-# Social OS Debugger v6.341 (社会＆地域インフラ・デバッガー)
+# Social OS Debugger v6.342 (社会＆地域インフラ・デバッガー)
 
 > 🌐 **Language / 言語:** [**日本語版はこちら →**](README.md) ・ **English**（this page）
 
@@ -134,6 +134,8 @@ open index.html   # or drag & drop into a browser
 ## Educational Use
 
 This app is designed as teaching material for information literacy, social-systems theory, and introductory machine learning. The simulation parameters and formulas are exposed in each metric's (?) modal, so critically examining the model's assumptions is itself part of the learning task.
+
+📄 Every formula, threshold, assumption, and limitation is documented in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) (currently Japanese; includes the disclaimer that this is a qualitative, non-calibrated model).
 
 ---
 
