@@ -1,4 +1,4 @@
-# Social OS Debugger v6.340 (社会＆地域インフラ・デバッガー)
+# Social OS Debugger v6.341 (社会＆地域インフラ・デバッガー)
 
 > 🌐 **Language / 言語:** [**日本語版はこちら →**](README.md) ・ **English**（this page）
 
