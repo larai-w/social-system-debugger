@@ -618,10 +618,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <div class="reboot-indicator" id="p2RebootIndicator">○ PUBLIC REBOOT MODE: OFF — 市場原理</div>
       <!-- Status grid -->
       <div class="sg">
-        <div class="si" onclick="openModal('p2Heli')"><div class="sl">救命ヘリ RESCUE HELI</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
-        <div class="si" onclick="openModal('p2Brand')"><div class="sl">ブランド産業 BRAND INDUSTRY</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
-        <div class="si" onclick="openModal('p2Budget')"><div class="sl">自治体財政 MUNICIPAL BUDGET</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
-        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl">デッドロック状態 DEADLOCK <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
+        <div class="si" onclick="openModal('p2Heli')"><div class="sl" data-i18n="p2_sl_heli">救命ヘリ</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
+        <div class="si" onclick="openModal('p2Brand')"><div class="sl" data-i18n="p2_sl_brand">ブランド産業</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
+        <div class="si" onclick="openModal('p2Budget')"><div class="sl" data-i18n="p2_sl_budget">自治体財政</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
+        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl"><span data-i18n="p2_sl_deadlock">デッドロック状態</span> <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
       </div>
       <!-- CPU Allocation -->
       <div class="cpu-meter">
@@ -767,12 +767,12 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div id="p3ExcuseLog" style="display:none;margin-top:6px;padding:7px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--red);font-size:.58rem;line-height:1.9;color:#ff8899;font-family:inherit"></div>
       </div>
       <div class="sg">
-        <div class="si"><div class="sl">毒入れ攻撃 POISONING</div><div class="sv" id="p3AttackBadge" style="color:var(--muted);font-size:.75rem">—</div></div>
-        <div class="si"><div class="sl">汚染ノード FOOLED</div><div class="sv" id="p3FooledNum" style="color:var(--ora)">0/32</div></div>
-        <div class="si"><div class="sl">中立ノード NEUTRAL</div><div class="sv" id="p3NeutralNum" style="color:var(--cyan)">3</div></div>
-        <div class="si"><div class="sl">デバッグ状態 DEBUG</div><div class="sv" id="p3DebugBadge" style="color:var(--muted);font-size:.75rem">RUNNING</div></div>
-        <div class="si"><div class="sl">モデル更新 MODEL UPDATE</div><div class="sv" id="p3ModelBadge" style="color:var(--green);font-size:.75rem">ADAPTIVE</div></div>
-        <div class="si"><div class="sl">Root権限 ROOT PRIVILEGE</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_poison">毒入れ攻撃</div><div class="sv" id="p3AttackBadge" style="color:var(--muted);font-size:.75rem">—</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_fooled">汚染ノード</div><div class="sv" id="p3FooledNum" style="color:var(--ora)">0/32</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_neutral">中立ノード</div><div class="sv" id="p3NeutralNum" style="color:var(--cyan)">3</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_debug">デバッグ状態</div><div class="sv" id="p3DebugBadge" style="color:var(--muted);font-size:.75rem">RUNNING</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_model">モデル更新</div><div class="sv" id="p3ModelBadge" style="color:var(--green);font-size:.75rem">ADAPTIVE</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_root">Root権限</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
       </div>
       <div class="diag" id="p3Diag" style="border-left-color:var(--pur)"></div>
       <button class="sbtn" id="p3ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP3Result()">▶ この結果を送る</button>
@@ -870,10 +870,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="gs" id="p4RatioStatus" style="color:var(--green)">GROUNDED</div>
       </div>
       <div class="sg">
-        <div class="si"><div class="sl">サイレントマジョリティ SILENT MAJORITY</div><div class="sv" style="color:var(--cyan);font-size:.85rem">5.3M NODES</div></div>
-        <div class="si"><div class="sl">外部ノード EXTERNAL NODES</div><div class="sv" id="p4ExtBadge" style="color:var(--muted)">0/36</div></div>
-        <div class="si"><div class="sl">目的関数 OBJECTIVE FUNC</div><div class="sv" id="p4ObjBadge" style="color:var(--green);font-size:.75rem">POLICY</div></div>
-        <div class="si"><div class="sl">フィルタ状態 FILTER STATUS</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_silent">サイレントマジョリティ</div><div class="sv" style="color:var(--cyan);font-size:.85rem">5.3M NODES</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_ext">外部ノード</div><div class="sv" id="p4ExtBadge" style="color:var(--muted)">0/36</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_obj">目的関数</div><div class="sv" id="p4ObjBadge" style="color:var(--green);font-size:.75rem">POLICY</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_filter">フィルタ状態</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
       </div>
       <div class="diag" id="p4Diag" style="border-left-color:var(--yel)"></div>
       <button class="sbtn" id="p4ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP4Result()">▶ この結果を送る</button>
@@ -925,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.340 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.341 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1264,7 +1264,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.340 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.341 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1287,6 +1287,10 @@ const I18N = {
     banner_p4_warn:'The voices of the people who live it are starting to be drowned out by the spectators',
     // v6.331: 詳細設定アコーディオンのラベル
     acc_more:'Advanced settings',
+    // v6.341: ステータスグリッド見出し（Page1と同様に日本語版=日本語のみ / 英語版=英語のみ）
+    p2_sl_heli:'RESCUE HELI', p2_sl_brand:'BRAND INDUSTRY', p2_sl_budget:'MUNICIPAL BUDGET', p2_sl_deadlock:'DEADLOCK STATUS',
+    p3_sl_poison:'POISONING ATTACK', p3_sl_fooled:'FOOLED NODES', p3_sl_neutral:'NEUTRAL NODES', p3_sl_debug:'DEBUG STATUS', p3_sl_model:'MODEL UPDATE', p3_sl_root:'ROOT PRIVILEGE',
+    p4_sl_silent:'SILENT MAJORITY', p4_sl_ext:'EXTERNAL NODES', p4_sl_obj:'OBJECTIVE FUNC', p4_sl_filter:'FILTER STATUS',
     // v6.334: 発見ログ
     disc_title:'📖 Discoveries',
     disc_hint:'Every time you tinker, a new discovery (a short lesson) is collected.',
@@ -3867,7 +3871,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.340 ]','[ SOCIAL SYSTEM DEBUGGER v6.340 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.341 ]','[ SOCIAL SYSTEM DEBUGGER v6.341 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3978,7 +3982,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.340 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.340'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.341 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.341'),W/2,583);
   c.textAlign='left';
   return cv;
 }
