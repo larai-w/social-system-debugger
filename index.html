@@ -692,8 +692,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 思考凍結</button>
   <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
+  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 アップデート拒否</button>
   <button class="pbtn" id="p3-fasting" onclick="setPresetP3('fasting')" data-i18n="p3_pr_fast">📵 SNS断食</button>
   <button class="pbtn" id="p3-debugger" onclick="setPresetP3('debugger')" data-i18n="p3_pr_debug">🔍 完全デバッガー</button>
   <span class="pl" style="opacity:.6" data-i18n="p3_pr_hint">→ Canvasの毒入れ攻撃の変化を観測せよ</span>
@@ -734,7 +734,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="pl2"><span class="pn" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
         <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
         <input type="range" id="learningRate" min="0" max="100" value="40">
-        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・思考凍結モード</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
+        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・アップデート拒否</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
       </div>
       </div><!-- /p3Details -->
       <hr class="div">
@@ -925,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.335 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.336 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1121,7 +1121,7 @@ const I18N = {
     banner_p2_good_steady:'✓ &nbsp;あなたの街は、今のところ平穏です&nbsp; ✓',
     banner_p2_good_survived:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
-    banner_p3_frozen:'⚠ &nbsp;あなたの思考は、凍りついている&nbsp; ⚠',
+    banner_p3_frozen:'⚠ &nbsp;あなたの考えは、更新できなくなっている&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
     // v6.335: 中間（注意）バナー — 危機でも模範でもない状態。「失われかけているもの」を主語に
     banner_p1_warn:'あなたの街の情報空間が、濁りはじめている',
@@ -1189,7 +1189,7 @@ const I18N = {
     p3_ground_d:'Connection rate to physical reality. Higher values wash out cognitive overfitting via SNS fasting and first-hand information.',
     p3_ground_l:'Always online', p3_ground_r:'Reality return / SNS fast',
     p3_lr_d:'Willingness to self-correct on new evidence. At 0%, model updates stop entirely — no amount of facts removes contamination.',
-    p3_lr_l:'Update halt / Cognitive Freeze Mode', p3_lr_r:'Flexible updating',
+    p3_lr_l:'Update halt / won’t-update mode', p3_lr_r:'Flexible updating',
     p3_drop_d:'Force grounding to 100% for 3 seconds — rapidly resets contamination of all echo-chambered nodes.',
     p3_es_d:'Detect overfitting, halt processing, and roll the whole system back to its healthiest state.',
     p3_root_d:'Apply the judiciary/parliament "regularization brake" to physical infrastructure (Page 2), so no leader can run <span style="color:var(--red)">sudo rm -rf</span> alone. <span class="link-badge" onclick="switchTab(2)">⇄ applies to P2</span>',
@@ -1200,7 +1200,7 @@ const I18N = {
     p3_cs_chart:'Time-series forecast of justice dopamine vs. cognitive integrity, driven by search depth and grounding.',
     p3_leg_fake:'Disguised node (self-proclaimed fair)', p3_leg_gen:'Ordinary node', p3_leg_neu:'Neutral node (facts)',
     p3_pr_hint:'→ Watch the poisoning attack change on canvas',
-    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Frozen Mind', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
+    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Won’t Update', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
     // ── v5.2: P4 static ──
     p4_cs_input:'Network parameters controlling the asymmetry between stakeholders (5.3M residents) and outsider traffic.',
     p4_ext_d:'Influx of outsiders & fandom accounts. Higher values flood 1-bit-minded spam nodes that jam residents\' communication links.',
@@ -1261,7 +1261,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.335 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.336 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1272,7 +1272,7 @@ const I18N = {
     banner_p2_good_steady:'✓ &nbsp;YOUR TOWN IS CALM, FOR NOW&nbsp; ✓',
     banner_p2_good_survived:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
-    banner_p3_frozen:'⚠ &nbsp;YOUR MIND IS FROZEN&nbsp; ⚠',
+    banner_p3_frozen:'⚠ &nbsp;YOUR MIND HAS STOPPED UPDATING&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
     // v6.335: caution (in-between) banners — subject is what is being lost
     banner_p1_warn:'Your town’s information space is starting to cloud over',
@@ -2737,7 +2737,7 @@ const DISCOVERIES=[
   {id:'d_p2_steady',   badge:()=>tt('🏘 平穏な街を保った','🏘 Kept a town at peace'), learn:()=>tt('危機がないことは、設計の成果でもある。','An uneventful town can itself be a design achievement.')},
   {id:'d_p3_poison',   badge:()=>tt('🧪 正義の毒入れ攻撃を見た','🧪 Saw a justice-poisoning attack'), learn:()=>tt('浅い探索は、正しさをハックされる。','Shallow reasoning gets its righteousness hijacked.')},
   {id:'d_p3_restored', badge:()=>tt('🧠 認知を現実に同期させた','🧠 Synced cognition with reality'), learn:()=>tt('深く探索すれば、偽装は見破れる。','Search deep enough and the disguise breaks.')},
-  {id:'d_p3_frozen',   badge:()=>tt('🧊 思考凍結を体験した','🧊 Experienced the cognitive freeze'), learn:()=>tt('学習を止めると、事実を入れても汚染は落ちない。','Stop learning, and no fact can wash the contamination out.')},
+  {id:'d_p3_frozen',   badge:()=>tt('🧊 アップデート拒否を体験した','🧊 Saw a mind that won’t update'), learn:()=>tt('学習を止めると、事実を入れても考えは変わらない。','Stop learning, and no fact will change the belief.')},
   {id:'d_p4_hijack',   badge:()=>tt('🎪 目的関数の乗っ取りを見た','🎪 Saw an objective hijack'), learn:()=>tt('声の大きさが、当事者の声を消す。','Loudness drowns out the people who actually live it.')},
   {id:'d_p4_restored', badge:()=>tt('📡 当事者の声を取り戻した','📡 Restored the stakeholders’ voice'), learn:()=>tt('フィルタは、検閲ではなく帯域の確保。','Filtering here protects bandwidth, not censorship.')},
   {id:'d_meta_allpages',   badge:()=>tt('🔗 4層の連鎖を、自分の手で起こした','🔗 Triggered the 4-layer cascade yourself'), learn:()=>tt('上のレイヤーの崩壊は、下のレイヤーへ伝染する。','A failure up top infects the layers below.')},
@@ -2869,7 +2869,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ DROPOUT ] 物理現実へ強制回帰中。ネットワークから切断され、汚染度が急速に洗い流されています。','[ DROPOUT ] Forced return to physical reality. Disconnected from the network; contamination washing out rapidly.');
     diag.style.borderLeftColor='var(--pur)';
   } else if(learningRate<10&&fooled>0){
-    diag.textContent=tt('[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても汚染が抜けません（思考凍結モード）。学習率を上げて自己修正を許可せよ。','[ FROZEN ] Learning rate near zero. Model updates halted — no facts can remove contamination (Cognitive Freeze Mode). Raise the learning rate to permit self-correction.');
+    diag.textContent=tt('[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても考えが更新されません（アップデート拒否の状態）。学習率を上げて自己修正を許可せよ。','[ FROZEN ] Learning rate near zero. Model updates halted — facts come in but beliefs never update (won’t-update state). Raise the learning rate to permit self-correction.');
     diag.style.borderLeftColor='var(--red)';
   } else if(searchDepth<=3&&fooled>8){
     diag.textContent=tt('[ CRITICAL ] 探索深度が浅すぎます。偽装ノードの「良識的な語り口」を検証できず、正義感をハックされたノードが事実を述べる中立ノードを攻撃中。','[ CRITICAL ] Search too shallow. The disguised node\'s "reasonable tone" goes unverified; justice-hacked nodes are attacking fact-stating neutral nodes.');
@@ -2891,7 +2891,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   if(p3Frozen){
     setVerdictBanner('alertBannerP3','crash','banner_p3_frozen');
     setText(document.getElementById('alertMsgP3'), fooled>0
-      ? tt('🧊 学習率0 — ファクトを入れても汚染が抜けない（思考凍結モード）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate 0 — no fact can wash out the contamination (cognitive freeze). Raise the learning rate to allow self-correction.')
+      ? tt('🧊 学習率0 — ファクトを入れても考えが更新されない（アップデート拒否）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate 0 — facts come in but beliefs never update (won’t-update mode). Raise the learning rate to allow self-correction.')
       : tt('🧊 自己修正が停止中。いまは無事でも、一度汚染されれば元には戻れません。','🧊 Self-correction is halted. Fine for now — but once contaminated, there is no way back.'));
     discover('d_p3_frozen');noteSessionPage(3);
   } else if(p3BannerOn){
@@ -3844,7 +3844,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.335 ]','[ SOCIAL SYSTEM DEBUGGER v6.335 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.336 ]','[ SOCIAL SYSTEM DEBUGGER v6.336 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3955,7 +3955,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.335 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.335'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.336 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.336'),W/2,583);
   c.textAlign='left';
   return cv;
 }
