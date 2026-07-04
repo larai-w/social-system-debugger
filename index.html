@@ -298,6 +298,16 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 .share-toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .share-toast button{padding:11px 22px;background:var(--bg2);border:1px solid var(--cyan);border-radius:3px;color:var(--cyan);font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.1em;cursor:pointer;box-shadow:0 0 18px rgba(0,212,255,.35)}
 .share-toast button:active{transform:scale(.98)}
+/* v6.334: 発見トースト（右下・軽量・自動で消える） */
+.disc-toast{position:fixed;right:14px;bottom:14px;max-width:290px;background:var(--bg2);border:1px solid var(--green);border-radius:4px;color:var(--green);font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:.04em;line-height:1.5;padding:10px 14px;box-shadow:0 0 18px rgba(0,255,136,.28);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .3s;z-index:1100}
+.disc-toast.on{opacity:1;transform:translateY(0)}
+/* v6.334: 発見ログのリスト行 */
+.disc-row{padding:9px 12px;border:1px solid var(--bdr);border-radius:3px;margin-bottom:7px;background:var(--bg1)}
+.disc-row.found{border-color:rgba(0,255,136,.35)}
+.disc-badge{font-size:.72rem;font-weight:bold;color:var(--txt)}
+.disc-row.found .disc-badge{color:var(--green)}
+.disc-learn{font-size:.6rem;color:var(--muted);margin-top:3px;line-height:1.55}
+.disc-locked{color:var(--muted);opacity:.6;letter-spacing:.2em}
 .sg-tblwrap{overflow-x:auto}
 .sg-tbl{width:100%;border-collapse:collapse;font-size:.62rem;line-height:1.6}
 .sg-tbl th{color:var(--cyan);text-align:left;border-bottom:1px solid var(--bdr);padding:6px 8px;font-size:.58rem;letter-spacing:.08em;white-space:nowrap}
@@ -321,6 +331,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
+    <button class="ibtn" id="discBtn" onclick="openDiscoveryLog()">📖 発見ログ (0/15)</button>
   </div>
   <div class="hdr-c">
     <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6 ]</h1>
@@ -524,9 +535,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Shrink Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">30%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
         <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
-        <input type="range" id="shrinkRate" min="0" max="100" value="30" class="ora-range">
+        <input type="range" id="shrinkRate" min="0" max="100" value="10" class="ora-range">
         <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
       </div>
       <hr class="div">
@@ -542,9 +553,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Leader Ethics P2 -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">60</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">68</span></div>
         <div class="pd" data-i18n="p2_ethics_d">低下するとシステム目的関数が『生活者の生存』から『自己保身』へ乗っ取られ、実務を完全放棄して他責化処理にCPUが100%占有されます。</div>
-        <input type="range" id="ethicsScoreP2" min="0" max="100" value="60">
+        <input type="range" id="ethicsScoreP2" min="0" max="100" value="68">
         <div class="rl"><span data-i18n="p2_ethics_l">他責・責任回避</span><span data-i18n="p2_ethics_r">実務・法治</span></div>
       </div>
       <hr class="div">
@@ -699,9 +710,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Search Depth -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">2</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">7</span></div>
         <div class="pd" data-i18n="p3_depth_d">思考の探索段数。3以下ではバズへの脊髄反射で偽装ノードに騙される。7以上で多次元の因果関係を検証してから判断する。</div>
-        <input type="range" id="searchDepth" min="1" max="10" value="2" class="pur-range">
+        <input type="range" id="searchDepth" min="1" max="10" value="7" class="pur-range">
         <div class="rl"><span data-i18n="p3_depth_l">脊髄反射・バズ即応</span><span data-i18n="p3_depth_r">多次元因果検証</span></div>
       </div>
       <hr class="div">
@@ -823,17 +834,17 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- External Traffic -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
         <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
-        <input type="range" id="extTraffic" min="0" max="100" value="20" class="red-range">
+        <input type="range" id="extTraffic" min="0" max="100" value="15" class="red-range">
         <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
       </div>
       <hr class="div">
       <!-- Gamification -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
         <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
-        <input type="range" id="gamification" min="0" max="100" value="20" class="yel-range">
+        <input type="range" id="gamification" min="0" max="100" value="15" class="yel-range">
         <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
       </div>
       <hr class="div">
@@ -911,7 +922,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.333 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.334 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -980,6 +991,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <!-- v6.2: プリセット適用直後の共有トースト -->
 <div class="share-toast" id="shareToast"><button id="shareToastBtn" onclick="shareFromToast()">⎘ このシナリオを送る</button></div>
+<!-- v6.334: 発見トースト（右下・非干渉・自動で消える） -->
+<div class="disc-toast" id="discToast"></div>
 
 <!-- v6.2: 共有ガイドモーダル -->
 <div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
@@ -1049,6 +1062,16 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   </div>
 </div>
 
+<!-- v6.334: 発見ログモーダル -->
+<div class="mo" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
+  <div class="mb" style="max-width:480px">
+    <button class="mc" onclick="closeDiscoveryLog()">✕</button>
+    <div class="mti" data-i18n="disc_title">📖 発見ログ</div>
+    <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
+    <div id="discList"></div>
+  </div>
+</div>
+
 <div class="mo" id="modal" onclick="closeModalIf(event)">
   <div class="mb">
     <button class="mc" onclick="closeModal()">✕</button>
@@ -1092,8 +1115,10 @@ const I18N = {
     log_infoH:'情報健全性  ', log_viability:'長期持続性  ', log_mentalWB:'精神的健全性',
     // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
     banner_p1_good:'✓ &nbsp;あなたの街の情報空間は、澄んでいる&nbsp; ✓',
-    banner_p2_good:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
+    banner_p2_good_steady:'✓ &nbsp;あなたの街は、今のところ平穏です&nbsp; ✓',
+    banner_p2_good_survived:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
+    banner_p3_frozen:'⚠ &nbsp;あなたの思考は、凍りついている&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
   },
   en: {
@@ -1227,18 +1252,23 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.333 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.334 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
     banner_p4:'⚠ &nbsp;YOUR TOWN\'S VOICE IS BEING DROWNED OUT&nbsp; ⚠',
     // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
     banner_p1_good:'✓ &nbsp;YOUR TOWN\'S INFORMATION SPACE IS CLEAR&nbsp; ✓',
-    banner_p2_good:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
+    banner_p2_good_steady:'✓ &nbsp;YOUR TOWN IS CALM, FOR NOW&nbsp; ✓',
+    banner_p2_good_survived:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
     banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
+    banner_p3_frozen:'⚠ &nbsp;YOUR MIND IS FROZEN&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
     // v6.331: 詳細設定アコーディオンのラベル
     acc_more:'Advanced settings',
+    // v6.334: 発見ログ
+    disc_title:'📖 Discoveries',
+    disc_hint:'Every time you tinker, a new discovery (a short lesson) is collected.',
     // v6.332: フィードバック導線 / 直接リンク
     link_btn:'🔗 Direct link to this page',
     fb_btn:'💬 Feedback',
@@ -1947,17 +1977,19 @@ function updateAll(){
   // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
   const p1Good=!m.crash&&m.entropy<28&&m.diversity>70&&m.infoH>75&&m.socialCap>65;
   if(m.crash){
-    setVerdictBanner('alertBanner','crash','banner_p1','banner_p1_good');
+    setVerdictBanner('alertBanner','crash','banner_p1','');
     const parts=[];
     if(m.entropy>76)parts.push(tt(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`,`Entropy ${Math.round(m.entropy)}% — social order breached critical threshold`));
     if(m.infra<18)parts.push(tt(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`,`Infrastructure ${Math.round(m.infra)} — medical & transport networks down`));
     if(m.socialCap<18)parts.push(tt(`ソーシャルキャピタル ${Math.round(m.socialCap)} — 相互信頼が消滅`,`Social capital ${Math.round(m.socialCap)} — mutual trust vanished`));
     parts.push(tt('過学習により現実世界のOSとの互換性が失われました。','Overfitting severed compatibility with the real-world OS.'));
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
+    discover('d_p1_crash');noteSessionPage(1);
   } else if(p1Good){
     setVerdictBanner('alertBanner','good','banner_p1','banner_p1_good');
     document.getElementById('alertMsg').textContent=tt('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · information diversity preserved · synced with the real-world OS');
-  } else setVerdictBanner('alertBanner','','banner_p1','banner_p1_good');
+    discover('d_p1_good');noteSessionPage(1);
+  } else setVerdictBanner('alertBanner','','banner_p1','');
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
 
@@ -2046,7 +2078,7 @@ function applyI18nAuto(){
   });
 }
 
-function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();}
+function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();if(typeof updateDiscoveryCounter==='function')updateDiscoveryCounter();}
 
 // v6.331: 詳細設定アコーディオンの開閉（ページ内完結・DOMは残すので値計算に影響なし）
 function toggleAcc(id,btn){
@@ -2073,6 +2105,7 @@ function setPreset(id){
   restartAgents();
   updateAll();
   showShareToast({kind:'preset',page:1,preset:id});
+  notePreset(1,id); if(id==='weimar')discover('d_p1_weimar'); if(id==='nordic')discover('d_p1_nordic');
 }
 
 function shareURL(){
@@ -2154,7 +2187,7 @@ function switchTab(n){
 }
 
 // ── PAGE 2 STATE ──────────────────────────────────────────
-let shrinkRate=30, dxRate=30, algoP2='greedy', ethicsP2=60;
+let shrinkRate=10, dxRate=30, algoP2='greedy', ethicsP2=68; // v6.334: 初期状態から p2Good（平穏）を満たす
 let p2AnimPlaying=false, p2AnimTimer=null, p2AnimStep=0, p2FullTimeline=null;
 let p2LogEntries=[];
 let p2LogTimer=null;
@@ -2333,19 +2366,27 @@ function updateAllP2(){
   }
   // Crash banner
   // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
-  const p2Good=shockState?.type==='survived'||(!m.crash&&m.heliOp&&!m.deadlock&&m.redundancy>=60&&m.infra>=55&&m.budget>=40);
+  const p2Survived=shockState?.type==='survived';
+  const p2Good=p2Survived||(!m.crash&&m.heliOp&&!m.deadlock&&m.redundancy>=60&&m.infra>=55&&m.budget>=40);
+  const p2Steady=p2Good&&!p2Survived; // ショックを経ていない平常運転の良好
   if(m.crash){
-    setVerdictBanner('alertBannerP2','crash','banner_p2','banner_p2_good');
+    setVerdictBanner('alertBannerP2','crash','banner_p2','');
     const parts=[];
     if(!m.heliOp&&m.infra<20) parts.push(tt('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達','Rescue heli suspended — infrastructure below critical point'));
     if(m.budget<8) parts.push(tt('自治体財政ショート — 予算が枯渇し行政機能停止','Municipal budget exhausted — administration halted'));
     if(m.deadlock) parts.push(tt('他責デッドロックによりシステムが自滅状態に突入','Blame-shift deadlock has driven the system into self-destruction'));
     if(shockState?.type==='crash') parts.push(tt(`⚡ ブラックスワン注入 — Redundancy Buffer ${shockState.rb}% で致命的崩壊（System Crash）`,`⚡ Black swan injected — fatal System Crash at Redundancy Buffer ${shockState.rb}%`));
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
+    discover('d_p2_crash');noteSessionPage(2);
   } else if(p2Good){
-    setVerdictBanner('alertBannerP2','good','banner_p2','banner_p2_good');
-    document.getElementById('alertMsgP2').textContent=tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 他責デッドロックなし`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · no blame-shift deadlock`);
-  } else setVerdictBanner('alertBannerP2','','banner_p2','banner_p2_good');
+    setVerdictBanner('alertBannerP2','good','banner_p2',p2Survived?'banner_p2_good_survived':'banner_p2_good_steady');
+    document.getElementById('alertMsgP2').textContent=p2Survived
+      ? tt(`🚁 ショックを吸収 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 救命ヘリ継続稼働`,`🚁 Shock absorbed · redundancy buffer ${Math.round(m.redundancy)}% · rescue heli still online`)
+      : tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 他責デッドロックなし`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · no blame-shift deadlock`);
+    if(p2Survived){discover('d_p2_survived');}else{discover('d_p2_steady');}
+    noteSessionPage(2);
+  } else setVerdictBanner('alertBannerP2','','banner_p2','');
+  if(m.deadlock){discover('d_p2_deadlock');noteSessionPage(2);}
   // Redundancy Buffer
   const rb=m.redundancy;
   const rbc=rb<30?'#ff2244':rb<60?'#ff6b2b':'#00ff88';
@@ -2501,7 +2542,7 @@ document.getElementById('ethicsScoreP2').addEventListener('input',function(){
 let timelineChartP2=null;
 
 // ── PAGE 3: COGNITIVE RECOVERY ────────────────────────────
-let searchDepth=2, groundingRate=20, learningRate=40;
+let searchDepth=7, groundingRate=20, learningRate=40; // v6.334: 初期状態から p3Good（健全な認知）を満たす
 let rootRestricted=false;
 let p3Started=false, p3Nodes=[], p3Ctx=null, p3W=0, p3H=0, p3AnimId=null;
 let dropoutActive=false, dropoutTimer=null, dropoutPrevGround=20;
@@ -2640,10 +2681,11 @@ function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;
 function setVerdictBanner(alertId,state,crashKey,goodKey){
   const al=document.getElementById(alertId);if(!al)return;
   const at=al.querySelector('.at');if(!at)return;
-  if(al.dataset.bst===state)return;   // 状態変化ガード（ループでのフリッカー防止）
-  al.dataset.bst=state;
+  const key=state==='good'?goodKey:(state==='crash'?crashKey:'');
+  const sig=state+'|'+key;            // good の種別（steady/survived）も区別
+  if(al.dataset.bst===sig)return;     // 状態変化ガード（ループでのフリッカー防止）
+  al.dataset.bst=sig;
   if(state==='crash'||state==='good'){
-    const key=state==='good'?goodKey:crashKey;
     at.dataset.i18n=key;
     const v=(I18N[lang]&&I18N[lang][key]);
     if(v!==undefined)at.innerHTML=v;
@@ -2654,6 +2696,84 @@ function setVerdictBanner(alertId,state,crashKey,goodKey){
     al.classList.remove('on','good');
   }
 }
+
+// ══════════════════════════════════════════════════════════
+// v6.334: 発見ログ（収集型ゲーミフィケーション）
+//   方針: ストリーク／時間制限／通知／不安を煽る文言は一切実装しない。
+//   触るたびに新しい発見＝短い学びがある、という純粋な好奇心の設計。
+// ══════════════════════════════════════════════════════════
+const DISCOVERIES=[
+  {id:'d_p1_crash',    badge:()=>tt('⚠ 情報空間の崩壊を再現した','⚠ Recreated an information-space collapse'), learn:()=>tt('パラメータが同じでも、結果は真逆になり得る。','Same parameters can still lead to opposite outcomes.')},
+  {id:'d_p1_good',     badge:()=>tt('🌐 澄んだ情報空間をつくった','🌐 Built a clear information space'), learn:()=>tt('開かれた入力は、社会の解像度を上げる。','Open inputs raise a society’s resolution.')},
+  {id:'d_p1_weimar',   badge:()=>tt('⚡ 1933年を1タップで再現した','⚡ Recreated 1933 in one tap'), learn:()=>tt('崩壊には、いつも同じ構造がある。','Collapse tends to share the same structure.')},
+  {id:'d_p1_nordic',   badge:()=>tt('🌿 北欧型の設計を試した','🌿 Tried the Nordic design'), learn:()=>tt('高い倫理と開放性は、崩壊耐性になる。','High ethics and openness buy resilience.')},
+  {id:'d_p2_crash',    badge:()=>tt('🏙 街を崩壊させた','🏙 Let a town collapse'), learn:()=>tt('効率の最大化は、余白を食い尽くす。','Maximizing efficiency devours the slack.')},
+  {id:'d_p2_deadlock', badge:()=>tt('🏚 他責デッドロックを目撃した','🏚 Witnessed a blame-shift deadlock'), learn:()=>tt('直せるのに、誰も直さない状態を見た。','You saw a fixable problem no one fixes.')},
+  {id:'d_p2_survived', badge:()=>tt('🚁 ショックを生き延びた','🚁 Survived the shock'), learn:()=>tt('非効率に見えた余白が、生命線だった。','The slack that looked wasteful was the lifeline.')},
+  {id:'d_p2_steady',   badge:()=>tt('🏘 平穏な街を保った','🏘 Kept a town at peace'), learn:()=>tt('危機がないことは、設計の成果でもある。','An uneventful town can itself be a design achievement.')},
+  {id:'d_p3_poison',   badge:()=>tt('🧪 正義の毒入れ攻撃を見た','🧪 Saw a justice-poisoning attack'), learn:()=>tt('浅い探索は、正しさをハックされる。','Shallow reasoning gets its righteousness hijacked.')},
+  {id:'d_p3_restored', badge:()=>tt('🧠 認知を現実に同期させた','🧠 Synced cognition with reality'), learn:()=>tt('深く探索すれば、偽装は見破れる。','Search deep enough and the disguise breaks.')},
+  {id:'d_p3_frozen',   badge:()=>tt('🧊 思考凍結を体験した','🧊 Experienced the cognitive freeze'), learn:()=>tt('学習を止めると、事実を入れても汚染は落ちない。','Stop learning, and no fact can wash the contamination out.')},
+  {id:'d_p4_hijack',   badge:()=>tt('🎪 目的関数の乗っ取りを見た','🎪 Saw an objective hijack'), learn:()=>tt('声の大きさが、当事者の声を消す。','Loudness drowns out the people who actually live it.')},
+  {id:'d_p4_restored', badge:()=>tt('📡 当事者の声を取り戻した','📡 Restored the stakeholders’ voice'), learn:()=>tt('フィルタは、検閲ではなく帯域の確保。','Filtering here protects bandwidth, not censorship.')},
+  {id:'d_meta_allpages',   badge:()=>tt('🔗 4層の連鎖を、自分の手で起こした','🔗 Triggered the 4-layer cascade yourself'), learn:()=>tt('上のレイヤーの崩壊は、下のレイヤーへ伝染する。','A failure up top infects the layers below.')},
+  {id:'d_meta_allpresets', badge:()=>tt('🗺 すべてのシナリオを巡った','🗺 Explored every scenario'), learn:()=>tt('崩壊も回復も、地続きの設計の話。','Collapse and recovery are one design continuum.')},
+];
+let _discovered=new Set(), _sessionPages=new Set(), _presetsSeen=new Set(), _discReady=false;
+function loadDiscoveries(){
+  try{_discovered=new Set(JSON.parse(localStorage.getItem('ssd_discoveries')||'[]'));}catch(e){_discovered=new Set();}
+  try{_presetsSeen=new Set(JSON.parse(localStorage.getItem('ssd_presets_seen')||'[]'));}catch(e){_presetsSeen=new Set();}
+}
+function discover(id){
+  if(!_discReady||_discovered.has(id))return;         // 読み込み時の自動付与を防ぐ + 既発見はスキップ
+  if(!DISCOVERIES.some(d=>d.id===id))return;
+  _discovered.add(id);
+  try{localStorage.setItem('ssd_discoveries',JSON.stringify([..._discovered]));}catch(e){}
+  const d=DISCOVERIES.find(x=>x.id===id);
+  showDiscoveryToast(d.badge());
+  updateDiscoveryCounter();
+}
+function noteSessionPage(page){
+  _sessionPages.add(page);
+  if(_sessionPages.size>=4)discover('d_meta_allpages');
+}
+function notePreset(page,id){
+  _presetsSeen.add(page+':'+id);
+  try{localStorage.setItem('ssd_presets_seen',JSON.stringify([..._presetsSeen]));}catch(e){}
+  const total=Object.keys(PRESETS).length+Object.keys(PRESETS_P2).length+Object.keys(PRESETS_P3).length+Object.keys(PRESETS_P4).length;
+  if(_presetsSeen.size>=total)discover('d_meta_allpresets');
+}
+let _discQueue=[], _discBusy=false;
+function showDiscoveryToast(text){ _discQueue.push(text); if(!_discBusy)drainDiscToast(); }
+function drainDiscToast(){
+  const t=document.getElementById('discToast');
+  if(!t||!_discQueue.length){_discBusy=false;if(t)t.classList.remove('on');return;}
+  _discBusy=true;
+  t.textContent=tt('🆕 発見: ','🆕 Found: ')+_discQueue.shift();
+  t.classList.add('on');
+  setTimeout(()=>{t.classList.remove('on');setTimeout(drainDiscToast,320);},1900);
+}
+function updateDiscoveryCounter(){
+  const b=document.getElementById('discBtn');if(!b)return;
+  b.textContent=tt('📖 発見ログ ','📖 Discoveries ')+`(${_discovered.size}/${DISCOVERIES.length})`;
+}
+function openDiscoveryLog(){
+  const list=document.getElementById('discList');if(!list)return;
+  list.innerHTML='';
+  DISCOVERIES.forEach(d=>{
+    const found=_discovered.has(d.id);
+    const row=document.createElement('div');
+    row.className='disc-row'+(found?' found':'');
+    row.innerHTML=found
+      ? `<div class="disc-badge">${d.badge()}</div><div class="disc-learn">${d.learn()}</div>`
+      : `<div class="disc-badge disc-locked">❓ ???</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('discCount').textContent=`${_discovered.size} / ${DISCOVERIES.length}`;
+  document.getElementById('discoveryModal').classList.add('on');
+}
+function closeDiscoveryLog(){document.getElementById('discoveryModal').classList.remove('on');}
+function closeDiscoveryLogIf(e){if(e.target===document.getElementById('discoveryModal'))closeDiscoveryLog();}
 
 function updateP3Monitor(avgDop,generals,attackEdges){
   const fooled=generals.filter(n=>n.c>0.55).length;
@@ -2740,15 +2860,25 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。','[ RUNNING ] Raise search depth or grounding to progress the debug.');
     diag.style.borderLeftColor='var(--pur)';
   }
-  // v6.333: 危機（赤・毒入れ進行中）/ 模範（緑・完全デバッグ）/ 非表示 の3状態
-  const p3Good=searchDepth>=7&&!attackSticky&&fooled===0;
-  if(p3BannerOn){
-    setVerdictBanner('alertBannerP3','crash','banner_p3','banner_p3_good');
+  // v6.334: 思考凍結（赤・学習率≈0で自己修正が停止。前状態の汚染が凍りつく）を最優先で明示
+  //   → 凍結を「健全(緑)」と誤表示せず、frozen選択時に必ずバナーが変化する
+  const p3Frozen=learningRate<10;
+  const p3Good=searchDepth>=7&&!attackSticky&&fooled===0&&learningRate>=30;
+  if(p3Frozen){
+    setVerdictBanner('alertBannerP3','crash','banner_p3_frozen','');
+    setText(document.getElementById('alertMsgP3'), fooled>0
+      ? tt('🧊 学習率0 — ファクトを入れても汚染が抜けない（思考凍結モード）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate 0 — no fact can wash out the contamination (cognitive freeze). Raise the learning rate to allow self-correction.')
+      : tt('🧊 自己修正が停止中。いまは無事でも、一度汚染されれば元には戻れません。','🧊 Self-correction is halted. Fine for now — but once contaminated, there is no way back.'));
+    discover('d_p3_frozen');noteSessionPage(3);
+  } else if(p3BannerOn){
+    setVerdictBanner('alertBannerP3','crash','banner_p3','');
     setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
+    discover('d_p3_poison');noteSessionPage(3);
   } else if(p3Good){
     setVerdictBanner('alertBannerP3','good','banner_p3','banner_p3_good');
     setText(document.getElementById('alertMsgP3'),tt('🧠 多次元因果検証が有効 ／ 毒入れ攻撃なし ／ 認知は現実と同期しています','🧠 Multi-dimensional verification active · no poisoning attack · cognition synced with reality'));
-  } else setVerdictBanner('alertBannerP3','','banner_p3','banner_p3_good');
+    discover('d_p3_restored');noteSessionPage(3);
+  } else setVerdictBanner('alertBannerP3','','banner_p3','');
 
   // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
   // v6.31: 判定は attackSticky（ヒステリシス済み）ベースにして点滅を防止
@@ -2756,7 +2886,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   const p3b=document.getElementById('p3ShareBtn');
   if(p3b){
     if(attackSticky) p3ShareState={type:'poison'};
-    else if(searchDepth>=7) p3ShareState={type:'restored'};
+    else if(p3Good) p3ShareState={type:'restored'};
     else p3ShareState=null;
     if(p3ShareState){
       setText(p3b,tt('▶ この結果を送る','▶ Share this result'));
@@ -2893,7 +3023,7 @@ document.getElementById('learningRate').addEventListener('input',function(){
 });
 
 // ── PAGE 4: STAKEHOLDER ASYMMETRY ─────────────────────────
-let extTraffic=20, gamification=20;
+let extTraffic=15, gamification=15; // v6.334: 初期状態から p4Good（声が届く）を満たす
 let p4Started=false, p4Citizens=[], p4Edges=[], p4Spam=[], p4Ctx=null, p4W=0, p4H=0, p4AnimId=null;
 let filterActive=false, filterTimer=null;
 let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0;
@@ -3071,12 +3201,13 @@ function updateP4Monitor(jamRatio){
   // v6.333: 危機（赤・乗っ取り）/ 模範（緑・声が届く）/ 非表示 の3状態。良い状態は安定値(gam/ext)で判定
   const p4Good=gamification<=18&&extTraffic<=18;
   if(p4BannerOn){
-    setVerdictBanner('alertBannerP4','crash','banner_p4','banner_p4_good');
+    setVerdictBanner('alertBannerP4','crash','banner_p4','');
     setText(document.getElementById('alertMsgP4'),tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
+    discover('d_p4_hijack');noteSessionPage(4);
   } else if(p4Good){
     setVerdictBanner('alertBannerP4','good','banner_p4','banner_p4_good');
     setText(document.getElementById('alertMsgP4'),tt('📡 当事者パケットが優先ルーティング ／ 部外者ノイズ最小 ／ 目的関数は政策のまま','📡 Resident packets prioritized · minimal outsider noise · objective still policy-focused'));
-  } else setVerdictBanner('alertBannerP4','','banner_p4','banner_p4_good');
+  } else setVerdictBanner('alertBannerP4','','banner_p4','');
 
   // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
   // 判定は gamification（ユーザー設定・安定値）ベースなので揺れないが、DOM書き込みはガード経由に統一
@@ -3181,6 +3312,7 @@ function executePacketFiltering(){
   if(!p4Started)return;
   if(filterTimer)clearTimeout(filterTimer);
   filterActive=true;
+  discover('d_p4_restored');noteSessionPage(4);
   document.getElementById('filterBtn').classList.add('exec');
   document.getElementById('p4FilterFlash').classList.add('on');
   updateP4Chart();
@@ -3231,6 +3363,7 @@ function setPresetP2(id){
   document.getElementById('p2-'+id)?.classList.add('sel');
   updateAllP2();
   showShareToast({kind:'preset',page:2,preset:id});
+  notePreset(2,id);
 }
 
 const PRESETS_P3={
@@ -3253,6 +3386,7 @@ function setPresetP3(id){
   document.getElementById('p3-'+id)?.classList.add('sel');
   updateP3Chart();
   showShareToast({kind:'preset',page:3,preset:id});
+  notePreset(3,id);
 }
 
 const PRESETS_P4={
@@ -3274,6 +3408,7 @@ function setPresetP4(id){
   document.getElementById('p4-'+id)?.classList.add('sel');
   updateP4Chart();
   showShareToast({kind:'preset',page:4,preset:id});
+  notePreset(4,id);
 }
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
@@ -3674,7 +3809,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.333 ]','[ SOCIAL SYSTEM DEBUGGER v6.333 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.334 ]','[ SOCIAL SYSTEM DEBUGGER v6.334 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3785,7 +3920,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.333 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.333'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.334 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.334'),W/2,583);
   c.textAlign='left';
   return cv;
 }
@@ -3953,7 +4088,7 @@ function copyPageLink(n,btn){
   try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();closeDiscoveryLog();}});
 
 (function init(){
   const p=new URLSearchParams(location.search);
@@ -4038,6 +4173,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   updateCascadeFX();checkGrandOptimal();
   // v6.333: 初期描画（P1のゲージ＋良い状態バナーを初回から反映）
   updateAll();
+  // v6.334: 発見ログ初期化（読み込み時の自動付与は防ぐ＝ここで初めて有効化）
+  loadDiscoveries();
+  updateDiscoveryCounter();
+  _discReady=true;
 })();
 </script>
 </body>
