@@ -67,13 +67,17 @@ Tune the parameters to bring all four layers into a healthy range and you earn *
 ## Features
 
 - **Four-page tabbed UI** — a unified cyberpunk aesthetic with a theme color per layer
-- **Scenario presets** — one-click contrast experiments on every page (Weimar collapse, Nordic democracy, cognitive freeze, fandom flame war, and more)
+- **Scenario presets** — one-click contrast experiments on every page, **ordered danger → healthy (red → green)** (e.g. Weimar collapse, Nordic democracy, "won't update", fandom flame war)
+- **Verdict banners (3 tiers, second person)** — each page's state is shown instantly as **danger (red) / caution (orange) / healthy (green)**, in second-person copy ("Your town is…") that names both collapse and survival in a line
+- **Discovery log (collection-style)** — every time you tinker, a new discovery (a short lesson) is collected (15 total); unfound ones read "❓ ???". Deliberately **no streaks, notifications, or urgency** — that would contradict the very "dopamine-loop" design the app critiques
 - **Intro modal** — illustrates the "4-layer model of the Social OS" on first launch (reopen anytime via ℹ GUIDE)
 - **(?) explainer modals** — bilingual theory notes plus formulas for all 17 metrics
 - **Cascade-collapse effects** — hidden tabs are monitored in the background, warning of cross-layer fault propagation via UI flicker
 - **Debug audit report** — reaching GRAND OPTIMAL generates a Markdown report with one-click copy and context-aware sharing
-- **Full JA/EN support** — the EN button localizes all UI, live status, logs, and reports
 - **Share system** — shares the current parameter state as a reproducible URL, auto-falling back across LINE / 𝕏 / OS share / copy (extended to every layer in v6.3)
+- **Feedback channel** — send ideas or bug reports from an in-app form (with a GitHub Issues path for researchers/engineers)
+- **Direct page links** — tab switches sync the address bar, and you can copy a clean page URL that carries no scenario state
+- **Full JA/EN support** — the EN button localizes all UI, live status, logs, reports, and **monitor labels**
 - **Mobile-ready** — optimized touch interaction and log readability in both portrait and landscape
 
 ---
