@@ -925,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.337 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.338 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1125,6 +1125,8 @@ const I18N = {
     banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
     // v6.335: 中間（注意）バナー — 危機でも模範でもない状態。「失われかけているもの」を主語に
     banner_p1_warn:'あなたの街の情報空間が、濁りはじめている',
+    banner_p1_warn_hot:'あなたの街は、分断で軋みはじめている',
+    banner_p1_warn_near:'あなたの街は、あと一歩で澄む',
     banner_p2_warn:'あなたの街は動いている。でも、余白が心もとない',
     banner_p3_warn:'あなたの視界は、まだ揺れている',
     banner_p4_warn:'あなたの街の当事者の声が、観客の声にかき消されはじめている',
@@ -1261,7 +1263,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.337 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.338 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1276,6 +1278,8 @@ const I18N = {
     banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
     // v6.335: caution (in-between) banners — subject is what is being lost
     banner_p1_warn:'Your town’s information space is starting to cloud over',
+    banner_p1_warn_hot:'Your town is straining under division',
+    banner_p1_warn_near:'Your town is one step from clarity',
     banner_p2_warn:'Your town is running — but its slack is thin',
     banner_p3_warn:'Your perception is still wavering',
     banner_p4_warn:'The voices of the people who live it are starting to be drowned out by the spectators',
@@ -2005,8 +2009,20 @@ function updateAll(){
     document.getElementById('alertMsg').textContent=tt('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · information diversity preserved · synced with the real-world OS');
     discover('d_p1_good');noteSessionPage(1);
   } else {
-    setVerdictBanner('alertBanner','warn','banner_p1_warn');
-    document.getElementById('alertMsg').textContent=tt(`エントロピー ${Math.round(m.entropy)}% ／ まだ崩壊はしていないが、情報の多様性がじわじわ削られている`,`Entropy ${Math.round(m.entropy)}% · not collapsed yet, but information diversity is being trimmed away`);
+    // v6.338: 中間状態を3つに区別（近クラッシュの分断 / エコーチェンバー / あと一歩で健全）
+    let wkey,wmsg;
+    if(m.entropy>=65){
+      wkey='banner_p1_warn_hot';
+      wmsg=tt(`エントロピー ${Math.round(m.entropy)}% ／ 扇動と分断が進み、社会の信頼が急速に痩せている（崩壊の一歩手前）`,`Entropy ${Math.round(m.entropy)}% · agitation and division are eroding social trust fast — one step from collapse`);
+    } else if(m.infoH<50){
+      wkey='banner_p1_warn';
+      wmsg=tt(`情報健全性 ${Math.round(m.infoH)} ／ 同質な声ばかりが循環し、情報空間が濁りはじめている（エコーチェンバー化）`,`Info health ${Math.round(m.infoH)} · the same voices keep circulating — the information space is clouding over (echo chamber)`);
+    } else {
+      wkey='banner_p1_warn_near';
+      wmsg=tt(`情報多様性 ${Math.round(m.diversity)} ／ おおむね健全。あと一歩で「澄んだ情報空間」に届く`,`Diversity ${Math.round(m.diversity)} · mostly healthy — one step from a clear information space`);
+    }
+    setVerdictBanner('alertBanner','warn',wkey);
+    document.getElementById('alertMsg').textContent=wmsg;
   }
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
@@ -2884,17 +2900,17 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。','[ RUNNING ] Raise search depth or grounding to progress the debug.');
     diag.style.borderLeftColor='var(--pur)';
   }
-  // v6.334: 思考凍結（赤・学習率≈0で自己修正が停止。前状態の汚染が凍りつく）を最優先で明示
-  //   → 凍結を「健全(緑)」と誤表示せず、frozen選択時に必ずバナーが変化する
-  const p3Frozen=learningRate<10;
-  const p3Good=searchDepth>=7&&!attackSticky&&fooled===0&&learningRate>=30;
+  // v6.338: バナーは「パラメータ」から即時判定する（fooled/attackSticky はノードの汚染度で
+  //   時間差で変化するため、ボタン押下にバナーが追従せず不安定だった）。探索深度・学習率は
+  //   押した瞬間に確定するので、バナーが安定してすぐ切り替わる。ノードのアニメ/ゲージ/攻撃バッジは実シムのまま。
+  const p3Frozen=learningRate<10;                          // アップデート拒否（自己修正が止まる）
+  const p3PoisonState=!p3Frozen&&searchDepth<=3;           // 浅い探索＝毒入れされる構成
+  const p3Good=!p3Frozen&&searchDepth>=7&&learningRate>=30; // 深い探索＋更新可能＝健全
   if(p3Frozen){
     setVerdictBanner('alertBannerP3','crash','banner_p3_frozen');
-    setText(document.getElementById('alertMsgP3'), fooled>0
-      ? tt('🧊 学習率0 — ファクトを入れても考えが更新されない（アップデート拒否）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate 0 — facts come in but beliefs never update (won’t-update mode). Raise the learning rate to allow self-correction.')
-      : tt('🧊 自己修正が停止中。いまは無事でも、一度汚染されれば元には戻れません。','🧊 Self-correction is halted. Fine for now — but once contaminated, there is no way back.'));
+    setText(document.getElementById('alertMsgP3'),tt('🧊 学習率が0付近 — 事実を入れても考えが更新されません（アップデート拒否）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate near zero — facts come in but beliefs never update (won’t-update mode). Raise the learning rate to allow self-correction.'));
     discover('d_p3_frozen');noteSessionPage(3);
-  } else if(p3BannerOn){
+  } else if(p3PoisonState){
     setVerdictBanner('alertBannerP3','crash','banner_p3');
     setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
     discover('d_p3_poison');noteSessionPage(3);
@@ -2912,7 +2928,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   p3Snapshot={integ,dop:dopR,fooled};
   const p3b=document.getElementById('p3ShareBtn');
   if(p3b){
-    if(attackSticky) p3ShareState={type:'poison'};
+    if(p3PoisonState) p3ShareState={type:'poison'};
     else if(p3Good) p3ShareState={type:'restored'};
     else p3ShareState=null;
     if(p3ShareState){
@@ -3844,7 +3860,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.337 ]','[ SOCIAL SYSTEM DEBUGGER v6.337 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.338 ]','[ SOCIAL SYSTEM DEBUGGER v6.338 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3955,7 +3971,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.337 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.337'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.338 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.338'),W/2,583);
   c.textAlign='left';
   return cv;
 }
