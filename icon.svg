@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Social System Debugger">
+  <!-- 背景（ダークターミナル調） -->
+  <rect width="512" height="512" fill="#070b14"/>
+  <!-- 薄いシアン格子 -->
+  <g stroke="#00d4ff" stroke-opacity="0.10" stroke-width="2">
+    <path d="M96 0V512M192 0V512M320 0V512M416 0V512M0 96H512M0 192H512M0 320H512M0 416H512"/>
+  </g>
+  <!-- 中央のノードネットワーク（社会＝分散システム、1本だけ壊れたリンク） -->
+  <g stroke-width="10" fill="none">
+    <!-- 正常リンク（シアン） -->
+    <path d="M256 256 L256 148" stroke="#00d4ff"/>
+    <path d="M256 256 L154 330" stroke="#00d4ff"/>
+    <!-- 壊れたリンク（赤・破線） -->
+    <path d="M256 256 L360 330" stroke="#ff2244" stroke-dasharray="14 12"/>
+  </g>
+  <!-- ノード -->
+  <g>
+    <circle cx="256" cy="256" r="34" fill="#00d4ff"/>
+    <circle cx="256" cy="148" r="22" fill="#00d4ff"/>
+    <circle cx="154" cy="330" r="22" fill="#00d4ff"/>
+    <circle cx="360" cy="330" r="24" fill="#ff2244"/>
+  </g>
+  <!-- ハブの発光 -->
+  <circle cx="256" cy="256" r="34" fill="none" stroke="#00d4ff" stroke-opacity="0.5" stroke-width="10"/>
+</svg>

@@ -10,6 +10,14 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
 <meta name="twitter:card" content="summary_large_image">
+<!-- v6.342: PWA（インストール可能・オフライン対応。見た目は不変） -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070b14">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="社会OSデバッガー">
 <!-- og-image.png 制作仕様（アプリ内の結果カードPNGと同デザイン / generateResultCard 参照）:
      ・サイズ 1200×630 / 背景 #070b14 + 48pxグリッド線 rgba(0,212,255,.06)
      ・外枠 #00d4ff 3px + 内枠 rgba(0,212,255,.3) 1px
@@ -925,7 +933,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.341 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.342 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1264,7 +1272,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.341 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.342 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -3871,7 +3879,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.341 ]','[ SOCIAL SYSTEM DEBUGGER v6.341 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.342 ]','[ SOCIAL SYSTEM DEBUGGER v6.342 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3982,7 +3990,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.341 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.341'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.342 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.342'),W/2,583);
   c.textAlign='left';
   return cv;
 }
@@ -4240,6 +4248,12 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   updateDiscoveryCounter();
   _discReady=true;
 })();
+</script>
+<!-- v6.342: Service Worker 登録（PWA / オフライン。失敗しても本体動作に影響なし） -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
 </script>
 </body>
 </html>
