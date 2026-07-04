@@ -66,9 +66,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 /* v6.333: 良い状態バナー（危機バナーと同等の強さで緑） */
 .alert.good{background:rgba(0,255,136,.12);border-color:var(--green);animation:apGood 1.1s infinite}
 @keyframes apGood{0%,100%{box-shadow:0 0 14px rgba(0,255,136,.4)}50%{box-shadow:none}}
+/* v6.335: 中間（注意）バナー — 橙・パルスなしの落ち着いた常時ステータス（赤/緑を目立たせるため控えめ） */
+.alert.warn{background:rgba(255,107,43,.10);border-color:var(--ora);animation:none;box-shadow:0 0 10px rgba(255,107,43,.18)}
 /* v6.331: 大見出し＝「あなたへの一言」。等幅は維持しつつ拡大・グロー背景・入場演出で計器(.am)と質感を分離 */
 .at{color:var(--red);font-size:1.15rem;font-weight:bold;letter-spacing:.18em;text-shadow:0 0 22px rgba(255,34,68,.85);padding:6px 10px;border-radius:5px;background:radial-gradient(ellipse at center,rgba(255,34,68,.16),transparent 72%);animation:atIn .45s ease-out}
 .at.good{color:var(--green);text-shadow:0 0 22px rgba(0,255,136,.85);background:radial-gradient(ellipse at center,rgba(0,255,136,.16),transparent 72%)}
+.at.warn{color:var(--ora);text-shadow:0 0 16px rgba(255,107,43,.6);background:radial-gradient(ellipse at center,rgba(255,107,43,.13),transparent 72%);letter-spacing:.12em}
 .am{color:#ff8899;font-size:.67rem;margin-top:6px;line-height:1.7}
 .alert.good .am{color:#7fe6b0}
 /* v6.331: 詳細設定アコーディオン（主要操作と細かいパラメータを2階層に分離） */
@@ -357,10 +360,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="preset-bar">
   <span class="pl" id="presetLbl">SCENARIOS ▶</span>
   <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
-  <button class="pbtn" id="p-sns"      onclick="setPreset('sns')">📱 SNS社会 2024</button>
-  <button class="pbtn" id="p-nordic"   onclick="setPreset('nordic')">🌿 北欧型民主主義</button>
-  <button class="pbtn" id="p-techno"   onclick="setPreset('techno')">🔬 テクノクラシー</button>
   <button class="pbtn" id="p-populism" onclick="setPreset('populism')">🔥 ポピュリズム爆走</button>
+  <button class="pbtn" id="p-sns"      onclick="setPreset('sns')">📱 SNS社会 2024</button>
+  <button class="pbtn" id="p-techno"   onclick="setPreset('techno')">🔬 テクノクラシー</button>
+  <button class="pbtn" id="p-nordic"   onclick="setPreset('nordic')">🌿 北欧型民主主義</button>
 </div>
 
 <div class="alert" id="alertBanner">
@@ -514,10 +517,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p2-efficiency" onclick="setPresetP2('efficiency')" data-i18n="p2_pr_eff">⚙ 効率至上都市</button>
-  <button class="pbtn" id="p2-redundant" onclick="setPresetP2('redundant')" data-i18n="p2_pr_red">🛡 冗長性確保都市</button>
   <button class="pbtn" id="p2-deadlock" onclick="setPresetP2('deadlock')" data-i18n="p2_pr_dl">🏚 他責デッドロック</button>
+  <button class="pbtn" id="p2-efficiency" onclick="setPresetP2('efficiency')" data-i18n="p2_pr_eff">⚙ 効率至上都市</button>
   <button class="pbtn" id="p2-smart" onclick="setPresetP2('smart')" data-i18n="p2_pr_smart">🌱 スマート縮退</button>
+  <button class="pbtn" id="p2-redundant" onclick="setPresetP2('redundant')" data-i18n="p2_pr_red">🛡 冗長性確保都市</button>
   <span class="pl" style="opacity:.6" data-i18n="p2_pr_hint">→ 適用後に ⚡ショック注入 で耐性を比較せよ</span>
 </div>
 
@@ -689,8 +692,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
   <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 思考凍結</button>
+  <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
   <button class="pbtn" id="p3-fasting" onclick="setPresetP3('fasting')" data-i18n="p3_pr_fast">📵 SNS断食</button>
   <button class="pbtn" id="p3-debugger" onclick="setPresetP3('debugger')" data-i18n="p3_pr_debug">🔍 完全デバッガー</button>
   <span class="pl" style="opacity:.6" data-i18n="p3_pr_hint">→ Canvasの毒入れ攻撃の変化を観測せよ</span>
@@ -813,15 +816,15 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p4-plaza" onclick="setPresetP4('plaza')" data-i18n="p4_pr_plaza">🏘 当事者の広場</button>
-  <button class="pbtn" id="p4-spectators" onclick="setPresetP4('spectators')" data-i18n="p4_pr_spec">🎪 見物人の殺到</button>
-  <button class="pbtn" id="p4-gamified" onclick="setPresetP4('gamified')" data-i18n="p4_pr_game">🎮 ゲーム化進行</button>
   <button class="pbtn" id="p4-flamewar" onclick="setPresetP4('flamewar')" data-i18n="p4_pr_flame">🔥 推し活炎上</button>
+  <button class="pbtn" id="p4-gamified" onclick="setPresetP4('gamified')" data-i18n="p4_pr_game">🎮 ゲーム化進行</button>
+  <button class="pbtn" id="p4-spectators" onclick="setPresetP4('spectators')" data-i18n="p4_pr_spec">🎪 見物人の殺到</button>
+  <button class="pbtn" id="p4-plaza" onclick="setPresetP4('plaza')" data-i18n="p4_pr_plaza">🏘 当事者の広場</button>
   <span class="pl" style="opacity:.6" data-i18n="p4_pr_hint">→ PACKET LOGの多様性の変化を観測せよ</span>
 </div>
 
 <div class="alert" id="alertBannerP4">
-  <div class="at" data-i18n="banner_p4">⚠ &nbsp;あなたの街の声が、かき消されている&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p4">⚠ &nbsp;あなたの街の議論が、勝ち負けゲームに乗っ取られた&nbsp; ⚠</div>
   <div class="am" id="alertMsgP4"></div>
 </div>
 
@@ -922,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.334 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.335 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1120,6 +1123,12 @@ const I18N = {
     banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
     banner_p3_frozen:'⚠ &nbsp;あなたの思考は、凍りついている&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
+    // v6.335: 中間（注意）バナー — 危機でも模範でもない状態。「失われかけているもの」を主語に
+    banner_p1_warn:'あなたの街の情報空間が、濁りはじめている',
+    banner_p2_warn:'あなたの街は動いている。でも、余白が心もとない',
+    banner_p3_warn:'あなたの視界は、まだ揺れている',
+    banner_p4_warn:'あなたの街の当事者の声が、観客の声にかき消されはじめている',
+    banner_p4_flood:'⚠ &nbsp;あなたの街が、炎上の見世物にされている&nbsp; ⚠',
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
@@ -1252,11 +1261,12 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.334 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.335 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
-    banner_p4:'⚠ &nbsp;YOUR TOWN\'S VOICE IS BEING DROWNED OUT&nbsp; ⚠',
+    banner_p4:'⚠ &nbsp;YOUR TOWN\'S DEBATE IS HIJACKED INTO A WIN/LOSE GAME&nbsp; ⚠',
+    banner_p4_flood:'⚠ &nbsp;YOUR TOWN HAS BECOME A FLAME-WAR SPECTACLE&nbsp; ⚠',
     // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
     banner_p1_good:'✓ &nbsp;YOUR TOWN\'S INFORMATION SPACE IS CLEAR&nbsp; ✓',
     banner_p2_good_steady:'✓ &nbsp;YOUR TOWN IS CALM, FOR NOW&nbsp; ✓',
@@ -1264,6 +1274,11 @@ const I18N = {
     banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
     banner_p3_frozen:'⚠ &nbsp;YOUR MIND IS FROZEN&nbsp; ⚠',
     banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
+    // v6.335: caution (in-between) banners — subject is what is being lost
+    banner_p1_warn:'Your town’s information space is starting to cloud over',
+    banner_p2_warn:'Your town is running — but its slack is thin',
+    banner_p3_warn:'Your perception is still wavering',
+    banner_p4_warn:'The voices of the people who live it are starting to be drowned out by the spectators',
     // v6.331: 詳細設定アコーディオンのラベル
     acc_more:'Advanced settings',
     // v6.334: 発見ログ
@@ -1977,7 +1992,7 @@ function updateAll(){
   // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
   const p1Good=!m.crash&&m.entropy<28&&m.diversity>70&&m.infoH>75&&m.socialCap>65;
   if(m.crash){
-    setVerdictBanner('alertBanner','crash','banner_p1','');
+    setVerdictBanner('alertBanner','crash','banner_p1');
     const parts=[];
     if(m.entropy>76)parts.push(tt(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`,`Entropy ${Math.round(m.entropy)}% — social order breached critical threshold`));
     if(m.infra<18)parts.push(tt(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`,`Infrastructure ${Math.round(m.infra)} — medical & transport networks down`));
@@ -1986,10 +2001,13 @@ function updateAll(){
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
     discover('d_p1_crash');noteSessionPage(1);
   } else if(p1Good){
-    setVerdictBanner('alertBanner','good','banner_p1','banner_p1_good');
+    setVerdictBanner('alertBanner','good','banner_p1_good');
     document.getElementById('alertMsg').textContent=tt('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · information diversity preserved · synced with the real-world OS');
     discover('d_p1_good');noteSessionPage(1);
-  } else setVerdictBanner('alertBanner','','banner_p1','');
+  } else {
+    setVerdictBanner('alertBanner','warn','banner_p1_warn');
+    document.getElementById('alertMsg').textContent=tt(`エントロピー ${Math.round(m.entropy)}% ／ まだ崩壊はしていないが、情報の多様性がじわじわ削られている`,`Entropy ${Math.round(m.entropy)}% · not collapsed yet, but information diversity is being trimmed away`);
+  }
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
 
@@ -2370,7 +2388,7 @@ function updateAllP2(){
   const p2Good=p2Survived||(!m.crash&&m.heliOp&&!m.deadlock&&m.redundancy>=60&&m.infra>=55&&m.budget>=40);
   const p2Steady=p2Good&&!p2Survived; // ショックを経ていない平常運転の良好
   if(m.crash){
-    setVerdictBanner('alertBannerP2','crash','banner_p2','');
+    setVerdictBanner('alertBannerP2','crash','banner_p2');
     const parts=[];
     if(!m.heliOp&&m.infra<20) parts.push(tt('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達','Rescue heli suspended — infrastructure below critical point'));
     if(m.budget<8) parts.push(tt('自治体財政ショート — 予算が枯渇し行政機能停止','Municipal budget exhausted — administration halted'));
@@ -2379,13 +2397,16 @@ function updateAllP2(){
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
     discover('d_p2_crash');noteSessionPage(2);
   } else if(p2Good){
-    setVerdictBanner('alertBannerP2','good','banner_p2',p2Survived?'banner_p2_good_survived':'banner_p2_good_steady');
+    setVerdictBanner('alertBannerP2','good',p2Survived?'banner_p2_good_survived':'banner_p2_good_steady');
     document.getElementById('alertMsgP2').textContent=p2Survived
       ? tt(`🚁 ショックを吸収 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 救命ヘリ継続稼働`,`🚁 Shock absorbed · redundancy buffer ${Math.round(m.redundancy)}% · rescue heli still online`)
       : tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 他責デッドロックなし`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · no blame-shift deadlock`);
     if(p2Survived){discover('d_p2_survived');}else{discover('d_p2_steady');}
     noteSessionPage(2);
-  } else setVerdictBanner('alertBannerP2','','banner_p2','');
+  } else {
+    setVerdictBanner('alertBannerP2','warn','banner_p2_warn');
+    document.getElementById('alertMsgP2').textContent=tt(`冗長性バッファ ${Math.round(m.redundancy)}% ／ 今は動くが、大きなショックが来れば耐えられないかもしれない`,`Redundancy buffer ${Math.round(m.redundancy)}% · running now, but a big shock might be too much`);
+  }
   if(m.deadlock){discover('d_p2_deadlock');noteSessionPage(2);}
   // Redundancy Buffer
   const rb=m.redundancy;
@@ -2678,22 +2699,25 @@ function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;
 
 // v6.333: 判定バナーの3状態切替（'crash' 赤 / 'good' 緑 / '' 非表示）。状態変化時だけDOMへ書き込む。
 //   .at の data-i18n を付け替えるので言語切替は既存 applyI18nAuto が自動追従する。
-function setVerdictBanner(alertId,state,crashKey,goodKey){
+// v6.335: 判定バナーの状態切替（'crash' 赤 / 'warn' 橙・中間 / 'good' 緑 / '' 非表示）
+//   key = その状態のI18Nキー。.at の data-i18n を付け替えるので言語切替は applyI18nAuto が追従。
+function setVerdictBanner(alertId,state,key){
   const al=document.getElementById(alertId);if(!al)return;
   const at=al.querySelector('.at');if(!at)return;
-  const key=state==='good'?goodKey:(state==='crash'?crashKey:'');
-  const sig=state+'|'+key;            // good の種別（steady/survived）も区別
+  const sig=state+'|'+(key||'');      // good の種別（steady/survived）等も区別
   if(al.dataset.bst===sig)return;     // 状態変化ガード（ループでのフリッカー防止）
   al.dataset.bst=sig;
-  if(state==='crash'||state==='good'){
+  al.classList.remove('good','warn');
+  at.classList.remove('good','warn');
+  if(state){
     at.dataset.i18n=key;
     const v=(I18N[lang]&&I18N[lang][key]);
     if(v!==undefined)at.innerHTML=v;
-    at.classList.toggle('good',state==='good');
-    al.classList.toggle('good',state==='good');
+    if(state==='good'){al.classList.add('good');at.classList.add('good');}
+    else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
     al.classList.add('on');
   }else{
-    al.classList.remove('on','good');
+    al.classList.remove('on');
   }
 }
 
@@ -2865,20 +2889,23 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   const p3Frozen=learningRate<10;
   const p3Good=searchDepth>=7&&!attackSticky&&fooled===0&&learningRate>=30;
   if(p3Frozen){
-    setVerdictBanner('alertBannerP3','crash','banner_p3_frozen','');
+    setVerdictBanner('alertBannerP3','crash','banner_p3_frozen');
     setText(document.getElementById('alertMsgP3'), fooled>0
       ? tt('🧊 学習率0 — ファクトを入れても汚染が抜けない（思考凍結モード）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate 0 — no fact can wash out the contamination (cognitive freeze). Raise the learning rate to allow self-correction.')
       : tt('🧊 自己修正が停止中。いまは無事でも、一度汚染されれば元には戻れません。','🧊 Self-correction is halted. Fine for now — but once contaminated, there is no way back.'));
     discover('d_p3_frozen');noteSessionPage(3);
   } else if(p3BannerOn){
-    setVerdictBanner('alertBannerP3','crash','banner_p3','');
+    setVerdictBanner('alertBannerP3','crash','banner_p3');
     setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
     discover('d_p3_poison');noteSessionPage(3);
   } else if(p3Good){
-    setVerdictBanner('alertBannerP3','good','banner_p3','banner_p3_good');
+    setVerdictBanner('alertBannerP3','good','banner_p3_good');
     setText(document.getElementById('alertMsgP3'),tt('🧠 多次元因果検証が有効 ／ 毒入れ攻撃なし ／ 認知は現実と同期しています','🧠 Multi-dimensional verification active · no poisoning attack · cognition synced with reality'));
     discover('d_p3_restored');noteSessionPage(3);
-  } else setVerdictBanner('alertBannerP3','','banner_p3','');
+  } else {
+    setVerdictBanner('alertBannerP3','warn','banner_p3_warn');
+    setText(document.getElementById('alertMsgP3'),tt('探索深度や現実同期レートを上げると、視界がクリアになっていきます。','Raise search depth or grounding and your view clears up.'));
+  }
 
   // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
   // v6.31: 判定は attackSticky（ヒステリシス済み）ベースにして点滅を防止
@@ -2987,6 +3014,7 @@ function executeEarlyStopping(){
   document.getElementById('lrVal').textContent='80%';
   setPct(ds);setPct(gs);setPct(ls);
   p3Nodes.forEach(n=>{if(n.type==='general'){n.c=0;n.dop=5;}});
+  clearPresetSelP3(); // v6.335: EARLY_STOPPINGで設定を書き換えたら、選択中プリセットの色も解除（状態と表示を一致させる）
   const btn=document.getElementById('earlyStopBtn');
   const orig=btn.textContent;
   btn.textContent=tt('✓ ROLLBACK COMPLETE — 健全状態へ復帰','✓ ROLLBACK COMPLETE — restored to healthy state');
@@ -3201,13 +3229,20 @@ function updateP4Monitor(jamRatio){
   // v6.333: 危機（赤・乗っ取り）/ 模範（緑・声が届く）/ 非表示 の3状態。良い状態は安定値(gam/ext)で判定
   const p4Good=gamification<=18&&extTraffic<=18;
   if(p4BannerOn){
-    setVerdictBanner('alertBannerP4','crash','banner_p4','');
-    setText(document.getElementById('alertMsgP4'),tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
+    // v6.335: 外部の殺到(ext>60)を伴う複合＝「推し活炎上」と、ゲーム化単独＝「ゲーム化進行」を区別
+    const p4Compound=extTraffic>60;
+    setVerdictBanner('alertBannerP4','crash',p4Compound?'banner_p4_flood':'banner_p4');
+    setText(document.getElementById('alertMsgP4'), p4Compound
+      ? tt('外部アカウントの殺到 × ゲーム化の複合  |  生活者パケットは '+drop+'% がドロップ  |  当事者の声が二重にかき消されている','Outsider flood × gamification (compound)  |  '+drop+'% of resident packets dropping  |  the stakeholders’ voice is doubly drowned out')
+      : tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
     discover('d_p4_hijack');noteSessionPage(4);
   } else if(p4Good){
-    setVerdictBanner('alertBannerP4','good','banner_p4','banner_p4_good');
-    setText(document.getElementById('alertMsgP4'),tt('📡 当事者パケットが優先ルーティング ／ 部外者ノイズ最小 ／ 目的関数は政策のまま','📡 Resident packets prioritized · minimal outsider noise · objective still policy-focused'));
-  } else setVerdictBanner('alertBannerP4','','banner_p4','');
+    setVerdictBanner('alertBannerP4','good','banner_p4_good');
+    setText(document.getElementById('alertMsgP4'),tt('📡 当事者の声が最優先で届いている ／ ノイズは最小 ／ 目的関数は「政策」のまま','📡 Stakeholders’ voices routed first · noise minimal · objective still policy-focused'));
+  } else {
+    setVerdictBanner('alertBannerP4','warn','banner_p4_warn');
+    setText(document.getElementById('alertMsgP4'),tt('生活者のパケットが '+drop+'% ドロップ ／ 当事者の声より、観客の声が通りやすくなっている',drop+'% of resident packets dropping · spectators’ voices are getting through more easily than the stakeholders’'));
+  }
 
   // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
   // 判定は gamification（ユーザー設定・安定値）ベースなので揺れないが、DOM書き込みはガード経由に統一
@@ -3809,7 +3844,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.334 ]','[ SOCIAL SYSTEM DEBUGGER v6.334 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.335 ]','[ SOCIAL SYSTEM DEBUGGER v6.335 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3920,7 +3955,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.334 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.334'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.335 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.335'),W/2,583);
   c.textAlign='left';
   return cv;
 }
