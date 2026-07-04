@@ -925,7 +925,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.336 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.337 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1261,7 +1261,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.336 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.337 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -3844,7 +3844,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.336 ]','[ SOCIAL SYSTEM DEBUGGER v6.336 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.337 ]','[ SOCIAL SYSTEM DEBUGGER v6.337 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3955,7 +3955,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.336 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.336'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.337 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.337'),W/2,583);
   c.textAlign='left';
   return cv;
 }
@@ -4056,7 +4056,7 @@ function closeShareGuideIf(e){if(e.target===document.getElementById('shareGuideM
 // ══════════════════════════════════════════════════════════
 // v6.332: フィードバック導線（既存の共有システムとは独立した別入口）
 // ══════════════════════════════════════════════════════════
-const FEEDBACK_ENDPOINT='https://formspree.io/f/YOUR_FORM_ID'; // ← 後日 Formspree 等の実IDに差し替え
+const FEEDBACK_ENDPOINT='https://formspree.io/f/meebvdjv'; // Formspree フォーム（feedback受信先）
 let researcherMode=false;
 function setResearcherMode(on){
   researcherMode=!!on;
