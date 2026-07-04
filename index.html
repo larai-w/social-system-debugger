@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.3</title>
+<title>社会＆地域インフラ・デバッガー v6.31</title>
 <!-- v6.2: OGP / SNSカード -->
-<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.3">
+<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.31">
 <meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
@@ -301,7 +301,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.3 ]</h1>
+    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.31 ]</h1>
     <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -878,7 +878,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.3 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.31 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -2050,6 +2050,11 @@ let p1ShareState=null, p3ShareState=null, p4ShareState=null;
 // v6.3: 結果カード生成用スナップショット（アニメ由来の判定値を保持）
 let p3Snapshot={integ:100,dop:0,fooled:0};
 let p4Snapshot={drop:0,ratio:100};
+// v6.31: フリッカー対策 — 毎フレーム評価される揺れ値のヒステリシス保持状態
+//   （P3の攻撃/バナー、P4のバナーが閾値付近で60fpsトグルするのを防ぐ）
+let p3AttackHold=0;      // attackEdges>0 の残存フレーム数（>0でACTIVE扱い）
+let p3BannerOn=false;    // P3アラートバナーのヒステリシス状態
+let p4BannerOn=false;    // P4アラートバナーのヒステリシス状態
 
 const P2_LOG_NORMAL_JA=[
   'INFRA_MAINT_SCHEDULED ........ OK','HELI_DISPATCH_STATUS ......... ONLINE',
@@ -2504,8 +2509,21 @@ function drawP3(){
   updateP3Monitor(avgDop,generals,attackEdges);
 }
 
+// v6.31: 状態変化ガード — 前回適用値と異なる時だけDOMへ書き込む
+//   （毎フレーム呼ばれるモニターでの無駄な再描画とフリッカーを抑止）
+function setText(el,txt){if(el&&el._t!==txt){el._t=txt;el.textContent=txt;}}
+function setColor(el,col){if(el&&el._c!==col){el._c=col;el.style.color=col;}}
+function setClassOn(el,name,on){if(el&&el['_k'+name]!==on){el['_k'+name]=on;el.classList.toggle(name,on);}}
+function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;}}
+
 function updateP3Monitor(avgDop,generals,attackEdges){
   const fooled=generals.filter(n=>n.c>0.55).length;
+  // v6.31: 揺れる attackEdges を約0.4秒保持し、0↔正の1フレーム往復による点滅を防ぐ
+  if(attackEdges>0)p3AttackHold=24;else if(p3AttackHold>0)p3AttackHold--;
+  const attackSticky=p3AttackHold>0;
+  // P3バナーはヒステリシス（点灯: fooled>=12 & 攻撃中 / 消灯: fooled<10 か 攻撃収束）
+  if(!p3BannerOn){ if(fooled>=12&&attackSticky)p3BannerOn=true; }
+  else { if(fooled<10||!attackSticky)p3BannerOn=false; }
   const avgC=generals.reduce((s,n)=>s+n.c,0)/generals.length;
   const integ=Math.round(clamp(100-avgC*100,0,100));
   const dopR=Math.round(avgDop);
@@ -2522,9 +2540,9 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   document.getElementById('p3IntStatus').textContent=integ<35?tt('OVERFITTED — 認知が偽装情報に過適合','OVERFITTED — cognition over-adapted to disguised info'):integ<65?tt('DEGRADED — ノイズ蓄積が進行中','DEGRADED — noise accumulating'):'HEALTHY';
   document.getElementById('p3IntStatus').style.color=icol;
   const atk=document.getElementById('p3AttackBadge');
-  if(attackEdges>0){atk.textContent='⚠ ACTIVE';atk.style.color='var(--red)';}
-  else if(searchDepth>=7){atk.textContent='NEUTRALIZED';atk.style.color='var(--green)';}
-  else{atk.textContent='—';atk.style.color='var(--muted)';}
+  if(attackSticky){setText(atk,'⚠ ACTIVE');setColor(atk,'var(--red)');}
+  else if(searchDepth>=7){setText(atk,'NEUTRALIZED');setColor(atk,'var(--green)');}
+  else{setText(atk,'—');setColor(atk,'var(--muted)');}
   const fn=document.getElementById('p3FooledNum');
   fn.textContent=`${fooled}/32`;
   fn.style.color=fooled>12?'var(--red)':fooled>4?'var(--ora)':'var(--green)';
@@ -2584,22 +2602,21 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.style.borderLeftColor='var(--pur)';
   }
   const ab3=document.getElementById('alertBannerP3');
-  if(fooled>=12&&attackEdges>0){
-    ab3.classList.add('on');
-    document.getElementById('alertMsgP3').textContent=tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.');
-  } else ab3.classList.remove('on');
+  if(p3BannerOn)setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
+  setClassOn(ab3,'on',p3BannerOn);
 
   // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
+  // v6.31: 判定は attackSticky（ヒステリシス済み）ベースにして点滅を防止
   p3Snapshot={integ,dop:dopR,fooled};
   const p3b=document.getElementById('p3ShareBtn');
   if(p3b){
-    if(attackEdges>0) p3ShareState={type:'poison'};
-    else if(searchDepth>=7&&fooled===0) p3ShareState={type:'restored'};
+    if(attackSticky) p3ShareState={type:'poison'};
+    else if(searchDepth>=7) p3ShareState={type:'restored'};
     else p3ShareState=null;
     if(p3ShareState){
-      p3b.style.display='block';
-      p3b.textContent=tt('▶ この結果を送る','▶ Share this result');
-    }else p3b.style.display='none';
+      setText(p3b,tt('▶ この結果を送る','▶ Share this result'));
+      setDisp(p3b,'block');
+    }else setDisp(p3b,'none');
   }
 }
 
@@ -2904,12 +2921,14 @@ function updateP4Monitor(jamRatio){
     diag.style.borderLeftColor='var(--yel)';
   }
   const ab4=document.getElementById('alertBannerP4');
-  if(gamification>70&&drop>60){
-    ab4.classList.add('on');
-    document.getElementById('alertMsgP4').textContent=tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed');
-  } else ab4.classList.remove('on');
+  // v6.31: drop（毎フレーム揺れる）にヒステリシス（点灯>62 / 消灯<55）。gamification は安定値
+  if(!p4BannerOn){ if(gamification>70&&drop>62)p4BannerOn=true; }
+  else { if(gamification<=70||drop<55)p4BannerOn=false; }
+  if(p4BannerOn)setText(document.getElementById('alertMsgP4'),tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
+  setClassOn(ab4,'on',p4BannerOn);
 
   // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
+  // 判定は gamification（ユーザー設定・安定値）ベースなので揺れないが、DOM書き込みはガード経由に統一
   p4Snapshot={drop,ratio};
   const p4b=document.getElementById('p4ShareBtn');
   if(p4b){
@@ -2917,9 +2936,9 @@ function updateP4Monitor(jamRatio){
     else if(gamification<=40) p4ShareState={type:'restored'};
     else p4ShareState=null;
     if(p4ShareState){
-      p4b.style.display='block';
-      p4b.textContent=tt('▶ この結果を送る','▶ Share this result');
-    }else p4b.style.display='none';
+      setText(p4b,tt('▶ この結果を送る','▶ Share this result'));
+      setDisp(p4b,'block');
+    }else setDisp(p4b,'none');
   }
 }
 
@@ -3501,7 +3520,7 @@ function generateResultCard(ctx){
   // アプリ名 + ページ名
   c.fillStyle='#00d4ff';c.font='bold 32px '+MONO;
   c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.3 ]','[ SOCIAL SYSTEM DEBUGGER v6.3 ]'),56,86);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.31 ]','[ SOCIAL SYSTEM DEBUGGER v6.31 ]'),56,86);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,122);
