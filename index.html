@@ -48,6 +48,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 @keyframes logpulse{0%,100%{opacity:1}50%{opacity:.6}}
 /* v6.331: 判定バナー大見出しの入場（フェードイン＋わずかに拡大） */
 @keyframes atIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+/* v6.333: モーション抑制設定では点滅系を停止（可読性・アクセシビリティ） */
+@media(prefers-reduced-motion:reduce){.mode-log-blink{animation:none!important}}
 .ibtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.65rem;cursor:pointer;transition:all .2s;letter-spacing:.08em;white-space:nowrap}
 .ibtn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.2)}
 .ibtn.on{border-color:var(--cyan);color:var(--cyan)}
@@ -61,9 +63,14 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .alert{display:none;background:rgba(255,34,68,.12);border:1px solid var(--red);border-radius:3px;padding:14px 20px;text-align:center;margin-bottom:14px;animation:ap 1.1s infinite}
 .alert.on{display:block}
 @keyframes ap{0%,100%{box-shadow:0 0 14px rgba(255,34,68,.4)}50%{box-shadow:none}}
+/* v6.333: 良い状態バナー（危機バナーと同等の強さで緑） */
+.alert.good{background:rgba(0,255,136,.12);border-color:var(--green);animation:apGood 1.1s infinite}
+@keyframes apGood{0%,100%{box-shadow:0 0 14px rgba(0,255,136,.4)}50%{box-shadow:none}}
 /* v6.331: 大見出し＝「あなたへの一言」。等幅は維持しつつ拡大・グロー背景・入場演出で計器(.am)と質感を分離 */
 .at{color:var(--red);font-size:1.15rem;font-weight:bold;letter-spacing:.18em;text-shadow:0 0 22px rgba(255,34,68,.85);padding:6px 10px;border-radius:5px;background:radial-gradient(ellipse at center,rgba(255,34,68,.16),transparent 72%);animation:atIn .45s ease-out}
+.at.good{color:var(--green);text-shadow:0 0 22px rgba(0,255,136,.85);background:radial-gradient(ellipse at center,rgba(0,255,136,.16),transparent 72%)}
 .am{color:#ff8899;font-size:.67rem;margin-top:6px;line-height:1.7}
+.alert.good .am{color:#7fe6b0}
 /* v6.331: 詳細設定アコーディオン（主要操作と細かいパラメータを2階層に分離） */
 .acc-tog{width:100%;display:flex;align-items:center;gap:8px;text-align:left;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.62rem;letter-spacing:.1em;padding:9px 12px;cursor:pointer;transition:all .2s;margin:2px 0}
 .acc-tog:hover{border-color:var(--cyan);color:var(--cyan)}
@@ -904,7 +911,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.332 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.333 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1083,6 +1090,11 @@ const I18N = {
     scatter_legend_real:'実データ', scatter_legend_fake:'過学習データ',
     log_trust:'信頼指数    ', log_resilience:'回復力      ', log_legitimacy:'正当性      ',
     log_infoH:'情報健全性  ', log_viability:'長期持続性  ', log_mentalWB:'精神的健全性',
+    // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
+    banner_p1_good:'✓ &nbsp;あなたの街の情報空間は、澄んでいる&nbsp; ✓',
+    banner_p2_good:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
+    banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
+    banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
@@ -1215,11 +1227,16 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.331 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.333 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
     banner_p4:'⚠ &nbsp;YOUR TOWN\'S VOICE IS BEING DROWNED OUT&nbsp; ⚠',
+    // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
+    banner_p1_good:'✓ &nbsp;YOUR TOWN\'S INFORMATION SPACE IS CLEAR&nbsp; ✓',
+    banner_p2_good:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
+    banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
+    banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
     // v6.331: 詳細設定アコーディオンのラベル
     acc_more:'Advanced settings',
     // v6.332: フィードバック導線 / 直接リンク
@@ -1927,16 +1944,20 @@ function updateAll(){
 
   updateHistRef();
 
-  const ab=document.getElementById('alertBanner');
+  // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
+  const p1Good=!m.crash&&m.entropy<28&&m.diversity>70&&m.infoH>75&&m.socialCap>65;
   if(m.crash){
-    ab.classList.add('on');
+    setVerdictBanner('alertBanner','crash','banner_p1','banner_p1_good');
     const parts=[];
     if(m.entropy>76)parts.push(tt(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`,`Entropy ${Math.round(m.entropy)}% — social order breached critical threshold`));
     if(m.infra<18)parts.push(tt(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`,`Infrastructure ${Math.round(m.infra)} — medical & transport networks down`));
     if(m.socialCap<18)parts.push(tt(`ソーシャルキャピタル ${Math.round(m.socialCap)} — 相互信頼が消滅`,`Social capital ${Math.round(m.socialCap)} — mutual trust vanished`));
     parts.push(tt('過学習により現実世界のOSとの互換性が失われました。','Overfitting severed compatibility with the real-world OS.'));
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
-  } else ab.classList.remove('on');
+  } else if(p1Good){
+    setVerdictBanner('alertBanner','good','banner_p1','banner_p1_good');
+    document.getElementById('alertMsg').textContent=tt('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · information diversity preserved · synced with the real-world OS');
+  } else setVerdictBanner('alertBanner','','banner_p1','banner_p1_good');
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
 
@@ -2311,16 +2332,20 @@ function updateAllP2(){
     timelineChartP2.update();
   }
   // Crash banner
-  const ab2=document.getElementById('alertBannerP2');
+  // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
+  const p2Good=shockState?.type==='survived'||(!m.crash&&m.heliOp&&!m.deadlock&&m.redundancy>=60&&m.infra>=55&&m.budget>=40);
   if(m.crash){
-    ab2.classList.add('on');
+    setVerdictBanner('alertBannerP2','crash','banner_p2','banner_p2_good');
     const parts=[];
     if(!m.heliOp&&m.infra<20) parts.push(tt('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達','Rescue heli suspended — infrastructure below critical point'));
     if(m.budget<8) parts.push(tt('自治体財政ショート — 予算が枯渇し行政機能停止','Municipal budget exhausted — administration halted'));
     if(m.deadlock) parts.push(tt('他責デッドロックによりシステムが自滅状態に突入','Blame-shift deadlock has driven the system into self-destruction'));
     if(shockState?.type==='crash') parts.push(tt(`⚡ ブラックスワン注入 — Redundancy Buffer ${shockState.rb}% で致命的崩壊（System Crash）`,`⚡ Black swan injected — fatal System Crash at Redundancy Buffer ${shockState.rb}%`));
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
-  } else ab2.classList.remove('on');
+  } else if(p2Good){
+    setVerdictBanner('alertBannerP2','good','banner_p2','banner_p2_good');
+    document.getElementById('alertMsgP2').textContent=tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 他責デッドロックなし`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · no blame-shift deadlock`);
+  } else setVerdictBanner('alertBannerP2','','banner_p2','banner_p2_good');
   // Redundancy Buffer
   const rb=m.redundancy;
   const rbc=rb<30?'#ff2244':rb<60?'#ff6b2b':'#00ff88';
@@ -2610,6 +2635,26 @@ function setColor(el,col){if(el&&el._c!==col){el._c=col;el.style.color=col;}}
 function setClassOn(el,name,on){if(el&&el['_k'+name]!==on){el['_k'+name]=on;el.classList.toggle(name,on);}}
 function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;}}
 
+// v6.333: 判定バナーの3状態切替（'crash' 赤 / 'good' 緑 / '' 非表示）。状態変化時だけDOMへ書き込む。
+//   .at の data-i18n を付け替えるので言語切替は既存 applyI18nAuto が自動追従する。
+function setVerdictBanner(alertId,state,crashKey,goodKey){
+  const al=document.getElementById(alertId);if(!al)return;
+  const at=al.querySelector('.at');if(!at)return;
+  if(al.dataset.bst===state)return;   // 状態変化ガード（ループでのフリッカー防止）
+  al.dataset.bst=state;
+  if(state==='crash'||state==='good'){
+    const key=state==='good'?goodKey:crashKey;
+    at.dataset.i18n=key;
+    const v=(I18N[lang]&&I18N[lang][key]);
+    if(v!==undefined)at.innerHTML=v;
+    at.classList.toggle('good',state==='good');
+    al.classList.toggle('good',state==='good');
+    al.classList.add('on');
+  }else{
+    al.classList.remove('on','good');
+  }
+}
+
 function updateP3Monitor(avgDop,generals,attackEdges){
   const fooled=generals.filter(n=>n.c>0.55).length;
   // v6.31: 揺れる attackEdges を約0.4秒保持し、0↔正の1フレーム往復による点滅を防ぐ
@@ -2695,9 +2740,15 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。','[ RUNNING ] Raise search depth or grounding to progress the debug.');
     diag.style.borderLeftColor='var(--pur)';
   }
-  const ab3=document.getElementById('alertBannerP3');
-  if(p3BannerOn)setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
-  setClassOn(ab3,'on',p3BannerOn);
+  // v6.333: 危機（赤・毒入れ進行中）/ 模範（緑・完全デバッグ）/ 非表示 の3状態
+  const p3Good=searchDepth>=7&&!attackSticky&&fooled===0;
+  if(p3BannerOn){
+    setVerdictBanner('alertBannerP3','crash','banner_p3','banner_p3_good');
+    setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
+  } else if(p3Good){
+    setVerdictBanner('alertBannerP3','good','banner_p3','banner_p3_good');
+    setText(document.getElementById('alertMsgP3'),tt('🧠 多次元因果検証が有効 ／ 毒入れ攻撃なし ／ 認知は現実と同期しています','🧠 Multi-dimensional verification active · no poisoning attack · cognition synced with reality'));
+  } else setVerdictBanner('alertBannerP3','','banner_p3','banner_p3_good');
 
   // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
   // v6.31: 判定は attackSticky（ヒステリシス済み）ベースにして点滅を防止
@@ -3014,12 +3065,18 @@ function updateP4Monitor(jamRatio){
     diag.textContent=tt('[ OK ] 当事者の声が正常にルーティングされています。パラメーターを操作して非対称性の発生をシミュレートできます。','[ OK ] Stakeholder voices routing normally. Adjust parameters to simulate asymmetry.');
     diag.style.borderLeftColor='var(--yel)';
   }
-  const ab4=document.getElementById('alertBannerP4');
   // v6.31: drop（毎フレーム揺れる）にヒステリシス（点灯>62 / 消灯<55）。gamification は安定値
   if(!p4BannerOn){ if(gamification>70&&drop>62)p4BannerOn=true; }
   else { if(gamification<=70||drop<55)p4BannerOn=false; }
-  if(p4BannerOn)setText(document.getElementById('alertMsgP4'),tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
-  setClassOn(ab4,'on',p4BannerOn);
+  // v6.333: 危機（赤・乗っ取り）/ 模範（緑・声が届く）/ 非表示 の3状態。良い状態は安定値(gam/ext)で判定
+  const p4Good=gamification<=18&&extTraffic<=18;
+  if(p4BannerOn){
+    setVerdictBanner('alertBannerP4','crash','banner_p4','banner_p4_good');
+    setText(document.getElementById('alertMsgP4'),tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
+  } else if(p4Good){
+    setVerdictBanner('alertBannerP4','good','banner_p4','banner_p4_good');
+    setText(document.getElementById('alertMsgP4'),tt('📡 当事者パケットが優先ルーティング ／ 部外者ノイズ最小 ／ 目的関数は政策のまま','📡 Resident packets prioritized · minimal outsider noise · objective still policy-focused'));
+  } else setVerdictBanner('alertBannerP4','','banner_p4','banner_p4_good');
 
   // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
   // 判定は gamification（ユーザー設定・安定値）ベースなので揺れないが、DOM書き込みはガード経由に統一
@@ -3048,7 +3105,7 @@ function updateP4Log(){
     // 低エントロピー: 90%超では語彙2種のみをループ
     const pool=gamification>=90?2:3;
     const tok=HIJ[p4LogSeq%pool];
-    html=`<span style="color:var(--red);animation:blink ${(0.4+(p4LogSeq%3)*0.15).toFixed(2)}s infinite">${ts} ${tok}${hijackTag}</span>`;
+    html=`<span class="mode-log-blink" style="color:var(--red);animation:logpulse ${(1.2+(p4LogSeq%3)*0.3).toFixed(2)}s infinite ease-in-out">${ts} ${tok}${hijackTag}</span>`;
   } else if(gamification>40&&p4LogSeq%2===0){
     const tok=HIJ[p4LogSeq%3];
     html=`<span style="color:rgba(255,34,68,.6)">${ts} ${tok}${hijackTag}</span>`;
@@ -3617,7 +3674,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.331 ]','[ SOCIAL SYSTEM DEBUGGER v6.331 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.333 ]','[ SOCIAL SYSTEM DEBUGGER v6.333 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3728,7 +3785,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.3 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.3'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.333 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.333'),W/2,583);
   c.textAlign='left';
   return cv;
 }
@@ -3979,6 +4036,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   // v5.3: カスケード崩壊判定＋Grand Optimal判定（非表示タブも裏側で監視）
   setInterval(()=>{updateCascadeFX();checkGrandOptimal();},500);
   updateCascadeFX();checkGrandOptimal();
+  // v6.333: 初期描画（P1のゲージ＋良い状態バナーを初回から反映）
+  updateAll();
 })();
 </script>
 </body>
