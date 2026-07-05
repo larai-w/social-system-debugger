@@ -933,7 +933,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.343 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.344 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1278,7 +1278,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.343 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.344 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -2315,7 +2315,7 @@ function metricsP2(s,d,al,e){
   }
   let infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14,0,100);
   infra=Math.max(0,infra-shockInfraPenalty);
-  const heliOp=shockState?.type==='crash'?false:(publicReboot?true:(infra>35&&cpuRepair>25));
+  const heliOp=shockState?.type==='crash'?false:(publicReboot?true:(infra>35&&cpuRepair>25&&ef>=0.3));
   const rebootCost=publicReboot?16:0;
   const brand=clamp(df*65+sf*18+(isG?-14:14)+ef*8,0,100);
   let budget=clamp(100-(1-sf)*44-(isG?(1-ef)*38:8)+df*14-rebootCost-(rootRestricted?5:0),0,100);
@@ -3888,7 +3888,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.343 ]','[ SOCIAL SYSTEM DEBUGGER v6.343 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.344 ]','[ SOCIAL SYSTEM DEBUGGER v6.344 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3999,7 +3999,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.343 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.343'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.344 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.344'),W/2,583);
   c.textAlign='left';
   return cv;
 }

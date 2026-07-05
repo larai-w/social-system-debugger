@@ -93,7 +93,7 @@ infraError = infraBase < 65
 
 deadlock = (!rootRestricted) && ef < 0.4 && isG && infraError   // blame-shift deadlock
 infra    = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14)
-heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25)        // rescue heli online
+heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)        // rescue heli online (blocked by low ethics)
 budget   = clamp(100 - (1-sf)*44 - (isG ? (1-ef)*38 : 8) + df*14 - (reboot?16:0) - (rootRestricted?5:0))
 
 crash = (!heliOp && infra < 20) || budget < 8 || <shock crash>
@@ -101,7 +101,7 @@ crash = (!heliOp && infra < 20) || budget < 8 || <shock crash>
 
 **System-shock injection**: a three-way branch on the Redundancy Buffer — **instant collapse below 30%**, **survival at ≥ 60%**, partial damage in between (`shockState`).
 
-**Reading it**: maximizing consolidation `sf` erodes redundancy (`base = 100 - sf*52 - …`), leaving the town fragile to shocks. `deadlock` fires when "low ethics × Greedy × infra trouble" coincide, redirecting 100% of admin CPU to blame-shifting so repair stops. `reboot` (re-municipalization) restores resilience (+42 redundancy, halved decay).
+**Reading it**: maximizing consolidation `sf` erodes redundancy (`base = 100 - sf*52 - …`), leaving the town fragile to shocks. `deadlock` fires when "low ethics × Greedy × infra trouble" coincide, redirecting 100% of admin CPU to blame-shifting so repair stops. `heliOp` is **directly blocked by low ethics** (`ef < 0.3`) — even if infrastructure and repair budget are sufficient, the helicopter doesn't fly when the leader lacks judgment and collaboration. `reboot` (re-municipalization) restores resilience (+42 redundancy, halved decay).
 
 ---
 
@@ -189,4 +189,4 @@ Earned when each layer's snapshot (diversity, infrastructure, cognitive integrit
 
 ---
 
-*Applies to: v6.343 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
+*Applies to: v6.344 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*

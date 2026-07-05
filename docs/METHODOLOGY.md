@@ -91,7 +91,7 @@ infraError = infraBase < 65
 
 deadlock = (!rootRestricted) && ef < 0.4 && isG && infraError   // 他責デッドロック
 infra    = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14)
-heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25)        // 救命ヘリ稼働
+heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)        // 救命ヘリ稼働（低倫理で停止）
 budget   = clamp(100 - (1-sf)*44 - (isG ? (1-ef)*38 : 8) + df*14 - (reboot?16:0) - (rootRestricted?5:0))
 
 crash = (!heliOp && infra < 20) || budget < 8 || <ショックでcrash>
@@ -99,7 +99,7 @@ crash = (!heliOp && infra < 20) || budget < 8 || <ショックでcrash>
 
 **環境ショック注入**: 冗長性バッファが **< 30% で即崩壊**、**≥ 60% で生存**、30〜60% で部分損傷、という三分岐（`shockState`）。
 
-**読み方**: 集約化 `sf` を極めるほど冗長性が失われ（`base = 100 - sf*52 - …`）、ショックに脆くなる。`deadlock` は「低倫理 × Greedy × インフラ不調」が揃うと発火し、CPUが100%他責化に回って修復が止まる。`reboot`（再公営化）は冗長性 +42・インフラ劣化半減で耐性を回復する。
+**読み方**: 集約化 `sf` を極めるほど冗長性が失われ（`base = 100 - sf*52 - …`）、ショックに脆くなる。`deadlock` は「低倫理 × Greedy × インフラ不調」が揃うと発火し、CPUが100%他責化に回って修復が止まる。`heliOp` は倫理観 `ef >= 0.3` に直結し、低倫理では――インフラと修復予算が充分でも――ヘリが飛ばない（リーダーの判断力・協調性の欠如が実務を停止）。`reboot`（再公営化）は冗直性 +42・インフラ劣化半減で耐性を回復する。
 
 ---
 
@@ -187,4 +187,4 @@ ratio = round(clamp(100 - gamification*0.85 - (filterActive ? 0 : extTraffic*0.2
 
 ---
 
-*対応バージョン: v6.343 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*
+*対応バージョン: v6.344 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*
