@@ -77,6 +77,17 @@ crash = entropy > 76  ||  (infra < 18 && socialCap < 18)
 - `isG` … 予算配分戦略が Greedy か
 - `reboot = publicReboot` … 公共性リブート（再公営化）ON/OFF
 - `dampener = reboot ? 0.5 : 1.0`
+- `skillStock`（0〜100）… **後継者ストック**（暗黙知の残量）。v6.346で追加された、このページ唯一の**遅い状態変数**
+
+**後継者ストック（skillStock・遅い状態変数 / v6.346）**
+P2表示中のみ 1.2秒/tick で時間発展する。
+```
+reboot        → skillStock を 60 以上へ回復（skillLost 解除）
+df < 0.25     → skillStock -= (0.25-df)*15   // 高齢職人の引退で減少（DX0で約12tickで崖）→ 0 で技術消滅(skillLost)
+df > 0.45     → skillStock += (df-0.45)*8     // 形式知化（シリアライズ）で緩やかに回復
+0.25〜0.45    → 均衡帯（デフォルトDX30はここ＝減らない）
+skillLost（0到達後）はDXを最大にしても回復せず、Public Reboot でのみ復活
+```
 
 **冗長性バッファ（Redundancy Buffer）**
 ```
@@ -84,22 +95,30 @@ base = clamp(100 - sf*52 - (isG ? 32 : 0))
 redundancy = reboot ? clamp(base + 42) : base
 ```
 
-**インフラ・判定**
+**因果連鎖 brand → 税収 → 保守 → インフラ → ヘリ（v6.346）**
 ```
-infraBase = clamp(100 - (1-sf)*35*dampener - (1-df)*15 - (isG ? (1-ef)*28 : 6)*dampener)
-infraError = infraBase < 65
+skillFactor = ss>=30 ? 1 : ss>=12 ? 0.55+(ss-12)/40 : (ss/12)*0.55        // 崖関数（当面平穏→ある日急落）
+brand  = clamp((45 + sf*16 + (isG?-12:12) + ef*8) * skillFactor)          // 産業出力は後継者ストックが支える
+budget = clamp(42 + brand*0.55 - (isG?(1-ef)*30:6) - (1-sf)*10 - (reboot?16:0) - (root?5:0))  // brand=税収基盤
+budgetShortfall = budget < 45 ? (45-budget)*1.2 : 0                       // 保守予算が薄いと維持力の実効値が低下
 
-deadlock = (!rootRestricted) && ef < 0.4 && isG && infraError   // 他責デッドロック
-infra    = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14)
-heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)        // 救命ヘリ稼働（低倫理で停止）
-budget   = clamp(100 - (1-sf)*44 - (isG ? (1-ef)*38 : 8) + df*14 - (reboot?16:0) - (rootRestricted?5:0))
+infraBase = clamp(100 - (1-sf)*35*dampener - (1-df)*15 - (isG?(1-ef)*28:6)*dampener)
+deadlock  = (!rootRestricted) && ef < 0.4 && isG && (infraBase < 65)      // 他責デッドロック
+infra     = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14 - budgetShortfall)
+```
 
+**救命ヘリ（3状態 / v6.346）**
+```
+heliOp（構造条件） = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)
+状態 = ショック中かつ保持時間(約3.6秒)内 → WEATHER HOLD（橙・悪天候の一時停止・自動復帰）
+      それ以外 heliOp → OPERATIONAL（緑） / !heliOp → SUSPENDED（赤）
 crash = (!heliOp && infra < 20) || budget < 8 || <ショックでcrash>
 ```
+SUSPENDEDに入ると運用ログへ `BRAND_REVENUE↓ → TAX_BASE↓ → MAINT_BUDGET↓ → INFRA<35% → HELI:SUSPENDED` が1行ずつ流れる（復帰時は回復の連鎖）。
 
-**環境ショック注入**: 冗長性バッファが **< 30% で即崩壊**、**≥ 60% で生存**、30〜60% で部分損傷、という三分岐（`shockState`）。
+**環境ショック注入**: 冗長性バッファが **< 30% で即崩壊**、**≥ 60% で生存**、30〜60% で部分損傷（`shockState`）。
 
-**読み方**: 集約化 `sf` を極めるほど冗長性が失われ（`base = 100 - sf*52 - …`）、ショックに脆くなる。`deadlock` は「低倫理 × Greedy × インフラ不調」が揃うと発火し、CPUが100%他責化に回って修復が止まる。`heliOp` は倫理観 `ef >= 0.3` に直結し、低倫理では――インフラと修復予算が充分でも――ヘリが飛ばない（リーダーの判断力・協調性の欠如が実務を停止）。`reboot`（再公営化）は冗直性 +42・インフラ劣化半減で耐性を回復する。
+**読み方**: 後継者ストックは「DXを削っても当面は平穏、尽きた瞬間にブランドが**崖のように崩落**」する遅い変数（Greedy＝今の効率 vs DP＝将来への投資の教材）。崩落は必ず **brand→税収→保守→インフラ→ヘリ** の階層を経由する——救命ヘリは広域システムであり一自治体の産業と直結しない、という誠実さを保つため。インフラが35%を割ると SUSPENDED。集約化 `sf` を極めるほど冗長性が失われショックに脆くなる。`deadlock` は「低倫理 × Greedy × インフラ不調」で発火しCPUが100%他責化に回る。`heliOp` は倫理観 `ef ≥ 0.3` にも直結（低倫理ではインフラが充分でもヘリが飛ばない）。`reboot`（再公営化）は冗長性 +42・劣化半減・後継者ストック復活で耐性を回復する。
 
 ---
 
@@ -187,4 +206,4 @@ ratio = round(clamp(100 - gamification*0.85 - (filterActive ? 0 : extTraffic*0.2
 
 ---
 
-*対応バージョン: v6.345 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*
+*対応バージョン: v6.346 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*

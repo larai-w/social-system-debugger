@@ -165,6 +165,7 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
 .tb.green-on{background:var(--green)!important;color:#040810!important}
 .heli-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-size:.62rem;letter-spacing:.1em;font-weight:bold;margin-top:4px}
 .heli-on{background:rgba(0,255,136,.12);border:1px solid var(--green);color:var(--green)}
+.heli-hold{background:rgba(255,107,43,.14);border:1px solid var(--ora);color:var(--ora);animation:blink 1.6s infinite}
 .heli-off{background:rgba(255,34,68,.12);border:1px solid var(--red);color:var(--red);animation:blink .8s infinite}
 .cpu-meter{margin:10px 0;padding:10px 12px;background:var(--bg1);border-radius:3px;border:1px solid var(--bdr)}
 .cpu-label{font-size:.6rem;color:var(--muted);letter-spacing:.12em;margin-bottom:8px}
@@ -684,6 +685,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
           <div class="gr"><span style="font-size:.64rem;color:var(--muted)">BRAND HEALTH INDEX</span><span class="gn" id="p2BrandLarge" style="color:var(--green)">70</span></div>
           <div class="gt" style="height:10px"><div class="gf" id="p2BrandBar" style="width:70%;background:var(--green)"></div></div>
           <div class="gs" id="p2BrandStatus" style="color:var(--muted);margin-top:5px">SUSTAINABLE</div>
+          <!-- v6.346: 後継者ストック（暗黙知の残量）。遅い状態変数。DX投資を怠るとやがて崖のように落ちる（Task B） -->
+          <div class="gr" style="margin-top:12px"><span style="font-size:.6rem;color:var(--muted)" onclick="openModal('p2Brand')"><span data-i18n="p2_skill_lbl">後継者ストック</span></span><span class="gn" id="p2SkillNum" style="color:var(--green);font-size:1rem">60</span></div>
+          <div class="gt" style="height:7px"><div class="gf" id="p2SkillBar" style="width:60%;background:var(--green)"></div></div>
+          <div class="gs" id="p2SkillStatus" style="color:var(--muted);margin-top:4px;font-size:.56rem"></div>
           <div style="margin-top:12px;padding:8px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--ora);font-size:.6rem;color:var(--muted);line-height:1.7" id="p2BrandDiag"></div>
         </div>
       </div>
@@ -937,7 +942,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.345 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会デバッガー v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1332,7 +1337,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.345 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social Debugger v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1357,6 +1362,7 @@ const I18N = {
     acc_more:'Advanced settings',
     // v6.341: ステータスグリッド見出し（Page1と同様に日本語版=日本語のみ / 英語版=英語のみ）
     p2_sl_heli:'RESCUE HELI', p2_sl_brand:'BRAND INDUSTRY', p2_sl_budget:'MUNICIPAL BUDGET', p2_sl_deadlock:'DEADLOCK STATUS',
+    p2_skill_lbl:'SUCCESSOR STOCK',
     p3_sl_poison:'POISONING ATTACK', p3_sl_fooled:'FOOLED NODES', p3_sl_neutral:'NEUTRAL NODES', p3_sl_debug:'DEBUG STATUS', p3_sl_model:'MODEL UPDATE', p3_sl_root:'ROOT PRIVILEGE',
     p4_sl_silent:'SILENT MAJORITY', p4_sl_ext:'EXTERNAL NODES', p4_sl_obj:'OBJECTIVE FUNC', p4_sl_filter:'FILTER STATUS',
     // v6.334: 発見ログ
@@ -1464,9 +1470,9 @@ const MDATA = {
   p2Infra:{
     tag:'METRIC · P2 INFRASTRUCTURE',
     jaTitle:'インフラ維持力（道路・水道・公共施設）', enTitle:'Infrastructure Capacity',
-    jaBody:`人口減少地域における物理インフラの維持能力。<strong>集約化率</strong>が低いと広域レガシーインフラの延命コストが財政を圧迫し続けます。<br><br>他責デッドロック発動中は修復処理がゼロになり崩壊速度が3倍に。<strong>Public Reboot ON</strong>で劣化速度は半減します。`,
-    enBody:`Capacity to maintain physical infrastructure in a depopulating region. Low <strong>consolidation</strong> keeps costly life-support for sprawling legacy assets.<br><br>Under blame-shift deadlock, repair drops to zero and decay triples. <strong>Public Reboot</strong> halves the decay rate.`,
-    formula:'I = 100 − (1−Shrink)·35·D − (1−DX)·15 − Greedy(1−E)·28·D   [D=0.5 if Reboot]'
+    jaBody:`人口減少地域における物理インフラの維持能力。<strong>集約化率</strong>が低いと広域レガシーインフラの延命コストが財政を圧迫し続けます。<br><br>他責デッドロック発動中は修復処理がゼロになり崩壊速度が3倍に。<strong>Public Reboot ON</strong>で劣化速度は半減します。<br><br>また<strong>財政（税収）が薄いと保守予算が不足</strong>し、インフラ維持力の実効値が下がります（財政 &lt; 45 で保守不足ペナルティ）。ブランド産業→税収→保守→インフラという連鎖の末端です。`,
+    enBody:`Capacity to maintain physical infrastructure in a depopulating region. Low <strong>consolidation</strong> keeps costly life-support for sprawling legacy assets.<br><br>Under blame-shift deadlock, repair drops to zero and decay triples. <strong>Public Reboot</strong> halves the decay rate.<br><br>A <strong>thin budget (tax base) starves maintenance</strong>, lowering effective infrastructure capacity (penalty when budget &lt; 45). This is the tail of the chain: brand industry → tax base → maintenance → infrastructure.`,
+    formula:'I = [100 − (1−Shrink)·35·D − (1−DX)·15 − Greedy(1−E)·28·D] + RepairCPU·0.14 − BudgetShortfall   [D=0.5 if Reboot; Shortfall=max(0,45−M)·1.2]'
   },
   p2Redundancy:{
     tag:'METRIC · REDUNDANCY',
@@ -1478,23 +1484,23 @@ const MDATA = {
   p2Heli:{
     tag:'METRIC · LIFELINE',
     jaTitle:'救命ヘリ（ライフラインの象徴）', enTitle:'Rescue Helicopter (Lifeline)',
-    jaBody:`「効率」の物差しでは測れない<strong>非市場的な公共サービス</strong>の象徴。稼働率が低くても、存在すること自体に価値があります。<br><br>インフラ維持力35%未満、または他責デッドロックで長期運休へ。<strong>Public Reboot ON</strong>なら数値に関わらず常時ONLINEが保証されます。`,
-    enBody:`A symbol of <strong>non-market public services</strong> that efficiency metrics cannot capture — its value lies in existing at all.<br><br>Suspends below 35% infrastructure or under deadlock. <strong>Public Reboot</strong> guarantees it stays online regardless.`,
-    formula:'Heli = Reboot ? ONLINE : (Infra>35 && RepairCPU>25)'
+    jaBody:`「効率」の物差しでは測れない<strong>非市場的な公共サービス</strong>の象徴。稼働率が低くても、存在すること自体に価値があります。<br><br>状態は3つ：<br>● <strong style="color:var(--green)">OPERATIONAL</strong> 常時稼働<br>◐ <strong style="color:var(--ora)">WEATHER HOLD</strong> ショック中の一時見合わせ（有視界飛行の制約で悪天候時は飛べない。天候回復後、構造条件を満たせば自動復帰）<br>■ <strong style="color:var(--red)">SUSPENDED</strong> 長期運休（インフラ35%未満／低倫理／他責デッドロック）<br><br>救命ヘリは広域システムであり、一自治体の産業と直結しません。停止は必ず<strong>ブランド→税収→保守→インフラ→ヘリ</strong>という連鎖を経由します（停止時はログに連鎖が流れます）。<strong>Public Reboot ON</strong>なら常時ONLINE。`,
+    enBody:`A symbol of <strong>non-market public services</strong> that efficiency metrics cannot capture — its value lies in existing at all.<br><br>Three states:<br>● <strong style="color:var(--green)">OPERATIONAL</strong> always on duty<br>◐ <strong style="color:var(--ora)">WEATHER HOLD</strong> temporary hold during a shock (VFR limits ground it in bad weather; auto-returns after the storm if structure holds)<br>■ <strong style="color:var(--red)">SUSPENDED</strong> long-term (infra &lt; 35% / low ethics / blame-shift deadlock)<br><br>The heli is a wide-area system, never wired directly to one town's industry. It only stops via the chain <strong>brand → tax base → maintenance → infra → heli</strong> (the cascade streams into the log when it stops). <strong>Public Reboot</strong> keeps it online.`,
+    formula:'Heli = WEATHER HOLD (shock中の一時) · SUSPENDED (Infra≤35 ∨ E<0.3 ∨ deadlock) · else OPERATIONAL'
   },
   p2Brand:{
     tag:'METRIC · LOCAL INDUSTRY',
     jaTitle:'地域ブランド産業（農業・特産品）', enTitle:'Local Brand Industry',
-    jaBody:`地域経済の自立を支える産業の持続性。<strong>DX投資</strong>が低いと高齢職人への依存が続き、後継者断絶で技術ごと消滅します。<br><br>スマート自動化は「伝統の破壊」ではなく、技術を次世代へ引き継ぐための<strong>シリアライズ（保存形式への変換）</strong>です。`,
-    enBody:`Sustainability of the industry that keeps the region economically independent. Low <strong>DX investment</strong> prolongs dependence on aging artisans until succession collapses.<br><br>Smart automation is not destroying tradition — it is <strong>serializing</strong> skills so the next generation can load them.`,
-    formula:'B = DX·65 + Shrink·18 + (DP?+14:−14) + Ethics·8'
+    jaBody:`地域経済の自立を支える産業の持続性。産業の出力は<strong>後継者ストック（暗黙知の残量）</strong>に支えられています。<br><br><strong>DX投資</strong>が低いと高齢職人の引退で後継者ストックがじわじわ減り——<strong>当面は何も起きません</strong>。しかし残量が尽きると、ブランドは段階的でなく<strong>崖のように急落</strong>し（後継者断絶）、税収→保守→インフラへ連鎖します。<strong>0で技術ごと消滅</strong>し、DXを最大にしても回復しません（再公営化のみ復活）。<br><br>スマート自動化は「伝統の破壊」ではなく、技術を次世代へ引き継ぐための<strong>シリアライズ（保存形式への変換）</strong>——後継者ストックを保つ手段です。これはGreedy（今の効率）とDP（将来への投資）の教材そのものです。`,
+    enBody:`Sustainability of the industry that keeps the region economically independent. Output is sustained by a <strong>successor stock (reserve of tacit knowledge)</strong>.<br><br>Low <strong>DX investment</strong> lets aging artisans retire and the stock slowly drains — and <strong>for a while nothing happens</strong>. But once it runs out, the brand does not decline gradually: it <strong>falls off a cliff</strong> (succession break), cascading into tax base → maintenance → infrastructure. At <strong>zero it goes extinct</strong> and won't recover even at max DX (only re-municipalization revives it).<br><br>Smart automation is not destroying tradition — it is <strong>serializing</strong> skills so the next generation can load them, keeping the successor stock alive. This is the very lesson of Greedy (efficiency now) vs. DP (investing in the future).`,
+    formula:'B = (45 + Shrink·16 + (DP?+12:−12) + Ethics·8) × SkillFactor(SuccessorStock)'
   },
   p2Budget:{
     tag:'METRIC · FISCAL',
     jaTitle:'自治体財政（Municipal Budget）', enTitle:'Municipal Budget',
-    jaBody:`行政の体力ゲージ。レガシーインフラの全面延命とGreedy戦略の利益誘導が最大の流出源です。<br><br><strong>Public Reboot</strong>と<strong>Root権限制限</strong>はいずれも財政コストを伴います——公共性とガバナンスは「タダではない」が、崩壊よりはるかに安い保険です。`,
-    enBody:`The administration's stamina gauge. Blanket life-support for legacy infrastructure and Greedy patronage are the biggest drains.<br><br><strong>Public Reboot</strong> and <strong>Root restriction</strong> both cost budget — public good and governance aren't free, but they are far cheaper insurance than collapse.`,
-    formula:'M = 100 − (1−Shrink)·44 − Greedy(1−E)·38 + DX·14 − RebootCost − GovCost'
+    jaBody:`行政の体力ゲージ。最大の収入源は<strong>地域ブランド産業の税収基盤</strong>です——ブランドが崖のように崩れると税収が細り、保守予算が不足してインフラ維持力まで連鎖的に低下します。<br><br>Greedy戦略の利益誘導が最大の流出源。<strong>Public Reboot</strong>と<strong>Root権限制限</strong>はいずれも財政コストを伴います——公共性とガバナンスは「タダではない」が、崩壊よりはるかに安い保険です。`,
+    enBody:`The administration's stamina gauge. Its main income is the <strong>tax base of the local brand industry</strong> — if the brand falls off a cliff, tax revenue thins, maintenance is underfunded, and infrastructure capacity drops in turn.<br><br>Greedy patronage is the biggest drain. <strong>Public Reboot</strong> and <strong>Root restriction</strong> both cost budget — public good and governance aren't free, but they are far cheaper insurance than collapse.`,
+    formula:'M = 42 + Brand·0.55 − Greedy(1−E)·30 − (1−Shrink)·10 − RebootCost − GovCost'
   },
   p2Deadlock:{
     tag:'STATE · DEADLOCK',
@@ -2328,7 +2334,7 @@ function switchTab(n){
     document.getElementById('page'+i).classList.toggle('active', n===i);
     document.getElementById('tab'+i+'Btn').classList.toggle('active', n===i);
   });
-  if(n===2) updateAllP2();
+  if(n===2){ updateAllP2(); startP2Tick(); } else { stopP2Tick(); } // v6.346: 後継者ストックはP2表示中のみ時間経過
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
   if(n===4&&!p4Started) startP4();
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
@@ -2340,6 +2346,14 @@ function switchTab(n){
 let shrinkRate=10, dxRate=30, algoP2='greedy', ethicsP2=68; // v6.334: 初期状態から p2Good（平穏）を満たす
 let p2AnimPlaying=false, p2AnimTimer=null, p2AnimStep=0, p2FullTimeline=null;
 let p2LogEntries=[];
+// v6.346: 後継者ストック（暗黙知の残量 0-100）。遅い状態変数（Task B）。DXが低いと引退で減少・高いと形式知化で回復
+let skillStock=60;
+let skillLost=false; // 0到達で技術ごと消滅＝DXを上げても回復不能（Public Rebootでのみ復活）
+let p2TickTimer=null;
+// v6.346 Task C: ヘリ3状態化。WEATHER HOLD＝ショック中の一時停止（有視界飛行の制約）。時間経過で自動復帰
+let heliWeatherHoldUntil=0;
+let prevHeliState='operational';
+const HELI_HOLD_MS=3600;
 let p2LogTimer=null;
 let publicReboot=false;
 let shockState=null;
@@ -2354,30 +2368,59 @@ let p3AttackHold=0;      // attackEdges>0 の残存フレーム数（>0でACTIVE
 let p3BannerOn=false;    // P3アラートバナーのヒステリシス状態
 let p4BannerOn=false;    // P4アラートバナーのヒステリシス状態
 
+// v6.346: 運用ログの項目名を日本語版では日本語に（ステータスは英語のまま）。lang で切替
 const P2_LOG_NORMAL_JA=[
+  'インフラ保守予定 … OK','救命ヘリ出動状況 … ONLINE',
+  'ブランド生産 … ACTIVE','予算配分 … BALANCED',
+  'スマート集約運用 … RUNNING','DXパイプライン … SYNCED',
+  '保守キュー … CLEAR','SECTOR-T 状態 … GREEN',
+];
+const P2_LOG_WARN_JA=[
+  'インフラ劣化 … WARNING','財政赤字検知 … ALERT',
+  '救命ヘリ燃料備蓄 … LOW','保守の先送り … QUEUED',
+  '修復キュー逼迫 … HIGH','コスト超過検知 … TRUE',
+];
+const P2_LOG_BLAME_JA=[
+  '他責転嫁の開始 … PRESS_CONF','責任所在 … DENIED',
+  '原因の指定先 … EXTERNAL','行政CPUの再配分 … →BLAME_100%',
+  '修復キュー … SUSPENDED','インフラ保守状況 … ABANDONED',
+  '説明責任チェック … REFUSED','外部要因の主張 … LOOP_x99',
+];
+const P2_LOG_REBOOT_JA=[
+  '公共性リブート … ACTIVE','市場ロジック … SUSPENDED',
+  '冗長性バッファ … RESTORING','救命ヘリ強制稼働 … FORCED_ONLINE',
+  'インフラ劣化速度 … HALVED','予算消費 … ELEVATED',
+  '公共サービス優先度 … MAXIMUM','効率ロジック … OVERRIDDEN',
+];
+const P2_LOG_SHOCK_JA=[
+  'ブラックスワン事象 … DETECTED','システムショック … INJECTED',
+  '冗長性テスト … RUNNING','インフラ耐性試験 … CRITICAL',
+  '緊急プロトコル … ACTIVATED','復元力チェック … IN_PROGRESS',
+];
+const P2_LOG_NORMAL_EN=[
   'INFRA_MAINT_SCHEDULED ........ OK','HELI_DISPATCH_STATUS ......... ONLINE',
   'BRAND_PRODUCTION ............. ACTIVE','BUDGET_ALLOCATION ............ BALANCED',
   'SMART_SHRINK_OPS ............. RUNNING','DX_PIPELINE .................. SYNCED',
   'MAINTENANCE_QUEUE ............ CLEAR','SECTOR_T_STATUS .............. GREEN',
 ];
-const P2_LOG_WARN_JA=[
+const P2_LOG_WARN_EN=[
   'INFRA_DEGRADATION ............ WARNING','BUDGET_DEFICIT_DETECTED ...... ALERT',
   'HELI_FUEL_RESERVE ............ LOW','MAINTENANCE_DEFERRED ......... QUEUED',
   'REPAIR_QUEUE_OVERFLOW ........ HIGH','COST_OVERRUN_DETECTED ........ TRUE',
 ];
-const P2_LOG_BLAME_JA=[
+const P2_LOG_BLAME_EN=[
   'BLAME_SHIFT_INITIATED ........ PRESS_CONF','RESPONSIBILITY_MATRIX ........ DENIED',
   'FAULT_VECTOR_ASSIGNED ........ EXTERNAL','ADMIN_CPU_REROUTED ........... →BLAME_100%',
   'REPAIR_QUEUE ................. SUSPENDED','INFRA_MAINT_STATUS ........... ABANDONED',
   'ACCOUNTABILITY_CHECK ......... REFUSED','EXTERNAL_CAUSE_CITED ......... LOOP_x99',
 ];
-const P2_LOG_REBOOT_JA=[
+const P2_LOG_REBOOT_EN=[
   'PUBLIC_REBOOT_MODE ........... ACTIVE','MARKET_LOGIC ................. SUSPENDED',
   'REDUNDANCY_BUFFER ............ RESTORING','HELI_OVERRIDE ................ FORCED_ONLINE',
   'INFRA_DECAY_RATE ............. HALVED','BUDGET_CONSUMPTION ........... ELEVATED',
   'PUBLIC_SERVICE_PRIORITY ...... MAXIMUM','EFFICIENCY_LOGIC ............. OVERRIDDEN',
 ];
-const P2_LOG_SHOCK_JA=[
+const P2_LOG_SHOCK_EN=[
   'BLACK_SWAN_EVENT ............. DETECTED','SYSTEM_SHOCK ................. INJECTED',
   'REDUNDANCY_TEST .............. RUNNING','INFRA_STRESS_TEST ............ CRITICAL',
   'EMERGENCY_PROTOCOL ........... ACTIVATED','RESILIENCE_CHECK ............. IN_PROGRESS',
@@ -2389,6 +2432,9 @@ function calcRedundancyBuffer(s,al,reboot){
   if(reboot)base=clamp(base+42,0,100);
   return Math.round(base);
 }
+
+// v6.346: 後継者ストック → ブランド維持力のゲート（崖関数）。ss≥30で満額、<12で急落＝当面平穏でもある日突然の崩落
+function p2SkillFactor(ss){ if(ss>=30)return 1; if(ss>=12)return 0.55+(ss-12)/40; return (ss/12)*0.55; }
 
 function metricsP2(s,d,al,e){
   const sf=s/100,df=d/100,isG=al==='greedy',ef=e/100;
@@ -2406,15 +2452,18 @@ function metricsP2(s,d,al,e){
     else if(shockState.type==='survived'){shockBudgetPenalty=35;}
     else{shockInfraPenalty=38;}
   }
-  let infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14,0,100);
+  // v6.346 Task A/B: 因果連鎖 brand → 税収(budget) → 保守財源 → infra → heli。skillStock が brand を支える遅い状態変数
+  const rebootCost=publicReboot?16:0;
+  const brandPotential=clamp(45+sf*16+(isG?-12:12)+ef*8,0,100);
+  const brand=clamp(brandPotential*p2SkillFactor(skillStock),0,100);
+  const budgetStruct=clamp(42+brand*0.55-(isG?(1-ef)*30:6)-(1-sf)*10-rebootCost-(rootRestricted?5:0),0,100); // brand=地域の税収基盤
+  const budgetShortfall=budgetStruct<45?(45-budgetStruct)*1.2:0; // 保守予算が薄いとインフラ維持の実効値が下がる
+  let infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14-budgetShortfall,0,100);
   infra=Math.max(0,infra-shockInfraPenalty);
   const heliOp=shockState?.type==='crash'?false:(publicReboot?true:(infra>35&&cpuRepair>25&&ef>=0.3));
-  const rebootCost=publicReboot?16:0;
-  const brand=clamp(df*65+sf*18+(isG?-14:14)+ef*8,0,100);
-  let budget=clamp(100-(1-sf)*44-(isG?(1-ef)*38:8)+df*14-rebootCost-(rootRestricted?5:0),0,100);
-  budget=Math.max(0,budget-shockBudgetPenalty);
+  let budget=Math.max(0,budgetStruct-shockBudgetPenalty);
   const crash=(!heliOp&&infra<20)||budget<8||(shockState?.type==='crash');
-  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError,redundancy};
+  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError,redundancy,skillStock};
 }
 
 function simTimelineP2(s,d,al,e,steps=65){
@@ -2445,6 +2494,47 @@ function simTimelineP2(s,d,al,e,steps=65){
   return{infra,brand,budget:budgetArr,heli};
 }
 
+// v6.346: 後継者ストックの可視化とリアルタイム減衰（Task B）。この段階ではまだブランドには波及させない
+function renderP2Skill(){
+  const el=document.getElementById('p2SkillNum'),bar=document.getElementById('p2SkillBar'),st=document.getElementById('p2SkillStatus');
+  if(!el||!bar)return;
+  const v=Math.round(skillStock);
+  const c=v<15?'#ff2244':v<35?'#ff6b2b':'#00ff88';
+  el.textContent=v; el.style.color=c;
+  bar.style.cssText=`width:${v}%;background:${c}`;
+  if(st){
+    st.textContent=skillLost?tt('技術ごと消滅（回復には再公営化が必要）','Skills extinct (needs re-municipalization)'):v<15?tt('後継者断絶が目前','Succession about to break'):v<35?tt('担い手が引退中','Holders retiring'):tt('技能が継承されている','Skills being handed down');
+    st.style.color=c;
+  }
+}
+function tickSkillStock(){
+  const df=dxRate/100;
+  if(publicReboot){ skillLost=false; skillStock=clamp(Math.max(skillStock,60),0,100); } // 再公営化＝公的な技能継承プログラムで復活
+  else if(skillLost){ /* 技術ごと消滅：DXを最大にしても回復しない */ }
+  else if(df<0.25){ skillStock=clamp(skillStock-(0.25-df)*15,0,100); if(skillStock<=0){skillStock=0;skillLost=true;} } // 引退で減少（DX0なら約12tickで崖）→0で消滅
+  else if(df>0.45){ skillStock=clamp(skillStock+(df-0.45)*8,0,100); }         // DXが十分なら形式知化（シリアライズ）で緩やかに回復
+  // 0.25〜0.45 は均衡帯（デフォルトDX30はここ＝減らない）
+  updateAllP2(); // skillStock は brand/budget/infra/heli に波及するため毎tick全体を再計算
+}
+function startP2Tick(){ if(!p2TickTimer) p2TickTimer=setInterval(tickSkillStock,1200); }
+function stopP2Tick(){ if(p2TickTimer){ clearInterval(p2TickTimer); p2TickTimer=null; } }
+
+// v6.346 Task C: 構造条件(heliOp)＋WEATHER HOLDタイマーから3状態を導出
+function getHeliState(m){
+  if(shockState&&Date.now()<heliWeatherHoldUntil) return 'hold'; // ショック中の悪天候で一時見合わせ（時間経過で自動復帰）
+  return m.heliOp ? 'operational' : 'suspended';
+}
+// 因果連鎖を1行ずつログへ流す（なぜ止まった/戻ったかを式でなく伝播として読ませる）
+function streamP2Cascade(lines,cls){
+  lines.forEach((ln,i)=>setTimeout(()=>{
+    const now=new Date();
+    const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    p2LogEntries.push(`<span class="${cls}">${ts} ${ln}</span>`);
+    if(p2LogEntries.length>7) p2LogEntries.shift();
+    const el=document.getElementById('p2Log'); if(el) el.innerHTML=p2LogEntries.join('<br>');
+  }, i*480));
+}
+
 function updateAllP2(){
   const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
   // Infra gauge
@@ -2455,20 +2545,41 @@ function updateAllP2(){
   const iStatus=m.infra<30?tt('CRITICAL — インフラが臨界点以下','CRITICAL — infrastructure below critical point'):m.infra<60?tt('WARNING — 劣化進行中','WARNING — degradation in progress'):'STABLE';
   document.getElementById('p2InfraStatus').textContent=iStatus;
   document.getElementById('p2InfraStatus').style.color=ic;
-  // Heli
+  // Heli（v6.346 Task C: 3状態化 OPERATIONAL / WEATHER HOLD / SUSPENDED）
   const hs=document.getElementById('p2HeliStatus');
   const hl=document.getElementById('p2HeliLabel');
   const hi=document.getElementById('p2HeliIcon');
   const hb=document.getElementById('p2HeliBar');
   const hd=document.getElementById('p2HeliDetail');
-  hs.className='heli-badge '+(m.heliOp?'heli-on':'heli-off');
-  hs.textContent=m.heliOp?'● ONLINE':'■ SUSPENDED';
-  hl.style.color=m.heliOp?'var(--green)':'var(--red)';
-  hl.textContent=m.heliOp?tt('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):tt('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded');
-  hi.style.filter=m.heliOp?'drop-shadow(0 0 12px var(--green))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
-  hb.style.cssText=`width:${m.heliOp?100:5}%;background:${m.heliOp?'var(--green)':'var(--red)'}`;
-  hd.textContent=m.heliOp?tt('Dispatch Ready — 出動待機中','Dispatch Ready'):tt('MALFUNCTION — 修復予算なし（他責処理中）','MALFUNCTION — no repair budget (blame-shifting in progress)');
-  hd.style.color=m.heliOp?'var(--muted)':'var(--red)';
+  const hstate=getHeliState(m);
+  const hcol=hstate==='operational'?'var(--green)':hstate==='hold'?'var(--ora)':'var(--red)';
+  hs.className='heli-badge '+(hstate==='operational'?'heli-on':hstate==='hold'?'heli-hold':'heli-off');
+  hs.textContent=hstate==='operational'?'● ONLINE':hstate==='hold'?'◐ WEATHER HOLD':'■ SUSPENDED';
+  hl.style.color=hcol;
+  hl.textContent=hstate==='operational'?tt('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):hstate==='hold'?tt('WEATHER HOLD — 悪天候で一時見合わせ','WEATHER HOLD — grounded by weather'):tt('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded');
+  hi.style.filter=hstate==='operational'?'drop-shadow(0 0 12px var(--green))':hstate==='hold'?'drop-shadow(0 0 12px var(--ora))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
+  hb.style.cssText=`width:${hstate==='operational'?100:hstate==='hold'?50:5}%;background:${hcol}`;
+  hd.textContent=hstate==='operational'?tt('Dispatch Ready — 出動待機中','Dispatch Ready'):hstate==='hold'?tt('有視界飛行の制約で一時停止（天候回復後に自動復帰）','VFR limits — temporary hold (auto-returns after the storm)'):tt('MALFUNCTION — 修復予算なし（他責処理中）','MALFUNCTION — no repair budget (blame-shifting in progress)');
+  hd.style.color=hstate==='operational'?'var(--muted)':hcol;
+  // 状態遷移で因果連鎖ログを流す（SUSPENDED入り＝停止の伝播 / 復帰＝回復の伝播）
+  if(hstate!==prevHeliState){
+    if(hstate==='suspended'&&prevHeliState!=='suspended'){
+      streamP2Cascade([
+        tt('BRAND_REVENUE ↓  地域ブランドの税収が細る','BRAND_REVENUE ↓  local brand tax revenue thins'),
+        tt('TAX_BASE ↓  自治体の税収基盤が縮小','TAX_BASE ↓  the municipal tax base shrinks'),
+        tt('MAINT_BUDGET ↓  インフラ保守予算が不足','MAINT_BUDGET ↓  infrastructure maintenance underfunded'),
+        tt('INFRA < 35%  維持力が臨界点を割る','INFRA < 35%  capacity falls below the critical point'),
+        tt('HELI: SUSPENDED  救命ヘリ長期運休','HELI: SUSPENDED  rescue helicopter grounded')
+      ],'p2log-blame');
+    } else if(prevHeliState==='suspended'&&hstate==='operational'){
+      streamP2Cascade([
+        tt('MAINT_BUDGET ↑  税収が戻り保守予算が回復','MAINT_BUDGET ↑  revenue returns, maintenance refunded'),
+        tt('INFRA > 35%  維持力が臨界点を回復','INFRA > 35%  capacity recovers above the critical point'),
+        tt('HELI: OPERATIONAL  救命ヘリ復帰','HELI: OPERATIONAL  rescue helicopter back on duty')
+      ],'p2log-normal');
+    }
+    prevHeliState=hstate;
+  }
   // Brand
   const bc=m.brand<30?'#ff2244':m.brand<60?'#ff6b2b':'#00ff88';
   document.getElementById('p2BrandNum').textContent=Math.round(m.brand);
@@ -2480,6 +2591,7 @@ function updateAllP2(){
   document.getElementById('p2BrandStatus').textContent=bs;
   document.getElementById('p2BrandStatus').style.color=bc;
   document.getElementById('p2BrandDiag').textContent=getP2BrandDiag(m);
+  renderP2Skill();
   // Budget
   const budc=m.budget<20?'#ff2244':m.budget<50?'#ff6b2b':'#00d4ff';
   document.getElementById('p2BudgetNum').textContent=m.budget<8?'BANKRUPT':Math.round(m.budget);
@@ -2592,6 +2704,9 @@ function updateAllP2(){
 
 function getP2BrandDiag(m){
   if(m.brand<20) return tt('[ FATAL ] 地域ブランド産業が崩壊。後継者ゼロ・自動化ゼロ。産業消滅。','[ FATAL ] Local brand industry collapsed. Zero successors, zero automation. Industry extinct.');
+  // v6.346: 後継者ストックの残量を先に警告（DX投資を怠ると、当面は平穏でもある日崖のように崩落する）
+  if(skillStock<15) return tt('[ CRITICAL ] 後継者ストックが枯渇寸前。このままDX投資を怠ると、ある日ブランドが崖のように崩落します。','[ CRITICAL ] Successor stock nearly depleted — keep neglecting DX and the brand will fall off a cliff one day.');
+  if(skillStock<35&&dxRate<25) return tt('[ WARNING ] 暗黙知の担い手が引退し続けています（後継者ストック低下中）。DX投資で技能を形式知化してください。','[ WARNING ] Tacit-knowledge holders keep retiring (successor stock falling). Invest in DX to serialize skills.');
   if(m.brand<50&&dxRate<40) return tt('[ WARNING ] DX投資不足で職人高齢化が加速中。5年以内に後継者断絶リスク。','[ WARNING ] DX under-investment is accelerating artisan aging. Succession collapse risk within 5 years.');
   if(m.brand>75&&dxRate>60) return tt('[ OPTIMAL ] スマート自動化によりブランド品質維持と後継問題を同時解決。持続的成長軌道。','[ OPTIMAL ] Smart automation solves quality and succession simultaneously. Sustainable growth trajectory.');
   return tt('[ OK ] ブランド産業は現状維持中。DX投資を増やすと長期持続性が向上する。','[ OK ] Brand industry holding steady. More DX investment improves long-term viability.');
@@ -2602,17 +2717,21 @@ function updateP2Log(m){
   p2LogTick++;
   const now=new Date();
   const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const ja=lang==='ja';
+  const NORMAL=ja?P2_LOG_NORMAL_JA:P2_LOG_NORMAL_EN, WARN=ja?P2_LOG_WARN_JA:P2_LOG_WARN_EN,
+        BLAME=ja?P2_LOG_BLAME_JA:P2_LOG_BLAME_EN, REBOOT=ja?P2_LOG_REBOOT_JA:P2_LOG_REBOOT_EN,
+        SHOCK=ja?P2_LOG_SHOCK_JA:P2_LOG_SHOCK_EN;
   let src,cls;
   if(shockState){
-    src=P2_LOG_SHOCK_JA[p2LogTick%P2_LOG_SHOCK_JA.length]; cls='p2log-warn';
+    src=SHOCK[p2LogTick%SHOCK.length]; cls='p2log-warn';
   } else if(m.deadlock){
-    src=P2_LOG_BLAME_JA[p2LogTick%P2_LOG_BLAME_JA.length]; cls='p2log-blame';
+    src=BLAME[p2LogTick%BLAME.length]; cls='p2log-blame';
   } else if(publicReboot){
-    src=P2_LOG_REBOOT_JA[p2LogTick%P2_LOG_REBOOT_JA.length]; cls='p2log-normal';
+    src=REBOOT[p2LogTick%REBOOT.length]; cls='p2log-normal';
   } else if(m.infraError||m.budget<40){
-    src=(p2LogTick%3===0?P2_LOG_WARN_JA:P2_LOG_NORMAL_JA)[p2LogTick%7]; cls='p2log-warn';
+    const arr=(p2LogTick%3===0?WARN:NORMAL); src=arr[p2LogTick%arr.length]; cls='p2log-warn';
   } else {
-    src=P2_LOG_NORMAL_JA[p2LogTick%P2_LOG_NORMAL_JA.length]; cls='p2log-normal';
+    src=NORMAL[p2LogTick%NORMAL.length]; cls='p2log-normal';
   }
   p2LogEntries.push(`<span class="${cls}">${ts} ${src}</span>`);
   if(p2LogEntries.length>7) p2LogEntries.shift();
@@ -2662,6 +2781,7 @@ function setAlgoP2(a){
 
 function setPublicReboot(on){
   publicReboot=on;
+  if(on){ skillLost=false; skillStock=clamp(Math.max(skillStock,60),0,100); } // v6.346: 再公営化＝公的技能継承で後継者ストック復活
   document.getElementById('btnRebootOff').classList.toggle('on',!on);
   document.getElementById('btnRebootOn').classList.toggle('on',on);
   document.getElementById('btnRebootOn').classList.toggle('green-on',on);
@@ -2674,6 +2794,7 @@ function injectSystemShock(){
   const rb=calcRedundancyBuffer(shrinkRate,algoP2,publicReboot);
   const type=rb<30?'crash':rb>=60?'survived':'partial';
   shockState={type,rb};
+  heliWeatherHoldUntil=Date.now()+HELI_HOLD_MS; // v6.346 Task C: ショック中は悪天候でヘリが一時見合わせ→時間経過で構造条件に応じ自動復帰
   const btn=document.getElementById('shockBtn');
   if(btn){
     btn.style.background='rgba(255,204,0,.28)';
@@ -2681,6 +2802,7 @@ function injectSystemShock(){
     setTimeout(()=>{btn.style.background='';btn.style.boxShadow='';},500);
   }
   updateAllP2();
+  setTimeout(()=>{ if(currentTab===2) updateAllP2(); },HELI_HOLD_MS+120); // WEATHER HOLD 明けに構造判定へ再描画
 }
 
 // P2 sliders
@@ -3194,7 +3316,7 @@ document.getElementById('learningRate').addEventListener('input',function(){
 let extTraffic=15, gamification=15; // v6.334: 初期状態から p4Good（声が届く）を満たす
 let p4Started=false, p4Citizens=[], p4Edges=[], p4Spam=[], p4Ctx=null, p4W=0, p4H=0, p4AnimId=null;
 let filterActive=false, filterTimer=null;
-let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0;
+let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0, p4DropSmooth=0;
 const P4_SPAM_MAX=36;
 
 const P4_LOG_POLICY_JA=[
@@ -3320,7 +3442,10 @@ function drawP4(){
 }
 
 function updateP4Monitor(jamRatio){
-  const drop=Math.round(clamp(jamRatio*72+gamification*(filterActive?0.08:0.3),0,100));
+  // v6.346: 生のjamRatioはフレーム毎に揺れて数値が高速点滅するので、EMAで滑らかに追従させる（落ち着いた読みやすい速度）
+  const dropTarget=clamp(jamRatio*72+gamification*(filterActive?0.08:0.3),0,100);
+  p4DropSmooth+=(dropTarget-p4DropSmooth)*0.08;
+  const drop=Math.round(p4DropSmooth);
   p4DropCurrent=drop;
   const ratio=Math.round(clamp(100-gamification*0.85-(filterActive?0:extTraffic*0.2),0,100));
   const dc=drop<35?'#00ff88':drop<70?'#ff6b2b':'#ff2244';
@@ -3520,6 +3645,7 @@ function clearPresetSelP2(){Object.keys(PRESETS_P2).forEach(k=>document.getEleme
 function setPresetP2(id){
   const p=PRESETS_P2[id];if(!p)return;
   shrinkRate=p.s;dxRate=p.d;ethicsP2=p.e;algoP2=p.a;publicReboot=p.r;
+  skillStock=p.d>=45?80:p.d<25?10:50; skillLost=false; // v6.346: プリセットのDXに応じた後継者ストック均衡値
   const sr=document.getElementById('shrinkRate'),dx=document.getElementById('dxRate'),es=document.getElementById('ethicsScoreP2');
   sr.value=p.s;dx.value=p.d;es.value=p.e;
   document.getElementById('shrinkVal').textContent=p.s+'%';
@@ -4082,7 +4208,7 @@ function generateResultCard(ctx){
   c.fillText(expandTown(tt('あなたの街の判定結果','Your town\'s verdict')),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.345 ]','[ SOCIAL SYSTEM DEBUGGER v6.345 ]'),56,106);
+  c.fillText(tt('[ 社会デバッガー v6.346 ]','[ SOCIAL DEBUGGER v6.346 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -4202,7 +4328,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.345 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.345'),W/2,583);
+  c.fillText(tt('社会デバッガー v6.346 — SOCIAL DEBUGGER','SOCIAL DEBUGGER v6.346'),W/2,583);
   c.textAlign='left';
   return cv;
 }

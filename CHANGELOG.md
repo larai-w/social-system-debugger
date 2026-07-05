@@ -4,6 +4,16 @@
 
 ---
 
+## v6.346 — 2026-07-05
+- **PAGE 2 エンジン改修（ブランド閉ループ・後継者ストック・ヘリ3状態）**
+- **Task A**: ブランドを因果ループへ組み込み。`brand → 税収(budget) → 保守財源 → infra → heli` の多段連鎖。財政に `budgetShortfall`（財政 < 45 で保守不足）を追加。
+- **Task B**: 遅い状態変数 `skillStock`（後継者ストック）を導入。P2表示中のみ 1.2秒/tick で時間発展。DX低で減少・高で回復、均衡帯（DX25–45%）でデフォルト維持。残量が尽きると **崖関数** でブランド急落（当面平穏→ある日崩落）、0で技術消滅（`skillLost`・Public Rebootのみ復活）。ブランドカードに後継者ストックゲージを追加。
+- **Task C**: 救命ヘリを **3状態化**（OPERATIONAL / WEATHER HOLD / SUSPENDED）。WEATHER HOLD はショック中の一時停止（有視界飛行の制約・約3.6秒で自動復帰）。SUSPENDED 突入時に因果連鎖 `BRAND_REVENUE↓ → TAX_BASE↓ → MAINT_BUDGET↓ → INFRA<35% → HELI:SUSPENDED` を運用ログへ1行ずつ表示（復帰時は回復の連鎖）。
+- **Task D**: 回帰確認（default平穏＋4プリセットの物語を数値検証で維持）。モーダル式（Infra/Brand/Budget/Heli）と `docs/METHODOLOGY`（日英）を新モデルに更新。
+- 因果の階層は厳守（ブランド→ヘリ直結はせず、必ず税収→保守→インフラを経由）。
+- **SECTOR-T OPERATION LOG** の項目名を言語連動に（日本語版＝日本語ラベル／英語版＝英語ラベル、ステータス語 OK/DETECTED 等は共通）。
+- 製品名リブランドの追随: フッター・結果カード・作法カードの表記を旧「社会＆地域インフラ・デバッガー」から新名称 **「社会デバッガー / Social Debugger」** に統一。
+
 ## v6.345 — 2026-07-05
 - **UX改修 Tasks 1–7** (all in one release)
 - **Task 1**: Product name → "社会デバッガー / Social Debugger"; tagline → "あなたの街は、生き残れるか。"

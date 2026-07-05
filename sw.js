@@ -1,7 +1,7 @@
 // 社会＆地域インフラ・デバッガー — Service Worker
 // 方針: メインドキュメントは network-first（新デプロイを必ず優先し、古いキャッシュに固定されない）。
 //       静的アセット/CDN は cache-first（オフライン動作）。
-const CACHE = 'ssd-cache-v6-345';
+const CACHE = 'ssd-cache-v6-346';
 const CORE = ['./', './index.html', './manifest.json', './icon.svg'];
 
 self.addEventListener('install', (e) => {
