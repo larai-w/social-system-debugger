@@ -27,7 +27,7 @@
      ・右中央: 斜めスタンプ風「SIMULATION ACTIVE」（#00ff88 / 二重枠 / -6°回転 / グロー）
      ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="window.__chartLoadFailed=true"></script>
 <!-- v6.345: analytics placeholder — swap src for Plausible or CF Web Analytics when ready
 <script defer data-domain="larai-w.github.io" src="https://plausible.io/js/script.js"></script>
 -->
@@ -252,7 +252,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .hdr{flex-direction:column;gap:8px;padding-bottom:10px}
   .hdr h1{font-size:1.02rem;letter-spacing:.06em}
   .hdr p{font-size:.6rem;line-height:1.6}
-  .hdr-acts{width:100%;justify-content:center}
+  .hdr-acts{width:100%;justify-content:center;flex-wrap:wrap;gap:6px}
+  .hdr-acts .ibtn{padding:5px 10px;font-size:.62rem;white-space:nowrap;flex-shrink:0}
+  .hdr-acts .badge{font-size:.5rem}
   .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .tab-bar::-webkit-scrollbar{display:none}
   .tab-btn{padding:11px 14px;font-size:.62rem;white-space:nowrap;flex-shrink:0}
@@ -351,6 +353,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="hdr">
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
+    <button class="ibtn" id="guideBtn" onclick="openIntro()" data-i18n="guide_btn">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
     <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
@@ -358,12 +361,16 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
+    <button class="ibtn" id="feedbackBtn" onclick="openFeedback()" data-i18n="feedback_short">💬 フィードバック</button>
+    <button class="ibtn" id="discHeaderBtn" style="display:none" onclick="openDiscoveryLog()">
+      <span data-i18n="discoveries_header">📖 発見</span> <span class="badge" style="padding:2px 8px;margin:0"><span class="bdot"></span><span id="discHeaderCount">0</span></span>
+    </button>
     <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
     <div class="menu-container">
       <button class="ibtn" id="menuBtn" onclick="toggleHeaderMenu()" data-i18n="menu_more">≡ メニュー</button>
       <div class="menu-dropdown" id="headerMenu" onclick="event.stopPropagation()">
-        <button class="menu-item" onclick="openIntro();closeHeaderMenu()" data-i18n="guide">ℹ GUIDE</button>
-        <button class="menu-item" id="discMenuBtn" onclick="openDiscoveryLog();closeHeaderMenu()">📖 発見ログ (<span id="discMenuCount">0</span>/15)</button>
+        <button class="menu-item" onclick="openIntro();closeHeaderMenu()" data-i18n="guide_btn">ℹ GUIDE</button>
+        <button class="menu-item" id="discMenuBtn" onclick="openDiscoveryLog();closeHeaderMenu()">📖 発見ログ (<span id="discMenuCount">0</span>/<span id="discMenuTotal">15</span>)</button>
         <hr class="menu-divider">
         <button class="menu-item" onclick="openShareGuide();closeHeaderMenu()" data-i18n="sg_btn">⇪ 共有ガイド</button>
         <button class="menu-item" onclick="copyPageLink(currentTab,this);closeHeaderMenu()" data-i18n="link_btn">🔗 このページへの直接リンク</button>
@@ -1039,6 +1046,11 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div class="share-acts" id="shareActions"></div>
     <div id="shareCardRow"></div>
     <div class="mfo" id="sharePopFoot" style="margin-top:10px;border-left-color:var(--cyan);color:var(--muted)"></div>
+    <div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:center">
+      💡 <span class="link-badge" onclick="openShareGuide()" style="cursor:pointer">
+        <span data-i18n="share_guide_link">SHARE GUIDE を見る</span> <span style="opacity:.6">— <span data-i18n="share_guide_hint">相手別の送り方・禁止事項</span></span>
+      </span>
+    </div>
   </div>
 </div>
 
@@ -1245,10 +1257,24 @@ const I18N = {
     scenario_card_cleared:'✓ CLEARED',
     scenario_card_challenge:'▶ 挑戦する',
     menu_more:'≡ メニュー',
+    guide_btn:'ℹ GUIDE',
+    feedback_short:'💬 フィードバック',
+    discoveries_header:'📖 発見',
+    discoveries_badge_hint:'個の発見がアンロック済み',
+    share_guide_link:'SHARE GUIDE を見る',
+    share_guide_hint:'相手別の送り方・禁止事項',
+    chart_error_msg:'グラフ表示に必要なライブラリが読み込めませんでした。広告ブロッカーの設定をご確認いただくか、再読み込みをお試しください',
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
     appName:'Social Debugger',
+    guide_btn:'ℹ GUIDE',
+    feedback_short:'💬 Feedback',
+    discoveries_header:'📖 Discoveries',
+    discoveries_badge_hint:'discoveries unlocked',
+    share_guide_link:'View SHARE GUIDE',
+    share_guide_hint:'Recipient-specific tips & do-nots',
+    chart_error_msg:'Failed to load charting library. Check your ad blocker settings or try reloading.',
     town_label:'▷ Give your town a name (optional)',
     town_placeholder:'e.g. Springfield / My city / Future town',
     town_hint:'The name appears in verdict banners and the result card. Saved for next time. Change it anytime via GUIDE.',
@@ -1968,41 +1994,108 @@ function startScatter(){
   initScatter();scatterLoop();
 }
 
-Chart.defaults.color='#5a6f94';Chart.defaults.borderColor='#172340';
-Chart.defaults.font.family="'Courier New', monospace";Chart.defaults.font.size=10;
+// ═══ グレースフル・デグラデーション: Chart.js エラーハンドリング ═══
+let currentTab = 1;  // コア機能：タブ機能を最上部で初期化（Chart失敗に強い）
+
+function handleChartLoadFailure() {
+  console.error('❌ Chart.js CDN 読み込み失敗');
+  window._chartLoadFailed = true;
+  showChartErrorBanner();
+}
+// fix: onerror属性はこの関数の定義前に発火するため、属性側ではフラグのみ立て、ここで実際のChart有無を見て処理する
+if (typeof Chart === 'undefined') handleChartLoadFailure();
+
+function showChartErrorBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'chartErrorBanner';
+  banner.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,34,68,0.08);
+    border-bottom: 1px solid #ff2244;
+    padding: 10px 20px;
+    text-align: center;
+    color: #ff8899;
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    z-index: 999;
+    letter-spacing: 0.05em;
+  `;
+  banner.innerHTML = `⚠️ <span data-i18n="chart_error_msg">グラフ表示に必要なライブラリが読み込めませんでした。広告ブロッカーの設定をご確認いただくか、再読み込みをお試しください</span>`;
+  document.body.insertBefore(banner, document.body.firstChild);
+  if (typeof applyI18nAuto === 'function') applyI18nAuto();
+}
+
+// ════════════════════════════════════════════════════════════
+
+// グレースフル初期化: Chart.js グローバル設定
+if (typeof Chart !== 'undefined') {
+  try {
+    Chart.defaults.color='#5a6f94';
+    Chart.defaults.borderColor='#172340';
+    Chart.defaults.font.family="'Courier New', monospace";
+    Chart.defaults.font.size=10;
+    window._chartReady = true;
+  } catch (e) {
+    console.warn('⚠️ Chart.js 初期化エラー:', e);
+    window._chartReady = false;
+  }
+} else {
+  console.warn('⚠️ Chart.js が読み込まれていません');
+  window._chartReady = false;
+}
 
 // scatterChart is now Canvas-driven via startScatter()
 
-const timelineChart=new Chart(document.getElementById('timelineChart'),{
-  type:'line',
-  data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-    {label:'Dopamine 熱狂度',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    {label:'Social Capital',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    {label:'Infrastructure',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-    plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-    scales:{
-      x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-      y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-    }
+let timelineChart = null;
+if (typeof Chart !== 'undefined') {
+  try {
+    timelineChart = new Chart(document.getElementById('timelineChart'),{
+      type:'line',
+      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+        {label:'Dopamine 熱狂度',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        {label:'Social Capital',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        {label:'Infrastructure',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+        scales:{
+          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('📊 チャート timelineChart 生成失敗:', e.message);
+    timelineChart = null;
   }
-});
+} else {
+  console.warn('📊 チャート timelineChart をスキップ: Chart.js が利用不可');
+}
 
-const radarChart=new Chart(document.getElementById('radarChart'),{
-  type:'radar',
-  data:{
-    labels:[['Trust','信頼性'],['Resilience','回復力'],['Legitimacy','正当性'],['Info Health','情報健全性'],['Viability','長期持続性'],['Mental WB','精神的健全性']],
-    datasets:[
-      {label:'Current',data:[100,100,100,100,100,100],backgroundColor:'rgba(0,212,255,.1)',borderColor:'#00d4ff',borderWidth:2,pointBackgroundColor:'#00d4ff',pointRadius:3},
-      {label:'Failure Threshold',data:[20,20,20,20,20,20],backgroundColor:'rgba(255,34,68,.04)',borderColor:'rgba(255,34,68,.45)',borderWidth:1,borderDash:[5,4],pointRadius:0}
-    ]
-  },
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:280},
-    plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}}},
-    scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5}}}}
+let radarChart = null;
+if (typeof Chart !== 'undefined') {
+  try {
+    radarChart = new Chart(document.getElementById('radarChart'),{
+      type:'radar',
+      data:{
+        labels:[['Trust','信頼性'],['Resilience','回復力'],['Legitimacy','正当性'],['Info Health','情報健全性'],['Viability','長期持続性'],['Mental WB','精神的健全性']],
+        datasets:[
+          {label:'Current',data:[100,100,100,100,100,100],backgroundColor:'rgba(0,212,255,.1)',borderColor:'#00d4ff',borderWidth:2,pointBackgroundColor:'#00d4ff',pointRadius:3},
+          {label:'Failure Threshold',data:[20,20,20,20,20,20],backgroundColor:'rgba(255,34,68,.04)',borderColor:'rgba(255,34,68,.45)',borderWidth:1,borderDash:[5,4],pointRadius:0}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:280},
+        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}}},
+        scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5}}}}
+      }
+    });
+  } catch (e) {
+    console.warn('📊 チャート radarChart 生成失敗:', e.message);
+    radarChart = null;
   }
-});
+} else {
+  console.warn('📊 チャート radarChart をスキップ: Chart.js が利用不可');
+}
 
 function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
@@ -2093,21 +2186,31 @@ function getModeCollapseLog(m){
 function updateAll(){
   const m=metrics(filterRate,ethicsScore,algo);
 
-  if(!animPlaying){
-    const tl=simTimeline(filterRate,ethicsScore,algo);
-    timelineChart.data.datasets[0].data=tl.dp;
-    timelineChart.data.datasets[1].data=tl.sc;
-    timelineChart.data.datasets[2].data=tl.inf;
-    timelineChart.update();
+  if(!animPlaying && timelineChart){
+    try {
+      const tl=simTimeline(filterRate,ethicsScore,algo);
+      timelineChart.data.datasets[0].data=tl.dp;
+      timelineChart.data.datasets[1].data=tl.sc;
+      timelineChart.data.datasets[2].data=tl.inf;
+      timelineChart.update();
+    } catch (e) {
+      console.warn('📊 timelineChart 更新失敗:', e);
+    }
   }
 
-  radarChart.data.datasets[0].data=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
-  const avg=(m.trust+m.resilience+m.legitimacy+m.infoH+m.viability+m.mentalWB)/6;
-  const rc=avg<38?'#ff2244':avg<62?'#ff6b2b':'#00d4ff';
-  radarChart.data.datasets[0].borderColor=rc;
-  radarChart.data.datasets[0].backgroundColor=rc+'1a';
-  radarChart.data.datasets[0].pointBackgroundColor=rc;
-  radarChart.update();
+  const avg=(m.trust+m.resilience+m.legitimacy+m.infoH+m.viability+m.mentalWB)/6; // fix: ブロック外で定義（下の diag ボーダー色でも使用するため）
+  if(radarChart){
+    try {
+      radarChart.data.datasets[0].data=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
+      const rc=avg<38?'#ff2244':avg<62?'#ff6b2b':'#00d4ff';
+      radarChart.data.datasets[0].borderColor=rc;
+      radarChart.data.datasets[0].backgroundColor=rc+'1a';
+      radarChart.data.datasets[0].pointBackgroundColor=rc;
+      radarChart.update();
+    } catch (e) {
+      console.warn('📊 radarChart 更新失敗:', e);
+    }
+  }
 
   const ep=Math.round(m.entropy);
   const ec=ep<40?'#00ff88':ep<70?'#ff6b2b':'#ff2244';
@@ -2394,7 +2497,6 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}});
 
-let currentTab = 1;
 function switchTab(n){
   currentTab = n;
   [1,2,3,4].forEach(i=>{
@@ -3126,12 +3228,31 @@ function drainDiscToast(){
 }
 function updateDiscoveryCounter(){
   const total = getTotalDiscoveryCount();
+  const count = _discovered.size;
+
   // Update menu counter
   const menuCount = document.getElementById('discMenuCount');
-  if(menuCount) menuCount.textContent = _discovered.size;
+  if(menuCount) menuCount.textContent = count;
+
+  // Update menu total (dynamic)
+  const menuTotal = document.getElementById('discMenuTotal');
+  if(menuTotal) menuTotal.textContent = total;
+
+  // Update header discovery button visibility and count
+  const headerBtn = document.getElementById('discHeaderBtn');
+  if(headerBtn) {
+    if(count > 0) {
+      headerBtn.style.display = '';
+      const headerCount = document.getElementById('discHeaderCount');
+      if(headerCount) headerCount.textContent = count;
+    } else {
+      headerBtn.style.display = 'none';
+    }
+  }
+
   // Legacy support for old button if it exists
   const b = document.getElementById('discBtn');
-  if(b) b.textContent = tt('📖 発見ログ ', '📖 Discoveries ') + `(${_discovered.size}/${total})`;
+  if(b) b.textContent = tt('📖 発見ログ ', '📖 Discoveries ') + `(${count}/${total})`;
 }
 function openDiscoveryLog(){
   const list=document.getElementById('discList');if(!list)return;
@@ -3305,21 +3426,30 @@ function updateP3Chart(){
 function startP3(){
   if(!p3Started){
     p3Started=true;
-    timelineChartP3=new Chart(document.getElementById('timelineChartP3'),{
-      type:'line',
-      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-        {label:'正義感ドーパミン Justice Dopamine',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'認知健全性 Cognitive Integrity',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'現実同期 Grounding',data:[],borderColor:'#9945ff',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-        scales:{
-          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-        }
+    if (typeof Chart !== 'undefined') {
+      try {
+        timelineChartP3=new Chart(document.getElementById('timelineChartP3'),{
+          type:'line',
+          data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+            {label:'正義感ドーパミン Justice Dopamine',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'認知健全性 Cognitive Integrity',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'現実同期 Grounding',data:[],borderColor:'#9945ff',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+            plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+            scales:{
+              x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+              y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('📊 チャート timelineChartP3 生成失敗:', e.message);
+        timelineChartP3 = null;
       }
-    });
+    } else {
+      console.warn('📊 チャート timelineChartP3 をスキップ: Chart.js が利用不可');
+    }
   }
   if(p3AnimId)cancelAnimationFrame(p3AnimId);
   const cv=document.getElementById('p3Canvas'),wrap=cv.parentElement;
@@ -3672,21 +3802,30 @@ function updateP4Chart(){
 function startP4(){
   if(!p4Started){
     p4Started=true;
-    timelineChartP4=new Chart(document.getElementById('timelineChartP4'),{
-      type:'line',
-      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-        {label:'パケットドロップ率 Packet Drop Rate',data:[],borderColor:'#ff2244',backgroundColor:'rgba(255,34,68,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'真の当事者比率 True Stakeholder Ratio',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'政策シグナル Policy Signal',data:[],borderColor:'#00ff88',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-        scales:{
-          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-        }
+    if (typeof Chart !== 'undefined') {
+      try {
+        timelineChartP4=new Chart(document.getElementById('timelineChartP4'),{
+          type:'line',
+          data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+            {label:'パケットドロップ率 Packet Drop Rate',data:[],borderColor:'#ff2244',backgroundColor:'rgba(255,34,68,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'真の当事者比率 True Stakeholder Ratio',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'政策シグナル Policy Signal',data:[],borderColor:'#00ff88',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+            plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+            scales:{
+              x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+              y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('📊 チャート timelineChartP4 生成失敗:', e.message);
+        timelineChartP4 = null;
       }
-    });
+    } else {
+      console.warn('📊 チャート timelineChartP4 をスキップ: Chart.js が利用不可');
+    }
   }
   if(p4AnimId)cancelAnimationFrame(p4AnimId);
   const cv=document.getElementById('p4Canvas'),wrap=cv.parentElement;
@@ -4094,18 +4233,17 @@ function startWeeklyScenarioFromCard() {
 }
 
 function checkScenarioGoal(metricsObj) {
+  if (!WEEKLY_ENABLED) return; // fix: Web版では週次シナリオ無効のため判定自体をスキップ
   const scenario = getWeeklyScenario();
   if (!scenario || !scenario.check) return;
   if (!document.getElementById('scenarioModal')?.classList.contains('on')) {
     if (scenario.check(metricsObj)) {
       const discId = scenario.discoveryId;
       if (!_discovered.has(discId)) {
-        _discovered.add(discId);
-        saveDiscoveries();
+        discover(discId); // fix: 未定義だった saveDiscoveries()/unlock() を既存の発見システム（保存・トースト込み）に置換
         if (document.getElementById('scenarioCheckContainer')) {
           document.getElementById('scenarioCheckContainer').style.display = 'block';
         }
-        unlock(discId);
         // Update scenario card status
         initWeeklyScenarioCard();
       }
@@ -4938,22 +5076,31 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   startAgents();
 
   // P2 timeline chart 初期化
-  timelineChartP2=new Chart(document.getElementById('timelineChartP2'),{
-    type:'line',
-    data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-      {label:'Infrastructure',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Rescue Heli',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Brand Industry',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Municipal Budget',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-      plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-      scales:{
-        x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-        y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-      }
+  if (typeof Chart !== 'undefined') {
+    try {
+      timelineChartP2=new Chart(document.getElementById('timelineChartP2'),{
+        type:'line',
+        data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+          {label:'Infrastructure',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Rescue Heli',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Brand Industry',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Municipal Budget',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+          plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+          scales:{
+            x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+            y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('📊 チャート timelineChartP2 生成失敗:', e.message);
+      timelineChartP2 = null;
     }
-  });
+  } else {
+    console.warn('📊 チャート timelineChartP2 をスキップ: Chart.js が利用不可');
+  }
   // P2 初期描画（URL復元値をスライダー・トグルへ反映）
   document.getElementById('shrinkRate').value=shrinkRate;
   document.getElementById('dxRate').value=dxRate;
