@@ -187,4 +187,4 @@ ratio = round(clamp(100 - gamification*0.85 - (filterActive ? 0 : extTraffic*0.2
 
 ---
 
-*対応バージョン: v6.342 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*
+*対応バージョン: v6.343 ／ 出典: `index.html`（`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor` ほか）*
