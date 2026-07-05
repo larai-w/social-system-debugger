@@ -3886,13 +3886,10 @@ function applyScenarioParams(scenario) {
     algo = p.al;
     document.getElementById('filterRate').value = p.f;
     document.getElementById('ethicsScore').value = p.e;
-    if (p.al === 'dp') {
-      document.getElementById('algoDP').checked = true;
-      document.getElementById('algoGreedy').checked = false;
-    } else {
-      document.getElementById('algoGreedy').checked = true;
-      document.getElementById('algoDP').checked = false;
-    }
+    document.getElementById('btnDP').classList.toggle('on', p.al === 'dp');
+    document.getElementById('btnDP').classList.toggle('green-on', p.al === 'dp');
+    document.getElementById('btnGreedy').classList.toggle('on', p.al === 'greedy');
+    document.getElementById('btnGreedy').classList.toggle('red-on', p.al === 'greedy');
     setPct(document.getElementById('filterRate'));
     setPct(document.getElementById('ethicsScore'));
     updateP1Chart();
@@ -3909,18 +3906,24 @@ function applyScenarioParams(scenario) {
     else skillStock = 50;
     document.getElementById('shrinkRate').value = p.s;
     document.getElementById('dxRate').value = p.d;
-    document.getElementById('ethicsP2').value = p.e;
+    document.getElementById('ethicsScoreP2').value = p.e;
     if (p.al === 'dp') {
-      document.getElementById('algoDP2').checked = true;
-      document.getElementById('algoGreedy2').checked = false;
+      document.getElementById('btnDPP2').classList.add('on');
+      document.getElementById('btnDPP2').classList.add('green-on');
+      document.getElementById('btnGreedyP2').classList.remove('on');
+      document.getElementById('btnGreedyP2').classList.remove('red-on');
     } else {
-      document.getElementById('algoGreedy2').checked = true;
-      document.getElementById('algoDP2').checked = false;
+      document.getElementById('btnGreedyP2').classList.add('on');
+      document.getElementById('btnGreedyP2').classList.add('red-on');
+      document.getElementById('btnDPP2').classList.remove('on');
+      document.getElementById('btnDPP2').classList.remove('green-on');
     }
-    document.getElementById('rebootChk').checked = p.reboot || false;
+    document.getElementById('btnRebootOff').classList.toggle('on', !p.reboot);
+    document.getElementById('btnRebootOn').classList.toggle('on', p.reboot);
+    document.getElementById('btnRebootOn').classList.toggle('green-on', p.reboot);
     setPct(document.getElementById('shrinkRate'));
     setPct(document.getElementById('dxRate'));
-    setPct(document.getElementById('ethicsP2'));
+    setPct(document.getElementById('ethicsScoreP2'));
     updateP2Chart();
   }
   if (scenario.params.p3) {
@@ -3928,10 +3931,10 @@ function applyScenarioParams(scenario) {
     searchDepth = p.depth;
     groundingRate = p.ground;
     learningRate = p.lr;
-    document.getElementById('depth').value = p.depth;
-    document.getElementById('grounding').value = p.ground;
+    document.getElementById('searchDepth').value = p.depth;
+    document.getElementById('groundingRate').value = p.ground;
     document.getElementById('learningRate').value = p.lr;
-    setPct(document.getElementById('grounding'));
+    setPct(document.getElementById('groundingRate'));
     setPct(document.getElementById('learningRate'));
     updateP3Monitor();
     updateP3Chart();
