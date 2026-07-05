@@ -933,7 +933,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.342 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.343 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -1049,7 +1049,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     </label>
     <!-- researcherMode ON 時に格上げされる開発者導線 -->
     <div id="fbDevTop" style="display:none;margin-bottom:14px">
-      <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
+      <a class="doclink sbtn" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_doc_link">📄 方法論・数式仕様（METHODOLOGY）</a>
+      <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
     </div>
     <form id="fbForm" onsubmit="return submitFeedback(event)">
       <div class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</div>
@@ -1090,6 +1091,11 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div class="mti" id="mTitle"></div>
     <div class="mbd" id="mBody"></div>
     <div class="mfo" id="mFormula"></div>
+    <!-- v6.343: 数式仕様ドキュメントへの導線（数式を検証したい人が一番近い場所に置く） -->
+    <div class="mfo" id="mDocNote" style="border-left-color:var(--cyan);margin-top:10px">
+      <span data-i18n="mdoc_note">全メトリクスの計算式・しきい値・前提と限界は方法論ドキュメントに集約されています → </span>
+      <a class="doclink" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="mdoc_link">📄 METHODOLOGY を開く</a>
+    </div>
   </div>
 </div>
 
@@ -1272,7 +1278,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.342 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.343 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -1316,6 +1322,9 @@ const I18N = {
     fb_submit:'Send',
     fb_dev:'Want to reach the developer directly (for researchers/engineers)? → ',
     fb_dev_link:'Open GitHub Issues',
+    fb_doc_link:'📄 Methodology & formula spec (METHODOLOGY)',
+    mdoc_note:'Every formula, threshold, assumption, and limitation is collected in the methodology doc → ',
+    mdoc_link:'📄 Open METHODOLOGY',
   }
 };
 
@@ -3879,7 +3888,7 @@ function generateResultCard(ctx){
   c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.342 ]','[ SOCIAL SYSTEM DEBUGGER v6.342 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.343 ]','[ SOCIAL SYSTEM DEBUGGER v6.343 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3990,7 +3999,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.342 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.342'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.343 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.343'),W/2,583);
   c.textAlign='left';
   return cv;
 }

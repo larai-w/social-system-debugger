@@ -189,4 +189,4 @@ Earned when each layer's snapshot (diversity, infrastructure, cognitive integrit
 
 ---
 
-*Applies to: v6.342 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
+*Applies to: v6.343 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
