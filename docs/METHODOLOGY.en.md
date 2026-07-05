@@ -79,6 +79,17 @@ crash = entropy > 76  ||  (infra < 18 && socialCap < 18)
 - `isG` … whether the budget strategy is Greedy
 - `reboot = publicReboot` … Public Reboot (re-municipalization) on/off
 - `dampener = reboot ? 0.5 : 1.0`
+- `skillStock` (0–100) … **successor stock** (reserve of tacit knowledge). Added in v6.346; the page's only **slow state variable**
+
+**Successor stock (skillStock — slow state variable / v6.346)**
+Evolves at 1.2 s/tick, only while Page 2 is visible.
+```
+reboot        → restores skillStock to ≥ 60 (clears skillLost)
+df < 0.25     → skillStock -= (0.25-df)*15   // aging artisans retire (DX0 ≈ cliff in ~12 ticks) → at 0, skills go extinct (skillLost)
+df > 0.45     → skillStock += (df-0.45)*8     // serialization (formalizing skills) slowly recovers it
+0.25–0.45     → equilibrium band (default DX30 sits here → no decay)
+skillLost (after hitting 0) won't recover even at max DX; only Public Reboot revives it
+```
 
 **Redundancy Buffer**
 ```
@@ -86,22 +97,30 @@ base = clamp(100 - sf*52 - (isG ? 32 : 0))
 redundancy = reboot ? clamp(base + 42) : base
 ```
 
-**Infrastructure & verdicts**
+**Causal chain: brand → tax base → maintenance → infra → heli (v6.346)**
 ```
-infraBase = clamp(100 - (1-sf)*35*dampener - (1-df)*15 - (isG ? (1-ef)*28 : 6)*dampener)
-infraError = infraBase < 65
+skillFactor = ss>=30 ? 1 : ss>=12 ? 0.55+(ss-12)/40 : (ss/12)*0.55        // cliff function (calm for a while, then sudden drop)
+brand  = clamp((45 + sf*16 + (isG?-12:12) + ef*8) * skillFactor)          // output is sustained by the successor stock
+budget = clamp(42 + brand*0.55 - (isG?(1-ef)*30:6) - (1-sf)*10 - (reboot?16:0) - (root?5:0))  // brand = tax base
+budgetShortfall = budget < 45 ? (45-budget)*1.2 : 0                       // a thin budget starves maintenance
 
-deadlock = (!rootRestricted) && ef < 0.4 && isG && infraError   // blame-shift deadlock
-infra    = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14)
-heliOp   = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)        // rescue heli online (blocked by low ethics)
-budget   = clamp(100 - (1-sf)*44 - (isG ? (1-ef)*38 : 8) + df*14 - (reboot?16:0) - (rootRestricted?5:0))
+infraBase = clamp(100 - (1-sf)*35*dampener - (1-df)*15 - (isG?(1-ef)*28:6)*dampener)
+deadlock  = (!rootRestricted) && ef < 0.4 && isG && (infraBase < 65)      // blame-shift deadlock
+infra     = deadlock ? clamp(infraBase - 42) : clamp(infraBase + (cpuRepair/100)*14 - budgetShortfall)
+```
 
+**Rescue helicopter (3 states / v6.346)**
+```
+heliOp (structural) = reboot ? true : (infra > 35 && cpuRepair > 25 && ef >= 0.3)
+state = during a shock, within the hold window (~3.6 s) → WEATHER HOLD (orange, VFR grounding, auto-returns)
+        otherwise heliOp → OPERATIONAL (green) / !heliOp → SUSPENDED (red)
 crash = (!heliOp && infra < 20) || budget < 8 || <shock crash>
 ```
+On entering SUSPENDED the operations log streams, one line at a time: `BRAND_REVENUE↓ → TAX_BASE↓ → MAINT_BUDGET↓ → INFRA<35% → HELI:SUSPENDED` (and the recovery chain on return).
 
 **System-shock injection**: a three-way branch on the Redundancy Buffer — **instant collapse below 30%**, **survival at ≥ 60%**, partial damage in between (`shockState`).
 
-**Reading it**: maximizing consolidation `sf` erodes redundancy (`base = 100 - sf*52 - …`), leaving the town fragile to shocks. `deadlock` fires when "low ethics × Greedy × infra trouble" coincide, redirecting 100% of admin CPU to blame-shifting so repair stops. `heliOp` is **directly blocked by low ethics** (`ef < 0.3`) — even if infrastructure and repair budget are sufficient, the helicopter doesn't fly when the leader lacks judgment and collaboration. `reboot` (re-municipalization) restores resilience (+42 redundancy, halved decay).
+**Reading it**: the successor stock is the slow variable that keeps things **calm even as you cut DX — until it runs out, when the brand falls off a cliff** (the very lesson of Greedy = efficiency now vs. DP = investing in the future). The collapse always propagates through the hierarchy **brand → tax base → maintenance → infra → heli** — preserving the honest point that the rescue helicopter is a wide-area system, never wired directly to one town's industry. Below 35% infra it goes SUSPENDED. Maximizing consolidation `sf` erodes redundancy and leaves the town fragile. `deadlock` fires under "low ethics × Greedy × infra trouble," sending 100% of admin CPU into blame-shifting. `heliOp` is also **directly blocked by low ethics** (`ef < 0.3`). `reboot` (re-municipalization) restores resilience (+42 redundancy, halved decay, revived successor stock).
 
 ---
 
@@ -189,4 +208,4 @@ Earned when each layer's snapshot (diversity, infrastructure, cognitive integrit
 
 ---
 
-*Applies to: v6.345 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
+*Applies to: v6.346 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
