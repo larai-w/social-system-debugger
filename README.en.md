@@ -139,6 +139,14 @@ This app is designed as teaching material for information literacy, social-syste
 
 ---
 
+## Documentation
+
+- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) — every layer's formulas, thresholds, cascades, and **assumptions & limitations** (currently Japanese)
+- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — developer guide: code map, how to change things, versioning, deploy, operational notes (currently Japanese)
+- [`CHANGELOG.md`](CHANGELOG.md) — release history
+
+---
+
 ## CI/CD
 
 Develop on the `development` branch → CI runs automatically on PRs to `main` → merging auto-deploys to GitHub Pages.
