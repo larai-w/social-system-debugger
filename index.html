@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6</title>
+<title>社会デバッガー</title>
 <!-- v6.2: OGP / SNSカード -->
-<meta property="og:title" content="社会＆地域インフラ・デバッガー v6">
-<meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
+<meta property="og:title" content="社会デバッガー">
+<meta property="og:description" content="あなたの街は、生き残れるか。— 社会が崩壊する構造をパラメータで操作できる教育用シミュレーター。特定の誰かではなく、どの社会にも起こる構造の話です">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -17,7 +17,7 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="社会OSデバッガー">
+<meta name="apple-mobile-web-app-title" content="社会デバッガー">
 <!-- og-image.png 制作仕様（アプリ内の結果カードPNGと同デザイン / generateResultCard 参照）:
      ・サイズ 1200×630 / 背景 #070b14 + 48pxグリッド線 rgba(0,212,255,.06)
      ・外枠 #00d4ff 3px + 内枠 rgba(0,212,255,.3) 1px
@@ -28,6 +28,9 @@
      ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- v6.345: analytics placeholder — swap src for Plausible or CF Web Analytics when ready
+<script defer data-domain="larai-w.github.io" src="https://plausible.io/js/script.js"></script>
+-->
 <style>
 :root{
   --bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;
@@ -345,7 +348,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <button class="ibtn" id="discBtn" onclick="openDiscoveryLog()">📖 発見ログ (0/15)</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6 ]</h1>
+    <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
     <p id="hdrSub">あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -463,6 +466,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <div class="diag" id="diag"></div>
       <div class="hist" id="histRef"></div>
       <button class="sbtn" id="p1ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP1Result()">▶ この結果を送る</button>
+      <button class="sbtn" id="p1RewindBtn" style="display:none;border-color:#ff6b2b;color:#ff6b2b;margin-top:6px" onclick="openRewind()" data-i18n="rewind_btn">↩ もし1つだけ過去に戻せるなら？</button>
     </div>
   </div>
 
@@ -933,7 +937,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.344 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会＆地域インフラ・デバッガー v6.345 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -945,7 +949,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
       <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
       <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
-      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="shareScenario({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
+      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="openShareComment({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
     </div>
   </div>
 </div>
@@ -954,8 +958,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div class="mb" style="max-width:620px">
     <button class="mc" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
-    <div class="mti" data-i18n="intro_title">この社会は、4つのレイヤーが連鎖して崩壊する</div>
-    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">もしあなたの街の社会システムが壊れるとしたら、どこから壊れるだろう。4つのレイヤーは連鎖する — 上の層の障害は、下の層へ伝播する。クリックして、あなた自身の街で試してみてほしい。</div>
+    <div class="mti" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
+    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
     <div class="intro-layers">
       <button class="intro-layer" style="--lc:var(--cyan)" onclick="introGo(1)">
         <span class="il-num">LAYER 1 — INFORMATION SPACE</span>
@@ -982,7 +986,17 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </button>
     </div>
     <div class="mfo" style="border-left-color:var(--green);color:var(--green)" data-i18n="intro_tip">💡 一部のパラメーターはページを跨いで連動します。緑の「⇄」バッジが目印です（クリックで連動先へジャンプ）。</div>
-    <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ デバッグを開始する</button>
+    <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ あなたの街をデバッグする</button>
+    <!-- v6.345: 街の名前（任意スキップ可） -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bdr)">
+      <div style="font-size:.6rem;color:var(--muted);margin-bottom:6px;letter-spacing:.06em" data-i18n="town_label">▷ あなたの街に名前を付ける（任意）</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="townNameInput" maxlength="20" data-i18n-placeholder="town_placeholder"
+          placeholder="例: 東京 / 地元の市 / 未来の街"
+          style="flex:1;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:6px 10px;letter-spacing:.04em;outline:none" oninput="saveTownName(this.value)">
+      </div>
+      <div style="font-size:.56rem;color:var(--muted);margin-top:5px;line-height:1.5" data-i18n="town_hint">名前を付けると判定バナーと結果カードに反映されます。次回以降は再入力不要。GUIDE から変更できます。</div>
+    </div>
   </div>
 </div>
 
@@ -1084,6 +1098,34 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   </div>
 </div>
 
+<!-- v6.345: 共有前コメントモーダル -->
+<div class="mo" id="rewindModal" onclick="closeRewindIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeRewind()">✕</button>
+    <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
+    <div class="mti" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
+    <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
+    <div id="rewindChoices" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+    <div id="rewindResult" style="display:none;padding:12px;border:1px solid var(--bdr);border-radius:3px;font-size:.65rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<div class="mo" id="shareCommentModal" onclick="closeShareCommentIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeShareComment()">✕</button>
+    <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
+    <div class="mti" data-i18n="sc_title">一言添えて送る（任意）</div>
+    <textarea id="shareCommentInput" rows="2" maxlength="100"
+      style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:none;letter-spacing:.03em;margin-bottom:10px"
+      placeholder="自分の感想を一言…（スキップ可）"></textarea>
+    <div id="scChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="sbtn" onclick="proceedShare(false)" style="flex:1;border-color:var(--cyan);color:var(--cyan)" data-i18n="sc_send">▶ 共有する</button>
+      <button class="sbtn" onclick="proceedShare(true)" style="border-color:var(--bdr);color:var(--muted)" data-i18n="sc_skip">スキップ</button>
+    </div>
+  </div>
+</div>
+
 <div class="mo" id="modal" onclick="closeModalIf(event)">
   <div class="mb">
     <button class="mc" onclick="closeModal()">✕</button>
@@ -1149,6 +1191,18 @@ const I18N = {
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
+    appName:'Social Debugger',
+    town_label:'▷ Give your town a name (optional)',
+    town_placeholder:'e.g. Springfield / My city / Future town',
+    town_hint:'The name appears in verdict banners and the result card. Saved for next time. Change it anytime via GUIDE.',
+    sc_tag:'▷ SHARE NOTE',
+    sc_title:'Add a note before sharing (optional)',
+    sc_send:'▶ Share',
+    sc_skip:'Skip',
+    rewind_btn:'↩ What if you could go back one step?',
+    rw_tag:'↩ REWIND',
+    rw_title:'What if you could change just one thing?',
+    rw_body:'Right before collapse — if you had changed a single parameter, would your town have survived?',
     simLbl:'SIMULATION ACTIVE', presetLbl:'SCENARIOS ▶',
     paramTitle:'INPUT PARAMETERS', paramDesc:'Social system design variables. Move sliders to see real-time system state changes.',
     f1lbl:'Information Filter Rate', f1desc:'Echo chamber level. Higher values mean only homogeneous info circulates, causing overfitting to supporters and loss of generalization.',
@@ -1235,8 +1289,8 @@ const I18N = {
     p4_pr_plaza:'🏘 Stakeholder Plaza', p4_pr_spec:'🎪 Spectator Flood', p4_pr_game:'🎮 Gamification', p4_pr_flame:'🔥 Fandom Flame War',
     // ── v5.2: intro modal ──
     intro_tag:'SYSTEM OVERVIEW — THE 4-LAYER SOCIAL OS',
-    intro_title:'This society collapses through four chained layers',
-    intro_body:'If your town\'s social system were to break, where would it start? The four layers are linked — a failure in an upper layer cascades to the ones below. Click in and try it on your own town.',
+    intro_title:'Where does your town break first?',
+    intro_body:'The four layers are linked — a failure in an upper layer cascades down. Move the sliders and try it on your own town.',
     intro_l1t:'Information Space', intro_l1d:'Echo chambers & overfitting — society\'s input data gets contaminated',
     intro_arrow1:'▼ Contaminated information corrupts decision-making',
     intro_l2t:'Physical Infrastructure', intro_l2d:'Budgets, rescue heli, redundancy — wrong optimization destroys the physical layer',
@@ -1245,7 +1299,7 @@ const I18N = {
     intro_arrow3:'▼ A hacked crowd drowns out real stakeholders',
     intro_l4t:'Stakeholder Voice', intro_l4d:'Outsider floods & gamification — 5.3M real voices get dropped',
     intro_tip:'💡 Some parameters are linked across pages — look for the green "⇄" badges (click to jump).',
-    intro_start:'▶ Start debugging',
+    intro_start:'▶ Debug your town',
     // ── v6.0: slider names (pn) ──
     p2_f1n:'Infra Consolidation <span class="tag to">SMART SHRINK</span>',
     p2_f2n:'Industrial DX Investment <span class="tag tc">AUTOMATION</span>',
@@ -1278,7 +1332,7 @@ const I18N = {
     sg_note:'*These are only suggestions.',
     sg_save:'⬇ Save this card',
     // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
-    footerTxt:'Social System Debugger v6.344 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    footerTxt:'Social System Debugger v6.345 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
     banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
     banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
     banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
@@ -2052,6 +2106,7 @@ function updateAll(){
 
   // v6.3: プリセット適用で安定/崩壊が確定した瞬間だけ共有ボタンを出す（P2の shockShareBtn パターン踏襲）
   const p1b=document.getElementById('p1ShareBtn');
+  const p1rw=document.getElementById('p1RewindBtn');
   if(p1b){
     if(activePreset){
       p1ShareState={type:m.crash?'crash':'stable'};
@@ -2060,6 +2115,16 @@ function updateAll(){
     }else{
       p1ShareState=null;
       p1b.style.display='none';
+    }
+  }
+  // v6.345: リワインドボタンはクラッシュ時のみ表示（プリセット不要）
+  if(p1rw){
+    if(m.crash){
+      p1rw.style.display='block';
+      p1rw.textContent=t('rewind_btn');
+      window._rewindSuccess=null;
+    }else{
+      p1rw.style.display='none';
     }
   }
 }
@@ -2120,6 +2185,10 @@ function applyI18n(){
     radarChart.update('none');
   }
   applyI18nAuto();
+  syncDocLinks();
+  syncTownPlaceholder();
+  // 言語切替後、表示中のバナーに街名を再展開（bstガードをリセット）
+  document.querySelectorAll('.alert[data-bst]').forEach(al=>{delete al.dataset.bst;});
   document.documentElement.lang=lang;
   updateAll();
   updateAllP2(); // 動的ステータス文の言語を即時反映
@@ -2136,6 +2205,30 @@ function applyI18nAuto(){
 }
 
 function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();if(typeof updateDiscoveryCounter==='function')updateDiscoveryCounter();}
+
+// v6.345: プライバシーファーストの analytics ラッパー（外部スクリプト未導入時は no-op）
+function track(event,props){
+  try{if(window.plausible)window.plausible(event,{props:props||{}});}catch(e){}
+}
+
+// v6.343: ドキュメント導線の言語連動
+function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/blob/main/docs/'+name+(lang==='en'?'.en':'')+'.md';}
+function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
+
+// v6.345: 街の名前 helpers
+function getTownName(){try{return localStorage.getItem('ssd_town_name')||'';}catch(e){return '';}}
+function saveTownName(name){try{if(name&&name.trim())localStorage.setItem('ssd_town_name',name.trim());else localStorage.removeItem('ssd_town_name');}catch(e){}}
+function expandTown(html){
+  const n=getTownName();if(!n)return html;
+  return lang==='ja'
+    ? html.replace(/あなたの街/g,n)
+    : html.replace(/YOUR TOWN/g,n.toUpperCase()).replace(/your town/gi,n);
+}
+function syncTownPlaceholder(){
+  const inp=document.getElementById('townNameInput');if(!inp)return;
+  inp.placeholder=lang==='ja'?'例: 東京 / 地元の市 / 未来の街':'e.g. Springfield / My city / Future town';
+  inp.value=getTownName();
+}
 
 // v6.331: 詳細設定アコーディオンの開閉（ページ内完結・DOMは残すので値計算に影響なし）
 function toggleAcc(id,btn){
@@ -2756,10 +2849,11 @@ function setVerdictBanner(alertId,state,key){
   if(state){
     at.dataset.i18n=key;
     const v=(I18N[lang]&&I18N[lang][key]);
-    if(v!==undefined)at.innerHTML=v;
+    if(v!==undefined)at.innerHTML=expandTown(v);
     if(state==='good'){al.classList.add('good');at.classList.add('good');}
     else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
     al.classList.add('on');
+    track('verdict',{banner:alertId,state,key});
   }else{
     al.classList.remove('on');
   }
@@ -2772,6 +2866,7 @@ function setVerdictBanner(alertId,state,key){
 // ══════════════════════════════════════════════════════════
 const DISCOVERIES=[
   {id:'d_p1_crash',    badge:()=>tt('⚠ 情報空間の崩壊を再現した','⚠ Recreated an information-space collapse'), learn:()=>tt('パラメータが同じでも、結果は真逆になり得る。','Same parameters can still lead to opposite outcomes.')},
+  {id:'d_p1_rewind',   badge:()=>tt('↩ 過去を一つ変えて街を救った','↩ Changed one thing and saved the town'), learn:()=>tt('崩壊は、たった一つの選択で回避できることがある。','Collapse can sometimes be averted by a single choice.')},
   {id:'d_p1_good',     badge:()=>tt('🌐 澄んだ情報空間をつくった','🌐 Built a clear information space'), learn:()=>tt('開かれた入力は、社会の解像度を上げる。','Open inputs raise a society’s resolution.')},
   {id:'d_p1_weimar',   badge:()=>tt('⚡ 1933年を1タップで再現した','⚡ Recreated 1933 in one tap'), learn:()=>tt('崩壊には、いつも同じ構造がある。','Collapse tends to share the same structure.')},
   {id:'d_p1_nordic',   badge:()=>tt('🌿 北欧型の設計を試した','🌿 Tried the Nordic design'), learn:()=>tt('高い倫理と開放性は、崩壊耐性になる。','High ethics and openness buy resilience.')},
@@ -2808,6 +2903,7 @@ function noteSessionPage(page){
 function notePreset(page,id){
   _presetsSeen.add(page+':'+id);
   try{localStorage.setItem('ssd_presets_seen',JSON.stringify([..._presetsSeen]));}catch(e){}
+  track('preset',{page,id});
   const total=Object.keys(PRESETS).length+Object.keys(PRESETS_P2).length+Object.keys(PRESETS_P3).length+Object.keys(PRESETS_P4).length;
   if(_presetsSeen.size>=total)discover('d_meta_allpresets');
 }
@@ -3491,7 +3587,10 @@ function setPresetP4(id){
 }
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
-function openIntro(){document.getElementById('introModal').classList.add('on');}
+function openIntro(){
+  document.getElementById('introModal').classList.add('on');
+  syncTownPlaceholder();
+}
 function closeIntro(){
   document.getElementById('introModal').classList.remove('on');
   try{localStorage.setItem('ssd_intro_seen','1')}catch(e){}
@@ -3726,8 +3825,99 @@ function buildShareTemplates(ctx){
 
 let shareCtx=null, shareTpls=[], shareSelIdx=0;
 
+// v6.345: 共有前コメント
+let _pendingShareCtx=null, shareComment='';
+const SC_CHIPS_JA=['自分の街として','思考実験として','友達に見せたい話','授業で出た話から'];
+const SC_CHIPS_EN=['My town','Thought experiment','Show a friend','From a lecture'];
+function openShareComment(ctx){
+  _pendingShareCtx=ctx;
+  shareComment='';
+  const inp=document.getElementById('shareCommentInput');
+  if(inp){inp.value='';inp.placeholder=lang==='ja'?'自分の感想を一言…（スキップ可）':'Add your take… (optional)';}
+  const chips=document.getElementById('scChips');
+  if(chips){
+    chips.innerHTML='';
+    const arr=lang==='ja'?SC_CHIPS_JA:SC_CHIPS_EN;
+    arr.forEach(txt=>{
+      const b=document.createElement('button');
+      b.className='sbtn';
+      b.style='font-size:.58rem;padding:3px 10px;border-color:var(--bdr);color:var(--muted);margin:0';
+      b.textContent=txt;
+      b.onclick=()=>{if(inp)inp.value=txt;inp.dispatchEvent(new Event('input'));};
+      chips.appendChild(b);
+    });
+  }
+  document.getElementById('shareCommentModal').classList.add('on');
+}
+function closeShareComment(){document.getElementById('shareCommentModal').classList.remove('on');}
+function closeShareCommentIf(e){if(e.target===document.getElementById('shareCommentModal'))closeShareComment();}
+function proceedShare(skip){
+  if(!skip){const inp=document.getElementById('shareCommentInput');shareComment=inp?inp.value.trim():'';}
+  else{shareComment='';}
+  closeShareComment();
+  if(_pendingShareCtx)shareScenario(_pendingShareCtx);
+}
+
+// v6.345: リワインド体験（P1のみ）
+let _rewindSnap=null;
+function openRewind(){
+  _rewindSnap={filterRate,ethicsScore,algo};
+  const res=document.getElementById('rewindResult');
+  if(res){res.style.display='none';res.innerHTML='';}
+  const ch=document.getElementById('rewindChoices');
+  if(ch){
+    ch.innerHTML='';
+    const opts=lang==='ja'
+      ?[['情報フィルタリングを下げる','filter'],['リーダーの倫理を引き上げる','ethics'],['DP（長期最適）に切り替える','algo']]
+      :[['Lower info filtering','filter'],['Raise leader ethics','ethics'],['Switch to DP strategy','algo']];
+    opts.forEach(([label,key])=>{
+      const b=document.createElement('button');
+      b.className='sbtn';
+      b.style='width:100%;text-align:left;border-color:var(--bdr);color:var(--txt);font-size:.65rem';
+      b.textContent='↩ '+label;
+      b.onclick=()=>applyRewind(key);
+      ch.appendChild(b);
+    });
+  }
+  document.getElementById('rewindModal').classList.add('on');
+}
+function closeRewind(){document.getElementById('rewindModal').classList.remove('on');}
+function closeRewindIf(e){if(e.target===document.getElementById('rewindModal'))closeRewind();}
+function applyRewind(key){
+  const snap=_rewindSnap;if(!snap)return;
+  let fr=snap.filterRate,es=snap.ethicsScore,al=snap.algo;
+  let chosenLabel;
+  if(key==='filter'){fr=Math.min(fr,38);chosenLabel=tt('フィルタリング削減','info filtering');}
+  else if(key==='ethics'){es=Math.max(es,72);chosenLabel=tt('倫理引き上げ','leader ethics');}
+  else{al='dp';chosenLabel=tt('DP切替','DP strategy');}
+  const m2=metrics(fr,es,al);
+  const survived=!m2.crash;
+  const res=document.getElementById('rewindResult');
+  if(!res)return;
+  res.style.display='block';
+  if(survived){
+    res.style.borderColor='var(--green)';
+    const town=getTownName();
+    const line=town
+      ? tt(`あなたは〈${chosenLabel}〉を守った。${town}は生き延びた。`,`You protected ‹${chosenLabel}›. ${town} survived.`)
+      : tt(`あなたは〈${chosenLabel}〉を守った。街は生き延びた。`,`You protected ‹${chosenLabel}›. Your town survived.`);
+    res.innerHTML='<span style="color:var(--green)">✔ '+line+'</span><br><span style="color:var(--muted);font-size:.58rem">'+tt('エントロピー','Entropy')+' '+Math.round(m2.entropy)+' / '+tt('多様性','Diversity')+' '+Math.round(m2.diversity)+'</span>';
+    discover('d_p1_rewind');
+    track('rewind_success',{key});
+    // 成功フラグ → 結果カードに反映するために保存
+    window._rewindSuccess={label:chosenLabel,metrics:m2};
+  } else {
+    res.style.borderColor='var(--warn)';
+    res.innerHTML='<span style="color:var(--warn)">✘ '+tt(`〈${chosenLabel}〉だけでは足りなかった。もう一つの要因が街を壊した。`,`‹${chosenLabel}› alone was not enough. Another factor broke your town.`)+'</span>';
+    window._rewindSuccess=null;
+  }
+  // チョイスボタンを無効化
+  document.querySelectorAll('#rewindChoices .sbtn').forEach(b=>b.disabled=true);
+}
+
 function shareScenario(ctx){
   shareCtx=ctx||{kind:'generic'};
+  track('share_open',{kind:shareCtx.kind||'generic'});
   shareTpls=buildShareTemplates(shareCtx);
   shareSelIdx=0;
   document.getElementById('sharePopTitle').textContent=tt('実験を共有','Share this experiment');
@@ -3738,7 +3928,11 @@ function shareScenario(ctx){
   document.getElementById('sharePopModal').classList.add('on');
 }
 
-function shareMessage(){return shareTpls[shareSelIdx]+'\n'+shareFooter();}
+function shareMessage(){
+  let msg=shareTpls[shareSelIdx]+'\n'+shareFooter();
+  if(shareComment)msg=shareComment+'\n\n'+msg;
+  return msg;
+}
 
 function renderSharePop(){
   const list=document.getElementById('shareTplList');
@@ -3802,20 +3996,20 @@ function closeSharePopIf(e){if(e.target===document.getElementById('sharePopModal
 
 function shareShockResult(){
   if(!shockState)return;
-  shareScenario({kind:'shock',type:shockState.type});
+  openShareComment({kind:'shock',type:shockState.type});
 }
 // v6.3: P1/P3/P4 判定共有（shareShockResult をそのまま流用）
 function shareP1Result(){
   if(!p1ShareState)return;
-  shareScenario({kind:'p1',type:p1ShareState.type,preset:activePreset});
+  openShareComment({kind:'p1',type:p1ShareState.type,preset:activePreset});
 }
 function shareP3Result(){
   if(!p3ShareState)return;
-  shareScenario({kind:'p3',type:p3ShareState.type});
+  openShareComment({kind:'p3',type:p3ShareState.type});
 }
 function shareP4Result(){
   if(!p4ShareState)return;
-  shareScenario({kind:'p4',type:p4ShareState.type});
+  openShareComment({kind:'p4',type:p4ShareState.type});
 }
 
 // ── 結果カードPNG（1200×630, 既存トークン準拠） ──────────────
@@ -3885,10 +4079,10 @@ function generateResultCard(ctx){
   // メインタイトル（二人称）+ アプリ名（小）+ ページ名
   c.fillStyle='#00d4ff';c.font='bold 34px '+MONO;
   c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
-  c.fillText(tt('あなたの街の判定結果','Your town\'s verdict'),56,80);
+  c.fillText(expandTown(tt('あなたの街の判定結果','Your town\'s verdict')),56,80);
   c.shadowBlur=0;
   c.fillStyle='#5a6f94';c.font='15px '+MONO;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.344 ]','[ SOCIAL SYSTEM DEBUGGER v6.344 ]'),56,106);
+  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.345 ]','[ SOCIAL SYSTEM DEBUGGER v6.345 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
@@ -3916,7 +4110,16 @@ function generateResultCard(ctx){
   c.fillStyle=st.color;c.fillText(st.txt,0,fs*0.28);
   c.restore();
   c.textAlign='left';c.shadowBlur=0;
+  // v6.345: リワインド成功メモ（P1クラッシュ後に1パラ変えて救済した場合）
+  if(ctx.kind==='p1'&&window._rewindSuccess){
+    c.fillStyle='rgba(0,255,136,.7)';c.font='italic 18px '+MONO;
+    c.fillText('↩ '+window._rewindSuccess.label,56,478,W-112);
+  }
   // 固定フッター + URL（小さく）
+  if(shareComment){
+    c.fillStyle='rgba(0,212,255,.55)';c.font='italic 17px '+MONO;
+    c.fillText('"'+shareComment+'"',56,H-112,W-112);
+  }
   c.fillStyle='#5a6f94';c.font='18px '+MONO;
   c.fillText(shareFooter(),56,H-84,W-112);
   c.fillStyle='rgba(90,111,148,.85)';c.font='16px '+MONO;
@@ -3999,7 +4202,7 @@ function generateEtiquetteCard(){
   c.fillStyle='#5a6f94';c.font='16px '+MONO;
   c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
   c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
-  c.fillText(tt('社会＆地域インフラ・デバッガー v6.344 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.344'),W/2,583);
+  c.fillText(tt('社会＆地域インフラ・デバッガー v6.345 — SOCIAL OS DEBUGGER','SOCIAL SYSTEM DEBUGGER v6.345'),W/2,583);
   c.textAlign='left';
   return cv;
 }
