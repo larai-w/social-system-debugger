@@ -3,13 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>社会＆地域インフラ・デバッガー v6.2</title>
+<title>社会デバッガー</title>
 <!-- v6.2: OGP / SNSカード -->
-<meta property="og:title" content="社会＆地域インフラ・デバッガー v6.2">
-<meta property="og:description" content="社会が壊れる仕組みをパラメータ操作で再現できる教育用シミュレーター。※特定の誰かではなく、どの社会にも起こる構造の話です">
+<meta property="og:title" content="社会デバッガー">
+<meta property="og:description" content="あなたの街は、生き残れるか。— 社会が崩壊する構造をパラメータで操作できる教育用シミュレーター。特定の誰かではなく、どの社会にも起こる構造の話です">
 <meta property="og:type" content="website">
 <meta property="og:image" content="og-image.png">
 <meta name="twitter:card" content="summary_large_image">
+<!-- v6.342: PWA（インストール可能・オフライン対応。見た目は不変） -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070b14">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="社会デバッガー">
 <!-- og-image.png 制作仕様（アプリ内の結果カードPNGと同デザイン / generateResultCard 参照）:
      ・サイズ 1200×630 / 背景 #070b14 + 48pxグリッド線 rgba(0,212,255,.06)
      ・外枠 #00d4ff 3px + 内枠 rgba(0,212,255,.3) 1px
@@ -19,7 +27,10 @@
      ・右中央: 斜めスタンプ風「SIMULATION ACTIVE」（#00ff88 / 二重枠 / -6°回転 / グロー）
      ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="window.__chartLoadFailed=true"></script>
+<!-- v6.345: analytics placeholder — swap src for Plausible or CF Web Analytics when ready
+<script defer data-domain="larai-w.github.io" src="https://plausible.io/js/script.js"></script>
+-->
 <style>
 :root{
   --bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;
@@ -40,15 +51,27 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .hdr-c{flex:1;text-align:center}
 .hdr h1{font-size:1.5rem;color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.45);letter-spacing:.12em}
 .hdr p{color:var(--muted);font-size:.7rem;margin-top:4px;letter-spacing:.05em}
-.hdr-acts{display:flex;gap:8px;align-items:center}
+.hdr-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:3px 12px;border:1px solid var(--green);color:var(--green);font-size:.6rem;letter-spacing:.18em;text-shadow:0 0 10px rgba(0,255,136,.5)}
 .bdot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+/* v6.33: 読めるように opacity を .6 までしか落とさない緩い点滅（モード崩壊ログ用） */
+@keyframes logpulse{0%,100%{opacity:1}50%{opacity:.6}}
+/* v6.331: 判定バナー大見出しの入場（フェードイン＋わずかに拡大） */
+@keyframes atIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+/* v6.333: モーション抑制設定では点滅系を停止（可読性・アクセシビリティ） */
+@media(prefers-reduced-motion:reduce){.mode-log-blink{animation:none!important}}
 .ibtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.65rem;cursor:pointer;transition:all .2s;letter-spacing:.08em;white-space:nowrap}
 .ibtn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.2)}
 .ibtn.on{border-color:var(--cyan);color:var(--cyan)}
 .ibtn.play-on{border-color:var(--green)!important;color:var(--green)!important;box-shadow:0 0 8px rgba(0,255,136,.3)}
 .ibtn.pin-on{border-color:var(--yel)!important;color:var(--yel)!important;box-shadow:0 0 8px rgba(255,204,0,.3)}
+.menu-container{position:relative;display:inline-block}
+.menu-dropdown{display:none;position:absolute;top:100%;right:0;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;min-width:200px;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1000;overflow:hidden;margin-top:4px}
+.menu-dropdown.open{display:block}
+.menu-item{display:block;width:100%;padding:10px 14px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:.65rem;text-align:left;cursor:pointer;transition:all .15s;letter-spacing:.05em;white-space:nowrap;border-left:3px solid transparent}
+.menu-item:hover{background:rgba(0,212,255,.08);color:var(--cyan);border-left-color:var(--cyan)}
+.menu-divider{margin:6px 0;border:none;border-top:1px solid var(--bdr)}
 .preset-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .pl{font-size:.6rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap}
 .pbtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -57,8 +80,23 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .alert{display:none;background:rgba(255,34,68,.12);border:1px solid var(--red);border-radius:3px;padding:14px 20px;text-align:center;margin-bottom:14px;animation:ap 1.1s infinite}
 .alert.on{display:block}
 @keyframes ap{0%,100%{box-shadow:0 0 14px rgba(255,34,68,.4)}50%{box-shadow:none}}
-.at{color:var(--red);font-size:.92rem;font-weight:bold;letter-spacing:.2em;text-shadow:0 0 16px rgba(255,34,68,.7)}
+/* v6.333: 良い状態バナー（危機バナーと同等の強さで緑） */
+.alert.good{background:rgba(0,255,136,.12);border-color:var(--green);animation:apGood 1.1s infinite}
+@keyframes apGood{0%,100%{box-shadow:0 0 14px rgba(0,255,136,.4)}50%{box-shadow:none}}
+/* v6.335: 中間（注意）バナー — 橙・パルスなしの落ち着いた常時ステータス（赤/緑を目立たせるため控えめ） */
+.alert.warn{background:rgba(255,107,43,.10);border-color:var(--ora);animation:none;box-shadow:0 0 10px rgba(255,107,43,.18)}
+/* v6.331: 大見出し＝「あなたへの一言」。等幅は維持しつつ拡大・グロー背景・入場演出で計器(.am)と質感を分離 */
+.at{color:var(--red);font-size:1.15rem;font-weight:bold;letter-spacing:.18em;text-shadow:0 0 22px rgba(255,34,68,.85);padding:6px 10px;border-radius:5px;background:radial-gradient(ellipse at center,rgba(255,34,68,.16),transparent 72%);animation:atIn .45s ease-out}
+.at.good{color:var(--green);text-shadow:0 0 22px rgba(0,255,136,.85);background:radial-gradient(ellipse at center,rgba(0,255,136,.16),transparent 72%)}
+.at.warn{color:var(--ora);text-shadow:0 0 16px rgba(255,107,43,.6);background:radial-gradient(ellipse at center,rgba(255,107,43,.13),transparent 72%);letter-spacing:.12em}
 .am{color:#ff8899;font-size:.67rem;margin-top:6px;line-height:1.7}
+.alert.good .am{color:#7fe6b0}
+/* v6.331: 詳細設定アコーディオン（主要操作と細かいパラメータを2階層に分離） */
+.acc-tog{width:100%;display:flex;align-items:center;gap:8px;text-align:left;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.62rem;letter-spacing:.1em;padding:9px 12px;cursor:pointer;transition:all .2s;margin:2px 0}
+.acc-tog:hover{border-color:var(--cyan);color:var(--cyan)}
+.acc-tog.open{color:var(--cyan);border-color:rgba(0,212,255,.4)}
+.acc-tog .cr{font-size:.7em;transition:transform .2s}
+.acc-tog.open .cr{transform:rotate(90deg)}
 .main{display:grid;grid-template-columns:305px 1fr;gap:16px;align-items:start}
 .charts{display:grid;gap:16px}
 .charts-top{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -116,7 +154,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .mlog{font-size:.61rem;line-height:2.1}
 .mo{display:none;position:fixed;inset:0;background:rgba(7,11,20,.88);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
 .mo.on{display:flex}
-.mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2)}
+.mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2);max-height:90vh;overflow-y:auto}
 .mc{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;font-family:inherit}
 .mc:hover{color:var(--red)}
 .mtag{font-size:.6rem;color:var(--cyan);letter-spacing:.2em;margin-bottom:7px}
@@ -133,6 +171,7 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
 .tb.green-on{background:var(--green)!important;color:#040810!important}
 .heli-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:2px;font-size:.62rem;letter-spacing:.1em;font-weight:bold;margin-top:4px}
 .heli-on{background:rgba(0,255,136,.12);border:1px solid var(--green);color:var(--green)}
+.heli-hold{background:rgba(255,107,43,.14);border:1px solid var(--ora);color:var(--ora);animation:blink 1.6s infinite}
 .heli-off{background:rgba(255,34,68,.12);border:1px solid var(--red);color:var(--red);animation:blink .8s infinite}
 .cpu-meter{margin:10px 0;padding:10px 12px;background:var(--bg1);border-radius:3px;border:1px solid var(--bdr)}
 .cpu-label{font-size:.6rem;color:var(--muted);letter-spacing:.12em;margin-bottom:8px}
@@ -145,6 +184,8 @@ input[type=range].ora-range::-moz-range-thumb{background:var(--ora);box-shadow:0
 .deadlock-on{background:rgba(255,34,68,.1);border:1px solid var(--red);color:#ff8899;animation:ap 1.2s infinite}
 .p2log{font-size:.6rem;line-height:2;max-height:160px;overflow:hidden;padding:4px 0}
 .p2log-normal{color:var(--muted)}.p2log-warn{color:var(--ora)}.p2log-blame{color:var(--red)}
+/* v6.33: P4で当事者の声が正常にルーティングされている（届いている）ログはポジティブに緑 */
+.p4log-ok{color:var(--green)}
 .shock-result-panel{margin-top:10px;padding:11px 14px;border-radius:3px;font-size:.62rem;line-height:1.9;display:none}
 .shock-survived{background:rgba(0,255,136,.1);border:1px solid var(--green);color:var(--green)}
 .shock-crashed{background:rgba(255,34,68,.14);border:1px solid var(--red);color:#ff8899;animation:ap 1.0s infinite}
@@ -206,10 +247,14 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 /* v6.0: モバイル最適化 — 縦積み・タッチ操作性・ログ可読性 */
 @media(max-width:640px){
   .wrap{padding:10px 10px 24px}
+  /* v6.33: モバイルではモード崩壊ログの点滅をさらに遅く＆浅くして可読性を確保 */
+  .mode-log-blink{animation-duration:2.6s!important}
   .hdr{flex-direction:column;gap:8px;padding-bottom:10px}
   .hdr h1{font-size:1.02rem;letter-spacing:.06em}
   .hdr p{font-size:.6rem;line-height:1.6}
-  .hdr-acts{width:100%;justify-content:center}
+  .hdr-acts{width:100%;justify-content:center;flex-wrap:wrap;gap:6px}
+  .hdr-acts .ibtn{padding:5px 10px;font-size:.62rem;white-space:nowrap;flex-shrink:0}
+  .hdr-acts .badge{font-size:.5rem}
   .tab-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
   .tab-bar::-webkit-scrollbar{display:none}
   .tab-btn{padding:11px 14px;font-size:.62rem;white-space:nowrap;flex-shrink:0}
@@ -261,7 +306,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .recover-btn,.shock-btn{padding:13px;font-size:.7rem}
   .sbtn{padding:12px;font-size:.68rem}
   .alert{padding:11px 12px}
-  .at{font-size:.78rem;letter-spacing:.1em}
+  .at{font-size:.95rem;letter-spacing:.1em}
   .am{font-size:.62rem}
   .foot{font-size:.5rem;line-height:1.9}
 }
@@ -276,6 +321,16 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 .share-toast.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .share-toast button{padding:11px 22px;background:var(--bg2);border:1px solid var(--cyan);border-radius:3px;color:var(--cyan);font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.1em;cursor:pointer;box-shadow:0 0 18px rgba(0,212,255,.35)}
 .share-toast button:active{transform:scale(.98)}
+/* v6.334: 発見トースト（右下・軽量・自動で消える） */
+.disc-toast{position:fixed;right:14px;bottom:14px;max-width:290px;background:var(--bg2);border:1px solid var(--green);border-radius:4px;color:var(--green);font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:.04em;line-height:1.5;padding:10px 14px;box-shadow:0 0 18px rgba(0,255,136,.28);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .3s;z-index:1100}
+.disc-toast.on{opacity:1;transform:translateY(0)}
+/* v6.334: 発見ログのリスト行 */
+.disc-row{padding:9px 12px;border:1px solid var(--bdr);border-radius:3px;margin-bottom:7px;background:var(--bg1)}
+.disc-row.found{border-color:rgba(0,255,136,.35)}
+.disc-badge{font-size:.72rem;font-weight:bold;color:var(--txt)}
+.disc-row.found .disc-badge{color:var(--green)}
+.disc-learn{font-size:.6rem;color:var(--muted);margin-top:3px;line-height:1.55}
+.disc-locked{color:var(--muted);opacity:.6;letter-spacing:.2em}
 .sg-tblwrap{overflow-x:auto}
 .sg-tbl{width:100%;border-collapse:collapse;font-size:.62rem;line-height:1.6}
 .sg-tbl th{color:var(--cyan);text-align:left;border-bottom:1px solid var(--bdr);padding:6px 8px;font-size:.58rem;letter-spacing:.08em;white-space:nowrap}
@@ -298,16 +353,31 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="hdr">
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
-    <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
+    <button class="ibtn" id="guideBtn" onclick="openIntro()" data-i18n="guide_btn">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ 社会＆地域インフラ・デバッガー v6.2 ]</h1>
-    <p id="hdrSub">インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測</p>
+    <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
+    <p id="hdrSub">あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
-    <button class="ibtn" id="shareGuideBtn" onclick="openShareGuide()" data-i18n="sg_btn">⇪ 共有ガイド</button>
+    <button class="ibtn" id="feedbackBtn" onclick="openFeedback()" data-i18n="feedback_short">💬 フィードバック</button>
+    <button class="ibtn" id="discHeaderBtn" style="display:none" onclick="openDiscoveryLog()">
+      <span data-i18n="discoveries_header">📖 発見</span> <span class="badge" style="padding:2px 8px;margin:0"><span class="bdot"></span><span id="discHeaderCount">0</span></span>
+    </button>
     <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
+    <div class="menu-container">
+      <button class="ibtn" id="menuBtn" onclick="toggleHeaderMenu()" data-i18n="menu_more">≡ メニュー</button>
+      <div class="menu-dropdown" id="headerMenu" onclick="event.stopPropagation()">
+        <button class="menu-item" onclick="openIntro();closeHeaderMenu()" data-i18n="guide_btn">ℹ GUIDE</button>
+        <button class="menu-item" id="discMenuBtn" onclick="openDiscoveryLog();closeHeaderMenu()">📖 発見ログ (<span id="discMenuCount">0</span>/<span id="discMenuTotal">15</span>)</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openShareGuide();closeHeaderMenu()" data-i18n="sg_btn">⇪ 共有ガイド</button>
+        <button class="menu-item" onclick="copyPageLink(currentTab,this);closeHeaderMenu()" data-i18n="link_btn">🔗 このページへの直接リンク</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openFeedback();closeHeaderMenu()" data-i18n="fb_btn">💬 フィードバック</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -319,17 +389,27 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div id="page1" class="page active">
+<!-- v6.35: Weekly Scenario Card -->
+<div class="card scenario-card" id="scenarioCardContainer" style="border-color:rgba(153,200,255,.3);margin-bottom:14px">
+  <div class="ct" style="color:rgba(153,200,255,.8)"><span class="dot" style="background:rgba(153,200,255,.8);box-shadow:0 0 7px rgba(153,200,255,.6)"></span><span data-i18n="scenario_title">ウィークリーチャレンジ</span></div>
+  <div id="scenarioCardTitle" style="font-size:.85rem;color:var(--txt);font-weight:bold;margin-bottom:8px">Echo Chamber Trap</div>
+  <div id="scenarioCardBrief" style="font-size:.65rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Your objective...</div>
+  <div id="scenarioCardGoal" style="font-size:.7rem;padding:10px;background:rgba(100,200,100,.08);border-left:3px solid rgba(100,200,100,.3);margin-bottom:12px;color:var(--txt)"></div>
+  <div id="scenarioCardStatus" style="font-size:.65rem;color:var(--green);margin-bottom:12px;display:none">✓ CLEARED — Another challenge next week!</div>
+  <button class="pbtn" id="scenarioCardBtn" onclick="startWeeklyScenarioFromCard()" style="border-color:rgba(153,200,255,.4);color:rgba(153,200,255,.8);width:100%;text-align:center" data-i18n="scenario_card_challenge">▶ 挑戦する</button>
+</div>
+
 <div class="preset-bar">
   <span class="pl" id="presetLbl">SCENARIOS ▶</span>
   <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
-  <button class="pbtn" id="p-sns"      onclick="setPreset('sns')">📱 SNS社会 2024</button>
-  <button class="pbtn" id="p-nordic"   onclick="setPreset('nordic')">🌿 北欧型民主主義</button>
-  <button class="pbtn" id="p-techno"   onclick="setPreset('techno')">🔬 テクノクラシー</button>
   <button class="pbtn" id="p-populism" onclick="setPreset('populism')">🔥 ポピュリズム爆走</button>
+  <button class="pbtn" id="p-sns"      onclick="setPreset('sns')">📱 SNS社会 2024</button>
+  <button class="pbtn" id="p-techno"   onclick="setPreset('techno')">🔬 テクノクラシー</button>
+  <button class="pbtn" id="p-nordic"   onclick="setPreset('nordic')">🌿 北欧型民主主義</button>
 </div>
 
 <div class="alert" id="alertBanner">
-  <div class="at">⚠ &nbsp;SYSTEM CRASH DETECTED&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p1">⚠ &nbsp;あなたの社会が、暴走を始めた&nbsp; ⚠</div>
   <div class="am" id="alertMsg"></div>
 </div>
 
@@ -349,6 +429,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="rl"><span id="f1L">OPEN</span><span id="f1R">ECHO CHAMBER</span></div>
       </div>
       <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p1Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p1Details" style="display:none">
       <div style="margin-bottom:12px">
         <div class="pl2">
           <span class="pn" id="f2lbl">リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span>
@@ -383,6 +465,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
           </button>
         </div>
       </div>
+      </div><!-- /p1Details -->
       <button class="sbtn" id="shareBtnFull" onclick="shareURL()">⎘ このシナリオのURLをコピー</button>
       <button class="sbtn" id="pinBtn" onclick="pinScenario()">📌 <span id="pinLabel">SCENARIO A をロック</span></button>
     </div>
@@ -413,6 +496,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </div>
       <div class="diag" id="diag"></div>
       <div class="hist" id="histRef"></div>
+      <button class="sbtn" id="p1ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP1Result()">▶ この結果を送る</button>
+      <button class="sbtn" id="p1RewindBtn" style="display:none;border-color:#ff6b2b;color:#ff6b2b;margin-top:6px" onclick="openRewind()" data-i18n="rewind_btn">↩ もし1つだけ過去に戻せるなら？</button>
     </div>
   </div>
 
@@ -475,15 +560,15 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p2-efficiency" onclick="setPresetP2('efficiency')" data-i18n="p2_pr_eff">⚙ 効率至上都市</button>
-  <button class="pbtn" id="p2-redundant" onclick="setPresetP2('redundant')" data-i18n="p2_pr_red">🛡 冗長性確保都市</button>
   <button class="pbtn" id="p2-deadlock" onclick="setPresetP2('deadlock')" data-i18n="p2_pr_dl">🏚 他責デッドロック</button>
+  <button class="pbtn" id="p2-efficiency" onclick="setPresetP2('efficiency')" data-i18n="p2_pr_eff">⚙ 効率至上都市</button>
   <button class="pbtn" id="p2-smart" onclick="setPresetP2('smart')" data-i18n="p2_pr_smart">🌱 スマート縮退</button>
+  <button class="pbtn" id="p2-redundant" onclick="setPresetP2('redundant')" data-i18n="p2_pr_red">🛡 冗長性確保都市</button>
   <span class="pl" style="opacity:.6" data-i18n="p2_pr_hint">→ 適用後に ⚡ショック注入 で耐性を比較せよ</span>
 </div>
 
 <div class="alert" id="alertBannerP2">
-  <div class="at">⚠ &nbsp;SYSTEM CRASH — SECTOR-T COLLAPSE&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p2">⚠ &nbsp;あなたの街は、崩壊しました&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span></div>
   <div class="am" id="alertMsgP2"></div>
 </div>
 
@@ -496,12 +581,14 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Shrink Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">30%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
         <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
-        <input type="range" id="shrinkRate" min="0" max="100" value="30" class="ora-range">
+        <input type="range" id="shrinkRate" min="0" max="100" value="10" class="ora-range">
         <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
       </div>
       <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p2Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p2Details" style="display:none">
       <!-- DX Rate -->
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
@@ -512,9 +599,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Leader Ethics P2 -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">60</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">68</span></div>
         <div class="pd" data-i18n="p2_ethics_d">低下するとシステム目的関数が『生活者の生存』から『自己保身』へ乗っ取られ、実務を完全放棄して他責化処理にCPUが100%占有されます。</div>
-        <input type="range" id="ethicsScoreP2" min="0" max="100" value="60">
+        <input type="range" id="ethicsScoreP2" min="0" max="100" value="68">
         <div class="rl"><span data-i18n="p2_ethics_l">他責・責任回避</span><span data-i18n="p2_ethics_r">実務・法治</span></div>
       </div>
       <hr class="div">
@@ -545,6 +632,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
           </button>
         </div>
       </div>
+      </div><!-- /p2Details -->
       <hr class="div">
       <!-- System Shock Injection -->
       <div>
@@ -573,10 +661,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <div class="reboot-indicator" id="p2RebootIndicator">○ PUBLIC REBOOT MODE: OFF — 市場原理</div>
       <!-- Status grid -->
       <div class="sg">
-        <div class="si" onclick="openModal('p2Heli')"><div class="sl">RESCUE HELI</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
-        <div class="si" onclick="openModal('p2Brand')"><div class="sl">BRAND INDUSTRY</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
-        <div class="si" onclick="openModal('p2Budget')"><div class="sl">MUNICIPAL BUDGET</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
-        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl">DEADLOCK STATUS <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
+        <div class="si" onclick="openModal('p2Heli')"><div class="sl" data-i18n="p2_sl_heli">救命ヘリ</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
+        <div class="si" onclick="openModal('p2Brand')"><div class="sl" data-i18n="p2_sl_brand">ブランド産業</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
+        <div class="si" onclick="openModal('p2Budget')"><div class="sl" data-i18n="p2_sl_budget">自治体財政</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
+        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl"><span data-i18n="p2_sl_deadlock">デッドロック状態</span> <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
       </div>
       <!-- CPU Allocation -->
       <div class="cpu-meter">
@@ -627,6 +715,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
           <div class="gr"><span style="font-size:.64rem;color:var(--muted)">BRAND HEALTH INDEX</span><span class="gn" id="p2BrandLarge" style="color:var(--green)">70</span></div>
           <div class="gt" style="height:10px"><div class="gf" id="p2BrandBar" style="width:70%;background:var(--green)"></div></div>
           <div class="gs" id="p2BrandStatus" style="color:var(--muted);margin-top:5px">SUSTAINABLE</div>
+          <!-- v6.346: 後継者ストック（暗黙知の残量）。遅い状態変数。DX投資を怠るとやがて崖のように落ちる（Task B） -->
+          <div class="gr" style="margin-top:12px"><span style="font-size:.6rem;color:var(--muted)" onclick="openModal('p2Brand')"><span data-i18n="p2_skill_lbl">後継者ストック</span></span><span class="gn" id="p2SkillNum" style="color:var(--green);font-size:1rem">60</span></div>
+          <div class="gt" style="height:7px"><div class="gf" id="p2SkillBar" style="width:60%;background:var(--green)"></div></div>
+          <div class="gs" id="p2SkillStatus" style="color:var(--muted);margin-top:4px;font-size:.56rem"></div>
           <div style="margin-top:12px;padding:8px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--ora);font-size:.6rem;color:var(--muted);line-height:1.7" id="p2BrandDiag"></div>
         </div>
       </div>
@@ -648,14 +740,14 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
   <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
-  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 思考凍結</button>
+  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 アップデート拒否</button>
   <button class="pbtn" id="p3-fasting" onclick="setPresetP3('fasting')" data-i18n="p3_pr_fast">📵 SNS断食</button>
   <button class="pbtn" id="p3-debugger" onclick="setPresetP3('debugger')" data-i18n="p3_pr_debug">🔍 完全デバッガー</button>
   <span class="pl" style="opacity:.6" data-i18n="p3_pr_hint">→ Canvasの毒入れ攻撃の変化を観測せよ</span>
 </div>
 
 <div class="alert" id="alertBannerP3">
-  <div class="at">⚠ &nbsp;POISONING ATTACK IN PROGRESS&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p3">⚠ &nbsp;あなたの正義感が、乗っ取られている&nbsp; ⚠</div>
   <div class="am" id="alertMsgP3"></div>
 </div>
 
@@ -668,12 +760,14 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- Search Depth -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">2</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">7</span></div>
         <div class="pd" data-i18n="p3_depth_d">思考の探索段数。3以下ではバズへの脊髄反射で偽装ノードに騙される。7以上で多次元の因果関係を検証してから判断する。</div>
-        <input type="range" id="searchDepth" min="1" max="10" value="2" class="pur-range">
+        <input type="range" id="searchDepth" min="1" max="10" value="7" class="pur-range">
         <div class="rl"><span data-i18n="p3_depth_l">脊髄反射・バズ即応</span><span data-i18n="p3_depth_r">多次元因果検証</span></div>
       </div>
       <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p3Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p3Details" style="display:none">
       <!-- Grounding Rate -->
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
@@ -687,8 +781,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="pl2"><span class="pn" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
         <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
         <input type="range" id="learningRate" min="0" max="100" value="40">
-        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・思考凍結モード</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
+        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・アップデート拒否</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
       </div>
+      </div><!-- /p3Details -->
       <hr class="div">
       <!-- Recovery Actions -->
       <button class="recover-btn dropout-btn" id="dropoutBtn" onclick="executeDropout()">▶ EXECUTE: DROP_OUT</button>
@@ -719,14 +814,15 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div id="p3ExcuseLog" style="display:none;margin-top:6px;padding:7px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--red);font-size:.58rem;line-height:1.9;color:#ff8899;font-family:inherit"></div>
       </div>
       <div class="sg">
-        <div class="si"><div class="sl">POISONING ATTACK</div><div class="sv" id="p3AttackBadge" style="color:var(--muted);font-size:.75rem">—</div></div>
-        <div class="si"><div class="sl">FOOLED NODES</div><div class="sv" id="p3FooledNum" style="color:var(--ora)">0/32</div></div>
-        <div class="si"><div class="sl">NEUTRAL NODES</div><div class="sv" id="p3NeutralNum" style="color:var(--cyan)">3</div></div>
-        <div class="si"><div class="sl">DEBUG STATUS</div><div class="sv" id="p3DebugBadge" style="color:var(--muted);font-size:.75rem">RUNNING</div></div>
-        <div class="si"><div class="sl">MODEL UPDATE</div><div class="sv" id="p3ModelBadge" style="color:var(--green);font-size:.75rem">ADAPTIVE</div></div>
-        <div class="si"><div class="sl">ROOT PRIVILEGE</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_poison">毒入れ攻撃</div><div class="sv" id="p3AttackBadge" style="color:var(--muted);font-size:.75rem">—</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_fooled">汚染ノード</div><div class="sv" id="p3FooledNum" style="color:var(--ora)">0/32</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_neutral">中立ノード</div><div class="sv" id="p3NeutralNum" style="color:var(--cyan)">3</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_debug">デバッグ状態</div><div class="sv" id="p3DebugBadge" style="color:var(--muted);font-size:.75rem">RUNNING</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_model">モデル更新</div><div class="sv" id="p3ModelBadge" style="color:var(--green);font-size:.75rem">ADAPTIVE</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_root">Root権限</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
       </div>
       <div class="diag" id="p3Diag" style="border-left-color:var(--pur)"></div>
+      <button class="sbtn" id="p3ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP3Result()">▶ この結果を送る</button>
     </div>
   </div>
 
@@ -767,15 +863,15 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
-  <button class="pbtn" id="p4-plaza" onclick="setPresetP4('plaza')" data-i18n="p4_pr_plaza">🏘 当事者の広場</button>
-  <button class="pbtn" id="p4-spectators" onclick="setPresetP4('spectators')" data-i18n="p4_pr_spec">🎪 見物人の殺到</button>
-  <button class="pbtn" id="p4-gamified" onclick="setPresetP4('gamified')" data-i18n="p4_pr_game">🎮 ゲーム化進行</button>
   <button class="pbtn" id="p4-flamewar" onclick="setPresetP4('flamewar')" data-i18n="p4_pr_flame">🔥 推し活炎上</button>
+  <button class="pbtn" id="p4-gamified" onclick="setPresetP4('gamified')" data-i18n="p4_pr_game">🎮 ゲーム化進行</button>
+  <button class="pbtn" id="p4-spectators" onclick="setPresetP4('spectators')" data-i18n="p4_pr_spec">🎪 見物人の殺到</button>
+  <button class="pbtn" id="p4-plaza" onclick="setPresetP4('plaza')" data-i18n="p4_pr_plaza">🏘 当事者の広場</button>
   <span class="pl" style="opacity:.6" data-i18n="p4_pr_hint">→ PACKET LOGの多様性の変化を観測せよ</span>
 </div>
 
 <div class="alert" id="alertBannerP4">
-  <div class="at">⚠ &nbsp;OBJECTIVE HIJACK — 目的関数乗っ取り&nbsp; ⚠</div>
+  <div class="at" data-i18n="banner_p4">⚠ &nbsp;あなたの街の議論が、勝ち負けゲームに乗っ取られた&nbsp; ⚠</div>
   <div class="am" id="alertMsgP4"></div>
 </div>
 
@@ -788,17 +884,17 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       <hr class="div">
       <!-- External Traffic -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
         <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
-        <input type="range" id="extTraffic" min="0" max="100" value="20" class="red-range">
+        <input type="range" id="extTraffic" min="0" max="100" value="15" class="red-range">
         <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
       </div>
       <hr class="div">
       <!-- Gamification -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">20%</span></div>
+        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
         <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
-        <input type="range" id="gamification" min="0" max="100" value="20" class="yel-range">
+        <input type="range" id="gamification" min="0" max="100" value="15" class="yel-range">
         <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
       </div>
       <hr class="div">
@@ -821,12 +917,13 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
         <div class="gs" id="p4RatioStatus" style="color:var(--green)">GROUNDED</div>
       </div>
       <div class="sg">
-        <div class="si"><div class="sl">SILENT MAJORITY</div><div class="sv" style="color:var(--cyan);font-size:.85rem">5.3M NODES</div></div>
-        <div class="si"><div class="sl">EXTERNAL NODES</div><div class="sv" id="p4ExtBadge" style="color:var(--muted)">0/36</div></div>
-        <div class="si"><div class="sl">OBJECTIVE FUNC</div><div class="sv" id="p4ObjBadge" style="color:var(--green);font-size:.75rem">POLICY</div></div>
-        <div class="si"><div class="sl">FILTER STATUS</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_silent">サイレントマジョリティ</div><div class="sv" style="color:var(--cyan);font-size:.85rem">5.3M NODES</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_ext">外部ノード</div><div class="sv" id="p4ExtBadge" style="color:var(--muted)">0/36</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_obj">目的関数</div><div class="sv" id="p4ObjBadge" style="color:var(--green);font-size:.75rem">POLICY</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_filter">フィルタ状態</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
       </div>
       <div class="diag" id="p4Diag" style="border-left-color:var(--yel)"></div>
+      <button class="sbtn" id="p4ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP4Result()">▶ この結果を送る</button>
     </div>
   </div>
 
@@ -875,7 +972,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
 </div>
 
-<div class="foot" id="footerTxt">社会＆地域インフラ・デバッガー v6.2 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Educational Tool</div>
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会デバッガー v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
 <div class="mo" id="auditModal" onclick="closeAuditIf(event)">
@@ -887,7 +984,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
       <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
       <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
-      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="shareScenario({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
+      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="openShareComment({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
     </div>
   </div>
 </div>
@@ -896,8 +993,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div class="mb" style="max-width:620px">
     <button class="mc" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
-    <div class="mti" data-i18n="intro_title">この社会は、4つのレイヤーが連鎖して崩壊する</div>
-    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">本アプリは社会を1つのOSに見立てた教育用デバッガーです。上の層の障害は下の層へ伝播します。各レイヤーをクリックして、崩壊のメカニズムと回復（デバッグ）手順を体験してください。</div>
+    <div class="mti" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
+    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
     <div class="intro-layers">
       <button class="intro-layer" style="--lc:var(--cyan)" onclick="introGo(1)">
         <span class="il-num">LAYER 1 — INFORMATION SPACE</span>
@@ -924,7 +1021,17 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </button>
     </div>
     <div class="mfo" style="border-left-color:var(--green);color:var(--green)" data-i18n="intro_tip">💡 一部のパラメーターはページを跨いで連動します。緑の「⇄」バッジが目印です（クリックで連動先へジャンプ）。</div>
-    <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ デバッグを開始する</button>
+    <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ あなたの街をデバッグする</button>
+    <!-- v6.345: 街の名前（任意スキップ可） -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bdr)">
+      <div style="font-size:.6rem;color:var(--muted);margin-bottom:6px;letter-spacing:.06em" data-i18n="town_label">▷ あなたの街に名前を付ける（任意）</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="townNameInput" maxlength="20" data-i18n-placeholder="town_placeholder"
+          placeholder="例: 東京 / 地元の市 / 未来の街"
+          style="flex:1;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:6px 10px;letter-spacing:.04em;outline:none" oninput="saveTownName(this.value)">
+      </div>
+      <div style="font-size:.56rem;color:var(--muted);margin-top:5px;line-height:1.5" data-i18n="town_hint">名前を付けると判定バナーと結果カードに反映されます。次回以降は再入力不要。GUIDE から変更できます。</div>
+    </div>
   </div>
 </div>
 
@@ -939,11 +1046,18 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div class="share-acts" id="shareActions"></div>
     <div id="shareCardRow"></div>
     <div class="mfo" id="sharePopFoot" style="margin-top:10px;border-left-color:var(--cyan);color:var(--muted)"></div>
+    <div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:center">
+      💡 <span class="link-badge" onclick="openShareGuide()" style="cursor:pointer">
+        <span data-i18n="share_guide_link">SHARE GUIDE を見る</span> <span style="opacity:.6">— <span data-i18n="share_guide_hint">相手別の送り方・禁止事項</span></span>
+      </span>
+    </div>
   </div>
 </div>
 
 <!-- v6.2: プリセット適用直後の共有トースト -->
 <div class="share-toast" id="shareToast"><button id="shareToastBtn" onclick="shareFromToast()">⎘ このシナリオを送る</button></div>
+<!-- v6.334: 発見トースト（右下・非干渉・自動で消える） -->
+<div class="disc-toast" id="discToast"></div>
 
 <!-- v6.2: 共有ガイドモーダル -->
 <div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
@@ -974,6 +1088,99 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
       </ul>
     </div>
     <div class="mfo" data-i18n="sg_note">*あくまでオススメの使い方です。</div>
+    <button class="sbtn" id="etiquetteSaveBtn" style="margin-top:14px;border-color:var(--cyan);color:var(--cyan)" onclick="saveEtiquetteCard(this)" data-i18n="sg_save">⬇ このカードを保存</button>
+  </div>
+</div>
+
+<!-- v6.332: フィードバックモーダル -->
+<div class="mo" id="feedbackModal" onclick="closeFeedbackIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeFeedback()">✕</button>
+    <div class="mti" data-i18n="fb_title">フィードバック</div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
+      <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
+      <span data-i18n="fb_researcher">🔬 研究者・技術者として表示</span>
+    </label>
+    <!-- researcherMode ON 時に格上げされる開発者導線 -->
+    <div id="fbDevTop" style="display:none;margin-bottom:14px">
+      <a class="doclink sbtn" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_doc_link">📄 方法論・数式仕様（METHODOLOGY）</a>
+      <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
+    <form id="fbForm" onsubmit="return submitFeedback(event)">
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:.66rem;color:var(--txt)">
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="improvement" checked> <span data-i18n="fb_type_improve">改善案</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
+      </div>
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
+      <textarea id="fbMessage" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
+      <div class="pd" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
+      <input type="email" id="fbEmail" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
+      <button type="submit" class="sbtn" id="fbSubmit" style="margin-top:14px;border-color:var(--green);color:var(--green)" data-i18n="fb_submit">送信</button>
+      <div id="fbStatus" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
+    </form>
+    <hr class="div" style="margin:14px 0">
+    <div class="mfo" id="fbDevNote" style="border-left-color:var(--muted)">
+      <span data-i18n="fb_dev">開発者に直接連絡したい方（研究者・技術者向け）→ </span>
+      <a href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
+  </div>
+</div>
+
+<!-- v6.334: 発見ログモーダル -->
+<div class="mo" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
+  <div class="mb" style="max-width:480px">
+    <button class="mc" onclick="closeDiscoveryLog()">✕</button>
+    <div class="mti" data-i18n="disc_title">📖 発見ログ</div>
+    <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
+    <div id="discList"></div>
+  </div>
+</div>
+
+<!-- v6.35: Weekly Scenarios Modal -->
+<div class="mo" id="scenarioModal" onclick="closeScenarioIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeScenarios()">✕</button>
+    <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
+    <div class="mti" id="scenarioTitle" style="font-size:1.2em;margin-bottom:10px">Echo Chamber Trap</div>
+    <div class="cs" style="margin-bottom:10px" data-i18n="scenario_intro_hint">今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。</div>
+    <div id="scenarioDesc" style="font-size:.75rem;color:var(--muted);margin-bottom:14px">Your objective...</div>
+    <div id="scenarioHint" style="font-size:.7rem;padding:10px;background:rgba(153,200,255,.1);border-left:3px solid var(--cyan);margin-bottom:12px;color:var(--txt)"></div>
+    <div style="font-size:.75rem;color:var(--txt);margin-bottom:8px" data-i18n="scenario_goal_hint">今週のゴール：</div>
+    <div id="scenarioGoal" style="font-size:.75rem;padding:12px;background:rgba(100,200,100,.1);border:1px solid rgba(100,200,100,.3);border-radius:3px;margin-bottom:14px;color:var(--txt)"></div>
+    <div id="scenarioCheckContainer" style="display:none;padding:12px;background:rgba(100,200,100,.2);border:1px solid rgba(100,200,100,.4);border-radius:3px;font-size:.75rem;margin-bottom:14px">
+      <div style="color:var(--green);font-weight:bold" data-i18n="scenario_goal_reached">✓ ゴール達成！ 発見ログを獲得しました。</div>
+    </div>
+    <button class="sbtn" style="border-color:var(--green);color:var(--green);width:100%;text-align:center" onclick="startScenario()" data-i18n="scenario_start_btn">▶ シナリオ開始</button>
+  </div>
+</div>
+
+<!-- v6.345: 共有前コメントモーダル -->
+<div class="mo" id="rewindModal" onclick="closeRewindIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeRewind()">✕</button>
+    <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
+    <div class="mti" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
+    <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
+    <div id="rewindChoices" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+    <div id="rewindResult" style="display:none;padding:12px;border:1px solid var(--bdr);border-radius:3px;font-size:.65rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<div class="mo" id="shareCommentModal" onclick="closeShareCommentIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeShareComment()">✕</button>
+    <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
+    <div class="mti" data-i18n="sc_title">一言添えて送る（任意）</div>
+    <textarea id="shareCommentInput" rows="2" maxlength="100"
+      style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:none;letter-spacing:.03em;margin-bottom:10px"
+      placeholder="自分の感想を一言…（スキップ可）"></textarea>
+    <div id="scChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="sbtn" onclick="proceedShare(false)" style="flex:1;border-color:var(--cyan);color:var(--cyan)" data-i18n="sc_send">▶ 共有する</button>
+      <button class="sbtn" onclick="proceedShare(true)" style="border-color:var(--bdr);color:var(--muted)" data-i18n="sc_skip">スキップ</button>
+    </div>
   </div>
 </div>
 
@@ -984,13 +1191,18 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div class="mti" id="mTitle"></div>
     <div class="mbd" id="mBody"></div>
     <div class="mfo" id="mFormula"></div>
+    <!-- v6.343: 数式仕様ドキュメントへの導線（数式を検証したい人が一番近い場所に置く） -->
+    <div class="mfo" id="mDocNote" style="border-left-color:var(--cyan);margin-top:10px">
+      <span data-i18n="mdoc_note">全メトリクスの計算式・しきい値・前提と限界は方法論ドキュメントに集約されています → </span>
+      <a class="doclink" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="mdoc_link">📄 METHODOLOGY を開く</a>
+    </div>
   </div>
 </div>
 
 <script>
 const I18N = {
   ja: {
-    hdrSub:'インタラクティブ・社会システム・デバッガー | パラメーターを操作して社会崩壊メカニズムをリアルタイム観測',
+    hdrSub:'あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい',
     simLbl:'SIMULATION ACTIVE', presetLbl:'SCENARIOS ▶',
     paramTitle:'INPUT PARAMETERS', paramDesc:'社会システムの設計変数。スライダーを動かすとリアルタイムでシステム状態が変化する。',
     f1lbl:'情報フィルタリング率', f1desc:'エコーチェンバー度。高いほど同質情報のみ流通し、現実OSとの互換性が喪失する（過学習）。',
@@ -1018,9 +1230,62 @@ const I18N = {
     scatter_legend_real:'実データ', scatter_legend_fake:'過学習データ',
     log_trust:'信頼指数    ', log_resilience:'回復力      ', log_legitimacy:'正当性      ',
     log_infoH:'情報健全性  ', log_viability:'長期持続性  ', log_mentalWB:'精神的健全性',
+    // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
+    banner_p1_good:'✓ &nbsp;あなたの街の情報空間は、澄んでいる&nbsp; ✓',
+    banner_p2_good_steady:'✓ &nbsp;あなたの街は、今のところ平穏です&nbsp; ✓',
+    banner_p2_good_survived:'✓ &nbsp;あなたの街は、生き残った&nbsp; ✓',
+    banner_p2_good_solid:'✓ &nbsp;あなたの街は、盤石です&nbsp; ✓',
+    banner_p3_good:'✓ &nbsp;あなたの視界は、正気を保っている&nbsp; ✓',
+    banner_p3_frozen:'⚠ &nbsp;あなたの考えは、更新できなくなっている&nbsp; ⚠',
+    banner_p4_good:'✓ &nbsp;あなたの街の声は、ちゃんと届いている&nbsp; ✓',
+    // v6.335: 中間（注意）バナー — 危機でも模範でもない状態。「失われかけているもの」を主語に
+    banner_p1_warn:'あなたの街の情報空間が、濁りはじめている',
+    banner_p1_warn_hot:'あなたの街は、分断で軋みはじめている',
+    banner_p1_warn_near:'あなたの街は、あと一歩で澄む',
+    banner_p2_warn:'あなたの街は動いている。でも、余白が心もとない',
+    banner_p3_warn:'あなたの視界は、まだ揺れている',
+    banner_p4_warn:'あなたの街の当事者の声が、観客の声にかき消されはじめている',
+    banner_p4_flood:'⚠ &nbsp;あなたの街が、炎上の見世物にされている&nbsp; ⚠',
+    // v6.35: Phase 1 Weekly Scenarios
+    scenario_btn:'🎯 WEEKLY CHALLENGE',
+    scenario_title:'ウィークリーチャレンジ',
+    scenario_intro_hint:'今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。',
+    scenario_goal_reached:'✓ ゴール達成！ 発見ログを獲得しました。',
+    scenario_goal_hint:'今週のゴール：',
+    scenario_start_btn:'▶ シナリオ開始',
+    scenario_close_btn:'閉じる',
+    scenario_card_cleared:'✓ CLEARED',
+    scenario_card_challenge:'▶ 挑戦する',
+    menu_more:'≡ メニュー',
+    guide_btn:'ℹ GUIDE',
+    feedback_short:'💬 フィードバック',
+    discoveries_header:'📖 発見',
+    discoveries_badge_hint:'個の発見がアンロック済み',
+    share_guide_link:'SHARE GUIDE を見る',
+    share_guide_hint:'相手別の送り方・禁止事項',
+    chart_error_msg:'グラフ表示に必要なライブラリが読み込めませんでした。広告ブロッカーの設定をご確認いただくか、再読み込みをお試しください',
   },
   en: {
-    hdrSub:'Interactive Social System Debugger | Adjust parameters to observe societal collapse in real-time',
+    hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
+    appName:'Social Debugger',
+    guide_btn:'ℹ GUIDE',
+    feedback_short:'💬 Feedback',
+    discoveries_header:'📖 Discoveries',
+    discoveries_badge_hint:'discoveries unlocked',
+    share_guide_link:'View SHARE GUIDE',
+    share_guide_hint:'Recipient-specific tips & do-nots',
+    chart_error_msg:'Failed to load charting library. Check your ad blocker settings or try reloading.',
+    town_label:'▷ Give your town a name (optional)',
+    town_placeholder:'e.g. Springfield / My city / Future town',
+    town_hint:'The name appears in verdict banners and the result card. Saved for next time. Change it anytime via GUIDE.',
+    sc_tag:'▷ SHARE NOTE',
+    sc_title:'Add a note before sharing (optional)',
+    sc_send:'▶ Share',
+    sc_skip:'Skip',
+    rewind_btn:'↩ What if you could go back one step?',
+    rw_tag:'↩ REWIND',
+    rw_title:'What if you could change just one thing?',
+    rw_body:'Right before collapse — if you had changed a single parameter, would your town have survived?',
     simLbl:'SIMULATION ACTIVE', presetLbl:'SCENARIOS ▶',
     paramTitle:'INPUT PARAMETERS', paramDesc:'Social system design variables. Move sliders to see real-time system state changes.',
     f1lbl:'Information Filter Rate', f1desc:'Echo chamber level. Higher values mean only homogeneous info circulates, causing overfitting to supporters and loss of generalization.',
@@ -1078,7 +1343,7 @@ const I18N = {
     p3_ground_d:'Connection rate to physical reality. Higher values wash out cognitive overfitting via SNS fasting and first-hand information.',
     p3_ground_l:'Always online', p3_ground_r:'Reality return / SNS fast',
     p3_lr_d:'Willingness to self-correct on new evidence. At 0%, model updates stop entirely — no amount of facts removes contamination.',
-    p3_lr_l:'Update halt / Cognitive Freeze Mode', p3_lr_r:'Flexible updating',
+    p3_lr_l:'Update halt / won’t-update mode', p3_lr_r:'Flexible updating',
     p3_drop_d:'Force grounding to 100% for 3 seconds — rapidly resets contamination of all echo-chambered nodes.',
     p3_es_d:'Detect overfitting, halt processing, and roll the whole system back to its healthiest state.',
     p3_root_d:'Apply the judiciary/parliament "regularization brake" to physical infrastructure (Page 2), so no leader can run <span style="color:var(--red)">sudo rm -rf</span> alone. <span class="link-badge" onclick="switchTab(2)">⇄ applies to P2</span>',
@@ -1089,7 +1354,7 @@ const I18N = {
     p3_cs_chart:'Time-series forecast of justice dopamine vs. cognitive integrity, driven by search depth and grounding.',
     p3_leg_fake:'Disguised node (self-proclaimed fair)', p3_leg_gen:'Ordinary node', p3_leg_neu:'Neutral node (facts)',
     p3_pr_hint:'→ Watch the poisoning attack change on canvas',
-    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Frozen Mind', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
+    p3_pr_reflex:'⚡ Spinal Reflex', p3_pr_frozen:'🧊 Won’t Update', p3_pr_fast:'📵 SNS Fasting', p3_pr_debug:'🔍 Full Debugger',
     // ── v5.2: P4 static ──
     p4_cs_input:'Network parameters controlling the asymmetry between stakeholders (5.3M residents) and outsider traffic.',
     p4_ext_d:'Influx of outsiders & fandom accounts. Higher values flood 1-bit-minded spam nodes that jam residents\' communication links.',
@@ -1107,8 +1372,8 @@ const I18N = {
     p4_pr_plaza:'🏘 Stakeholder Plaza', p4_pr_spec:'🎪 Spectator Flood', p4_pr_game:'🎮 Gamification', p4_pr_flame:'🔥 Fandom Flame War',
     // ── v5.2: intro modal ──
     intro_tag:'SYSTEM OVERVIEW — THE 4-LAYER SOCIAL OS',
-    intro_title:'This society collapses through four chained layers',
-    intro_body:'This app is an educational debugger that treats society as one OS. Failures propagate downward through the layers. Click a layer to explore its collapse mechanism and recovery procedure.',
+    intro_title:'Where does your town break first?',
+    intro_body:'The four layers are linked — a failure in an upper layer cascades down. Move the sliders and try it on your own town.',
     intro_l1t:'Information Space', intro_l1d:'Echo chambers & overfitting — society\'s input data gets contaminated',
     intro_arrow1:'▼ Contaminated information corrupts decision-making',
     intro_l2t:'Physical Infrastructure', intro_l2d:'Budgets, rescue heli, redundancy — wrong optimization destroys the physical layer',
@@ -1117,7 +1382,7 @@ const I18N = {
     intro_arrow3:'▼ A hacked crowd drowns out real stakeholders',
     intro_l4t:'Stakeholder Voice', intro_l4d:'Outsider floods & gamification — 5.3M real voices get dropped',
     intro_tip:'💡 Some parameters are linked across pages — look for the green "⇄" badges (click to jump).',
-    intro_start:'▶ Start debugging',
+    intro_start:'▶ Debug your town',
     // ── v6.0: slider names (pn) ──
     p2_f1n:'Infra Consolidation <span class="tag to">SMART SHRINK</span>',
     p2_f2n:'Industrial DX Investment <span class="tag tc">AUTOMATION</span>',
@@ -1148,6 +1413,67 @@ const I18N = {
     sg_dont_t:'Do-not list',
     sg_dont:'<li>Do not attach real names</li><li>Do not spell out “this is exactly about ◯◯” (let the receiver discover it)</li><li>Do not paste into threads mid-argument</li><li>Do not use it to persuade anyone — share curiosity only</li>',
     sg_note:'*These are only suggestions.',
+    sg_save:'⬇ Save this card',
+    // v6.31: ナラティブ・コピー（二人称）— フッター / 判定バナー大見出し
+    footerTxt:'Social Debugger v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; Try it with your own town\'s settings',
+    banner_p1:'⚠ &nbsp;YOUR SOCIETY IS SPIRALING OUT&nbsp; ⚠',
+    banner_p2:'⚠ &nbsp;YOUR TOWN HAS COLLAPSED&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span>',
+    banner_p3:'⚠ &nbsp;YOUR SENSE OF JUSTICE IS BEING HIJACKED&nbsp; ⚠',
+    banner_p4:'⚠ &nbsp;YOUR TOWN\'S DEBATE IS HIJACKED INTO A WIN/LOSE GAME&nbsp; ⚠',
+    banner_p4_flood:'⚠ &nbsp;YOUR TOWN HAS BECOME A FLAME-WAR SPECTACLE&nbsp; ⚠',
+    // v6.333: 良い状態バナー（危機バナーと対になるポジティブ二人称）
+    banner_p1_good:'✓ &nbsp;YOUR TOWN\'S INFORMATION SPACE IS CLEAR&nbsp; ✓',
+    banner_p2_good_steady:'✓ &nbsp;YOUR TOWN IS CALM, FOR NOW&nbsp; ✓',
+    banner_p2_good_survived:'✓ &nbsp;YOUR TOWN HAS SURVIVED&nbsp; ✓',
+    banner_p2_good_solid:'✓ &nbsp;YOUR TOWN IS ROCK-SOLID&nbsp; ✓',
+    banner_p3_good:'✓ &nbsp;YOUR PERCEPTION IS HOLDING STEADY&nbsp; ✓',
+    banner_p3_frozen:'⚠ &nbsp;YOUR MIND HAS STOPPED UPDATING&nbsp; ⚠',
+    banner_p4_good:'✓ &nbsp;YOUR TOWN\'S VOICE IS BEING HEARD&nbsp; ✓',
+    // v6.335: caution (in-between) banners — subject is what is being lost
+    banner_p1_warn:'Your town’s information space is starting to cloud over',
+    banner_p1_warn_hot:'Your town is straining under division',
+    banner_p1_warn_near:'Your town is one step from clarity',
+    banner_p2_warn:'Your town is running — but its slack is thin',
+    banner_p3_warn:'Your perception is still wavering',
+    banner_p4_warn:'The voices of the people who live it are starting to be drowned out by the spectators',
+    // v6.331: 詳細設定アコーディオンのラベル
+    acc_more:'Advanced settings',
+    // v6.341: ステータスグリッド見出し（Page1と同様に日本語版=日本語のみ / 英語版=英語のみ）
+    p2_sl_heli:'RESCUE HELI', p2_sl_brand:'BRAND INDUSTRY', p2_sl_budget:'MUNICIPAL BUDGET', p2_sl_deadlock:'DEADLOCK STATUS',
+    p2_skill_lbl:'SUCCESSOR STOCK',
+    p3_sl_poison:'POISONING ATTACK', p3_sl_fooled:'FOOLED NODES', p3_sl_neutral:'NEUTRAL NODES', p3_sl_debug:'DEBUG STATUS', p3_sl_model:'MODEL UPDATE', p3_sl_root:'ROOT PRIVILEGE',
+    p4_sl_silent:'SILENT MAJORITY', p4_sl_ext:'EXTERNAL NODES', p4_sl_obj:'OBJECTIVE FUNC', p4_sl_filter:'FILTER STATUS',
+    // v6.334: 発見ログ
+    disc_title:'📖 Discoveries',
+    disc_hint:'Every time you tinker, a new discovery (a short lesson) is collected.',
+    // v6.332: フィードバック導線 / 直接リンク
+    link_btn:'🔗 Direct link to this page',
+    fb_btn:'💬 Feedback',
+    fb_title:'Feedback',
+    fb_researcher:'🔬 Show as researcher / engineer',
+    fb_type_label:'Type',
+    fb_type_improve:'Improvement',
+    fb_type_bug:'Bug report',
+    fb_type_other:'Other',
+    fb_msg_label:'Message (required)',
+    fb_email_label:'Email (optional — if you\'d like a reply)',
+    fb_submit:'Send',
+    fb_dev:'Want to reach the developer directly (for researchers/engineers)? → ',
+    fb_dev_link:'Open GitHub Issues',
+    fb_doc_link:'📄 Methodology & formula spec (METHODOLOGY)',
+    mdoc_note:'Every formula, threshold, assumption, and limitation is collected in the methodology doc → ',
+    mdoc_link:'📄 Open METHODOLOGY',
+    // v6.35: Phase 1 Weekly Scenarios
+    scenario_btn:'🎯 WEEKLY CHALLENGE',
+    scenario_title:'Weekly Challenge',
+    scenario_intro_hint:'A guided scenario for this week. Follow the goal and watch your town evolve.',
+    scenario_goal_reached:'✓ Goal reached! Discovery unlocked.',
+    scenario_goal_hint:'Your goal this week:',
+    scenario_start_btn:'▶ Start scenario',
+    scenario_close_btn:'Close',
+    scenario_card_cleared:'✓ CLEARED',
+    scenario_card_challenge:'▶ Take the challenge',
+    menu_more:'≡ Menu',
   }
 };
 
@@ -1233,9 +1559,9 @@ const MDATA = {
   p2Infra:{
     tag:'METRIC · P2 INFRASTRUCTURE',
     jaTitle:'インフラ維持力（道路・水道・公共施設）', enTitle:'Infrastructure Capacity',
-    jaBody:`人口減少地域における物理インフラの維持能力。<strong>集約化率</strong>が低いと広域レガシーインフラの延命コストが財政を圧迫し続けます。<br><br>他責デッドロック発動中は修復処理がゼロになり崩壊速度が3倍に。<strong>Public Reboot ON</strong>で劣化速度は半減します。`,
-    enBody:`Capacity to maintain physical infrastructure in a depopulating region. Low <strong>consolidation</strong> keeps costly life-support for sprawling legacy assets.<br><br>Under blame-shift deadlock, repair drops to zero and decay triples. <strong>Public Reboot</strong> halves the decay rate.`,
-    formula:'I = 100 − (1−Shrink)·35·D − (1−DX)·15 − Greedy(1−E)·28·D   [D=0.5 if Reboot]'
+    jaBody:`人口減少地域における物理インフラの維持能力。<strong>集約化率</strong>が低いと広域レガシーインフラの延命コストが財政を圧迫し続けます。<br><br>他責デッドロック発動中は修復処理がゼロになり崩壊速度が3倍に。<strong>Public Reboot ON</strong>で劣化速度は半減します。<br><br>また<strong>財政（税収）が薄いと保守予算が不足</strong>し、インフラ維持力の実効値が下がります（財政 &lt; 45 で保守不足ペナルティ）。ブランド産業→税収→保守→インフラという連鎖の末端です。`,
+    enBody:`Capacity to maintain physical infrastructure in a depopulating region. Low <strong>consolidation</strong> keeps costly life-support for sprawling legacy assets.<br><br>Under blame-shift deadlock, repair drops to zero and decay triples. <strong>Public Reboot</strong> halves the decay rate.<br><br>A <strong>thin budget (tax base) starves maintenance</strong>, lowering effective infrastructure capacity (penalty when budget &lt; 45). This is the tail of the chain: brand industry → tax base → maintenance → infrastructure.`,
+    formula:'I = [100 − (1−Shrink)·35·D − (1−DX)·15 − Greedy(1−E)·28·D] + RepairCPU·0.14 − BudgetShortfall   [D=0.5 if Reboot; Shortfall=max(0,45−M)·1.2]'
   },
   p2Redundancy:{
     tag:'METRIC · REDUNDANCY',
@@ -1247,23 +1573,23 @@ const MDATA = {
   p2Heli:{
     tag:'METRIC · LIFELINE',
     jaTitle:'救命ヘリ（ライフラインの象徴）', enTitle:'Rescue Helicopter (Lifeline)',
-    jaBody:`「効率」の物差しでは測れない<strong>非市場的な公共サービス</strong>の象徴。稼働率が低くても、存在すること自体に価値があります。<br><br>インフラ維持力35%未満、または他責デッドロックで長期運休へ。<strong>Public Reboot ON</strong>なら数値に関わらず常時ONLINEが保証されます。`,
-    enBody:`A symbol of <strong>non-market public services</strong> that efficiency metrics cannot capture — its value lies in existing at all.<br><br>Suspends below 35% infrastructure or under deadlock. <strong>Public Reboot</strong> guarantees it stays online regardless.`,
-    formula:'Heli = Reboot ? ONLINE : (Infra>35 && RepairCPU>25)'
+    jaBody:`「効率」の物差しでは測れない<strong>非市場的な公共サービス</strong>の象徴。稼働率が低くても、存在すること自体に価値があります。<br><br>状態は3つ：<br>● <strong style="color:var(--green)">OPERATIONAL</strong> 常時稼働<br>◐ <strong style="color:var(--ora)">WEATHER HOLD</strong> ショック中の一時見合わせ（有視界飛行の制約で悪天候時は飛べない。天候回復後、構造条件を満たせば自動復帰）<br>■ <strong style="color:var(--red)">SUSPENDED</strong> 長期運休（インフラ35%未満／低倫理／他責デッドロック）<br><br>救命ヘリは広域システムであり、一自治体の産業と直結しません。停止は必ず<strong>ブランド→税収→保守→インフラ→ヘリ</strong>という連鎖を経由します（停止時はログに連鎖が流れます）。<strong>Public Reboot ON</strong>なら常時ONLINE。`,
+    enBody:`A symbol of <strong>non-market public services</strong> that efficiency metrics cannot capture — its value lies in existing at all.<br><br>Three states:<br>● <strong style="color:var(--green)">OPERATIONAL</strong> always on duty<br>◐ <strong style="color:var(--ora)">WEATHER HOLD</strong> temporary hold during a shock (VFR limits ground it in bad weather; auto-returns after the storm if structure holds)<br>■ <strong style="color:var(--red)">SUSPENDED</strong> long-term (infra &lt; 35% / low ethics / blame-shift deadlock)<br><br>The heli is a wide-area system, never wired directly to one town's industry. It only stops via the chain <strong>brand → tax base → maintenance → infra → heli</strong> (the cascade streams into the log when it stops). <strong>Public Reboot</strong> keeps it online.`,
+    formula:'Heli = WEATHER HOLD (shock中の一時) · SUSPENDED (Infra≤35 ∨ E<0.3 ∨ deadlock) · else OPERATIONAL'
   },
   p2Brand:{
     tag:'METRIC · LOCAL INDUSTRY',
     jaTitle:'地域ブランド産業（農業・特産品）', enTitle:'Local Brand Industry',
-    jaBody:`地域経済の自立を支える産業の持続性。<strong>DX投資</strong>が低いと高齢職人への依存が続き、後継者断絶で技術ごと消滅します。<br><br>スマート自動化は「伝統の破壊」ではなく、技術を次世代へ引き継ぐための<strong>シリアライズ（保存形式への変換）</strong>です。`,
-    enBody:`Sustainability of the industry that keeps the region economically independent. Low <strong>DX investment</strong> prolongs dependence on aging artisans until succession collapses.<br><br>Smart automation is not destroying tradition — it is <strong>serializing</strong> skills so the next generation can load them.`,
-    formula:'B = DX·65 + Shrink·18 + (DP?+14:−14) + Ethics·8'
+    jaBody:`地域経済の自立を支える産業の持続性。産業の出力は<strong>後継者ストック（暗黙知の残量）</strong>に支えられています。<br><br><strong>DX投資</strong>が低いと高齢職人の引退で後継者ストックがじわじわ減り——<strong>当面は何も起きません</strong>。しかし残量が尽きると、ブランドは段階的でなく<strong>崖のように急落</strong>し（後継者断絶）、税収→保守→インフラへ連鎖します。<strong>0で技術ごと消滅</strong>し、DXを最大にしても回復しません（再公営化のみ復活）。<br><br>スマート自動化は「伝統の破壊」ではなく、技術を次世代へ引き継ぐための<strong>シリアライズ（保存形式への変換）</strong>——後継者ストックを保つ手段です。これはGreedy（今の効率）とDP（将来への投資）の教材そのものです。`,
+    enBody:`Sustainability of the industry that keeps the region economically independent. Output is sustained by a <strong>successor stock (reserve of tacit knowledge)</strong>.<br><br>Low <strong>DX investment</strong> lets aging artisans retire and the stock slowly drains — and <strong>for a while nothing happens</strong>. But once it runs out, the brand does not decline gradually: it <strong>falls off a cliff</strong> (succession break), cascading into tax base → maintenance → infrastructure. At <strong>zero it goes extinct</strong> and won't recover even at max DX (only re-municipalization revives it).<br><br>Smart automation is not destroying tradition — it is <strong>serializing</strong> skills so the next generation can load them, keeping the successor stock alive. This is the very lesson of Greedy (efficiency now) vs. DP (investing in the future).`,
+    formula:'B = (45 + Shrink·16 + (DP?+12:−12) + Ethics·8) × SkillFactor(SuccessorStock)'
   },
   p2Budget:{
     tag:'METRIC · FISCAL',
     jaTitle:'自治体財政（Municipal Budget）', enTitle:'Municipal Budget',
-    jaBody:`行政の体力ゲージ。レガシーインフラの全面延命とGreedy戦略の利益誘導が最大の流出源です。<br><br><strong>Public Reboot</strong>と<strong>Root権限制限</strong>はいずれも財政コストを伴います——公共性とガバナンスは「タダではない」が、崩壊よりはるかに安い保険です。`,
-    enBody:`The administration's stamina gauge. Blanket life-support for legacy infrastructure and Greedy patronage are the biggest drains.<br><br><strong>Public Reboot</strong> and <strong>Root restriction</strong> both cost budget — public good and governance aren't free, but they are far cheaper insurance than collapse.`,
-    formula:'M = 100 − (1−Shrink)·44 − Greedy(1−E)·38 + DX·14 − RebootCost − GovCost'
+    jaBody:`行政の体力ゲージ。最大の収入源は<strong>地域ブランド産業の税収基盤</strong>です——ブランドが崖のように崩れると税収が細り、保守予算が不足してインフラ維持力まで連鎖的に低下します。<br><br>Greedy戦略の利益誘導が最大の流出源。<strong>Public Reboot</strong>と<strong>Root権限制限</strong>はいずれも財政コストを伴います——公共性とガバナンスは「タダではない」が、崩壊よりはるかに安い保険です。`,
+    enBody:`The administration's stamina gauge. Its main income is the <strong>tax base of the local brand industry</strong> — if the brand falls off a cliff, tax revenue thins, maintenance is underfunded, and infrastructure capacity drops in turn.<br><br>Greedy patronage is the biggest drain. <strong>Public Reboot</strong> and <strong>Root restriction</strong> both cost budget — public good and governance aren't free, but they are far cheaper insurance than collapse.`,
+    formula:'M = 42 + Brand·0.55 − Greedy(1−E)·30 − (1−Shrink)·10 − RebootCost − GovCost'
   },
   p2Deadlock:{
     tag:'STATE · DEADLOCK',
@@ -1312,6 +1638,7 @@ const MDATA = {
 };
 
 let algo = 'greedy', filterRate = 0, ethicsScore = 100, historicalImmunity = 50, lang = 'ja';
+const WEEKLY_ENABLED = window.Capacitor?.isNativePlatform?.() ?? false;
 let activePreset = null;
 let animPlaying = false, animStep = 0, animTimer = null, fullTimeline = null;
 let pinnedData = null;
@@ -1667,41 +1994,108 @@ function startScatter(){
   initScatter();scatterLoop();
 }
 
-Chart.defaults.color='#5a6f94';Chart.defaults.borderColor='#172340';
-Chart.defaults.font.family="'Courier New', monospace";Chart.defaults.font.size=10;
+// ═══ グレースフル・デグラデーション: Chart.js エラーハンドリング ═══
+let currentTab = 1;  // コア機能：タブ機能を最上部で初期化（Chart失敗に強い）
+
+function handleChartLoadFailure() {
+  console.error('❌ Chart.js CDN 読み込み失敗');
+  window._chartLoadFailed = true;
+  showChartErrorBanner();
+}
+// fix: onerror属性はこの関数の定義前に発火するため、属性側ではフラグのみ立て、ここで実際のChart有無を見て処理する
+if (typeof Chart === 'undefined') handleChartLoadFailure();
+
+function showChartErrorBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'chartErrorBanner';
+  banner.style.cssText = `
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,34,68,0.08);
+    border-bottom: 1px solid #ff2244;
+    padding: 10px 20px;
+    text-align: center;
+    color: #ff8899;
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    z-index: 999;
+    letter-spacing: 0.05em;
+  `;
+  banner.innerHTML = `⚠️ <span data-i18n="chart_error_msg">グラフ表示に必要なライブラリが読み込めませんでした。広告ブロッカーの設定をご確認いただくか、再読み込みをお試しください</span>`;
+  document.body.insertBefore(banner, document.body.firstChild);
+  if (typeof applyI18nAuto === 'function') applyI18nAuto();
+}
+
+// ════════════════════════════════════════════════════════════
+
+// グレースフル初期化: Chart.js グローバル設定
+if (typeof Chart !== 'undefined') {
+  try {
+    Chart.defaults.color='#5a6f94';
+    Chart.defaults.borderColor='#172340';
+    Chart.defaults.font.family="'Courier New', monospace";
+    Chart.defaults.font.size=10;
+    window._chartReady = true;
+  } catch (e) {
+    console.warn('⚠️ Chart.js 初期化エラー:', e);
+    window._chartReady = false;
+  }
+} else {
+  console.warn('⚠️ Chart.js が読み込まれていません');
+  window._chartReady = false;
+}
 
 // scatterChart is now Canvas-driven via startScatter()
 
-const timelineChart=new Chart(document.getElementById('timelineChart'),{
-  type:'line',
-  data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-    {label:'Dopamine 熱狂度',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    {label:'Social Capital',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    {label:'Infrastructure',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-    plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-    scales:{
-      x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-      y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-    }
+let timelineChart = null;
+if (typeof Chart !== 'undefined') {
+  try {
+    timelineChart = new Chart(document.getElementById('timelineChart'),{
+      type:'line',
+      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+        {label:'Dopamine 熱狂度',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        {label:'Social Capital',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        {label:'Infrastructure',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+        scales:{
+          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+        }
+      }
+    });
+  } catch (e) {
+    console.warn('📊 チャート timelineChart 生成失敗:', e.message);
+    timelineChart = null;
   }
-});
+} else {
+  console.warn('📊 チャート timelineChart をスキップ: Chart.js が利用不可');
+}
 
-const radarChart=new Chart(document.getElementById('radarChart'),{
-  type:'radar',
-  data:{
-    labels:[['Trust','信頼性'],['Resilience','回復力'],['Legitimacy','正当性'],['Info Health','情報健全性'],['Viability','長期持続性'],['Mental WB','精神的健全性']],
-    datasets:[
-      {label:'Current',data:[100,100,100,100,100,100],backgroundColor:'rgba(0,212,255,.1)',borderColor:'#00d4ff',borderWidth:2,pointBackgroundColor:'#00d4ff',pointRadius:3},
-      {label:'Failure Threshold',data:[20,20,20,20,20,20],backgroundColor:'rgba(255,34,68,.04)',borderColor:'rgba(255,34,68,.45)',borderWidth:1,borderDash:[5,4],pointRadius:0}
-    ]
-  },
-  options:{responsive:true,maintainAspectRatio:false,animation:{duration:280},
-    plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}}},
-    scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5}}}}
+let radarChart = null;
+if (typeof Chart !== 'undefined') {
+  try {
+    radarChart = new Chart(document.getElementById('radarChart'),{
+      type:'radar',
+      data:{
+        labels:[['Trust','信頼性'],['Resilience','回復力'],['Legitimacy','正当性'],['Info Health','情報健全性'],['Viability','長期持続性'],['Mental WB','精神的健全性']],
+        datasets:[
+          {label:'Current',data:[100,100,100,100,100,100],backgroundColor:'rgba(0,212,255,.1)',borderColor:'#00d4ff',borderWidth:2,pointBackgroundColor:'#00d4ff',pointRadius:3},
+          {label:'Failure Threshold',data:[20,20,20,20,20,20],backgroundColor:'rgba(255,34,68,.04)',borderColor:'rgba(255,34,68,.45)',borderWidth:1,borderDash:[5,4],pointRadius:0}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,animation:{duration:280},
+        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}}},
+        scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5}}}}
+      }
+    });
+  } catch (e) {
+    console.warn('📊 チャート radarChart 生成失敗:', e.message);
+    radarChart = null;
   }
-});
+} else {
+  console.warn('📊 チャート radarChart をスキップ: Chart.js が利用不可');
+}
 
 function cFor(v){return v<30?'#ff2244':v<60?'#ff6b2b':'#00d4ff'}
 
@@ -1734,14 +2128,15 @@ function getModeCollapseLog(m){
   const sloganTag=`<span style="font-size:.5em;color:#7a4400;background:rgba(255,107,43,.2);border:1px solid rgba(255,107,43,.4);border-radius:2px;padding:0 4px;margin-left:5px;vertical-align:middle">${lang==='ja'?'スローガン':'SLOGAN'}</span><span style="font-size:.48em;color:#3a4050;margin-left:3px;vertical-align:middle">${lang==='ja'?'具体策:ゼロ':'policy:null'}</span>`;
   const radicalTag=`<span style="font-size:.5em;color:#7a0010;background:rgba(255,0,60,.2);border:1px solid rgba(255,0,60,.4);border-radius:2px;padding:0 4px;margin-left:5px;vertical-align:middle">${lang==='ja'?'排外':'RADICAL'}</span>`;
 
+  // v6.33: 読めるように減速（旧: makeP1 0.6〜/ makeP2 0.3〜秒 は速すぎた）＋ opacityを深く落とさない logpulse
   const makeP1=(i,alpha=1)=>{
-    const speed=0.6+i*0.22;
+    const speed=1.2+i*0.28;
     const col=i%2===0?`rgba(255,34,68,${alpha})`:`rgba(255,107,43,${alpha})`;
-    return`<span style="color:${col};animation:blink ${speed}s infinite">▌ ${phase1[i%phase1.length]} ▐${sloganTag}</span>`;
+    return`<span class="mode-log-blink" style="color:${col};animation:logpulse ${speed}s infinite ease-in-out">▌ ${phase1[i%phase1.length]} ▐${sloganTag}</span>`;
   };
   const makeP2=(i,alpha=1)=>{
-    const speed=Math.max(0.3,0.55-i*0.06);
-    return`<span style="color:rgba(255,0,60,${alpha});animation:blink ${speed}s infinite">▌ ${phase2[i%phase2.length]} ▐${radicalTag}</span>`;
+    const speed=Math.max(1.0,1.3-i*0.08);
+    return`<span class="mode-log-blink" style="color:rgba(255,0,60,${alpha});animation:logpulse ${speed}s infinite ease-in-out">▌ ${phase2[i%phase2.length]} ▐${radicalTag}</span>`;
   };
 
   const fr=filterRate;
@@ -1791,21 +2186,31 @@ function getModeCollapseLog(m){
 function updateAll(){
   const m=metrics(filterRate,ethicsScore,algo);
 
-  if(!animPlaying){
-    const tl=simTimeline(filterRate,ethicsScore,algo);
-    timelineChart.data.datasets[0].data=tl.dp;
-    timelineChart.data.datasets[1].data=tl.sc;
-    timelineChart.data.datasets[2].data=tl.inf;
-    timelineChart.update();
+  if(!animPlaying && timelineChart){
+    try {
+      const tl=simTimeline(filterRate,ethicsScore,algo);
+      timelineChart.data.datasets[0].data=tl.dp;
+      timelineChart.data.datasets[1].data=tl.sc;
+      timelineChart.data.datasets[2].data=tl.inf;
+      timelineChart.update();
+    } catch (e) {
+      console.warn('📊 timelineChart 更新失敗:', e);
+    }
   }
 
-  radarChart.data.datasets[0].data=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
-  const avg=(m.trust+m.resilience+m.legitimacy+m.infoH+m.viability+m.mentalWB)/6;
-  const rc=avg<38?'#ff2244':avg<62?'#ff6b2b':'#00d4ff';
-  radarChart.data.datasets[0].borderColor=rc;
-  radarChart.data.datasets[0].backgroundColor=rc+'1a';
-  radarChart.data.datasets[0].pointBackgroundColor=rc;
-  radarChart.update();
+  const avg=(m.trust+m.resilience+m.legitimacy+m.infoH+m.viability+m.mentalWB)/6; // fix: ブロック外で定義（下の diag ボーダー色でも使用するため）
+  if(radarChart){
+    try {
+      radarChart.data.datasets[0].data=[m.trust,m.resilience,m.legitimacy,m.infoH,m.viability,m.mentalWB];
+      const rc=avg<38?'#ff2244':avg<62?'#ff6b2b':'#00d4ff';
+      radarChart.data.datasets[0].borderColor=rc;
+      radarChart.data.datasets[0].backgroundColor=rc+'1a';
+      radarChart.data.datasets[0].pointBackgroundColor=rc;
+      radarChart.update();
+    } catch (e) {
+      console.warn('📊 radarChart 更新失敗:', e);
+    }
+  }
 
   const ep=Math.round(m.entropy);
   const ec=ep<40?'#00ff88':ep<70?'#ff6b2b':'#ff2244';
@@ -1838,18 +2243,64 @@ function updateAll(){
 
   updateHistRef();
 
-  const ab=document.getElementById('alertBanner');
+  // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
+  const p1Good=!m.crash&&m.entropy<28&&m.diversity>70&&m.infoH>75&&m.socialCap>65;
   if(m.crash){
-    ab.classList.add('on');
+    setVerdictBanner('alertBanner','crash','banner_p1');
     const parts=[];
     if(m.entropy>76)parts.push(tt(`エントロピー ${Math.round(m.entropy)}% — 社会秩序が臨界値を突破`,`Entropy ${Math.round(m.entropy)}% — social order breached critical threshold`));
     if(m.infra<18)parts.push(tt(`インフラ ${Math.round(m.infra)} — 医療・交通網が機能停止`,`Infrastructure ${Math.round(m.infra)} — medical & transport networks down`));
     if(m.socialCap<18)parts.push(tt(`ソーシャルキャピタル ${Math.round(m.socialCap)} — 相互信頼が消滅`,`Social capital ${Math.round(m.socialCap)} — mutual trust vanished`));
     parts.push(tt('過学習により現実世界のOSとの互換性が失われました。','Overfitting severed compatibility with the real-world OS.'));
     document.getElementById('alertMsg').textContent=parts.join('  |  ');
-  } else ab.classList.remove('on');
+    discover('d_p1_crash');noteSessionPage(1);
+  } else if(p1Good){
+    setVerdictBanner('alertBanner','good','banner_p1_good');
+    document.getElementById('alertMsg').textContent=tt('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · information diversity preserved · synced with the real-world OS');
+    discover('d_p1_good');noteSessionPage(1);
+  } else {
+    // v6.338: 中間状態を3つに区別（近クラッシュの分断 / エコーチェンバー / あと一歩で健全）
+    let wkey,wmsg;
+    if(m.entropy>=65){
+      wkey='banner_p1_warn_hot';
+      wmsg=tt(`エントロピー ${Math.round(m.entropy)}% ／ 扇動と分断が進み、社会の信頼が急速に痩せている（崩壊の一歩手前）`,`Entropy ${Math.round(m.entropy)}% · agitation and division are eroding social trust fast — one step from collapse`);
+    } else if(m.infoH<50){
+      wkey='banner_p1_warn';
+      wmsg=tt(`情報健全性 ${Math.round(m.infoH)} ／ 同質な声ばかりが循環し、情報空間が濁りはじめている（エコーチェンバー化）`,`Info health ${Math.round(m.infoH)} · the same voices keep circulating — the information space is clouding over (echo chamber)`);
+    } else {
+      wkey='banner_p1_warn_near';
+      wmsg=tt(`情報多様性 ${Math.round(m.diversity)} ／ おおむね健全。あと一歩で「澄んだ情報空間」に届く`,`Diversity ${Math.round(m.diversity)} · mostly healthy — one step from a clear information space`);
+    }
+    setVerdictBanner('alertBanner','warn',wkey);
+    document.getElementById('alertMsg').textContent=wmsg;
+  }
 
   document.getElementById('metricLog').innerHTML=getModeCollapseLog(m);
+
+  // v6.3: プリセット適用で安定/崩壊が確定した瞬間だけ共有ボタンを出す（P2の shockShareBtn パターン踏襲）
+  const p1b=document.getElementById('p1ShareBtn');
+  const p1rw=document.getElementById('p1RewindBtn');
+  if(p1b){
+    if(activePreset){
+      p1ShareState={type:m.crash?'crash':'stable'};
+      p1b.style.display='block';
+      p1b.textContent=tt('▶ この結果を送る','▶ Share this result');
+    }else{
+      p1ShareState=null;
+      p1b.style.display='none';
+    }
+  }
+  // v6.345: リワインドボタンはクラッシュ時のみ表示（プリセット不要）
+  if(p1rw){
+    if(m.crash){
+      p1rw.style.display='block';
+      p1rw.textContent=t('rewind_btn');
+      window._rewindSuccess=null;
+    }else{
+      p1rw.style.display='none';
+    }
+  }
+  checkScenarioGoal(m);
 }
 
 function getDiag(m){
@@ -1870,6 +2321,8 @@ function applyI18n(){
   });
   document.getElementById('langBtn').textContent=t('langBtn');
   document.getElementById('shareBtn').textContent=t('shareBtn');
+  const menuBtn = document.getElementById('menuBtn');
+  if(menuBtn) menuBtn.textContent = t('menu_more');
   const pb=document.getElementById('playBtn');
   if(pb) pb.textContent=animPlaying?t('playStop'):t('playPlay');
   const pl=document.getElementById('pinLabel');
@@ -1908,6 +2361,10 @@ function applyI18n(){
     radarChart.update('none');
   }
   applyI18nAuto();
+  syncDocLinks();
+  syncTownPlaceholder();
+  // 言語切替後、表示中のバナーに街名を再展開（bstガードをリセット）
+  document.querySelectorAll('.alert[data-bst]').forEach(al=>{delete al.dataset.bst;});
   document.documentElement.lang=lang;
   updateAll();
   updateAllP2(); // 動的ステータス文の言語を即時反映
@@ -1923,7 +2380,39 @@ function applyI18nAuto(){
   });
 }
 
-function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();}
+function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();if(typeof updateDiscoveryCounter==='function')updateDiscoveryCounter();}
+
+// v6.345: プライバシーファーストの analytics ラッパー（外部スクリプト未導入時は no-op）
+function track(event,props){
+  try{if(window.plausible)window.plausible(event,{props:props||{}});}catch(e){}
+}
+
+// v6.343: ドキュメント導線の言語連動
+function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/blob/main/docs/'+name+(lang==='en'?'.en':'')+'.md';}
+function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
+
+// v6.345: 街の名前 helpers
+function getTownName(){try{return localStorage.getItem('ssd_town_name')||'';}catch(e){return '';}}
+function saveTownName(name){try{if(name&&name.trim())localStorage.setItem('ssd_town_name',name.trim());else localStorage.removeItem('ssd_town_name');}catch(e){}}
+function expandTown(html){
+  const n=getTownName();if(!n)return html;
+  return lang==='ja'
+    ? html.replace(/あなたの街/g,n)
+    : html.replace(/YOUR TOWN/g,n.toUpperCase()).replace(/your town/gi,n);
+}
+function syncTownPlaceholder(){
+  const inp=document.getElementById('townNameInput');if(!inp)return;
+  inp.placeholder=lang==='ja'?'例: 東京 / 地元の市 / 未来の街':'e.g. Springfield / My city / Future town';
+  inp.value=getTownName();
+}
+
+// v6.331: 詳細設定アコーディオンの開閉（ページ内完結・DOMは残すので値計算に影響なし）
+function toggleAcc(id,btn){
+  const el=document.getElementById(id);if(!el)return;
+  const open=el.style.display==='none';
+  el.style.display=open?'block':'none';
+  if(btn)btn.classList.toggle('open',open);
+}
 
 function setPreset(id){
   const p=PRESETS[id];if(!p)return;
@@ -1942,6 +2431,7 @@ function setPreset(id){
   restartAgents();
   updateAll();
   showShareToast({kind:'preset',page:1,preset:id});
+  notePreset(1,id); if(id==='weimar')discover('d_p1_weimar'); if(id==='nordic')discover('d_p1_nordic');
 }
 
 function shareURL(){
@@ -2007,51 +2497,99 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}});
 
-let currentTab = 1;
 function switchTab(n){
   currentTab = n;
   [1,2,3,4].forEach(i=>{
     document.getElementById('page'+i).classList.toggle('active', n===i);
     document.getElementById('tab'+i+'Btn').classList.toggle('active', n===i);
   });
-  if(n===2) updateAllP2();
+  if(n===2){ updateAllP2(); startP2Tick(); } else { stopP2Tick(); } // v6.346: 後継者ストックはP2表示中のみ時間経過
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
   if(n===4&&!p4Started) startP4();
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
+  // v6.332: アドレスバーの tab のみ同期（他のシナリオパラメータ f/e/s/dx… は不変）
+  try{const u=new URL(location.href);u.searchParams.set('tab',n);history.replaceState(null,'',u);}catch(e){}
 }
 
 // ── PAGE 2 STATE ──────────────────────────────────────────
-let shrinkRate=30, dxRate=30, algoP2='greedy', ethicsP2=60;
+let shrinkRate=10, dxRate=30, algoP2='greedy', ethicsP2=68; // v6.334: 初期状態から p2Good（平穏）を満たす
 let p2AnimPlaying=false, p2AnimTimer=null, p2AnimStep=0, p2FullTimeline=null;
 let p2LogEntries=[];
+// v6.346: 後継者ストック（暗黙知の残量 0-100）。遅い状態変数（Task B）。DXが低いと引退で減少・高いと形式知化で回復
+let skillStock=60;
+let skillLost=false; // 0到達で技術ごと消滅＝DXを上げても回復不能（Public Rebootでのみ復活）
+let p2TickTimer=null;
+// v6.346 Task C: ヘリ3状態化。WEATHER HOLD＝ショック中の一時停止（有視界飛行の制約）。時間経過で自動復帰
+let heliWeatherHoldUntil=0;
+let prevHeliState='operational';
+const HELI_HOLD_MS=3600;
 let p2LogTimer=null;
 let publicReboot=false;
 let shockState=null;
+// v6.3: P1/P3/P4 判定確定ステート（shockStateに相当。null=判定未確定でボタン非表示）
+let p1ShareState=null, p3ShareState=null, p4ShareState=null;
+// v6.3: 結果カード生成用スナップショット（アニメ由来の判定値を保持）
+let p3Snapshot={integ:100,dop:0,fooled:0};
+let p4Snapshot={drop:0,ratio:100};
+// v6.31: フリッカー対策 — 毎フレーム評価される揺れ値のヒステリシス保持状態
+//   （P3の攻撃/バナー、P4のバナーが閾値付近で60fpsトグルするのを防ぐ）
+let p3AttackHold=0;      // attackEdges>0 の残存フレーム数（>0でACTIVE扱い）
+let p3BannerOn=false;    // P3アラートバナーのヒステリシス状態
+let p4BannerOn=false;    // P4アラートバナーのヒステリシス状態
 
+// v6.346: 運用ログの項目名を日本語版では日本語に（ステータスは英語のまま）。lang で切替
 const P2_LOG_NORMAL_JA=[
+  'インフラ保守予定 … OK','救命ヘリ出動状況 … ONLINE',
+  'ブランド生産 … ACTIVE','予算配分 … BALANCED',
+  'スマート集約運用 … RUNNING','DXパイプライン … SYNCED',
+  '保守キュー … CLEAR','SECTOR-T 状態 … GREEN',
+];
+const P2_LOG_WARN_JA=[
+  'インフラ劣化 … WARNING','財政赤字検知 … ALERT',
+  '救命ヘリ燃料備蓄 … LOW','保守の先送り … QUEUED',
+  '修復キュー逼迫 … HIGH','コスト超過検知 … TRUE',
+];
+const P2_LOG_BLAME_JA=[
+  '他責転嫁の開始 … PRESS_CONF','責任所在 … DENIED',
+  '原因の指定先 … EXTERNAL','行政CPUの再配分 … →BLAME_100%',
+  '修復キュー … SUSPENDED','インフラ保守状況 … ABANDONED',
+  '説明責任チェック … REFUSED','外部要因の主張 … LOOP_x99',
+];
+const P2_LOG_REBOOT_JA=[
+  '公共性リブート … ACTIVE','市場ロジック … SUSPENDED',
+  '冗長性バッファ … RESTORING','救命ヘリ強制稼働 … FORCED_ONLINE',
+  'インフラ劣化速度 … HALVED','予算消費 … ELEVATED',
+  '公共サービス優先度 … MAXIMUM','効率ロジック … OVERRIDDEN',
+];
+const P2_LOG_SHOCK_JA=[
+  'ブラックスワン事象 … DETECTED','システムショック … INJECTED',
+  '冗長性テスト … RUNNING','インフラ耐性試験 … CRITICAL',
+  '緊急プロトコル … ACTIVATED','復元力チェック … IN_PROGRESS',
+];
+const P2_LOG_NORMAL_EN=[
   'INFRA_MAINT_SCHEDULED ........ OK','HELI_DISPATCH_STATUS ......... ONLINE',
   'BRAND_PRODUCTION ............. ACTIVE','BUDGET_ALLOCATION ............ BALANCED',
   'SMART_SHRINK_OPS ............. RUNNING','DX_PIPELINE .................. SYNCED',
   'MAINTENANCE_QUEUE ............ CLEAR','SECTOR_T_STATUS .............. GREEN',
 ];
-const P2_LOG_WARN_JA=[
+const P2_LOG_WARN_EN=[
   'INFRA_DEGRADATION ............ WARNING','BUDGET_DEFICIT_DETECTED ...... ALERT',
   'HELI_FUEL_RESERVE ............ LOW','MAINTENANCE_DEFERRED ......... QUEUED',
   'REPAIR_QUEUE_OVERFLOW ........ HIGH','COST_OVERRUN_DETECTED ........ TRUE',
 ];
-const P2_LOG_BLAME_JA=[
+const P2_LOG_BLAME_EN=[
   'BLAME_SHIFT_INITIATED ........ PRESS_CONF','RESPONSIBILITY_MATRIX ........ DENIED',
   'FAULT_VECTOR_ASSIGNED ........ EXTERNAL','ADMIN_CPU_REROUTED ........... →BLAME_100%',
   'REPAIR_QUEUE ................. SUSPENDED','INFRA_MAINT_STATUS ........... ABANDONED',
   'ACCOUNTABILITY_CHECK ......... REFUSED','EXTERNAL_CAUSE_CITED ......... LOOP_x99',
 ];
-const P2_LOG_REBOOT_JA=[
+const P2_LOG_REBOOT_EN=[
   'PUBLIC_REBOOT_MODE ........... ACTIVE','MARKET_LOGIC ................. SUSPENDED',
   'REDUNDANCY_BUFFER ............ RESTORING','HELI_OVERRIDE ................ FORCED_ONLINE',
   'INFRA_DECAY_RATE ............. HALVED','BUDGET_CONSUMPTION ........... ELEVATED',
   'PUBLIC_SERVICE_PRIORITY ...... MAXIMUM','EFFICIENCY_LOGIC ............. OVERRIDDEN',
 ];
-const P2_LOG_SHOCK_JA=[
+const P2_LOG_SHOCK_EN=[
   'BLACK_SWAN_EVENT ............. DETECTED','SYSTEM_SHOCK ................. INJECTED',
   'REDUNDANCY_TEST .............. RUNNING','INFRA_STRESS_TEST ............ CRITICAL',
   'EMERGENCY_PROTOCOL ........... ACTIVATED','RESILIENCE_CHECK ............. IN_PROGRESS',
@@ -2063,6 +2601,9 @@ function calcRedundancyBuffer(s,al,reboot){
   if(reboot)base=clamp(base+42,0,100);
   return Math.round(base);
 }
+
+// v6.346: 後継者ストック → ブランド維持力のゲート（崖関数）。ss≥30で満額、<12で急落＝当面平穏でもある日突然の崩落
+function p2SkillFactor(ss){ if(ss>=30)return 1; if(ss>=12)return 0.55+(ss-12)/40; return (ss/12)*0.55; }
 
 function metricsP2(s,d,al,e){
   const sf=s/100,df=d/100,isG=al==='greedy',ef=e/100;
@@ -2080,15 +2621,18 @@ function metricsP2(s,d,al,e){
     else if(shockState.type==='survived'){shockBudgetPenalty=35;}
     else{shockInfraPenalty=38;}
   }
-  let infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14,0,100);
-  infra=Math.max(0,infra-shockInfraPenalty);
-  const heliOp=shockState?.type==='crash'?false:(publicReboot?true:(infra>35&&cpuRepair>25));
+  // v6.346 Task A/B: 因果連鎖 brand → 税収(budget) → 保守財源 → infra → heli。skillStock が brand を支える遅い状態変数
   const rebootCost=publicReboot?16:0;
-  const brand=clamp(df*65+sf*18+(isG?-14:14)+ef*8,0,100);
-  let budget=clamp(100-(1-sf)*44-(isG?(1-ef)*38:8)+df*14-rebootCost-(rootRestricted?5:0),0,100);
-  budget=Math.max(0,budget-shockBudgetPenalty);
+  const brandPotential=clamp(45+sf*16+(isG?-12:12)+ef*8,0,100);
+  const brand=clamp(brandPotential*p2SkillFactor(skillStock),0,100);
+  const budgetStruct=clamp(42+brand*0.55-(isG?(1-ef)*30:6)-(1-sf)*10-rebootCost-(rootRestricted?5:0),0,100); // brand=地域の税収基盤
+  const budgetShortfall=budgetStruct<45?(45-budgetStruct)*1.2:0; // 保守予算が薄いとインフラ維持の実効値が下がる
+  let infra=deadlock?clamp(infraBase-42,0,100):clamp(infraBase+(cpuRepair/100)*14-budgetShortfall,0,100);
+  infra=Math.max(0,infra-shockInfraPenalty);
+  const heliOp=shockState?.type==='crash'?false:(publicReboot?true:(infra>35&&cpuRepair>25&&ef>=0.3));
+  let budget=Math.max(0,budgetStruct-shockBudgetPenalty);
   const crash=(!heliOp&&infra<20)||budget<8||(shockState?.type==='crash');
-  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError,redundancy};
+  return{infra,heliOp,brand,budget,cpuBlame,cpuRepair,deadlock,crash,infraError,redundancy,skillStock};
 }
 
 function simTimelineP2(s,d,al,e,steps=65){
@@ -2119,6 +2663,47 @@ function simTimelineP2(s,d,al,e,steps=65){
   return{infra,brand,budget:budgetArr,heli};
 }
 
+// v6.346: 後継者ストックの可視化とリアルタイム減衰（Task B）。この段階ではまだブランドには波及させない
+function renderP2Skill(){
+  const el=document.getElementById('p2SkillNum'),bar=document.getElementById('p2SkillBar'),st=document.getElementById('p2SkillStatus');
+  if(!el||!bar)return;
+  const v=Math.round(skillStock);
+  const c=v<15?'#ff2244':v<35?'#ff6b2b':'#00ff88';
+  el.textContent=v; el.style.color=c;
+  bar.style.cssText=`width:${v}%;background:${c}`;
+  if(st){
+    st.textContent=skillLost?tt('技術ごと消滅（回復には再公営化が必要）','Skills extinct (needs re-municipalization)'):v<15?tt('後継者断絶が目前','Succession about to break'):v<35?tt('担い手が引退中','Holders retiring'):tt('技能が継承されている','Skills being handed down');
+    st.style.color=c;
+  }
+}
+function tickSkillStock(){
+  const df=dxRate/100;
+  if(publicReboot){ skillLost=false; skillStock=clamp(Math.max(skillStock,60),0,100); } // 再公営化＝公的な技能継承プログラムで復活
+  else if(skillLost){ /* 技術ごと消滅：DXを最大にしても回復しない */ }
+  else if(df<0.25){ skillStock=clamp(skillStock-(0.25-df)*15,0,100); if(skillStock<=0){skillStock=0;skillLost=true;} } // 引退で減少（DX0なら約12tickで崖）→0で消滅
+  else if(df>0.45){ skillStock=clamp(skillStock+(df-0.45)*8,0,100); }         // DXが十分なら形式知化（シリアライズ）で緩やかに回復
+  // 0.25〜0.45 は均衡帯（デフォルトDX30はここ＝減らない）
+  updateAllP2(); // skillStock は brand/budget/infra/heli に波及するため毎tick全体を再計算
+}
+function startP2Tick(){ if(!p2TickTimer) p2TickTimer=setInterval(tickSkillStock,1200); }
+function stopP2Tick(){ if(p2TickTimer){ clearInterval(p2TickTimer); p2TickTimer=null; } }
+
+// v6.346 Task C: 構造条件(heliOp)＋WEATHER HOLDタイマーから3状態を導出
+function getHeliState(m){
+  if(shockState&&Date.now()<heliWeatherHoldUntil) return 'hold'; // ショック中の悪天候で一時見合わせ（時間経過で自動復帰）
+  return m.heliOp ? 'operational' : 'suspended';
+}
+// 因果連鎖を1行ずつログへ流す（なぜ止まった/戻ったかを式でなく伝播として読ませる）
+function streamP2Cascade(lines,cls){
+  lines.forEach((ln,i)=>setTimeout(()=>{
+    const now=new Date();
+    const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+    p2LogEntries.push(`<span class="${cls}">${ts} ${ln}</span>`);
+    if(p2LogEntries.length>7) p2LogEntries.shift();
+    const el=document.getElementById('p2Log'); if(el) el.innerHTML=p2LogEntries.join('<br>');
+  }, i*480));
+}
+
 function updateAllP2(){
   const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
   // Infra gauge
@@ -2129,20 +2714,41 @@ function updateAllP2(){
   const iStatus=m.infra<30?tt('CRITICAL — インフラが臨界点以下','CRITICAL — infrastructure below critical point'):m.infra<60?tt('WARNING — 劣化進行中','WARNING — degradation in progress'):'STABLE';
   document.getElementById('p2InfraStatus').textContent=iStatus;
   document.getElementById('p2InfraStatus').style.color=ic;
-  // Heli
+  // Heli（v6.346 Task C: 3状態化 OPERATIONAL / WEATHER HOLD / SUSPENDED）
   const hs=document.getElementById('p2HeliStatus');
   const hl=document.getElementById('p2HeliLabel');
   const hi=document.getElementById('p2HeliIcon');
   const hb=document.getElementById('p2HeliBar');
   const hd=document.getElementById('p2HeliDetail');
-  hs.className='heli-badge '+(m.heliOp?'heli-on':'heli-off');
-  hs.textContent=m.heliOp?'● ONLINE':'■ SUSPENDED';
-  hl.style.color=m.heliOp?'var(--green)':'var(--red)';
-  hl.textContent=m.heliOp?tt('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):tt('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded');
-  hi.style.filter=m.heliOp?'drop-shadow(0 0 12px var(--green))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
-  hb.style.cssText=`width:${m.heliOp?100:5}%;background:${m.heliOp?'var(--green)':'var(--red)'}`;
-  hd.textContent=m.heliOp?tt('Dispatch Ready — 出動待機中','Dispatch Ready'):tt('MALFUNCTION — 修復予算なし（他責処理中）','MALFUNCTION — no repair budget (blame-shifting in progress)');
-  hd.style.color=m.heliOp?'var(--muted)':'var(--red)';
+  const hstate=getHeliState(m);
+  const hcol=hstate==='operational'?'var(--green)':hstate==='hold'?'var(--ora)':'var(--red)';
+  hs.className='heli-badge '+(hstate==='operational'?'heli-on':hstate==='hold'?'heli-hold':'heli-off');
+  hs.textContent=hstate==='operational'?'● ONLINE':hstate==='hold'?'◐ WEATHER HOLD':'■ SUSPENDED';
+  hl.style.color=hcol;
+  hl.textContent=hstate==='operational'?tt('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):hstate==='hold'?tt('WEATHER HOLD — 悪天候で一時見合わせ','WEATHER HOLD — grounded by weather'):tt('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded');
+  hi.style.filter=hstate==='operational'?'drop-shadow(0 0 12px var(--green))':hstate==='hold'?'drop-shadow(0 0 12px var(--ora))':'drop-shadow(0 0 12px var(--red)) grayscale(1)';
+  hb.style.cssText=`width:${hstate==='operational'?100:hstate==='hold'?50:5}%;background:${hcol}`;
+  hd.textContent=hstate==='operational'?tt('Dispatch Ready — 出動待機中','Dispatch Ready'):hstate==='hold'?tt('有視界飛行の制約で一時停止（天候回復後に自動復帰）','VFR limits — temporary hold (auto-returns after the storm)'):tt('MALFUNCTION — 修復予算なし（他責処理中）','MALFUNCTION — no repair budget (blame-shifting in progress)');
+  hd.style.color=hstate==='operational'?'var(--muted)':hcol;
+  // 状態遷移で因果連鎖ログを流す（SUSPENDED入り＝停止の伝播 / 復帰＝回復の伝播）
+  if(hstate!==prevHeliState){
+    if(hstate==='suspended'&&prevHeliState!=='suspended'){
+      streamP2Cascade([
+        tt('BRAND_REVENUE ↓  地域ブランドの税収が細る','BRAND_REVENUE ↓  local brand tax revenue thins'),
+        tt('TAX_BASE ↓  自治体の税収基盤が縮小','TAX_BASE ↓  the municipal tax base shrinks'),
+        tt('MAINT_BUDGET ↓  インフラ保守予算が不足','MAINT_BUDGET ↓  infrastructure maintenance underfunded'),
+        tt('INFRA < 35%  維持力が臨界点を割る','INFRA < 35%  capacity falls below the critical point'),
+        tt('HELI: SUSPENDED  救命ヘリ長期運休','HELI: SUSPENDED  rescue helicopter grounded')
+      ],'p2log-blame');
+    } else if(prevHeliState==='suspended'&&hstate==='operational'){
+      streamP2Cascade([
+        tt('MAINT_BUDGET ↑  税収が戻り保守予算が回復','MAINT_BUDGET ↑  revenue returns, maintenance refunded'),
+        tt('INFRA > 35%  維持力が臨界点を回復','INFRA > 35%  capacity recovers above the critical point'),
+        tt('HELI: OPERATIONAL  救命ヘリ復帰','HELI: OPERATIONAL  rescue helicopter back on duty')
+      ],'p2log-normal');
+    }
+    prevHeliState=hstate;
+  }
   // Brand
   const bc=m.brand<30?'#ff2244':m.brand<60?'#ff6b2b':'#00ff88';
   document.getElementById('p2BrandNum').textContent=Math.round(m.brand);
@@ -2154,6 +2760,7 @@ function updateAllP2(){
   document.getElementById('p2BrandStatus').textContent=bs;
   document.getElementById('p2BrandStatus').style.color=bc;
   document.getElementById('p2BrandDiag').textContent=getP2BrandDiag(m);
+  renderP2Skill();
   // Budget
   const budc=m.budget<20?'#ff2244':m.budget<50?'#ff6b2b':'#00d4ff';
   document.getElementById('p2BudgetNum').textContent=m.budget<8?'BANKRUPT':Math.round(m.budget);
@@ -2189,16 +2796,36 @@ function updateAllP2(){
     timelineChartP2.update();
   }
   // Crash banner
-  const ab2=document.getElementById('alertBannerP2');
+  // v6.333: 危機（赤）/ 模範（緑）/ 非表示 の3状態バナー
+  const p2Survived=shockState?.type==='survived';
+  const p2Good=p2Survived||(!m.crash&&m.heliOp&&!m.deadlock&&m.redundancy>=60&&m.infra>=55&&m.budget>=40);
+  const p2Steady=p2Good&&!p2Survived; // ショックを経ていない平常運転の良好
   if(m.crash){
-    ab2.classList.add('on');
+    setVerdictBanner('alertBannerP2','crash','banner_p2');
     const parts=[];
     if(!m.heliOp&&m.infra<20) parts.push(tt('救命ヘリ長期運休 — インフラ維持力が臨界点以下に到達','Rescue heli suspended — infrastructure below critical point'));
     if(m.budget<8) parts.push(tt('自治体財政ショート — 予算が枯渇し行政機能停止','Municipal budget exhausted — administration halted'));
     if(m.deadlock) parts.push(tt('他責デッドロックによりシステムが自滅状態に突入','Blame-shift deadlock has driven the system into self-destruction'));
     if(shockState?.type==='crash') parts.push(tt(`⚡ ブラックスワン注入 — Redundancy Buffer ${shockState.rb}% で致命的崩壊（System Crash）`,`⚡ Black swan injected — fatal System Crash at Redundancy Buffer ${shockState.rb}%`));
     document.getElementById('alertMsgP2').textContent=parts.join('  |  ');
-  } else ab2.classList.remove('on');
+    discover('d_p2_crash');noteSessionPage(2);
+  } else if(p2Good){
+    // v6.339: 良好を「盤石（冗長性が非常に高い＝redundant都市）」と「平穏（smart/既定など）」で区別
+    const p2Solid=!p2Survived&&m.redundancy>=85;
+    const gkey=p2Survived?'banner_p2_good_survived':(p2Solid?'banner_p2_good_solid':'banner_p2_good_steady');
+    setVerdictBanner('alertBannerP2','good',gkey);
+    document.getElementById('alertMsgP2').textContent = p2Survived
+      ? tt(`🚁 ショックを吸収 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ 救命ヘリ継続稼働`,`🚁 Shock absorbed · redundancy buffer ${Math.round(m.redundancy)}% · rescue heli still online`)
+      : p2Solid
+        ? tt(`🛡 冗長性バッファ ${Math.round(m.redundancy)}% ／ 大きなショックが来ても耐えられる盤石な構成`,`🛡 Redundancy buffer ${Math.round(m.redundancy)}% · built to withstand even a major shock`)
+        : tt(`🚁 救命ヘリ稼働中 ／ 冗長性バッファ ${Math.round(m.redundancy)}% ／ ひとまず安定（盤石とまではいかない）`,`🚁 Rescue heli online · redundancy buffer ${Math.round(m.redundancy)}% · stable for now (not rock-solid yet)`);
+    if(p2Survived){discover('d_p2_survived');}else{discover('d_p2_steady');}
+    noteSessionPage(2);
+  } else {
+    setVerdictBanner('alertBannerP2','warn','banner_p2_warn');
+    document.getElementById('alertMsgP2').textContent=tt(`冗長性バッファ ${Math.round(m.redundancy)}% ／ 今は動くが、大きなショックが来れば耐えられないかもしれない`,`Redundancy buffer ${Math.round(m.redundancy)}% · running now, but a big shock might be too much`);
+  }
+  if(m.deadlock){discover('d_p2_deadlock');noteSessionPage(2);}
   // Redundancy Buffer
   const rb=m.redundancy;
   const rbc=rb<30?'#ff2244':rb<60?'#ff6b2b':'#00ff88';
@@ -2221,13 +2848,13 @@ function updateAllP2(){
       sp.style.display='block';
       if(shockState.type==='crash'){
         sp.className='shock-result-panel shock-crashed';
-        sp.innerHTML=tt(`<strong>⚠ SYSTEM CRASH — ブラックスワン発生</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ SYSTEM CRASH — black swan struck</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
+        sp.innerHTML=tt(`<strong>⚠ あなたの街は、崩壊しました</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ Your town has collapsed</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
       }else if(shockState.type==='survived'){
         sp.className='shock-result-panel shock-survived';
-        sp.innerHTML=tt(`<strong>✓ SURVIVED — ショック吸収成功</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ SURVIVED — shock absorbed</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
+        sp.innerHTML=tt(`<strong>✓ あなたの街は、生き残った</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ Your town survived</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
       }else{
         sp.className='shock-result-panel shock-partial';
-        sp.innerHTML=tt(`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`,`<strong>⚡ PARTIAL DAMAGE</strong><br>Redundancy Buffer: ${shockState.rb}% (30–60%)<br>Moderate redundancy absorbed part of the shock, but infrastructure took damage. Consider enabling Public Reboot.`);
+        sp.innerHTML=tt(`<strong>⚡ あなたの街は、なんとか持ちこたえた</strong><br>Redundancy Buffer: ${shockState.rb}% (30〜60%)<br>中程度の冗長性で一部のショックを吸収しましたが、インフラが損傷を受けました。Public Reboot導入を検討してください。`,`<strong>⚡ Your town barely held on</strong><br>Redundancy Buffer: ${shockState.rb}% (30–60%)<br>Moderate redundancy absorbed part of the shock, but infrastructure took damage. Consider enabling Public Reboot.`);
       }
     }else{
       sp.style.display='none';
@@ -2242,10 +2869,14 @@ function updateAllP2(){
   }
   // Operation log
   updateP2Log(m);
+  checkScenarioGoal(m);
 }
 
 function getP2BrandDiag(m){
   if(m.brand<20) return tt('[ FATAL ] 地域ブランド産業が崩壊。後継者ゼロ・自動化ゼロ。産業消滅。','[ FATAL ] Local brand industry collapsed. Zero successors, zero automation. Industry extinct.');
+  // v6.346: 後継者ストックの残量を先に警告（DX投資を怠ると、当面は平穏でもある日崖のように崩落する）
+  if(skillStock<15) return tt('[ CRITICAL ] 後継者ストックが枯渇寸前。このままDX投資を怠ると、ある日ブランドが崖のように崩落します。','[ CRITICAL ] Successor stock nearly depleted — keep neglecting DX and the brand will fall off a cliff one day.');
+  if(skillStock<35&&dxRate<25) return tt('[ WARNING ] 暗黙知の担い手が引退し続けています（後継者ストック低下中）。DX投資で技能を形式知化してください。','[ WARNING ] Tacit-knowledge holders keep retiring (successor stock falling). Invest in DX to serialize skills.');
   if(m.brand<50&&dxRate<40) return tt('[ WARNING ] DX投資不足で職人高齢化が加速中。5年以内に後継者断絶リスク。','[ WARNING ] DX under-investment is accelerating artisan aging. Succession collapse risk within 5 years.');
   if(m.brand>75&&dxRate>60) return tt('[ OPTIMAL ] スマート自動化によりブランド品質維持と後継問題を同時解決。持続的成長軌道。','[ OPTIMAL ] Smart automation solves quality and succession simultaneously. Sustainable growth trajectory.');
   return tt('[ OK ] ブランド産業は現状維持中。DX投資を増やすと長期持続性が向上する。','[ OK ] Brand industry holding steady. More DX investment improves long-term viability.');
@@ -2256,17 +2887,21 @@ function updateP2Log(m){
   p2LogTick++;
   const now=new Date();
   const ts=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const ja=lang==='ja';
+  const NORMAL=ja?P2_LOG_NORMAL_JA:P2_LOG_NORMAL_EN, WARN=ja?P2_LOG_WARN_JA:P2_LOG_WARN_EN,
+        BLAME=ja?P2_LOG_BLAME_JA:P2_LOG_BLAME_EN, REBOOT=ja?P2_LOG_REBOOT_JA:P2_LOG_REBOOT_EN,
+        SHOCK=ja?P2_LOG_SHOCK_JA:P2_LOG_SHOCK_EN;
   let src,cls;
   if(shockState){
-    src=P2_LOG_SHOCK_JA[p2LogTick%P2_LOG_SHOCK_JA.length]; cls='p2log-warn';
+    src=SHOCK[p2LogTick%SHOCK.length]; cls='p2log-warn';
   } else if(m.deadlock){
-    src=P2_LOG_BLAME_JA[p2LogTick%P2_LOG_BLAME_JA.length]; cls='p2log-blame';
+    src=BLAME[p2LogTick%BLAME.length]; cls='p2log-blame';
   } else if(publicReboot){
-    src=P2_LOG_REBOOT_JA[p2LogTick%P2_LOG_REBOOT_JA.length]; cls='p2log-normal';
+    src=REBOOT[p2LogTick%REBOOT.length]; cls='p2log-normal';
   } else if(m.infraError||m.budget<40){
-    src=(p2LogTick%3===0?P2_LOG_WARN_JA:P2_LOG_NORMAL_JA)[p2LogTick%7]; cls='p2log-warn';
+    const arr=(p2LogTick%3===0?WARN:NORMAL); src=arr[p2LogTick%arr.length]; cls='p2log-warn';
   } else {
-    src=P2_LOG_NORMAL_JA[p2LogTick%P2_LOG_NORMAL_JA.length]; cls='p2log-normal';
+    src=NORMAL[p2LogTick%NORMAL.length]; cls='p2log-normal';
   }
   p2LogEntries.push(`<span class="${cls}">${ts} ${src}</span>`);
   if(p2LogEntries.length>7) p2LogEntries.shift();
@@ -2316,6 +2951,7 @@ function setAlgoP2(a){
 
 function setPublicReboot(on){
   publicReboot=on;
+  if(on){ skillLost=false; skillStock=clamp(Math.max(skillStock,60),0,100); } // v6.346: 再公営化＝公的技能継承で後継者ストック復活
   document.getElementById('btnRebootOff').classList.toggle('on',!on);
   document.getElementById('btnRebootOn').classList.toggle('on',on);
   document.getElementById('btnRebootOn').classList.toggle('green-on',on);
@@ -2328,6 +2964,7 @@ function injectSystemShock(){
   const rb=calcRedundancyBuffer(shrinkRate,algoP2,publicReboot);
   const type=rb<30?'crash':rb>=60?'survived':'partial';
   shockState={type,rb};
+  heliWeatherHoldUntil=Date.now()+HELI_HOLD_MS; // v6.346 Task C: ショック中は悪天候でヘリが一時見合わせ→時間経過で構造条件に応じ自動復帰
   const btn=document.getElementById('shockBtn');
   if(btn){
     btn.style.background='rgba(255,204,0,.28)';
@@ -2335,6 +2972,7 @@ function injectSystemShock(){
     setTimeout(()=>{btn.style.background='';btn.style.boxShadow='';},500);
   }
   updateAllP2();
+  setTimeout(()=>{ if(currentTab===2) updateAllP2(); },HELI_HOLD_MS+120); // WEATHER HOLD 明けに構造判定へ再描画
 }
 
 // P2 sliders
@@ -2354,7 +2992,7 @@ document.getElementById('ethicsScoreP2').addEventListener('input',function(){
 let timelineChartP2=null;
 
 // ── PAGE 3: COGNITIVE RECOVERY ────────────────────────────
-let searchDepth=2, groundingRate=20, learningRate=40;
+let searchDepth=7, groundingRate=20, learningRate=40; // v6.334: 初期状態から p3Good（健全な認知）を満たす
 let rootRestricted=false;
 let p3Started=false, p3Nodes=[], p3Ctx=null, p3W=0, p3H=0, p3AnimId=null;
 let dropoutActive=false, dropoutTimer=null, dropoutPrevGround=20;
@@ -2481,8 +3119,168 @@ function drawP3(){
   updateP3Monitor(avgDop,generals,attackEdges);
 }
 
+// v6.31: 状態変化ガード — 前回適用値と異なる時だけDOMへ書き込む
+//   （毎フレーム呼ばれるモニターでの無駄な再描画とフリッカーを抑止）
+function setText(el,txt){if(el&&el._t!==txt){el._t=txt;el.textContent=txt;}}
+function setColor(el,col){if(el&&el._c!==col){el._c=col;el.style.color=col;}}
+function setClassOn(el,name,on){if(el&&el['_k'+name]!==on){el['_k'+name]=on;el.classList.toggle(name,on);}}
+function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;}}
+
+// v6.333: 判定バナーの3状態切替（'crash' 赤 / 'good' 緑 / '' 非表示）。状態変化時だけDOMへ書き込む。
+//   .at の data-i18n を付け替えるので言語切替は既存 applyI18nAuto が自動追従する。
+// v6.335: 判定バナーの状態切替（'crash' 赤 / 'warn' 橙・中間 / 'good' 緑 / '' 非表示）
+//   key = その状態のI18Nキー。.at の data-i18n を付け替えるので言語切替は applyI18nAuto が追従。
+function setVerdictBanner(alertId,state,key){
+  const al=document.getElementById(alertId);if(!al)return;
+  const at=al.querySelector('.at');if(!at)return;
+  const sig=state+'|'+(key||'');      // good の種別（steady/survived）等も区別
+  if(al.dataset.bst===sig)return;     // 状態変化ガード（ループでのフリッカー防止）
+  al.dataset.bst=sig;
+  al.classList.remove('good','warn');
+  at.classList.remove('good','warn');
+  if(state){
+    at.dataset.i18n=key;
+    const v=(I18N[lang]&&I18N[lang][key]);
+    if(v!==undefined)at.innerHTML=expandTown(v);
+    if(state==='good'){al.classList.add('good');at.classList.add('good');}
+    else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
+    al.classList.add('on');
+    track('verdict',{banner:alertId,state,key});
+  }else{
+    al.classList.remove('on');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// v6.334: 発見ログ（収集型ゲーミフィケーション）
+//   方針: ストリーク／時間制限／通知／不安を煽る文言は一切実装しない。
+//   触るたびに新しい発見＝短い学びがある、という純粋な好奇心の設計。
+// ══════════════════════════════════════════════════════════
+const DISCOVERIES=[
+  {id:'d_p1_crash',    badge:()=>tt('⚠ 情報空間の崩壊を再現した','⚠ Recreated an information-space collapse'), learn:()=>tt('パラメータが同じでも、結果は真逆になり得る。','Same parameters can still lead to opposite outcomes.')},
+  {id:'d_p1_rewind',   badge:()=>tt('↩ 過去を一つ変えて街を救った','↩ Changed one thing and saved the town'), learn:()=>tt('崩壊は、たった一つの選択で回避できることがある。','Collapse can sometimes be averted by a single choice.')},
+  {id:'d_p1_good',     badge:()=>tt('🌐 澄んだ情報空間をつくった','🌐 Built a clear information space'), learn:()=>tt('開かれた入力は、社会の解像度を上げる。','Open inputs raise a society’s resolution.')},
+  {id:'d_p1_weimar',   badge:()=>tt('⚡ 1933年を1タップで再現した','⚡ Recreated 1933 in one tap'), learn:()=>tt('崩壊には、いつも同じ構造がある。','Collapse tends to share the same structure.')},
+  {id:'d_p1_nordic',   badge:()=>tt('🌿 北欧型の設計を試した','🌿 Tried the Nordic design'), learn:()=>tt('高い倫理と開放性は、崩壊耐性になる。','High ethics and openness buy resilience.')},
+  {id:'d_p2_crash',    badge:()=>tt('🏙 街を崩壊させた','🏙 Let a town collapse'), learn:()=>tt('効率の最大化は、余白を食い尽くす。','Maximizing efficiency devours the slack.')},
+  {id:'d_p2_deadlock', badge:()=>tt('🏚 他責デッドロックを目撃した','🏚 Witnessed a blame-shift deadlock'), learn:()=>tt('直せるのに、誰も直さない状態を見た。','You saw a fixable problem no one fixes.')},
+  {id:'d_p2_survived', badge:()=>tt('🚁 ショックを生き延びた','🚁 Survived the shock'), learn:()=>tt('非効率に見えた余白が、生命線だった。','The slack that looked wasteful was the lifeline.')},
+  {id:'d_p2_steady',   badge:()=>tt('🏘 平穏な街を保った','🏘 Kept a town at peace'), learn:()=>tt('危機がないことは、設計の成果でもある。','An uneventful town can itself be a design achievement.')},
+  {id:'d_p3_poison',   badge:()=>tt('🧪 正義の毒入れ攻撃を見た','🧪 Saw a justice-poisoning attack'), learn:()=>tt('浅い探索は、正しさをハックされる。','Shallow reasoning gets its righteousness hijacked.')},
+  {id:'d_p3_restored', badge:()=>tt('🧠 認知を現実に同期させた','🧠 Synced cognition with reality'), learn:()=>tt('深く探索すれば、偽装は見破れる。','Search deep enough and the disguise breaks.')},
+  {id:'d_p3_frozen',   badge:()=>tt('🧊 アップデート拒否を体験した','🧊 Saw a mind that won’t update'), learn:()=>tt('学習を止めると、事実を入れても考えは変わらない。','Stop learning, and no fact will change the belief.')},
+  {id:'d_p4_hijack',   badge:()=>tt('🎪 目的関数の乗っ取りを見た','🎪 Saw an objective hijack'), learn:()=>tt('声の大きさが、当事者の声を消す。','Loudness drowns out the people who actually live it.')},
+  {id:'d_p4_restored', badge:()=>tt('📡 当事者の声を取り戻した','📡 Restored the stakeholders’ voice'), learn:()=>tt('フィルタは、検閲ではなく帯域の確保。','Filtering here protects bandwidth, not censorship.')},
+  {id:'d_meta_allpages',   badge:()=>tt('🔗 4層の連鎖を、自分の手で起こした','🔗 Triggered the 4-layer cascade yourself'), learn:()=>tt('上のレイヤーの崩壊は、下のレイヤーへ伝染する。','A failure up top infects the layers below.')},
+  {id:'d_meta_allpresets', badge:()=>tt('🗺 すべてのシナリオを巡った','🗺 Explored every scenario'), learn:()=>tt('崩壊も回復も、地続きの設計の話。','Collapse and recovery are one design continuum.')},
+];
+let _discovered=new Set(), _sessionPages=new Set(), _presetsSeen=new Set(), _discReady=false;
+
+function getReachableDiscoveries() {
+  return DISCOVERIES.filter(d => {
+    // Exclude scenario discoveries if weekly scenarios are not enabled
+    if (!WEEKLY_ENABLED && d.id.startsWith('sce_')) {
+      return false;
+    }
+    return true;
+  });
+}
+
+function getTotalDiscoveryCount() {
+  return getReachableDiscoveries().length;
+}
+
+function loadDiscoveries(){
+  try{_discovered=new Set(JSON.parse(localStorage.getItem('ssd_discoveries')||'[]'));}catch(e){_discovered=new Set();}
+  try{_presetsSeen=new Set(JSON.parse(localStorage.getItem('ssd_presets_seen')||'[]'));}catch(e){_presetsSeen=new Set();}
+}
+function discover(id){
+  if(!_discReady||_discovered.has(id))return;         // 読み込み時の自動付与を防ぐ + 既発見はスキップ
+  // Prevent discovering scenario discoveries when weekly scenarios are disabled
+  if (!WEEKLY_ENABLED && id.startsWith('sce_')) return;
+  if(!DISCOVERIES.some(d=>d.id===id))return;
+  _discovered.add(id);
+  try{localStorage.setItem('ssd_discoveries',JSON.stringify([..._discovered]));}catch(e){}
+  const d=DISCOVERIES.find(x=>x.id===id);
+  showDiscoveryToast(d.badge());
+  updateDiscoveryCounter();
+}
+function noteSessionPage(page){
+  _sessionPages.add(page);
+  if(_sessionPages.size>=4)discover('d_meta_allpages');
+}
+function notePreset(page,id){
+  _presetsSeen.add(page+':'+id);
+  try{localStorage.setItem('ssd_presets_seen',JSON.stringify([..._presetsSeen]));}catch(e){}
+  track('preset',{page,id});
+  const total=Object.keys(PRESETS).length+Object.keys(PRESETS_P2).length+Object.keys(PRESETS_P3).length+Object.keys(PRESETS_P4).length;
+  if(_presetsSeen.size>=total)discover('d_meta_allpresets');
+}
+let _discQueue=[], _discBusy=false;
+function showDiscoveryToast(text){ _discQueue.push(text); if(!_discBusy)drainDiscToast(); }
+function drainDiscToast(){
+  const t=document.getElementById('discToast');
+  if(!t||!_discQueue.length){_discBusy=false;if(t)t.classList.remove('on');return;}
+  _discBusy=true;
+  t.textContent=tt('🆕 発見: ','🆕 Found: ')+_discQueue.shift();
+  t.classList.add('on');
+  setTimeout(()=>{t.classList.remove('on');setTimeout(drainDiscToast,320);},1900);
+}
+function updateDiscoveryCounter(){
+  const total = getTotalDiscoveryCount();
+  const count = _discovered.size;
+
+  // Update menu counter
+  const menuCount = document.getElementById('discMenuCount');
+  if(menuCount) menuCount.textContent = count;
+
+  // Update menu total (dynamic)
+  const menuTotal = document.getElementById('discMenuTotal');
+  if(menuTotal) menuTotal.textContent = total;
+
+  // Update header discovery button visibility and count
+  const headerBtn = document.getElementById('discHeaderBtn');
+  if(headerBtn) {
+    if(count > 0) {
+      headerBtn.style.display = '';
+      const headerCount = document.getElementById('discHeaderCount');
+      if(headerCount) headerCount.textContent = count;
+    } else {
+      headerBtn.style.display = 'none';
+    }
+  }
+
+  // Legacy support for old button if it exists
+  const b = document.getElementById('discBtn');
+  if(b) b.textContent = tt('📖 発見ログ ', '📖 Discoveries ') + `(${count}/${total})`;
+}
+function openDiscoveryLog(){
+  const list=document.getElementById('discList');if(!list)return;
+  list.innerHTML='';
+  const reachable = getReachableDiscoveries();
+  reachable.forEach(d=>{
+    const found=_discovered.has(d.id);
+    const row=document.createElement('div');
+    row.className='disc-row'+(found?' found':'');
+    row.innerHTML=found
+      ? `<div class="disc-badge">${d.badge()}</div><div class="disc-learn">${d.learn()}</div>`
+      : `<div class="disc-badge disc-locked">❓ ???</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('discCount').textContent=`${_discovered.size} / ${getTotalDiscoveryCount()}`;
+  document.getElementById('discoveryModal').classList.add('on');
+}
+function closeDiscoveryLog(){document.getElementById('discoveryModal').classList.remove('on');}
+function closeDiscoveryLogIf(e){if(e.target===document.getElementById('discoveryModal'))closeDiscoveryLog();}
+
 function updateP3Monitor(avgDop,generals,attackEdges){
   const fooled=generals.filter(n=>n.c>0.55).length;
+  // v6.31: 揺れる attackEdges を約0.4秒保持し、0↔正の1フレーム往復による点滅を防ぐ
+  if(attackEdges>0)p3AttackHold=24;else if(p3AttackHold>0)p3AttackHold--;
+  const attackSticky=p3AttackHold>0;
+  // P3バナーはヒステリシス（点灯: fooled>=12 & 攻撃中 / 消灯: fooled<10 か 攻撃収束）
+  if(!p3BannerOn){ if(fooled>=12&&attackSticky)p3BannerOn=true; }
+  else { if(fooled<10||!attackSticky)p3BannerOn=false; }
   const avgC=generals.reduce((s,n)=>s+n.c,0)/generals.length;
   const integ=Math.round(clamp(100-avgC*100,0,100));
   const dopR=Math.round(avgDop);
@@ -2496,12 +3294,12 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   document.getElementById('p3IntNum').textContent=integ;
   document.getElementById('p3IntNum').style.color=icol;
   document.getElementById('p3IntBar').style.cssText=`width:${integ}%;background:${icol}`;
-  document.getElementById('p3IntStatus').textContent=integ<35?tt('OVERFITTED — 認知が偽装情報に過適合','OVERFITTED — cognition over-adapted to disguised info'):integ<65?tt('DEGRADED — ノイズ蓄積が進行中','DEGRADED — noise accumulating'):'HEALTHY';
+  document.getElementById('p3IntStatus').textContent=integ<35?tt('OVERFITTED — 認知が偽装情報に過適合','OVERFITTED — cognition over-adapted to disguised info'):integ<65?tt('DEGRADED — ノイズ蓄積が進行中','DEGRADED — noise accumulating'):tt('HEALTHY — 認知は健全','HEALTHY — cognition is sound');
   document.getElementById('p3IntStatus').style.color=icol;
   const atk=document.getElementById('p3AttackBadge');
-  if(attackEdges>0){atk.textContent='⚠ ACTIVE';atk.style.color='var(--red)';}
-  else if(searchDepth>=7){atk.textContent='NEUTRALIZED';atk.style.color='var(--green)';}
-  else{atk.textContent='—';atk.style.color='var(--muted)';}
+  if(attackSticky){setText(atk,'⚠ ACTIVE');setColor(atk,'var(--red)');}
+  else if(searchDepth>=7){setText(atk,'NEUTRALIZED');setColor(atk,'var(--green)');}
+  else{setText(atk,'—');setColor(atk,'var(--muted)');}
   const fn=document.getElementById('p3FooledNum');
   fn.textContent=`${fooled}/32`;
   fn.style.color=fooled>12?'var(--red)':fooled>4?'var(--ora)':'var(--green)';
@@ -2545,7 +3343,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ DROPOUT ] 物理現実へ強制回帰中。ネットワークから切断され、汚染度が急速に洗い流されています。','[ DROPOUT ] Forced return to physical reality. Disconnected from the network; contamination washing out rapidly.');
     diag.style.borderLeftColor='var(--pur)';
   } else if(learningRate<10&&fooled>0){
-    diag.textContent=tt('[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても汚染が抜けません（思考凍結モード）。学習率を上げて自己修正を許可せよ。','[ FROZEN ] Learning rate near zero. Model updates halted — no facts can remove contamination (Cognitive Freeze Mode). Raise the learning rate to permit self-correction.');
+    diag.textContent=tt('[ FROZEN ] 学習率が0付近。モデル更新が完全停止しており、ファクトを入力しても考えが更新されません（アップデート拒否の状態）。学習率を上げて自己修正を許可せよ。','[ FROZEN ] Learning rate near zero. Model updates halted — facts come in but beliefs never update (won’t-update state). Raise the learning rate to permit self-correction.');
     diag.style.borderLeftColor='var(--red)';
   } else if(searchDepth<=3&&fooled>8){
     diag.textContent=tt('[ CRITICAL ] 探索深度が浅すぎます。偽装ノードの「良識的な語り口」を検証できず、正義感をハックされたノードが事実を述べる中立ノードを攻撃中。','[ CRITICAL ] Search too shallow. The disguised node\'s "reasonable tone" goes unverified; justice-hacked nodes are attacking fact-stating neutral nodes.');
@@ -2560,11 +3358,43 @@ function updateP3Monitor(avgDop,generals,attackEdges){
     diag.textContent=tt('[ RUNNING ] 探索深度または現実同期レートを上げることでデバッグが進行します。','[ RUNNING ] Raise search depth or grounding to progress the debug.');
     diag.style.borderLeftColor='var(--pur)';
   }
-  const ab3=document.getElementById('alertBannerP3');
-  if(fooled>=12&&attackEdges>0){
-    ab3.classList.add('on');
-    document.getElementById('alertMsgP3').textContent=tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.');
-  } else ab3.classList.remove('on');
+  // v6.338: バナーは「パラメータ」から即時判定する（fooled/attackSticky はノードの汚染度で
+  //   時間差で変化するため、ボタン押下にバナーが追従せず不安定だった）。探索深度・学習率は
+  //   押した瞬間に確定するので、バナーが安定してすぐ切り替わる。ノードのアニメ/ゲージ/攻撃バッジは実シムのまま。
+  const p3Frozen=learningRate<10;                          // アップデート拒否（自己修正が止まる）
+  const p3PoisonState=!p3Frozen&&searchDepth<=3;           // 浅い探索＝毒入れされる構成
+  const p3Good=!p3Frozen&&searchDepth>=7&&learningRate>=30; // 深い探索＋更新可能＝健全
+  if(p3Frozen){
+    setVerdictBanner('alertBannerP3','crash','banner_p3_frozen');
+    setText(document.getElementById('alertMsgP3'),tt('🧊 学習率が0付近 — 事実を入れても考えが更新されません（アップデート拒否）。学習率を上げて自己修正を許可せよ。','🧊 Learning rate near zero — facts come in but beliefs never update (won’t-update mode). Raise the learning rate to allow self-correction.'));
+    discover('d_p3_frozen');noteSessionPage(3);
+  } else if(p3PoisonState){
+    setVerdictBanner('alertBannerP3','crash','banner_p3');
+    setText(document.getElementById('alertMsgP3'),tt('正義の毒入れ攻撃が進行中 — 偽装ノードに騙された一般ノードが、事実を述べる中立ノードを集団攻撃しています。探索深度を上げて検証能力を回復せよ。','Poisoning attack in progress — nodes fooled by the disguised node are mobbing fact-stating neutral nodes. Raise search depth to restore verification.'));
+    discover('d_p3_poison');noteSessionPage(3);
+  } else if(p3Good){
+    setVerdictBanner('alertBannerP3','good','banner_p3_good');
+    setText(document.getElementById('alertMsgP3'),tt('🧠 多次元因果検証が有効 ／ 毒入れ攻撃なし ／ 認知は現実と同期しています','🧠 Multi-dimensional verification active · no poisoning attack · cognition synced with reality'));
+    discover('d_p3_restored');noteSessionPage(3);
+  } else {
+    setVerdictBanner('alertBannerP3','warn','banner_p3_warn');
+    setText(document.getElementById('alertMsgP3'),tt('探索深度や現実同期レートを上げると、視界がクリアになっていきます。','Raise search depth or grounding and your view clears up.'));
+  }
+
+  // v6.3: 判定確定スナップショット + 共有ボタン（POISONING ACTIVE / RESTORED の瞬間）
+  // v6.31: 判定は attackSticky（ヒステリシス済み）ベースにして点滅を防止
+  p3Snapshot={integ,dop:dopR,fooled};
+  const p3b=document.getElementById('p3ShareBtn');
+  if(p3b){
+    if(p3PoisonState) p3ShareState={type:'poison'};
+    else if(p3Good) p3ShareState={type:'restored'};
+    else p3ShareState=null;
+    if(p3ShareState){
+      setText(p3b,tt('▶ この結果を送る','▶ Share this result'));
+      setDisp(p3b,'block');
+    }else setDisp(p3b,'none');
+  }
+  checkScenarioGoal({integrity:integ,dopamine:dopR,depth:searchDepth});
 }
 
 function simTimelineP3(depth,ground,steps=65){
@@ -2596,21 +3426,30 @@ function updateP3Chart(){
 function startP3(){
   if(!p3Started){
     p3Started=true;
-    timelineChartP3=new Chart(document.getElementById('timelineChartP3'),{
-      type:'line',
-      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-        {label:'正義感ドーパミン Justice Dopamine',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'認知健全性 Cognitive Integrity',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'現実同期 Grounding',data:[],borderColor:'#9945ff',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-        scales:{
-          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-        }
+    if (typeof Chart !== 'undefined') {
+      try {
+        timelineChartP3=new Chart(document.getElementById('timelineChartP3'),{
+          type:'line',
+          data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+            {label:'正義感ドーパミン Justice Dopamine',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'認知健全性 Cognitive Integrity',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'現実同期 Grounding',data:[],borderColor:'#9945ff',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+            plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+            scales:{
+              x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+              y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('📊 チャート timelineChartP3 生成失敗:', e.message);
+        timelineChartP3 = null;
       }
-    });
+    } else {
+      console.warn('📊 チャート timelineChartP3 をスキップ: Chart.js が利用不可');
+    }
   }
   if(p3AnimId)cancelAnimationFrame(p3AnimId);
   const cv=document.getElementById('p3Canvas'),wrap=cv.parentElement;
@@ -2659,6 +3498,7 @@ function executeEarlyStopping(){
   document.getElementById('lrVal').textContent='80%';
   setPct(ds);setPct(gs);setPct(ls);
   p3Nodes.forEach(n=>{if(n.type==='general'){n.c=0;n.dop=5;}});
+  clearPresetSelP3(); // v6.335: EARLY_STOPPINGで設定を書き換えたら、選択中プリセットの色も解除（状態と表示を一致させる）
   const btn=document.getElementById('earlyStopBtn');
   const orig=btn.textContent;
   btn.textContent=tt('✓ ROLLBACK COMPLETE — 健全状態へ復帰','✓ ROLLBACK COMPLETE — restored to healthy state');
@@ -2695,10 +3535,10 @@ document.getElementById('learningRate').addEventListener('input',function(){
 });
 
 // ── PAGE 4: STAKEHOLDER ASYMMETRY ─────────────────────────
-let extTraffic=20, gamification=20;
+let extTraffic=15, gamification=15; // v6.334: 初期状態から p4Good（声が届く）を満たす
 let p4Started=false, p4Citizens=[], p4Edges=[], p4Spam=[], p4Ctx=null, p4W=0, p4H=0, p4AnimId=null;
 let filterActive=false, filterTimer=null;
-let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0;
+let timelineChartP4=null, p4LogEntries=[], p4Tick=0, p4LogSeq=0, p4DropCurrent=0, p4DropSmooth=0;
 const P4_SPAM_MAX=36;
 
 const P4_LOG_POLICY_JA=[
@@ -2810,10 +3650,10 @@ function drawP4(){
     p4Ctx.font="bold 7px 'Courier New',monospace";p4Ctx.textAlign='center';
     p4Ctx.fillStyle='#fff';p4Ctx.fillText(String(s.bit),x,y+2.5);
   });
-  // クラスターラベル
-  p4Ctx.font="9px 'Courier New',monospace";p4Ctx.textAlign='center';
+  // クラスターラベル（v6.340: 下部の凡例「遮断されたリンク」との重なりを避けて左上へ移動）
+  p4Ctx.font="9px 'Courier New',monospace";p4Ctx.textAlign='left';
   p4Ctx.fillStyle='rgba(90,111,148,.9)';
-  p4Ctx.fillText(lang==='ja'?'生活者クラスター（530万ノードの象徴）':'RESIDENT CLUSTER (5.3M NODES)',p4W/2,p4H-10);
+  p4Ctx.fillText(lang==='ja'?'生活者クラスター（530万ノードの象徴）':'RESIDENT CLUSTER (5.3M NODES)',10,16);
   // オーバーレイ・モニター更新
   const jamRatio=p4Edges.length?jammed/p4Edges.length:0;
   document.getElementById('p4St1').textContent=`JAMMED LINKS: ${jammed}/${p4Edges.length}`;
@@ -2824,7 +3664,10 @@ function drawP4(){
 }
 
 function updateP4Monitor(jamRatio){
-  const drop=Math.round(clamp(jamRatio*72+gamification*(filterActive?0.08:0.3),0,100));
+  // v6.346: 生のjamRatioはフレーム毎に揺れて数値が高速点滅するので、EMAで滑らかに追従させる（落ち着いた読みやすい速度）
+  const dropTarget=clamp(jamRatio*72+gamification*(filterActive?0.08:0.3),0,100);
+  p4DropSmooth+=(dropTarget-p4DropSmooth)*0.08;
+  const drop=Math.round(p4DropSmooth);
   p4DropCurrent=drop;
   const ratio=Math.round(clamp(100-gamification*0.85-(filterActive?0:extTraffic*0.2),0,100));
   const dc=drop<35?'#00ff88':drop<70?'#ff6b2b':'#ff2244';
@@ -2867,11 +3710,41 @@ function updateP4Monitor(jamRatio){
     diag.textContent=tt('[ OK ] 当事者の声が正常にルーティングされています。パラメーターを操作して非対称性の発生をシミュレートできます。','[ OK ] Stakeholder voices routing normally. Adjust parameters to simulate asymmetry.');
     diag.style.borderLeftColor='var(--yel)';
   }
-  const ab4=document.getElementById('alertBannerP4');
-  if(gamification>70&&drop>60){
-    ab4.classList.add('on');
-    document.getElementById('alertMsgP4').textContent=tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed');
-  } else ab4.classList.remove('on');
+  // v6.31: drop（毎フレーム揺れる）にヒステリシス（点灯>62 / 消灯<55）。gamification は安定値
+  if(!p4BannerOn){ if(gamification>70&&drop>62)p4BannerOn=true; }
+  else { if(gamification<=70||drop<55)p4BannerOn=false; }
+  // v6.333: 危機（赤・乗っ取り）/ 模範（緑・声が届く）/ 非表示 の3状態。良い状態は安定値(gam/ext)で判定
+  const p4Good=gamification<=18&&extTraffic<=18;
+  if(p4BannerOn){
+    // v6.335: 外部の殺到(ext>60)を伴う複合＝「推し活炎上」と、ゲーム化単独＝「ゲーム化進行」を区別
+    const p4Compound=extTraffic>60;
+    setVerdictBanner('alertBannerP4','crash',p4Compound?'banner_p4_flood':'banner_p4');
+    setText(document.getElementById('alertMsgP4'), p4Compound
+      ? tt('外部アカウントの殺到 × ゲーム化の複合  |  生活者パケットは '+drop+'% がドロップ  |  当事者の声が二重にかき消されている','Outsider flood × gamification (compound)  |  '+drop+'% of resident packets dropping  |  the stakeholders’ voice is doubly drowned out')
+      : tt('目的関数が「生活の改善」から「二元論ゲーム」へ乗っ取られました  |  サイレントマジョリティのパケットは '+drop+'% がドロップ中  |  政策議論のエントロピーが消失','Objective hijacked from "improving life" to a binary game  |  '+drop+'% of silent-majority packets dropping  |  policy-debate entropy collapsed'));
+    discover('d_p4_hijack');noteSessionPage(4);
+  } else if(p4Good){
+    setVerdictBanner('alertBannerP4','good','banner_p4_good');
+    setText(document.getElementById('alertMsgP4'),tt('📡 当事者の声が最優先で届いている ／ ノイズは最小 ／ 目的関数は「政策」のまま','📡 Stakeholders’ voices routed first · noise minimal · objective still policy-focused'));
+  } else {
+    setVerdictBanner('alertBannerP4','warn','banner_p4_warn');
+    setText(document.getElementById('alertMsgP4'),tt('生活者のパケットが '+drop+'% ドロップ ／ 当事者の声より、観客の声が通りやすくなっている',drop+'% of resident packets dropping · spectators’ voices are getting through more easily than the stakeholders’'));
+  }
+
+  // v6.3: 判定確定スナップショット + 共有ボタン（OBJECTIVE HIJACK / GROUNDED の瞬間）
+  // 判定は gamification（ユーザー設定・安定値）ベースなので揺れないが、DOM書き込みはガード経由に統一
+  p4Snapshot={drop,ratio};
+  const p4b=document.getElementById('p4ShareBtn');
+  if(p4b){
+    if(gamification>70) p4ShareState={type:'hijack'};
+    else if(gamification<=40) p4ShareState={type:'restored'};
+    else p4ShareState=null;
+    if(p4ShareState){
+      setText(p4b,tt('▶ この結果を送る','▶ Share this result'));
+      setDisp(p4b,'block');
+    }else setDisp(p4b,'none');
+  }
+  checkScenarioGoal({drop,ratio});
 }
 
 function updateP4Log(){
@@ -2886,7 +3759,7 @@ function updateP4Log(){
     // 低エントロピー: 90%超では語彙2種のみをループ
     const pool=gamification>=90?2:3;
     const tok=HIJ[p4LogSeq%pool];
-    html=`<span style="color:var(--red);animation:blink ${(0.4+(p4LogSeq%3)*0.15).toFixed(2)}s infinite">${ts} ${tok}${hijackTag}</span>`;
+    html=`<span class="mode-log-blink" style="color:var(--red);animation:logpulse ${(1.2+(p4LogSeq%3)*0.3).toFixed(2)}s infinite ease-in-out">${ts} ${tok}${hijackTag}</span>`;
   } else if(gamification>40&&p4LogSeq%2===0){
     const tok=HIJ[p4LogSeq%3];
     html=`<span style="color:rgba(255,34,68,.6)">${ts} ${tok}${hijackTag}</span>`;
@@ -2895,7 +3768,7 @@ function updateP4Log(){
     const dropped=Math.random()*100<p4DropCurrent;
     html=dropped
       ?`<span style="color:var(--red)">${ts} ${p.replace('QUEUED','DROPPED ✕')}</span>`
-      :`<span class="p2log-normal">${ts} ${p}</span>`;
+      :`<span class="p4log-ok">${ts} ${p}</span>`;
   }
   p4LogEntries.push(html);
   if(p4LogEntries.length>7)p4LogEntries.shift();
@@ -2929,21 +3802,30 @@ function updateP4Chart(){
 function startP4(){
   if(!p4Started){
     p4Started=true;
-    timelineChartP4=new Chart(document.getElementById('timelineChartP4'),{
-      type:'line',
-      data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-        {label:'Packet Drop Rate',data:[],borderColor:'#ff2244',backgroundColor:'rgba(255,34,68,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'True Stakeholder Ratio',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-        {label:'政策シグナル Policy Signal',data:[],borderColor:'#00ff88',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-        scales:{
-          x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-          y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-        }
+    if (typeof Chart !== 'undefined') {
+      try {
+        timelineChartP4=new Chart(document.getElementById('timelineChartP4'),{
+          type:'line',
+          data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+            {label:'パケットドロップ率 Packet Drop Rate',data:[],borderColor:'#ff2244',backgroundColor:'rgba(255,34,68,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'真の当事者比率 True Stakeholder Ratio',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+            {label:'政策シグナル Policy Signal',data:[],borderColor:'#00ff88',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0.42,fill:false},
+          ]},
+          options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+            plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+            scales:{
+              x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+              y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('📊 チャート timelineChartP4 生成失敗:', e.message);
+        timelineChartP4 = null;
       }
-    });
+    } else {
+      console.warn('📊 チャート timelineChartP4 をスキップ: Chart.js が利用不可');
+    }
   }
   if(p4AnimId)cancelAnimationFrame(p4AnimId);
   const cv=document.getElementById('p4Canvas'),wrap=cv.parentElement;
@@ -2962,6 +3844,7 @@ function executePacketFiltering(){
   if(!p4Started)return;
   if(filterTimer)clearTimeout(filterTimer);
   filterActive=true;
+  discover('d_p4_restored');noteSessionPage(4);
   document.getElementById('filterBtn').classList.add('exec');
   document.getElementById('p4FilterFlash').classList.add('on');
   updateP4Chart();
@@ -2994,6 +3877,7 @@ function clearPresetSelP2(){Object.keys(PRESETS_P2).forEach(k=>document.getEleme
 function setPresetP2(id){
   const p=PRESETS_P2[id];if(!p)return;
   shrinkRate=p.s;dxRate=p.d;ethicsP2=p.e;algoP2=p.a;publicReboot=p.r;
+  skillStock=p.d>=45?80:p.d<25?10:50; skillLost=false; // v6.346: プリセットのDXに応じた後継者ストック均衡値
   const sr=document.getElementById('shrinkRate'),dx=document.getElementById('dxRate'),es=document.getElementById('ethicsScoreP2');
   sr.value=p.s;dx.value=p.d;es.value=p.e;
   document.getElementById('shrinkVal').textContent=p.s+'%';
@@ -3012,6 +3896,7 @@ function setPresetP2(id){
   document.getElementById('p2-'+id)?.classList.add('sel');
   updateAllP2();
   showShareToast({kind:'preset',page:2,preset:id});
+  notePreset(2,id);
 }
 
 const PRESETS_P3={
@@ -3034,6 +3919,7 @@ function setPresetP3(id){
   document.getElementById('p3-'+id)?.classList.add('sel');
   updateP3Chart();
   showShareToast({kind:'preset',page:3,preset:id});
+  notePreset(3,id);
 }
 
 const PRESETS_P4={
@@ -3055,10 +3941,321 @@ function setPresetP4(id){
   document.getElementById('p4-'+id)?.classList.add('sel');
   updateP4Chart();
   showShareToast({kind:'preset',page:4,preset:id});
+  notePreset(4,id);
+}
+
+// ── v6.35: Phase 1 Weekly Scenarios ──
+const SCENARIOS = [
+  {
+    id: 'echo_trap',
+    title: { ja: 'エコーチェンバーの罠', en: 'Echo Chamber Trap' },
+    brief: { ja: 'フィルタリングが徐々に強まる世界で、情報空間は澄むか、濁るか？', en: 'As filtering gradually increases, will your information space stay clear or become clouded?' },
+    page: 1,
+    params: {
+      p1: { f: 0, e: 100, al: 'dp' },
+      hint: { ja: 'フィルタリングを少しずつ上げていき、多様性とエントロピーがどう変わるかを観察してください。', en: 'Gradually increase filtering and observe how diversity and entropy change.' }
+    },
+    goal: {
+      ja: 'エントロピーを70以上に上昇させずに、多様性を80以上に保つ',
+      en: 'Keep diversity above 80 while preventing entropy from rising above 70'
+    },
+    check: (m) => {
+      const ent = m.entropy || 0, div = m.diversity || 0;
+      return div >= 80 && ent < 70;
+    },
+    discoveryId: 'sce_echo_trap'
+  },
+  {
+    id: 'ethics_cascade',
+    title: { ja: 'リーダー倫理観の滝', en: 'Leader Ethics Waterfall' },
+    brief: { ja: 'リーダーの倫理観が低下するとき、社会全体がどうカスケードするか？', en: 'When a leader\'s ethics drops, how does the entire society cascade?' },
+    page: 1,
+    params: {
+      p1: { f: 30, e: 100, al: 'dp' },
+      hint: { ja: 'リーダーの倫理スコアをゆっくり下げ、パラノイア、信頼、正当性がどう悪化するかを見てください。', en: 'Slowly lower the leader\'s ethics score and watch paranoia, trust, and legitimacy deteriorate.' }
+    },
+    goal: {
+      ja: '正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に上げ直す',
+      en: 'Keep legitimacy above 60 while raising the ethics score back to 50+'
+    },
+    check: (m) => {
+      const leg = m.legitimacy || 0, e = ethicsScore;
+      return leg >= 60 && e >= 50;
+    },
+    discoveryId: 'sce_ethics_cascade'
+  },
+  {
+    id: 'successor_crisis',
+    title: { ja: '後継者ストック危機', en: 'Successor Stock Crisis' },
+    brief: { ja: 'DXに投資しなければ、後継者ストックが枯渇し、ブランドが崖から落ちる。', en: 'Without DX investment, successor stock depletes and the brand collapses off a cliff.' },
+    page: 2,
+    params: {
+      p2: { s: 30, d: 10, e: 80, al: 'dp', reboot: false },
+      hint: { ja: 'DX投資を急速に上げて、後継者ストック（スキルゲージ）の回復を見てください。平穏→崖落ちの瞬間を体験できます。', en: 'Rapidly increase DX investment to recover the successor stock (skill gauge). Experience the calm→cliff moment.' }
+    },
+    goal: {
+      ja: '後継者ストックを50以上に回復させ、ブランド産業の崩壊を止める',
+      en: 'Recover successor stock above 50 and prevent brand industry collapse'
+    },
+    check: (m) => {
+      const ss = skillStock || 0, br = m.brand || 0;
+      return ss >= 50 && br >= 40;
+    },
+    discoveryId: 'sce_successor_crisis'
+  },
+  {
+    id: 'redundancy_shock',
+    title: { ja: '冗長性ショック対抗', en: 'Redundancy Shock Resilience' },
+    brief: { ja: 'インフラの集約化を進めると、ショックに脆くなる。冗長性バッファを上げてショックに耐える。', en: 'Consolidating infrastructure makes you vulnerable to shocks. Build redundancy buffer to survive.' },
+    page: 2,
+    params: {
+      p2: { s: 50, d: 30, e: 80, al: 'dp', reboot: false },
+      hint: { ja: '集約化（Consolidation）を下げて冗長性を上げ、そのあと⚡ショックを注入してください。生存の分岐点を見てください。', en: 'Lower consolidation to raise redundancy, then inject ⚡ shock. Watch the survival branching point.' }
+    },
+    goal: {
+      ja: '冗長性バッファを75以上に上げ、ショック注入後も生き残る',
+      en: 'Raise redundancy buffer above 75 and survive after shock injection'
+    },
+    check: (m) => {
+      const red = m.redundancy || 0;
+      return red >= 75 && (m.infra || 0) >= 20;
+    },
+    discoveryId: 'sce_redundancy_shock'
+  },
+  {
+    id: 'cognitive_grounding',
+    title: { ja: '認知のグラウンディング', en: 'Cognitive Grounding' },
+    brief: { ja: 'SNS断食と現実同期：深い探索と高い学習率でバランスを取る。', en: 'SNS fasting & reality sync: balance deep reasoning with high learning rate.' },
+    page: 3,
+    params: {
+      p3: { depth: 3, ground: 20, lr: 20 },
+      hint: { ja: 'パラメータを調整して、「毒入れ」（赤い攻撃）が消えるか、認知健全性が改善するか観察してください。', en: 'Adjust parameters to watch the "poisoning attack" (red arrows) disappear and cognitive integrity improve.' }
+    },
+    goal: {
+      ja: '認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする',
+      en: 'Raise cognitive integrity above 80 and achieve search depth 7+'
+    },
+    check: (m) => {
+      const int = m.integrity || 0, depth = (document.getElementById('depth')?.value || 3) >> 0;
+      return int >= 80 && depth >= 7;
+    },
+    discoveryId: 'sce_cognitive_grounding'
+  },
+  {
+    id: 'stakeholder_voice',
+    title: { ja: '当事者の声を取り戻す', en: 'Restore Stakeholder Voice' },
+    brief: { ja: 'ゲーム化が進むと、当事者比率が低下する。フィルタリングで本来の声を優先させる。', en: 'As gamification rises, stakeholder ratio drops. Use filtering to restore true voices.' },
+    page: 4,
+    params: {
+      p4: { ext: 50, gam: 40 },
+      hint: { ja: 'ゲーム化（Gamification）とパケットドロップ率の関係を観察し、フィルタリングで当事者比率を改善してください。', en: 'Observe how gamification links to packet drop, and use filtering to improve stakeholder ratio.' }
+    },
+    goal: {
+      ja: '当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる',
+      en: 'Raise stakeholder commit ratio above 70 and drop packet rate below 40%'
+    },
+    check: (m) => {
+      const ratio = m.ratio || 0, drop = m.drop || 0;
+      return ratio >= 70 && drop <= 40;
+    },
+    discoveryId: 'sce_stakeholder_voice'
+  }
+];
+
+function getWeeklyScenario() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const diffTime = now - jan1;
+  const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+  const weekNum = (diffWeeks % SCENARIOS.length);
+  return SCENARIOS[weekNum];
+}
+
+function applyScenarioParams(scenario) {
+  if (scenario.params.p1) {
+    const p = scenario.params.p1;
+    filterRate = p.f;
+    ethicsScore = p.e;
+    algo = p.al;
+    document.getElementById('filterRate').value = p.f;
+    document.getElementById('ethicsScore').value = p.e;
+    document.getElementById('btnDP').classList.toggle('on', p.al === 'dp');
+    document.getElementById('btnDP').classList.toggle('green-on', p.al === 'dp');
+    document.getElementById('btnGreedy').classList.toggle('on', p.al === 'greedy');
+    document.getElementById('btnGreedy').classList.toggle('red-on', p.al === 'greedy');
+    setPct(document.getElementById('filterRate'));
+    setPct(document.getElementById('ethicsScore'));
+    updateP1Chart();
+  }
+  if (scenario.params.p2) {
+    const p = scenario.params.p2;
+    shrinkRate = p.s;
+    dxRate = p.d;
+    ethicsP2 = p.e;
+    algo = p.al;
+    publicReboot = p.reboot || false;
+    if (p.d >= 45) skillStock = 80;
+    else if (p.d < 25) skillStock = 10;
+    else skillStock = 50;
+    document.getElementById('shrinkRate').value = p.s;
+    document.getElementById('dxRate').value = p.d;
+    document.getElementById('ethicsScoreP2').value = p.e;
+    if (p.al === 'dp') {
+      document.getElementById('btnDPP2').classList.add('on');
+      document.getElementById('btnDPP2').classList.add('green-on');
+      document.getElementById('btnGreedyP2').classList.remove('on');
+      document.getElementById('btnGreedyP2').classList.remove('red-on');
+    } else {
+      document.getElementById('btnGreedyP2').classList.add('on');
+      document.getElementById('btnGreedyP2').classList.add('red-on');
+      document.getElementById('btnDPP2').classList.remove('on');
+      document.getElementById('btnDPP2').classList.remove('green-on');
+    }
+    document.getElementById('btnRebootOff').classList.toggle('on', !p.reboot);
+    document.getElementById('btnRebootOn').classList.toggle('on', p.reboot);
+    document.getElementById('btnRebootOn').classList.toggle('green-on', p.reboot);
+    setPct(document.getElementById('shrinkRate'));
+    setPct(document.getElementById('dxRate'));
+    setPct(document.getElementById('ethicsScoreP2'));
+    updateP2Chart();
+  }
+  if (scenario.params.p3) {
+    const p = scenario.params.p3;
+    searchDepth = p.depth;
+    groundingRate = p.ground;
+    learningRate = p.lr;
+    document.getElementById('searchDepth').value = p.depth;
+    document.getElementById('groundingRate').value = p.ground;
+    document.getElementById('learningRate').value = p.lr;
+    setPct(document.getElementById('groundingRate'));
+    setPct(document.getElementById('learningRate'));
+    updateP3Monitor();
+    updateP3Chart();
+  }
+  if (scenario.params.p4) {
+    const p = scenario.params.p4;
+    extTraffic = p.ext;
+    gamification = p.gam;
+    document.getElementById('extTraffic').value = p.ext;
+    document.getElementById('gamification').value = p.gam;
+    setPct(document.getElementById('extTraffic'));
+    setPct(document.getElementById('gamification'));
+    updateP4Chart();
+  }
+}
+
+function openScenarios() {
+  if (!WEEKLY_ENABLED) return;
+
+  const scenario = getWeeklyScenario();
+  const titleEl = document.getElementById('scenarioTitle');
+  const descEl = document.getElementById('scenarioDesc');
+  const goalEl = document.getElementById('scenarioGoal');
+  const hintEl = document.getElementById('scenarioHint');
+  const checkEl = document.getElementById('scenarioCheckContainer');
+
+  if (titleEl) titleEl.textContent = tt(scenario.title.ja, scenario.title.en);
+  if (descEl) descEl.textContent = tt(scenario.brief.ja, scenario.brief.en);
+  if (goalEl) goalEl.textContent = tt(scenario.goal.ja, scenario.goal.en);
+  if (hintEl) hintEl.textContent = (scenario.params.hint ? tt(scenario.params.hint.ja, scenario.params.hint.en) : '');
+  if (checkEl) checkEl.style.display = 'none';
+
+  document.getElementById('scenarioModal').classList.add('on');
+}
+
+function closeScenarios() {
+  document.getElementById('scenarioModal').classList.remove('on');
+}
+
+function closeScenarioIf(e) {
+  if (e.target === document.getElementById('scenarioModal')) closeScenarios();
+}
+
+function startScenario() {
+  const scenario = getWeeklyScenario();
+  applyScenarioParams(scenario);
+  switchTab(scenario.page);
+  closeScenarios();
+  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
+}
+
+function toggleHeaderMenu() {
+  const menu = document.getElementById('headerMenu');
+  menu?.classList.toggle('open');
+}
+
+function closeHeaderMenu() {
+  const menu = document.getElementById('headerMenu');
+  menu?.classList.remove('open');
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.menu-container')) {
+    closeHeaderMenu();
+  }
+});
+
+function initWeeklyScenarioCard() {
+  if (!WEEKLY_ENABLED) return;
+
+  const scenario = getWeeklyScenario();
+  const isClear = _discovered.has(scenario.discoveryId);
+
+  document.getElementById('scenarioCardTitle').textContent = tt(scenario.title.ja, scenario.title.en);
+  document.getElementById('scenarioCardBrief').textContent = tt(scenario.brief.ja, scenario.brief.en);
+  document.getElementById('scenarioCardGoal').textContent = tt(scenario.goal.ja, scenario.goal.en);
+
+  const statusEl = document.getElementById('scenarioCardStatus');
+  const btnEl = document.getElementById('scenarioCardBtn');
+
+  if (isClear) {
+    statusEl.style.display = 'block';
+    statusEl.textContent = tt('✓ CLEARED — 来週のシナリオをお楽しみに！', '✓ CLEARED — Another challenge next week!');
+    btnEl.textContent = tt('来週のシナリオまで待機中', 'Waiting for next week');
+    btnEl.disabled = true;
+    btnEl.style.opacity = '0.5';
+    btnEl.style.cursor = 'default';
+  } else {
+    statusEl.style.display = 'none';
+    btnEl.disabled = false;
+    btnEl.style.opacity = '1';
+    btnEl.style.cursor = 'pointer';
+    btnEl.textContent = tt('▶ 挑戦する', '▶ Take the challenge');
+  }
+}
+
+function startWeeklyScenarioFromCard() {
+  const scenario = getWeeklyScenario();
+  applyScenarioParams(scenario);
+  switchTab(scenario.page);
+  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
+}
+
+function checkScenarioGoal(metricsObj) {
+  if (!WEEKLY_ENABLED) return; // fix: Web版では週次シナリオ無効のため判定自体をスキップ
+  const scenario = getWeeklyScenario();
+  if (!scenario || !scenario.check) return;
+  if (!document.getElementById('scenarioModal')?.classList.contains('on')) {
+    if (scenario.check(metricsObj)) {
+      const discId = scenario.discoveryId;
+      if (!_discovered.has(discId)) {
+        discover(discId); // fix: 未定義だった saveDiscoveries()/unlock() を既存の発見システム（保存・トースト込み）に置換
+        if (document.getElementById('scenarioCheckContainer')) {
+          document.getElementById('scenarioCheckContainer').style.display = 'block';
+        }
+        // Update scenario card status
+        initWeeklyScenarioCard();
+      }
+    }
+  }
 }
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
-function openIntro(){document.getElementById('introModal').classList.add('on');}
+function openIntro(){
+  document.getElementById('introModal').classList.add('on');
+  syncTownPlaceholder();
+}
 function closeIntro(){
   document.getElementById('introModal').classList.remove('on');
   try{localStorage.setItem('ssd_intro_seen','1')}catch(e){}
@@ -3227,6 +4424,12 @@ function buildShareTemplates(ctx){
     'Honestly fun as a game: tweak a society’s parameters and watch it collapse — or survive.');
   const addDeadlock=()=>add('行政のCPUが100%「責任回避」に回ると救命ヘリが止まる、っていうシミュレーターがあって、ちょっと出来が良すぎる',
     'There’s a simulator where the rescue helicopter stops once the admin CPU hits 100% “blame-avoidance”. It’s a little too well made.');
+  const addEchoChamber=()=>add('1タップで1933年を再現できるんだけど、パラメータ変えたら普通に持ち直した。歴史がゲームになってる',
+    'You can recreate 1933 with one tap — but tweak the parameters and it recovers. History, turned into a game.');
+  const addPoisoning=()=>add('SNSの接続時間を増やすと脳のネットワークが赤く汚染されていくの、可視化されるとけっこう怖い',
+    'Crank up screen time and you can watch the cognitive network turn red in real time. Seeing it visualized is unsettling.');
+  const addHijack=()=>add('外部の声を増やしていくと、当事者の意見が静かにかき消されていくのが数値で見える',
+    'Add more outside noise and you can watch the actual stakeholders’ voices get quietly drowned out, in real time.');
   if(ctx.kind==='shock'){
     if(ctx.type==='crash') add('同じ災害を2回入れて、設定だけで生き残れるか試すやつ。この設定だと落ちた…',
       'A sim where you inject the same disaster twice and see if the settings alone survive. This setup collapsed…');
@@ -3240,6 +4443,27 @@ function buildShareTemplates(ctx){
     add('社会OSのデバッグに成功した。冗長性を戻して思考を再学習させると、社会は生き残れるらしい',
       'Successfully debugged the social OS. Restore redundancy and retrain cognition, and society survives.');
     addGame();addGeneric();
+  }else if(ctx.kind==='p1'){
+    if(ctx.type==='crash') add('パラメータを設定して社会を動かしたら、そのまま崩壊した実験。誰の話でもないのに見覚えがある',
+      'A run where I set the parameters, let the society go — and it collapsed. About nobody, yet so familiar.');
+    else add('パラメータを設定して社会を動かしたら、崩壊せずに安定して回りはじめた実験',
+      'A run where I set the parameters, let the society go — and it stabilized instead of collapsing.');
+    if(metrics(filterRate,ethicsScore,algo).crash)addEchoChamber();else addGame();
+    addGeneric();
+  }else if(ctx.kind==='p3'){
+    if(ctx.type==='poison') add('探索を浅くすると、事実を述べるノードが集団で赤く攻撃されはじめる実験。脳の話であって政治の話じゃない',
+      'A run where, with shallow reasoning, fact-stating nodes get mobbed in red. It’s about brains, not politics.');
+    else add('探索深度を上げたら、毒入れ攻撃が止まって認知ネットワークが元に戻った実験',
+      'A run where raising the search depth stopped the poisoning attack and the cognitive network recovered.');
+    if(ctx.type==='poison')addPoisoning();else addGame();
+    addGeneric();
+  }else if(ctx.kind==='p4'){
+    if(ctx.type==='hijack') add('外部トラフィックを増やすと、当事者の政策パケットがドロップして議論が乗っ取られる実験',
+      'A run where adding outside traffic drops the stakeholders’ policy packets and the debate gets hijacked.');
+    else add('外部トラフィックを絞ると、当事者の声がちゃんとルーティングされて議論が戻る実験',
+      'A run where throttling outside traffic lets the stakeholders’ voices route through and the debate recovers.');
+    if(gamification>70)addHijack();else addGame();
+    addGeneric();
   }else if(ctx.kind==='preset'){
     if(ctx.page===1){
       if(ctx.preset==='weimar')add('1933年の崩壊を1タップで再現できるシミュレーター。パラメータを変えると結末が変わる',
@@ -3266,8 +4490,99 @@ function buildShareTemplates(ctx){
 
 let shareCtx=null, shareTpls=[], shareSelIdx=0;
 
+// v6.345: 共有前コメント
+let _pendingShareCtx=null, shareComment='';
+const SC_CHIPS_JA=['自分の街として','思考実験として','友達に見せたい話','授業で出た話から'];
+const SC_CHIPS_EN=['My town','Thought experiment','Show a friend','From a lecture'];
+function openShareComment(ctx){
+  _pendingShareCtx=ctx;
+  shareComment='';
+  const inp=document.getElementById('shareCommentInput');
+  if(inp){inp.value='';inp.placeholder=lang==='ja'?'自分の感想を一言…（スキップ可）':'Add your take… (optional)';}
+  const chips=document.getElementById('scChips');
+  if(chips){
+    chips.innerHTML='';
+    const arr=lang==='ja'?SC_CHIPS_JA:SC_CHIPS_EN;
+    arr.forEach(txt=>{
+      const b=document.createElement('button');
+      b.className='sbtn';
+      b.style='font-size:.58rem;padding:3px 10px;border-color:var(--bdr);color:var(--muted);margin:0';
+      b.textContent=txt;
+      b.onclick=()=>{if(inp)inp.value=txt;inp.dispatchEvent(new Event('input'));};
+      chips.appendChild(b);
+    });
+  }
+  document.getElementById('shareCommentModal').classList.add('on');
+}
+function closeShareComment(){document.getElementById('shareCommentModal').classList.remove('on');}
+function closeShareCommentIf(e){if(e.target===document.getElementById('shareCommentModal'))closeShareComment();}
+function proceedShare(skip){
+  if(!skip){const inp=document.getElementById('shareCommentInput');shareComment=inp?inp.value.trim():'';}
+  else{shareComment='';}
+  closeShareComment();
+  if(_pendingShareCtx)shareScenario(_pendingShareCtx);
+}
+
+// v6.345: リワインド体験（P1のみ）
+let _rewindSnap=null;
+function openRewind(){
+  _rewindSnap={filterRate,ethicsScore,algo};
+  const res=document.getElementById('rewindResult');
+  if(res){res.style.display='none';res.innerHTML='';}
+  const ch=document.getElementById('rewindChoices');
+  if(ch){
+    ch.innerHTML='';
+    const opts=lang==='ja'
+      ?[['情報フィルタリングを下げる','filter'],['リーダーの倫理を引き上げる','ethics'],['DP（長期最適）に切り替える','algo']]
+      :[['Lower info filtering','filter'],['Raise leader ethics','ethics'],['Switch to DP strategy','algo']];
+    opts.forEach(([label,key])=>{
+      const b=document.createElement('button');
+      b.className='sbtn';
+      b.style='width:100%;text-align:left;border-color:var(--bdr);color:var(--txt);font-size:.65rem';
+      b.textContent='↩ '+label;
+      b.onclick=()=>applyRewind(key);
+      ch.appendChild(b);
+    });
+  }
+  document.getElementById('rewindModal').classList.add('on');
+}
+function closeRewind(){document.getElementById('rewindModal').classList.remove('on');}
+function closeRewindIf(e){if(e.target===document.getElementById('rewindModal'))closeRewind();}
+function applyRewind(key){
+  const snap=_rewindSnap;if(!snap)return;
+  let fr=snap.filterRate,es=snap.ethicsScore,al=snap.algo;
+  let chosenLabel;
+  if(key==='filter'){fr=Math.min(fr,38);chosenLabel=tt('フィルタリング削減','info filtering');}
+  else if(key==='ethics'){es=Math.max(es,72);chosenLabel=tt('倫理引き上げ','leader ethics');}
+  else{al='dp';chosenLabel=tt('DP切替','DP strategy');}
+  const m2=metrics(fr,es,al);
+  const survived=!m2.crash;
+  const res=document.getElementById('rewindResult');
+  if(!res)return;
+  res.style.display='block';
+  if(survived){
+    res.style.borderColor='var(--green)';
+    const town=getTownName();
+    const line=town
+      ? tt(`あなたは〈${chosenLabel}〉を守った。${town}は生き延びた。`,`You protected ‹${chosenLabel}›. ${town} survived.`)
+      : tt(`あなたは〈${chosenLabel}〉を守った。街は生き延びた。`,`You protected ‹${chosenLabel}›. Your town survived.`);
+    res.innerHTML='<span style="color:var(--green)">✔ '+line+'</span><br><span style="color:var(--muted);font-size:.58rem">'+tt('エントロピー','Entropy')+' '+Math.round(m2.entropy)+' / '+tt('多様性','Diversity')+' '+Math.round(m2.diversity)+'</span>';
+    discover('d_p1_rewind');
+    track('rewind_success',{key});
+    // 成功フラグ → 結果カードに反映するために保存
+    window._rewindSuccess={label:chosenLabel,metrics:m2};
+  } else {
+    res.style.borderColor='var(--warn)';
+    res.innerHTML='<span style="color:var(--warn)">✘ '+tt(`〈${chosenLabel}〉だけでは足りなかった。もう一つの要因が街を壊した。`,`‹${chosenLabel}› alone was not enough. Another factor broke your town.`)+'</span>';
+    window._rewindSuccess=null;
+  }
+  // チョイスボタンを無効化
+  document.querySelectorAll('#rewindChoices .sbtn').forEach(b=>b.disabled=true);
+}
+
 function shareScenario(ctx){
   shareCtx=ctx||{kind:'generic'};
+  track('share_open',{kind:shareCtx.kind||'generic'});
   shareTpls=buildShareTemplates(shareCtx);
   shareSelIdx=0;
   document.getElementById('sharePopTitle').textContent=tt('実験を共有','Share this experiment');
@@ -3278,7 +4593,11 @@ function shareScenario(ctx){
   document.getElementById('sharePopModal').classList.add('on');
 }
 
-function shareMessage(){return shareTpls[shareSelIdx]+'\n'+shareFooter();}
+function shareMessage(){
+  let msg=shareTpls[shareSelIdx]+'\n'+shareFooter();
+  if(shareComment)msg=shareComment+'\n\n'+msg;
+  return msg;
+}
 
 function renderSharePop(){
   const list=document.getElementById('shareTplList');
@@ -3315,7 +4634,7 @@ function renderSharePop(){
   // 判定・監査コンテキストのみ: 結果カードPNG
   const row=document.getElementById('shareCardRow');
   row.innerHTML='';
-  if(shareCtx.kind==='shock'||shareCtx.kind==='audit'){
+  if(['shock','audit','p1','p3','p4'].includes(shareCtx.kind)){
     const cb=document.createElement('button');
     cb.className='sbtn';cb.style.cssText='margin-top:8px;border-color:var(--green);color:var(--green)';
     cb.textContent=canShareFiles()
@@ -3342,7 +4661,20 @@ function closeSharePopIf(e){if(e.target===document.getElementById('sharePopModal
 
 function shareShockResult(){
   if(!shockState)return;
-  shareScenario({kind:'shock',type:shockState.type});
+  openShareComment({kind:'shock',type:shockState.type});
+}
+// v6.3: P1/P3/P4 判定共有（shareShockResult をそのまま流用）
+function shareP1Result(){
+  if(!p1ShareState)return;
+  openShareComment({kind:'p1',type:p1ShareState.type,preset:activePreset});
+}
+function shareP3Result(){
+  if(!p3ShareState)return;
+  openShareComment({kind:'p3',type:p3ShareState.type});
+}
+function shareP4Result(){
+  if(!p4ShareState)return;
+  openShareComment({kind:'p4',type:p4ShareState.type});
 }
 
 // ── 結果カードPNG（1200×630, 既存トークン準拠） ──────────────
@@ -3354,6 +4686,9 @@ function canShareFiles(){
 
 function cardStamp(ctx){
   if(ctx.kind==='audit')return{txt:'GRAND OPTIMAL',color:'#00ff88'};
+  if(ctx.kind==='p1')return ctx.type==='crash'?{txt:'COLLAPSE',color:'#ff2244'}:{txt:'STABLE',color:'#00ff88'};
+  if(ctx.kind==='p3')return ctx.type==='poison'?{txt:'POISONED',color:'#ff2244'}:{txt:'DEBUGGED',color:'#00ff88'};
+  if(ctx.kind==='p4')return ctx.type==='hijack'?{txt:'HIJACKED',color:'#ff2244'}:{txt:'GROUNDED',color:'#00ff88'};
   if(ctx.type==='crash')return{txt:'COLLAPSE',color:'#ff2244'};
   if(ctx.type==='survived')return{txt:'SURVIVED',color:'#00ff88'};
   return{txt:'PARTIAL DAMAGE',color:'#ff6b2b'};
@@ -3367,6 +4702,19 @@ function cardGauges(ctx){
            {l:'L3 COGNITIVE INTEGRITY',v:s.integ},{l:'L4 STAKEHOLDER RATIO',v:s.ratio}]
            .map(g=>({...g,c:col(g.v)}));
   }
+  if(ctx.kind==='p1'){
+    const m1=metrics(filterRate,ethicsScore,algo);
+    return[{l:'SOCIAL CAPITAL',v:Math.round(m1.socialCap)},{l:'INFRASTRUCTURE',v:Math.round(m1.infra)},
+           {l:'DIVERSITY INDEX',v:Math.round(m1.diversity)}].map(g=>({...g,c:col(g.v)}));
+  }
+  if(ctx.kind==='p3'){
+    return[{l:'COGNITIVE INTEGRITY',v:Math.round(p3Snapshot.integ)},{l:'JUSTICE CALM',v:Math.round(clamp(100-p3Snapshot.dop,0,100))},
+           {l:'SEARCH DEPTH',v:Math.round(clamp(searchDepth*10,0,100))}].map(g=>({...g,c:col(g.v)}));
+  }
+  if(ctx.kind==='p4'){
+    return[{l:'STAKEHOLDER RATIO',v:Math.round(p4Snapshot.ratio)},{l:'VOICE ROUTED',v:Math.round(clamp(100-p4Snapshot.drop,0,100))},
+           {l:'POLICY FOCUS',v:Math.round(clamp(100-gamification,0,100))}].map(g=>({...g,c:col(g.v)}));
+  }
   const m=metricsP2(shrinkRate,dxRate,algoP2,ethicsP2);
   const rb=shockState?shockState.rb:m.redundancy;
   return[{l:'REDUNDANCY BUFFER',v:Math.round(rb)},{l:'INFRASTRUCTURE',v:Math.round(m.infra)},
@@ -3375,6 +4723,9 @@ function cardGauges(ctx){
 
 function cardPageLabel(ctx){
   if(ctx.kind==='audit')return tt('SOCIAL OS AUDIT — 全レイヤー健全域','SOCIAL OS AUDIT — ALL LAYERS HEALTHY');
+  if(ctx.kind==='p1')return 'PAGE 1: SOCIAL OS — ECHO CHAMBER';
+  if(ctx.kind==='p3')return 'PAGE 3: INDIVIDUAL COGNITION — POISONING ATTACK';
+  if(ctx.kind==='p4')return 'PAGE 4: STAKEHOLDER TRAFFIC — SYBIL FLOOD';
   return 'PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T';
 }
 
@@ -3390,13 +4741,15 @@ function generateResultCard(ctx){
   // 二重フレーム
   c.strokeStyle='#00d4ff';c.lineWidth=3;c.strokeRect(16,16,W-32,H-32);
   c.strokeStyle='rgba(0,212,255,.3)';c.lineWidth=1;c.strokeRect(26,26,W-52,H-52);
-  // アプリ名 + ページ名
-  c.fillStyle='#00d4ff';c.font='bold 32px '+MONO;
+  // メインタイトル（二人称）+ アプリ名（小）+ ページ名
+  c.fillStyle='#00d4ff';c.font='bold 34px '+MONO;
   c.shadowColor='rgba(0,212,255,.6)';c.shadowBlur=14;
-  c.fillText(tt('[ 社会＆地域インフラ・デバッガー v6.2 ]','[ SOCIAL SYSTEM DEBUGGER v6.2 ]'),56,86);
+  c.fillText(expandTown(tt('あなたの街の判定結果','Your town\'s verdict')),56,80);
   c.shadowBlur=0;
+  c.fillStyle='#5a6f94';c.font='15px '+MONO;
+  c.fillText(tt('[ 社会デバッガー v6.346 ]','[ SOCIAL DEBUGGER v6.346 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
-  c.fillText(cardPageLabel(ctx),56,122);
+  c.fillText(cardPageLabel(ctx),56,134);
   // 主要ゲージ
   const gs=cardGauges(ctx);
   let gy=gs.length>3?184:208;
@@ -3422,7 +4775,16 @@ function generateResultCard(ctx){
   c.fillStyle=st.color;c.fillText(st.txt,0,fs*0.28);
   c.restore();
   c.textAlign='left';c.shadowBlur=0;
+  // v6.345: リワインド成功メモ（P1クラッシュ後に1パラ変えて救済した場合）
+  if(ctx.kind==='p1'&&window._rewindSuccess){
+    c.fillStyle='rgba(0,255,136,.7)';c.font='italic 18px '+MONO;
+    c.fillText('↩ '+window._rewindSuccess.label,56,478,W-112);
+  }
   // 固定フッター + URL（小さく）
+  if(shareComment){
+    c.fillStyle='rgba(0,212,255,.55)';c.font='italic 17px '+MONO;
+    c.fillText('"'+shareComment+'"',56,H-112,W-112);
+  }
   c.fillStyle='#5a6f94';c.font='18px '+MONO;
   c.fillText(shareFooter(),56,H-84,W-112);
   c.fillStyle='rgba(90,111,148,.85)';c.font='16px '+MONO;
@@ -3430,23 +4792,153 @@ function generateResultCard(ctx){
   return cv;
 }
 
+// ── 共有作法カード（⇪ 3か条・1200×630, 内容固定 → 初回のみ生成しキャッシュ） ──
+// 文言は shareGuideModal の sg_dont / sg_note と完全一致
+function generateEtiquetteCard(){
+  const W=1200,H=630,MONO='"Courier New",monospace';
+  const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  const rrect=(x,y,w,h,r)=>{c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();};
+  // 背景 + グリッド（薄シアン48px） + 四隅L字アクセント
+  c.fillStyle='#070b14';c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(0,212,255,.045)';c.lineWidth=1;
+  for(let x=48;x<W;x+=48){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=48;y<H;y+=48){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+  c.strokeStyle='#00d4ff';c.lineWidth=3;
+  [[24,24,1,1],[W-24,24,-1,1],[24,H-24,1,-1],[W-24,H-24,-1,-1]].forEach(([x,y,dx,dy])=>{
+    c.beginPath();c.moveTo(x,y+34*dy);c.lineTo(x,y);c.lineTo(x+34*dx,y);c.stroke();});
+  // 見出し（中央寄せ・シアン太字グロー）
+  c.textAlign='center';
+  c.fillStyle='#00d4ff';c.font='bold 30px '+MONO;
+  c.shadowColor='#00d4ff';c.shadowBlur=18;
+  c.fillText(tt('⇪ 共有のつかいかた — 送るときの3か条','⇪ Share Etiquette — 3 rules before you send'),W/2,80);
+  c.shadowBlur=0;
+  // サブ（明るめ白系・太字）
+  c.fillStyle='#d8e4ff';c.font='bold 18px '+MONO;
+  c.fillText(tt('気まずい話題ほど、送り方がすべて。','The touchier the topic, the more delivery is everything.'),W/2,112);
+  // 免責サブライン（ルールではなく推奨）
+  c.fillStyle='#5a6f94';c.font='15px '+MONO;
+  c.fillText(tt('※ これは推奨する共有方法の一例です。必ず守るべきルールではありません。','* A recommended way to share — not a rule you must follow.'),W/2,140);
+  c.textAlign='left';
+  // テキスト折り返し（日本語=文字単位 / 英語=単語単位）
+  const wrap=(text,x,yy,maxW,lh,font,color)=>{
+    c.font=font;c.fillStyle=color;
+    const isJa=lang==='ja';
+    const units=isJa?[...text]:text.split(' ');
+    let line='';
+    for(let i=0;i<units.length;i++){
+      const test=isJa?line+units[i]:(line?line+' ':'')+units[i];
+      if(c.measureText(test).width>maxW&&line){c.fillText(line,x,yy);line=units[i];yy+=lh;}
+      else line=test;
+    }
+    if(line)c.fillText(line,x,yy);
+    return yy+lh;
+  };
+  // 3か条（番号色: 赤/黄/緑）— 各行は角丸ボックス＋発光番号バッジ＋タイトル＋説明
+  // 文言は sg_dont[0/1/3] と完全一致
+  const rules=[
+    {n:'01',color:'#ff2244',h:tt('人名を、添えない。','Don’t attach names.'),
+     d:tt('実在の人名を添えて送らない','Do not attach real names')},
+    {n:'02',color:'#ffcc00',h:tt('答えを、言わない。','Don’t give the answer.'),
+     d:tt('「これがまさに◯◯のこと」と答えを言わない（受け手に発見させる）','Do not spell out “this is exactly about ◯◯” (let the receiver discover it)')},
+    {n:'03',color:'#00ff88',h:tt('好奇心だけ、添える。','Add only curiosity.'),
+     d:tt('相手を説得する道具として使わない（好奇心の共有だけ）','Do not use it to persuade anyone — share curiosity only')},
+  ];
+  rules.forEach((r,i)=>{
+    const y=166+i*118;
+    // ボックス（薄い塗り＋同色枠線）
+    c.fillStyle='rgba(15,24,41,.85)';c.strokeStyle=r.color;c.lineWidth=1.6;
+    rrect(90,y,1020,96,6);c.fill();c.stroke();
+    // 番号バッジ（発光）
+    c.fillStyle=r.color;c.font='bold 40px '+MONO;
+    c.shadowColor=r.color;c.shadowBlur=14;
+    c.fillText(r.n,130,y+62);c.shadowBlur=0;
+    // タイトル
+    c.fillStyle='#d8e4ff';c.font='bold 30px '+MONO;
+    c.fillText(r.h,250,y+40);
+    // 説明（ボックス内幅で折り返し / 最大2行までボックス内に収まる）
+    wrap(r.d,250,y+64,840,22,'18px '+MONO,'#8fa5cc');
+  });
+  // フッター帯（角丸ボックス＋区切り線＋免責文＋アプリ名 v6.3）
+  c.fillStyle='rgba(15,24,41,.9)';c.strokeStyle='#172340';c.lineWidth=1;
+  rrect(90,522,1020,74,6);c.fill();c.stroke();
+  c.strokeStyle='rgba(23,35,64,.9)';c.beginPath();c.moveTo(120,562);c.lineTo(1080,562);c.stroke();
+  c.textAlign='center';
+  c.fillStyle='#5a6f94';c.font='16px '+MONO;
+  c.fillText(tt('*あくまでオススメの使い方です。','*These are only suggestions.'),W/2,551,1010);
+  c.fillStyle='#00d4ff';c.font='bold 17px '+MONO;
+  c.fillText(tt('社会デバッガー v6.346 — SOCIAL DEBUGGER','SOCIAL DEBUGGER v6.346'),W/2,583);
+  c.textAlign='left';
+  return cv;
+}
+
+let _etiquetteCardBlob=null, _etiquetteCardLang=null;
+async function getEtiquetteCardBlob(){
+  if(_etiquetteCardBlob&&_etiquetteCardLang===lang)return _etiquetteCardBlob;
+  const cv=generateEtiquetteCard();
+  const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  _etiquetteCardBlob=blob;_etiquetteCardLang=lang;
+  return blob;
+}
+function canShareMultipleFiles(a,b){
+  if(!navigator.canShare)return false;
+  try{return navigator.canShare({files:[a,b]});}catch(e){return false;}
+}
+
+// 共有ガイド内「⬇ このカードを保存」: 作法カード単体を保存/共有
+async function saveEtiquetteCard(btn){
+  const blob=await getEtiquetteCardBlob();
+  if(!blob)return;
+  // モバイル: 共有シート経由で「画像を保存」できる
+  if(canShareFiles()){
+    const file=new File([blob],'share-etiquette.png',{type:'image/png'});
+    try{await navigator.share({files:[file]});return;}
+    catch(e){if(e&&e.name==='AbortError')return;/* 失敗時はDLへフォールバック */}
+  }
+  // デスクトップ: PNGダウンロード
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='share-etiquette-card.png';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  if(btn){
+    const o=btn.innerHTML;
+    btn.innerHTML=tt('✓ 保存しました','✓ Saved');btn.classList.add('ok');
+    setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('ok');},1800);
+  }
+}
+
+// 結果カード + 作法カードの2枚添付共有（P2ショック / P1・P3・P4 判定 共通）
+async function shareWithEtiquette(resultBlob,message){
+  if(!resultBlob)return false;
+  const url=buildShareURL();
+  const resultFile=new File([resultBlob],'result-card.png',{type:'image/png'});
+  if(canShareFiles()){
+    const etqBlob=await getEtiquetteCardBlob();
+    const etqFile=etqBlob?new File([etqBlob],'share-etiquette.png',{type:'image/png'}):null;
+    if(etqFile&&canShareMultipleFiles(resultFile,etqFile)){
+      // 複数ファイル対応: 結果カード + 作法カードの2枚を同送
+      try{await navigator.share({files:[resultFile,etqFile],text:message+'\n'+url});return true;}
+      catch(e){if(e&&e.name==='AbortError')return true;}
+    }else{
+      // 複数ファイル非対応: 結果カード1枚 + メッセージ末尾にガイド誘導文
+      const tip=tt('\n送り方のコツ → アプリ内の「⇪ 共有ガイド」','\nTip: see the in-app “Share Guide” for how to send this well.');
+      try{await navigator.share({files:[resultFile],text:message+tip+'\n'+url});return true;}
+      catch(e){if(e&&e.name==='AbortError')return true;}
+    }
+  }
+  // ファイル共有非対応: PNGダウンロード（テキストはポップオーバーの他ボタンで別送）
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(resultBlob);a.download='ssd-result-card.png';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  return false;
+}
+
 async function shareResultCard(){
   const cv=generateResultCard(shareCtx||{kind:'generic'});
   const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
   if(!blob)return;
-  // Web Share API Level 2（files対応）: PNGを添付して共有
-  if(canShareFiles()){
-    const file=new File([blob],'result-card.png',{type:'image/png'});
-    try{
-      await navigator.share({files:[file],text:shareMessage()+'\n'+buildShareURL()});
-      return;
-    }catch(e){if(e&&e.name==='AbortError')return;/* 失敗時はDLへフォールバック */}
-  }
-  // 非対応: PNGダウンロード（テキスト共有はポップオーバーの他ボタンで別送）
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='ssd-result-card.png';
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  await shareWithEtiquette(blob,shareMessage());
 }
 
 // ── プリセット適用直後の共有トースト ──────────────────────
@@ -3473,7 +4965,77 @@ function openShareGuide(){document.getElementById('shareGuideModal').classList.a
 function closeShareGuide(){document.getElementById('shareGuideModal').classList.remove('on');}
 function closeShareGuideIf(e){if(e.target===document.getElementById('shareGuideModal'))closeShareGuide();}
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();}});
+// ══════════════════════════════════════════════════════════
+// v6.332: フィードバック導線（既存の共有システムとは独立した別入口）
+// ══════════════════════════════════════════════════════════
+const FEEDBACK_ENDPOINT='https://formspree.io/f/meebvdjv'; // Formspree フォーム（feedback受信先）
+let researcherMode=false;
+function setResearcherMode(on){
+  researcherMode=!!on;
+  const cb=document.getElementById('fbResearcher'); if(cb)cb.checked=researcherMode;
+  // ON: 開発者導線を上部にボタンとして格上げ / OFF: 下部の控えめな補足リンク
+  const top=document.getElementById('fbDevTop'), note=document.getElementById('fbDevNote');
+  if(top)top.style.display=researcherMode?'block':'none';
+  if(note)note.style.display=researcherMode?'none':'block';
+}
+function openFeedback(){
+  const msg=document.getElementById('fbMessage'), em=document.getElementById('fbEmail');
+  if(msg)msg.placeholder=tt('改善案・気づいたこと・不具合の内容など','Your idea, something you noticed, or a bug…');
+  if(em)em.placeholder=tt('you@example.com（任意）','you@example.com (optional)');
+  const st=document.getElementById('fbStatus'); if(st)st.style.display='none';
+  setResearcherMode(researcherMode); // 開発者導線の表示状態を反映
+  document.getElementById('feedbackModal').classList.add('on');
+}
+function closeFeedback(){document.getElementById('feedbackModal').classList.remove('on');}
+function closeFeedbackIf(e){if(e.target===document.getElementById('feedbackModal'))closeFeedback();}
+async function submitFeedback(e){
+  e.preventDefault();
+  const btn=document.getElementById('fbSubmit'), status=document.getElementById('fbStatus');
+  const message=document.getElementById('fbMessage').value.trim();
+  if(!message)return false;
+  const payload={
+    type:(document.querySelector('input[name="fbType"]:checked')||{}).value||'other',
+    message,
+    email:document.getElementById('fbEmail').value.trim(),
+    tab:currentTab, lang,               // 不具合報告時の文脈（どのページ・言語か）
+    _subject:'[Social OS Debugger] Feedback'
+  };
+  const orig=btn.textContent;
+  btn.disabled=true; btn.textContent=tt('送信中…','Sending…');
+  status.style.display='none';
+  try{
+    const res=await fetch(FEEDBACK_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    if(!res.ok)throw new Error('bad status '+res.status);
+    status.style.display='block'; status.style.color='var(--green)';
+    status.textContent=tt('✓ 送信しました。ありがとうございます','✓ Sent. Thank you!');
+    document.getElementById('fbForm').reset();
+    setTimeout(()=>{closeFeedback();btn.disabled=false;btn.textContent=orig;status.style.display='none';},1600);
+  }catch(err){
+    // 失敗: フォーム内容は保持し、再送できるようにする
+    status.style.display='block'; status.style.color='var(--red)';
+    status.textContent=tt('送信に失敗しました。時間をおいて再度お試しください','Sending failed. Please try again later.');
+    btn.disabled=false; btn.textContent=orig;
+  }
+  return false;
+}
+
+// v6.332: 現在ページへのクリーンな直接リンク（シナリオ状態を含まない。既存共有とは別物）
+function copyPageLink(n,btn){
+  const url=location.origin+location.pathname+'?tab='+n;
+  const done=()=>{
+    if(!btn)return;
+    const o=btn.textContent;
+    btn.textContent=tt('✓ コピーしました','✓ Copied!');btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1800);
+  };
+  try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();closeDiscoveryLog();}});
 
 (function init(){
   const p=new URLSearchParams(location.search);
@@ -3500,26 +5062,45 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   setPct(document.getElementById('ethicsScore'));
   setAlgoUI(algo);
   applyI18n();
+
+  // Hide weekly scenario elements if not on native platform
+  if (!WEEKLY_ENABLED) {
+    const scenarioCard = document.getElementById('scenarioCardContainer');
+    if (scenarioCard) scenarioCard.style.display = 'none';
+    const scenarioModal = document.getElementById('scenarioModal');
+    if (scenarioModal) scenarioModal.style.display = 'none';
+  }
+
+  initWeeklyScenarioCard();
   startScatter();
   startAgents();
 
   // P2 timeline chart 初期化
-  timelineChartP2=new Chart(document.getElementById('timelineChartP2'),{
-    type:'line',
-    data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
-      {label:'Infrastructure',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Rescue Heli',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Brand Industry',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-      {label:'Municipal Budget',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
-      plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
-      scales:{
-        x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
-        y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
-      }
+  if (typeof Chart !== 'undefined') {
+    try {
+      timelineChartP2=new Chart(document.getElementById('timelineChartP2'),{
+        type:'line',
+        data:{labels:Array.from({length:65},(_,i)=>i),datasets:[
+          {label:'Infrastructure',data:[],borderColor:'#00d4ff',backgroundColor:'rgba(0,212,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Rescue Heli',data:[],borderColor:'#00ff88',backgroundColor:'rgba(0,255,136,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Brand Industry',data:[],borderColor:'#ff6b2b',backgroundColor:'rgba(255,107,43,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+          {label:'Municipal Budget',data:[],borderColor:'#9945ff',backgroundColor:'rgba(153,69,255,.05)',borderWidth:2,pointRadius:0,tension:0.42,fill:false},
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,animation:{duration:260},
+          plugins:{legend:{labels:{color:'#5a6f94',boxWidth:12,font:{size:10}}}},
+          scales:{
+            x:{title:{display:true,text:'Time Steps →',color:'#5a6f94',font:{size:9}},grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94',maxTicksLimit:8}},
+            y:{min:0,max:105,grid:{color:'rgba(23,35,64,.6)'},ticks:{color:'#5a6f94'}}
+          }
+        }
+      });
+    } catch (e) {
+      console.warn('📊 チャート timelineChartP2 生成失敗:', e.message);
+      timelineChartP2 = null;
     }
-  });
+  } else {
+    console.warn('📊 チャート timelineChartP2 をスキップ: Chart.js が利用不可');
+  }
   // P2 初期描画（URL復元値をスライダー・トグルへ反映）
   document.getElementById('shrinkRate').value=shrinkRate;
   document.getElementById('dxRate').value=dxRate;
@@ -3556,7 +5137,19 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   // v5.3: カスケード崩壊判定＋Grand Optimal判定（非表示タブも裏側で監視）
   setInterval(()=>{updateCascadeFX();checkGrandOptimal();},500);
   updateCascadeFX();checkGrandOptimal();
+  // v6.333: 初期描画（P1のゲージ＋良い状態バナーを初回から反映）
+  updateAll();
+  // v6.334: 発見ログ初期化（読み込み時の自動付与は防ぐ＝ここで初めて有効化）
+  loadDiscoveries();
+  updateDiscoveryCounter();
+  _discReady=true;
 })();
+</script>
+<!-- v6.342: Service Worker 登録（PWA / オフライン。失敗しても本体動作に影響なし） -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
 </script>
 </body>
 </html>
