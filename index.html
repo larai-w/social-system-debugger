@@ -346,6 +346,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
     <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
+    <button class="ibtn" id="scenarioBtn" onclick="openScenarios()" data-i18n="scenario_btn">🎯 WEEKLY CHALLENGE</button>
     <button class="ibtn" id="discBtn" onclick="openDiscoveryLog()">📖 発見ログ (0/15)</button>
   </div>
   <div class="hdr-c">
@@ -1103,6 +1104,24 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   </div>
 </div>
 
+<!-- v6.35: Weekly Scenarios Modal -->
+<div class="mo" id="scenarioModal" onclick="closeScenarioIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeScenarios()">✕</button>
+    <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
+    <div class="mti" id="scenarioTitle" style="font-size:1.2em;margin-bottom:10px">Echo Chamber Trap</div>
+    <div class="cs" style="margin-bottom:10px" data-i18n="scenario_intro_hint">今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。</div>
+    <div id="scenarioDesc" style="font-size:.75rem;color:var(--muted);margin-bottom:14px">Your objective...</div>
+    <div id="scenarioHint" style="font-size:.7rem;padding:10px;background:rgba(153,200,255,.1);border-left:3px solid var(--cyan);margin-bottom:12px;color:var(--txt)"></div>
+    <div style="font-size:.75rem;color:var(--txt);margin-bottom:8px" data-i18n="scenario_goal_hint">今週のゴール：</div>
+    <div id="scenarioGoal" style="font-size:.75rem;padding:12px;background:rgba(100,200,100,.1);border:1px solid rgba(100,200,100,.3);border-radius:3px;margin-bottom:14px;color:var(--txt)"></div>
+    <div id="scenarioCheckContainer" style="display:none;padding:12px;background:rgba(100,200,100,.2);border:1px solid rgba(100,200,100,.4);border-radius:3px;font-size:.75rem;margin-bottom:14px">
+      <div style="color:var(--green);font-weight:bold" data-i18n="scenario_goal_reached">✓ ゴール達成！ 発見ログを獲得しました。</div>
+    </div>
+    <button class="sbtn" style="border-color:var(--green);color:var(--green);width:100%;text-align:center" onclick="startScenario()" data-i18n="scenario_start_btn">▶ シナリオ開始</button>
+  </div>
+</div>
+
 <!-- v6.345: 共有前コメントモーダル -->
 <div class="mo" id="rewindModal" onclick="closeRewindIf(event)">
   <div class="mb" style="max-width:460px">
@@ -1193,6 +1212,14 @@ const I18N = {
     banner_p3_warn:'あなたの視界は、まだ揺れている',
     banner_p4_warn:'あなたの街の当事者の声が、観客の声にかき消されはじめている',
     banner_p4_flood:'⚠ &nbsp;あなたの街が、炎上の見世物にされている&nbsp; ⚠',
+    // v6.35: Phase 1 Weekly Scenarios
+    scenario_btn:'🎯 WEEKLY CHALLENGE',
+    scenario_title:'ウィークリーチャレンジ',
+    scenario_intro_hint:'今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。',
+    scenario_goal_reached:'✓ ゴール達成！ 発見ログを獲得しました。',
+    scenario_goal_hint:'今週のゴール：',
+    scenario_start_btn:'▶ シナリオ開始',
+    scenario_close_btn:'閉じる',
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
@@ -1385,6 +1412,14 @@ const I18N = {
     fb_doc_link:'📄 Methodology & formula spec (METHODOLOGY)',
     mdoc_note:'Every formula, threshold, assumption, and limitation is collected in the methodology doc → ',
     mdoc_link:'📄 Open METHODOLOGY',
+    // v6.35: Phase 1 Weekly Scenarios
+    scenario_btn:'🎯 WEEKLY CHALLENGE',
+    scenario_title:'Weekly Challenge',
+    scenario_intro_hint:'A guided scenario for this week. Follow the goal and watch your town evolve.',
+    scenario_goal_reached:'✓ Goal reached! Discovery unlocked.',
+    scenario_goal_hint:'Your goal this week:',
+    scenario_start_btn:'▶ Start scenario',
+    scenario_close_btn:'Close',
   }
 };
 
@@ -2133,6 +2168,7 @@ function updateAll(){
       p1rw.style.display='none';
     }
   }
+  checkScenarioGoal(m);
 }
 
 function getDiag(m){
@@ -2700,6 +2736,7 @@ function updateAllP2(){
   }
   // Operation log
   updateP2Log(m);
+  checkScenarioGoal(m);
 }
 
 function getP2BrandDiag(m){
@@ -3182,6 +3219,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
       setDisp(p3b,'block');
     }else setDisp(p3b,'none');
   }
+  checkScenarioGoal({integrity:integ,dopamine:dopR,depth:searchDepth});
 }
 
 function simTimelineP3(depth,ground,steps=65){
@@ -3522,6 +3560,7 @@ function updateP4Monitor(jamRatio){
       setDisp(p4b,'block');
     }else setDisp(p4b,'none');
   }
+  checkScenarioGoal({drop,ratio});
 }
 
 function updateP4Log(){
@@ -3710,6 +3749,254 @@ function setPresetP4(id){
   updateP4Chart();
   showShareToast({kind:'preset',page:4,preset:id});
   notePreset(4,id);
+}
+
+// ── v6.35: Phase 1 Weekly Scenarios ──
+const SCENARIOS = [
+  {
+    id: 'echo_trap',
+    title: { ja: 'エコーチェンバーの罠', en: 'Echo Chamber Trap' },
+    brief: { ja: 'フィルタリングが徐々に強まる世界で、情報空間は澄むか、濁るか？', en: 'As filtering gradually increases, will your information space stay clear or become clouded?' },
+    page: 1,
+    params: {
+      p1: { f: 0, e: 100, al: 'dp' },
+      hint: { ja: 'フィルタリングを少しずつ上げていき、多様性とエントロピーがどう変わるかを観察してください。', en: 'Gradually increase filtering and observe how diversity and entropy change.' }
+    },
+    goal: {
+      ja: 'エントロピーを70以上に上昇させずに、多様性を80以上に保つ',
+      en: 'Keep diversity above 80 while preventing entropy from rising above 70'
+    },
+    check: (m) => {
+      const ent = m.entropy || 0, div = m.diversity || 0;
+      return div >= 80 && ent < 70;
+    },
+    discoveryId: 'sce_echo_trap'
+  },
+  {
+    id: 'ethics_cascade',
+    title: { ja: 'リーダー倫理観の滝', en: 'Leader Ethics Waterfall' },
+    brief: { ja: 'リーダーの倫理観が低下するとき、社会全体がどうカスケードするか？', en: 'When a leader\'s ethics drops, how does the entire society cascade?' },
+    page: 1,
+    params: {
+      p1: { f: 30, e: 100, al: 'dp' },
+      hint: { ja: 'リーダーの倫理スコアをゆっくり下げ、パラノイア、信頼、正当性がどう悪化するかを見てください。', en: 'Slowly lower the leader\'s ethics score and watch paranoia, trust, and legitimacy deteriorate.' }
+    },
+    goal: {
+      ja: '正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に上げ直す',
+      en: 'Keep legitimacy above 60 while raising the ethics score back to 50+'
+    },
+    check: (m) => {
+      const leg = m.legitimacy || 0, e = ethicsScore;
+      return leg >= 60 && e >= 50;
+    },
+    discoveryId: 'sce_ethics_cascade'
+  },
+  {
+    id: 'successor_crisis',
+    title: { ja: '後継者ストック危機', en: 'Successor Stock Crisis' },
+    brief: { ja: 'DXに投資しなければ、後継者ストックが枯渇し、ブランドが崖から落ちる。', en: 'Without DX investment, successor stock depletes and the brand collapses off a cliff.' },
+    page: 2,
+    params: {
+      p2: { s: 30, d: 10, e: 80, al: 'dp', reboot: false },
+      hint: { ja: 'DX投資を急速に上げて、後継者ストック（スキルゲージ）の回復を見てください。平穏→崖落ちの瞬間を体験できます。', en: 'Rapidly increase DX investment to recover the successor stock (skill gauge). Experience the calm→cliff moment.' }
+    },
+    goal: {
+      ja: '後継者ストックを50以上に回復させ、ブランド産業の崩壊を止める',
+      en: 'Recover successor stock above 50 and prevent brand industry collapse'
+    },
+    check: (m) => {
+      const ss = skillStock || 0, br = m.brand || 0;
+      return ss >= 50 && br >= 40;
+    },
+    discoveryId: 'sce_successor_crisis'
+  },
+  {
+    id: 'redundancy_shock',
+    title: { ja: '冗長性ショック対抗', en: 'Redundancy Shock Resilience' },
+    brief: { ja: 'インフラの集約化を進めると、ショックに脆くなる。冗長性バッファを上げてショックに耐える。', en: 'Consolidating infrastructure makes you vulnerable to shocks. Build redundancy buffer to survive.' },
+    page: 2,
+    params: {
+      p2: { s: 50, d: 30, e: 80, al: 'dp', reboot: false },
+      hint: { ja: '集約化（Consolidation）を下げて冗長性を上げ、そのあと⚡ショックを注入してください。生存の分岐点を見てください。', en: 'Lower consolidation to raise redundancy, then inject ⚡ shock. Watch the survival branching point.' }
+    },
+    goal: {
+      ja: '冗長性バッファを75以上に上げ、ショック注入後も生き残る',
+      en: 'Raise redundancy buffer above 75 and survive after shock injection'
+    },
+    check: (m) => {
+      const red = m.redundancy || 0;
+      return red >= 75 && (m.infra || 0) >= 20;
+    },
+    discoveryId: 'sce_redundancy_shock'
+  },
+  {
+    id: 'cognitive_grounding',
+    title: { ja: '認知のグラウンディング', en: 'Cognitive Grounding' },
+    brief: { ja: 'SNS断食と現実同期：深い探索と高い学習率でバランスを取る。', en: 'SNS fasting & reality sync: balance deep reasoning with high learning rate.' },
+    page: 3,
+    params: {
+      p3: { depth: 3, ground: 20, lr: 20 },
+      hint: { ja: 'パラメータを調整して、「毒入れ」（赤い攻撃）が消えるか、認知健全性が改善するか観察してください。', en: 'Adjust parameters to watch the "poisoning attack" (red arrows) disappear and cognitive integrity improve.' }
+    },
+    goal: {
+      ja: '認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする',
+      en: 'Raise cognitive integrity above 80 and achieve search depth 7+'
+    },
+    check: (m) => {
+      const int = m.integrity || 0, depth = (document.getElementById('depth')?.value || 3) >> 0;
+      return int >= 80 && depth >= 7;
+    },
+    discoveryId: 'sce_cognitive_grounding'
+  },
+  {
+    id: 'stakeholder_voice',
+    title: { ja: '当事者の声を取り戻す', en: 'Restore Stakeholder Voice' },
+    brief: { ja: 'ゲーム化が進むと、当事者比率が低下する。フィルタリングで本来の声を優先させる。', en: 'As gamification rises, stakeholder ratio drops. Use filtering to restore true voices.' },
+    page: 4,
+    params: {
+      p4: { ext: 50, gam: 40 },
+      hint: { ja: 'ゲーム化（Gamification）とパケットドロップ率の関係を観察し、フィルタリングで当事者比率を改善してください。', en: 'Observe how gamification links to packet drop, and use filtering to improve stakeholder ratio.' }
+    },
+    goal: {
+      ja: '当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる',
+      en: 'Raise stakeholder commit ratio above 70 and drop packet rate below 40%'
+    },
+    check: (m) => {
+      const ratio = m.ratio || 0, drop = m.drop || 0;
+      return ratio >= 70 && drop <= 40;
+    },
+    discoveryId: 'sce_stakeholder_voice'
+  }
+];
+
+function getWeeklyScenario() {
+  const now = new Date();
+  const jan1 = new Date(now.getFullYear(), 0, 1);
+  const diffTime = now - jan1;
+  const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
+  const weekNum = (diffWeeks % SCENARIOS.length);
+  return SCENARIOS[weekNum];
+}
+
+function applyScenarioParams(scenario) {
+  if (scenario.params.p1) {
+    const p = scenario.params.p1;
+    filterRate = p.f;
+    ethicsScore = p.e;
+    algo = p.al;
+    document.getElementById('filterRate').value = p.f;
+    document.getElementById('ethicsScore').value = p.e;
+    if (p.al === 'dp') {
+      document.getElementById('algoDP').checked = true;
+      document.getElementById('algoGreedy').checked = false;
+    } else {
+      document.getElementById('algoGreedy').checked = true;
+      document.getElementById('algoDP').checked = false;
+    }
+    setPct(document.getElementById('filterRate'));
+    setPct(document.getElementById('ethicsScore'));
+    updateP1Chart();
+  }
+  if (scenario.params.p2) {
+    const p = scenario.params.p2;
+    shrinkRate = p.s;
+    dxRate = p.d;
+    ethicsP2 = p.e;
+    algo = p.al;
+    publicReboot = p.reboot || false;
+    if (p.d >= 45) skillStock = 80;
+    else if (p.d < 25) skillStock = 10;
+    else skillStock = 50;
+    document.getElementById('shrinkRate').value = p.s;
+    document.getElementById('dxRate').value = p.d;
+    document.getElementById('ethicsP2').value = p.e;
+    if (p.al === 'dp') {
+      document.getElementById('algoDP2').checked = true;
+      document.getElementById('algoGreedy2').checked = false;
+    } else {
+      document.getElementById('algoGreedy2').checked = true;
+      document.getElementById('algoDP2').checked = false;
+    }
+    document.getElementById('rebootChk').checked = p.reboot || false;
+    setPct(document.getElementById('shrinkRate'));
+    setPct(document.getElementById('dxRate'));
+    setPct(document.getElementById('ethicsP2'));
+    updateP2Chart();
+  }
+  if (scenario.params.p3) {
+    const p = scenario.params.p3;
+    searchDepth = p.depth;
+    groundingRate = p.ground;
+    learningRate = p.lr;
+    document.getElementById('depth').value = p.depth;
+    document.getElementById('grounding').value = p.ground;
+    document.getElementById('learningRate').value = p.lr;
+    setPct(document.getElementById('grounding'));
+    setPct(document.getElementById('learningRate'));
+    updateP3Monitor();
+    updateP3Chart();
+  }
+  if (scenario.params.p4) {
+    const p = scenario.params.p4;
+    extTraffic = p.ext;
+    gamification = p.gam;
+    document.getElementById('extTraffic').value = p.ext;
+    document.getElementById('gamification').value = p.gam;
+    setPct(document.getElementById('extTraffic'));
+    setPct(document.getElementById('gamification'));
+    updateP4Chart();
+  }
+}
+
+function openScenarios() {
+  const scenario = getWeeklyScenario();
+  const titleEl = document.getElementById('scenarioTitle');
+  const descEl = document.getElementById('scenarioDesc');
+  const goalEl = document.getElementById('scenarioGoal');
+  const hintEl = document.getElementById('scenarioHint');
+  const checkEl = document.getElementById('scenarioCheckContainer');
+
+  if (titleEl) titleEl.textContent = tt(scenario.title.ja, scenario.title.en);
+  if (descEl) descEl.textContent = tt(scenario.brief.ja, scenario.brief.en);
+  if (goalEl) goalEl.textContent = tt(scenario.goal.ja, scenario.goal.en);
+  if (hintEl) hintEl.textContent = (scenario.params.hint ? tt(scenario.params.hint.ja, scenario.params.hint.en) : '');
+  if (checkEl) checkEl.style.display = 'none';
+
+  document.getElementById('scenarioModal').classList.add('on');
+}
+
+function closeScenarios() {
+  document.getElementById('scenarioModal').classList.remove('on');
+}
+
+function closeScenarioIf(e) {
+  if (e.target === document.getElementById('scenarioModal')) closeScenarios();
+}
+
+function startScenario() {
+  const scenario = getWeeklyScenario();
+  applyScenarioParams(scenario);
+  switchTab(scenario.page);
+  closeScenarios();
+  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
+}
+
+function checkScenarioGoal(metricsObj) {
+  const scenario = getWeeklyScenario();
+  if (!scenario || !scenario.check) return;
+  if (!document.getElementById('scenarioModal')?.classList.contains('on')) {
+    if (scenario.check(metricsObj)) {
+      const discId = scenario.discoveryId;
+      if (!_discovered.has(discId)) {
+        _discovered.add(discId);
+        saveDiscoveries();
+        if (document.getElementById('scenarioCheckContainer')) {
+          document.getElementById('scenarioCheckContainer').style.display = 'block';
+        }
+        unlock(discId);
+      }
+    }
+  }
 }
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
