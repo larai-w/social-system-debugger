@@ -66,6 +66,12 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .ibtn.on{border-color:var(--cyan);color:var(--cyan)}
 .ibtn.play-on{border-color:var(--green)!important;color:var(--green)!important;box-shadow:0 0 8px rgba(0,255,136,.3)}
 .ibtn.pin-on{border-color:var(--yel)!important;color:var(--yel)!important;box-shadow:0 0 8px rgba(255,204,0,.3)}
+.menu-container{position:relative;display:inline-block}
+.menu-dropdown{display:none;position:absolute;top:100%;right:0;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;min-width:200px;box-shadow:0 8px 20px rgba(0,0,0,.4);z-index:1000;overflow:hidden;margin-top:4px}
+.menu-dropdown.open{display:block}
+.menu-item{display:block;width:100%;padding:10px 14px;background:transparent;border:none;color:var(--muted);font-family:inherit;font-size:.65rem;text-align:left;cursor:pointer;transition:all .15s;letter-spacing:.05em;white-space:nowrap;border-left:3px solid transparent}
+.menu-item:hover{background:rgba(0,212,255,.08);color:var(--cyan);border-left-color:var(--cyan)}
+.menu-divider{margin:6px 0;border:none;border-top:1px solid var(--bdr)}
 .preset-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
 .pl{font-size:.6rem;color:var(--muted);letter-spacing:.12em;white-space:nowrap}
 .pbtn{padding:6px 13px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -345,9 +351,6 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 <div class="hdr">
   <div class="hdr-acts">
     <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
-    <button class="ibtn" id="guideBtn" onclick="openIntro()">ℹ GUIDE</button>
-    <button class="ibtn" id="scenarioBtn" onclick="openScenarios()" data-i18n="scenario_btn">🎯 WEEKLY CHALLENGE</button>
-    <button class="ibtn" id="discBtn" onclick="openDiscoveryLog()">📖 発見ログ (0/15)</button>
   </div>
   <div class="hdr-c">
     <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
@@ -355,10 +358,19 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
   <div class="hdr-acts">
-    <button class="ibtn" id="pageLinkBtn" onclick="copyPageLink(currentTab,this)" data-i18n="link_btn">🔗 このページへの直接リンク</button>
-    <button class="ibtn" id="feedbackBtn" onclick="openFeedback()" data-i18n="fb_btn">💬 フィードバック</button>
-    <button class="ibtn" id="shareGuideBtn" onclick="openShareGuide()" data-i18n="sg_btn">⇪ 共有ガイド</button>
     <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
+    <div class="menu-container">
+      <button class="ibtn" id="menuBtn" onclick="toggleHeaderMenu()" data-i18n="menu_more">≡ メニュー</button>
+      <div class="menu-dropdown" id="headerMenu" onclick="event.stopPropagation()">
+        <button class="menu-item" onclick="openIntro();closeHeaderMenu()" data-i18n="guide">ℹ GUIDE</button>
+        <button class="menu-item" id="discMenuBtn" onclick="openDiscoveryLog();closeHeaderMenu()">📖 発見ログ (<span id="discMenuCount">0</span>/15)</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openShareGuide();closeHeaderMenu()" data-i18n="sg_btn">⇪ 共有ガイド</button>
+        <button class="menu-item" onclick="copyPageLink(currentTab,this);closeHeaderMenu()" data-i18n="link_btn">🔗 このページへの直接リンク</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openFeedback();closeHeaderMenu()" data-i18n="fb_btn">💬 フィードバック</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -370,6 +382,16 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 </div>
 
 <div id="page1" class="page active">
+<!-- v6.35: Weekly Scenario Card -->
+<div class="card scenario-card" id="scenarioCardContainer" style="border-color:rgba(153,200,255,.3);margin-bottom:14px">
+  <div class="ct" style="color:rgba(153,200,255,.8)"><span class="dot" style="background:rgba(153,200,255,.8);box-shadow:0 0 7px rgba(153,200,255,.6)"></span><span data-i18n="scenario_title">ウィークリーチャレンジ</span></div>
+  <div id="scenarioCardTitle" style="font-size:.85rem;color:var(--txt);font-weight:bold;margin-bottom:8px">Echo Chamber Trap</div>
+  <div id="scenarioCardBrief" style="font-size:.65rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Your objective...</div>
+  <div id="scenarioCardGoal" style="font-size:.7rem;padding:10px;background:rgba(100,200,100,.08);border-left:3px solid rgba(100,200,100,.3);margin-bottom:12px;color:var(--txt)"></div>
+  <div id="scenarioCardStatus" style="font-size:.65rem;color:var(--green);margin-bottom:12px;display:none">✓ CLEARED — Another challenge next week!</div>
+  <button class="pbtn" id="scenarioCardBtn" onclick="startWeeklyScenarioFromCard()" style="border-color:rgba(153,200,255,.4);color:rgba(153,200,255,.8);width:100%;text-align:center" data-i18n="scenario_card_challenge">▶ 挑戦する</button>
+</div>
+
 <div class="preset-bar">
   <span class="pl" id="presetLbl">SCENARIOS ▶</span>
   <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
@@ -1220,6 +1242,9 @@ const I18N = {
     scenario_goal_hint:'今週のゴール：',
     scenario_start_btn:'▶ シナリオ開始',
     scenario_close_btn:'閉じる',
+    scenario_card_cleared:'✓ CLEARED',
+    scenario_card_challenge:'▶ 挑戦する',
+    menu_more:'≡ メニュー',
   },
   en: {
     hdrSub:'Could your town survive this? — Move the parameters and watch a society break.',
@@ -1420,6 +1445,9 @@ const I18N = {
     scenario_goal_hint:'Your goal this week:',
     scenario_start_btn:'▶ Start scenario',
     scenario_close_btn:'Close',
+    scenario_card_cleared:'✓ CLEARED',
+    scenario_card_challenge:'▶ Take the challenge',
+    menu_more:'≡ Menu',
   }
 };
 
@@ -2189,6 +2217,8 @@ function applyI18n(){
   });
   document.getElementById('langBtn').textContent=t('langBtn');
   document.getElementById('shareBtn').textContent=t('shareBtn');
+  const menuBtn = document.getElementById('menuBtn');
+  if(menuBtn) menuBtn.textContent = t('menu_more');
   const pb=document.getElementById('playBtn');
   if(pb) pb.textContent=animPlaying?t('playStop'):t('playPlay');
   const pl=document.getElementById('pinLabel');
@@ -3077,8 +3107,12 @@ function drainDiscToast(){
   setTimeout(()=>{t.classList.remove('on');setTimeout(drainDiscToast,320);},1900);
 }
 function updateDiscoveryCounter(){
-  const b=document.getElementById('discBtn');if(!b)return;
-  b.textContent=tt('📖 発見ログ ','📖 Discoveries ')+`(${_discovered.size}/${DISCOVERIES.length})`;
+  // Update menu counter
+  const menuCount = document.getElementById('discMenuCount');
+  if(menuCount) menuCount.textContent = _discovered.size;
+  // Legacy support for old button if it exists
+  const b = document.getElementById('discBtn');
+  if(b) b.textContent = tt('📖 発見ログ ', '📖 Discoveries ') + `(${_discovered.size}/${DISCOVERIES.length})`;
 }
 function openDiscoveryLog(){
   const list=document.getElementById('discList');if(!list)return;
@@ -3984,6 +4018,57 @@ function startScenario() {
   showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
 }
 
+function toggleHeaderMenu() {
+  const menu = document.getElementById('headerMenu');
+  menu?.classList.toggle('open');
+}
+
+function closeHeaderMenu() {
+  const menu = document.getElementById('headerMenu');
+  menu?.classList.remove('open');
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.menu-container')) {
+    closeHeaderMenu();
+  }
+});
+
+function initWeeklyScenarioCard() {
+  const scenario = getWeeklyScenario();
+  const isClear = _discovered.has(scenario.discoveryId);
+
+  document.getElementById('scenarioCardTitle').textContent = tt(scenario.title.ja, scenario.title.en);
+  document.getElementById('scenarioCardBrief').textContent = tt(scenario.brief.ja, scenario.brief.en);
+  document.getElementById('scenarioCardGoal').textContent = tt(scenario.goal.ja, scenario.goal.en);
+
+  const statusEl = document.getElementById('scenarioCardStatus');
+  const btnEl = document.getElementById('scenarioCardBtn');
+
+  if (isClear) {
+    statusEl.style.display = 'block';
+    statusEl.textContent = tt('✓ CLEARED — 来週のシナリオをお楽しみに！', '✓ CLEARED — Another challenge next week!');
+    btnEl.textContent = tt('来週のシナリオまで待機中', 'Waiting for next week');
+    btnEl.disabled = true;
+    btnEl.style.opacity = '0.5';
+    btnEl.style.cursor = 'default';
+  } else {
+    statusEl.style.display = 'none';
+    btnEl.disabled = false;
+    btnEl.style.opacity = '1';
+    btnEl.style.cursor = 'pointer';
+    btnEl.textContent = tt('▶ 挑戦する', '▶ Take the challenge');
+  }
+}
+
+function startWeeklyScenarioFromCard() {
+  const scenario = getWeeklyScenario();
+  applyScenarioParams(scenario);
+  switchTab(scenario.page);
+  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
+}
+
 function checkScenarioGoal(metricsObj) {
   const scenario = getWeeklyScenario();
   if (!scenario || !scenario.check) return;
@@ -3997,6 +4082,8 @@ function checkScenarioGoal(metricsObj) {
           document.getElementById('scenarioCheckContainer').style.display = 'block';
         }
         unlock(discId);
+        // Update scenario card status
+        initWeeklyScenarioCard();
       }
     }
   }
@@ -4813,6 +4900,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   setPct(document.getElementById('ethicsScore'));
   setAlgoUI(algo);
   applyI18n();
+  initWeeklyScenarioCard();
   startScatter();
   startAgents();
 
