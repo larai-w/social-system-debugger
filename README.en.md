@@ -135,14 +135,14 @@ open index.html   # or drag & drop into a browser
 
 This app is designed as teaching material for information literacy, social-systems theory, and introductory machine learning. The simulation parameters and formulas are exposed in each metric's (?) modal, so critically examining the model's assumptions is itself part of the learning task.
 
-📄 Every formula, threshold, assumption, and limitation is documented in [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) (currently Japanese; includes the disclaimer that this is a qualitative, non-calibrated model).
+📄 Every formula, threshold, assumption, and limitation is documented in [`docs/METHODOLOGY.en.md`](docs/METHODOLOGY.en.md) (includes the disclaimer that this is a qualitative, non-calibrated model).
 
 ---
 
 ## Documentation
 
-- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) — every layer's formulas, thresholds, cascades, and **assumptions & limitations** (currently Japanese)
-- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — developer guide: code map, how to change things, versioning, deploy, operational notes (currently Japanese)
+- [`docs/METHODOLOGY.en.md`](docs/METHODOLOGY.en.md) — every layer's formulas, thresholds, cascades, and **assumptions & limitations** ([日本語](docs/METHODOLOGY.md))
+- [`docs/DEVELOPMENT.en.md`](docs/DEVELOPMENT.en.md) — developer guide: code map, how to change things, versioning, deploy, operational notes ([日本語](docs/DEVELOPMENT.md))
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 
 ---

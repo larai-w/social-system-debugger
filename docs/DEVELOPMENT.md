@@ -1,5 +1,7 @@
 # 開発ガイド / Development
 
+> **[日本語](DEVELOPMENT.md)**（このページ）｜**[English](DEVELOPMENT.en.md)**
+
 「社会＆地域インフラ・デバッガー」に手を入れる人（未来の自分・協力者）向けの実務メモ。モデルの数式は [`METHODOLOGY.md`](METHODOLOGY.md)、変更履歴は [`../CHANGELOG.md`](../CHANGELOG.md) を参照。
 
 ---

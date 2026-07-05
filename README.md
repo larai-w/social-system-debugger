@@ -141,8 +141,8 @@ open index.html   # またはブラウザにドラッグ&ドロップ
 
 ## ドキュメント / Documentation
 
-- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) — 全レイヤーの計算式・しきい値・カスケード・**前提と限界**
-- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — 開発ガイド（コードの地図・変更手順・バージョン方針・デプロイ・運用注意）
+- [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) — 全レイヤーの計算式・しきい値・カスケード・**前提と限界**（[English](docs/METHODOLOGY.en.md)）
+- [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — 開発ガイド（コードの地図・変更手順・バージョン方針・デプロイ・運用注意）（[English](docs/DEVELOPMENT.en.md)）
 - [`CHANGELOG.md`](CHANGELOG.md) — 変更履歴
 
 ---
