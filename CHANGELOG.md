@@ -4,6 +4,16 @@
 
 ---
 
+## v6.345 — 2026-07-05
+- **UX改修 Tasks 1–7** (all in one release)
+- **Task 1**: Product name → "社会デバッガー / Social Debugger"; tagline → "あなたの街は、生き残れるか。"
+- **Task 2**: Intro modal rewritten in second-person ("あなたの街はどこから壊れるか。")
+- **Task 3**: Optional town name input (`ssd_town_name`); substituted into verdict banners and result card PNG
+- **Task 4**: Pre-share comment step — quick chips + free text injected into `shareMessage()` and result card
+- **Task 5**: Rewind experience (P1 MVP) — after collapse, pick 1 param to change; discovery `d_p1_rewind` added
+- **Task 6**: Privacy-first analytics — Plausible placeholder in `<head>`; `track()` wrapper with calls at verdict/share/preset/rewind
+- **Task 7**: `manifest.json` name/short_name updated to "社会デバッガー"; `sw.js` cache bumped to `ssd-cache-v6-345`
+
 ## v6.344 — 2026-07-05
 - **P2 L2 モデル修正**: `heliOp` に倫理観条件 `ef >= 0.3` を直結。低倫理なら、インフラ・予算が充分でも救命ヘリが飛ばない（実例：兵庫ドクヘリ停止）。
 - リーダーの判断力・協調性の欠如が実務停止・ヘリ停止を引き起こす因果を直接表現。
