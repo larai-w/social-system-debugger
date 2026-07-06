@@ -1,0 +1,26 @@
+{
+  "id": "2026-W28",
+  "title": { "ja": "エコーチェンバーの罠", "en": "Echo Chamber Trap" },
+  "intro": {
+    "ja": "ある街の情報空間で、心地よい同質な声だけが少しずつ増えていく。最初は快適だが、やがて外の現実と噛み合わなくなる。多様性を手放さずに、この静かな濁りを止められるか。",
+    "en": "In one town's information space, comfortable, like-minded voices slowly crowd out the rest. It feels pleasant at first — until it no longer fits outside reality. Can you hold onto diversity and stop the quiet clouding?"
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 0, "e": 100, "al": "dp" },
+    "hint": {
+      "ja": "フィルタリングを少しずつ上げ、多様性とエントロピーの変化を観察してください。",
+      "en": "Gradually raise filtering and watch how diversity and entropy shift."
+    }
+  },
+  "goal": {
+    "ja": "エントロピーを70以上に上げずに、多様性を80以上に保つ",
+    "en": "Keep diversity above 80 while preventing entropy from rising above 70"
+  },
+  "goalConds": [
+    { "metric": "diversity", "op": ">=", "value": 80 },
+    { "metric": "entropy", "op": "<", "value": 70 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_echo_trap"
+}

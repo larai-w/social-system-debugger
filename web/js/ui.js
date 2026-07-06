@@ -1466,6 +1466,14 @@ const DISCOVERIES=[
   {id:'d_p4_restored', badge:()=>tt('📡 当事者の声を取り戻した','📡 Restored the stakeholders’ voice'), learn:()=>tt('フィルタは、検閲ではなく帯域の確保。','Filtering here protects bandwidth, not censorship.')},
   {id:'d_meta_allpages',   badge:()=>tt('🔗 4層の連鎖を、自分の手で起こした','🔗 Triggered the 4-layer cascade yourself'), learn:()=>tt('上のレイヤーの崩壊は、下のレイヤーへ伝染する。','A failure up top infects the layers below.')},
   {id:'d_meta_allpresets', badge:()=>tt('🗺 すべてのシナリオを巡った','🗺 Explored every scenario'), learn:()=>tt('崩壊も回復も、地続きの設計の話。','Collapse and recovery are one design continuum.')},
+  // ── v6.35 (task4): 週替わりシナリオの発見（sce_ は WEEKLY_ENABLED=native のみ到達・カウント対象） ──
+  {id:'sce_weekly_guardian', badge:()=>tt('🛡 今週の守り人 — 街を守った','🛡 This week’s guardian — you protected the town'), learn:()=>tt('今週の困難を、あなたの手で越えた。','You cleared this week’s hardship yourself.')},
+  {id:'sce_echo_trap', badge:()=>tt('📡 エコーチェンバーの罠を抜けた','📡 Escaped the echo-chamber trap'), learn:()=>tt('多様性を保てば、情報空間は濁らない。','Keep diversity and the information space stays clear.')},
+  {id:'sce_ethics_cascade', badge:()=>tt('⚖ 倫理の滝を押し戻した','⚖ Pushed back the ethics waterfall'), learn:()=>tt('正当性は、倫理の回復とともに戻る。','Legitimacy returns as ethics recovers.')},
+  {id:'sce_successor_crisis', badge:()=>tt('🌱 後継者ストックを立て直した','🌱 Rebuilt the successor stock'), learn:()=>tt('DXは伝統の破壊でなく、技術の継承。','DX isn’t destroying tradition — it’s handing skills to the next generation.')},
+  {id:'sce_redundancy_shock', badge:()=>tt('🛡 冗長性でショックに耐えた','🛡 Absorbed the shock with redundancy'), learn:()=>tt('無駄に見える余白が、未知の衝撃を吸収する。','The slack that looks wasteful is what absorbs the unknown.')},
+  {id:'sce_cognitive_grounding', badge:()=>tt('🧭 認知をグラウンディングした','🧭 Grounded your cognition'), learn:()=>tt('深い探索と現実同期が、汚染を洗い流す。','Deep search and reality-sync wash out the contamination.')},
+  {id:'sce_stakeholder_voice', badge:()=>tt('📣 当事者の声を取り戻した','📣 Restored the stakeholders’ voice'), learn:()=>tt('帯域の奪還が、静かな多数派を可聴にする。','Reclaiming bandwidth makes the quiet majority audible.')},
 ];
 let _discovered=new Set(), _sessionPages=new Set(), _presetsSeen=new Set(), _discReady=false;
 
@@ -2237,240 +2245,6 @@ function setPresetP4(id){
   notePreset(4,id);
 }
 
-// ── v6.35: Phase 1 Weekly Scenarios ──
-const SCENARIOS = [
-  {
-    id: 'echo_trap',
-    title: { ja: 'エコーチェンバーの罠', en: 'Echo Chamber Trap' },
-    brief: { ja: 'フィルタリングが徐々に強まる世界で、情報空間は澄むか、濁るか？', en: 'As filtering gradually increases, will your information space stay clear or become clouded?' },
-    page: 1,
-    params: {
-      p1: { f: 0, e: 100, al: 'dp' },
-      hint: { ja: 'フィルタリングを少しずつ上げていき、多様性とエントロピーがどう変わるかを観察してください。', en: 'Gradually increase filtering and observe how diversity and entropy change.' }
-    },
-    goal: {
-      ja: 'エントロピーを70以上に上昇させずに、多様性を80以上に保つ',
-      en: 'Keep diversity above 80 while preventing entropy from rising above 70'
-    },
-    check: (m) => {
-      const ent = m.entropy || 0, div = m.diversity || 0;
-      return div >= 80 && ent < 70;
-    },
-    discoveryId: 'sce_echo_trap'
-  },
-  {
-    id: 'ethics_cascade',
-    title: { ja: 'リーダー倫理観の滝', en: 'Leader Ethics Waterfall' },
-    brief: { ja: 'リーダーの倫理観が低下するとき、社会全体がどうカスケードするか？', en: 'When a leader\'s ethics drops, how does the entire society cascade?' },
-    page: 1,
-    params: {
-      p1: { f: 30, e: 100, al: 'dp' },
-      hint: { ja: 'リーダーの倫理スコアをゆっくり下げ、パラノイア、信頼、正当性がどう悪化するかを見てください。', en: 'Slowly lower the leader\'s ethics score and watch paranoia, trust, and legitimacy deteriorate.' }
-    },
-    goal: {
-      ja: '正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に上げ直す',
-      en: 'Keep legitimacy above 60 while raising the ethics score back to 50+'
-    },
-    check: (m) => {
-      const leg = m.legitimacy || 0, e = ethicsScore;
-      return leg >= 60 && e >= 50;
-    },
-    discoveryId: 'sce_ethics_cascade'
-  },
-  {
-    id: 'successor_crisis',
-    title: { ja: '後継者ストック危機', en: 'Successor Stock Crisis' },
-    brief: { ja: 'DXに投資しなければ、後継者ストックが枯渇し、ブランドが崖から落ちる。', en: 'Without DX investment, successor stock depletes and the brand collapses off a cliff.' },
-    page: 2,
-    params: {
-      p2: { s: 30, d: 10, e: 80, al: 'dp', reboot: false },
-      hint: { ja: 'DX投資を急速に上げて、後継者ストック（スキルゲージ）の回復を見てください。平穏→崖落ちの瞬間を体験できます。', en: 'Rapidly increase DX investment to recover the successor stock (skill gauge). Experience the calm→cliff moment.' }
-    },
-    goal: {
-      ja: '後継者ストックを50以上に回復させ、ブランド産業の崩壊を止める',
-      en: 'Recover successor stock above 50 and prevent brand industry collapse'
-    },
-    check: (m) => {
-      const ss = skillStock || 0, br = m.brand || 0;
-      return ss >= 50 && br >= 40;
-    },
-    discoveryId: 'sce_successor_crisis'
-  },
-  {
-    id: 'redundancy_shock',
-    title: { ja: '冗長性ショック対抗', en: 'Redundancy Shock Resilience' },
-    brief: { ja: 'インフラの集約化を進めると、ショックに脆くなる。冗長性バッファを上げてショックに耐える。', en: 'Consolidating infrastructure makes you vulnerable to shocks. Build redundancy buffer to survive.' },
-    page: 2,
-    params: {
-      p2: { s: 50, d: 30, e: 80, al: 'dp', reboot: false },
-      hint: { ja: '集約化（Consolidation）を下げて冗長性を上げ、そのあと⚡ショックを注入してください。生存の分岐点を見てください。', en: 'Lower consolidation to raise redundancy, then inject ⚡ shock. Watch the survival branching point.' }
-    },
-    goal: {
-      ja: '冗長性バッファを75以上に上げ、ショック注入後も生き残る',
-      en: 'Raise redundancy buffer above 75 and survive after shock injection'
-    },
-    check: (m) => {
-      const red = m.redundancy || 0;
-      return red >= 75 && (m.infra || 0) >= 20;
-    },
-    discoveryId: 'sce_redundancy_shock'
-  },
-  {
-    id: 'cognitive_grounding',
-    title: { ja: '認知のグラウンディング', en: 'Cognitive Grounding' },
-    brief: { ja: 'SNS断食と現実同期：深い探索と高い学習率でバランスを取る。', en: 'SNS fasting & reality sync: balance deep reasoning with high learning rate.' },
-    page: 3,
-    params: {
-      p3: { depth: 3, ground: 20, lr: 20 },
-      hint: { ja: 'パラメータを調整して、「毒入れ」（赤い攻撃）が消えるか、認知健全性が改善するか観察してください。', en: 'Adjust parameters to watch the "poisoning attack" (red arrows) disappear and cognitive integrity improve.' }
-    },
-    goal: {
-      ja: '認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする',
-      en: 'Raise cognitive integrity above 80 and achieve search depth 7+'
-    },
-    check: (m) => {
-      const int = m.integrity || 0, depth = (document.getElementById('depth')?.value || 3) >> 0;
-      return int >= 80 && depth >= 7;
-    },
-    discoveryId: 'sce_cognitive_grounding'
-  },
-  {
-    id: 'stakeholder_voice',
-    title: { ja: '当事者の声を取り戻す', en: 'Restore Stakeholder Voice' },
-    brief: { ja: 'ゲーム化が進むと、当事者比率が低下する。フィルタリングで本来の声を優先させる。', en: 'As gamification rises, stakeholder ratio drops. Use filtering to restore true voices.' },
-    page: 4,
-    params: {
-      p4: { ext: 50, gam: 40 },
-      hint: { ja: 'ゲーム化（Gamification）とパケットドロップ率の関係を観察し、フィルタリングで当事者比率を改善してください。', en: 'Observe how gamification links to packet drop, and use filtering to improve stakeholder ratio.' }
-    },
-    goal: {
-      ja: '当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる',
-      en: 'Raise stakeholder commit ratio above 70 and drop packet rate below 40%'
-    },
-    check: (m) => {
-      const ratio = m.ratio || 0, drop = m.drop || 0;
-      return ratio >= 70 && drop <= 40;
-    },
-    discoveryId: 'sce_stakeholder_voice'
-  }
-];
-
-function getWeeklyScenario() {
-  const now = new Date();
-  const jan1 = new Date(now.getFullYear(), 0, 1);
-  const diffTime = now - jan1;
-  const diffWeeks = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 7));
-  const weekNum = (diffWeeks % SCENARIOS.length);
-  return SCENARIOS[weekNum];
-}
-
-function applyScenarioParams(scenario) {
-  if (scenario.params.p1) {
-    const p = scenario.params.p1;
-    filterRate = p.f;
-    ethicsScore = p.e;
-    algo = p.al;
-    document.getElementById('filterRate').value = p.f;
-    document.getElementById('ethicsScore').value = p.e;
-    document.getElementById('btnDP').classList.toggle('on', p.al === 'dp');
-    document.getElementById('btnDP').classList.toggle('green-on', p.al === 'dp');
-    document.getElementById('btnGreedy').classList.toggle('on', p.al === 'greedy');
-    document.getElementById('btnGreedy').classList.toggle('red-on', p.al === 'greedy');
-    setPct(document.getElementById('filterRate'));
-    setPct(document.getElementById('ethicsScore'));
-    updateP1Chart();
-  }
-  if (scenario.params.p2) {
-    const p = scenario.params.p2;
-    shrinkRate = p.s;
-    dxRate = p.d;
-    ethicsP2 = p.e;
-    algo = p.al;
-    publicReboot = p.reboot || false;
-    if (p.d >= 45) skillStock = 80;
-    else if (p.d < 25) skillStock = 10;
-    else skillStock = 50;
-    document.getElementById('shrinkRate').value = p.s;
-    document.getElementById('dxRate').value = p.d;
-    document.getElementById('ethicsScoreP2').value = p.e;
-    if (p.al === 'dp') {
-      document.getElementById('btnDPP2').classList.add('on');
-      document.getElementById('btnDPP2').classList.add('green-on');
-      document.getElementById('btnGreedyP2').classList.remove('on');
-      document.getElementById('btnGreedyP2').classList.remove('red-on');
-    } else {
-      document.getElementById('btnGreedyP2').classList.add('on');
-      document.getElementById('btnGreedyP2').classList.add('red-on');
-      document.getElementById('btnDPP2').classList.remove('on');
-      document.getElementById('btnDPP2').classList.remove('green-on');
-    }
-    document.getElementById('btnRebootOff').classList.toggle('on', !p.reboot);
-    document.getElementById('btnRebootOn').classList.toggle('on', p.reboot);
-    document.getElementById('btnRebootOn').classList.toggle('green-on', p.reboot);
-    setPct(document.getElementById('shrinkRate'));
-    setPct(document.getElementById('dxRate'));
-    setPct(document.getElementById('ethicsScoreP2'));
-    updateP2Chart();
-  }
-  if (scenario.params.p3) {
-    const p = scenario.params.p3;
-    searchDepth = p.depth;
-    groundingRate = p.ground;
-    learningRate = p.lr;
-    document.getElementById('searchDepth').value = p.depth;
-    document.getElementById('groundingRate').value = p.ground;
-    document.getElementById('learningRate').value = p.lr;
-    setPct(document.getElementById('groundingRate'));
-    setPct(document.getElementById('learningRate'));
-    updateP3Monitor();
-    updateP3Chart();
-  }
-  if (scenario.params.p4) {
-    const p = scenario.params.p4;
-    extTraffic = p.ext;
-    gamification = p.gam;
-    document.getElementById('extTraffic').value = p.ext;
-    document.getElementById('gamification').value = p.gam;
-    setPct(document.getElementById('extTraffic'));
-    setPct(document.getElementById('gamification'));
-    updateP4Chart();
-  }
-}
-
-function openScenarios() {
-  if (!WEEKLY_ENABLED) return;
-
-  const scenario = getWeeklyScenario();
-  const titleEl = document.getElementById('scenarioTitle');
-  const descEl = document.getElementById('scenarioDesc');
-  const goalEl = document.getElementById('scenarioGoal');
-  const hintEl = document.getElementById('scenarioHint');
-  const checkEl = document.getElementById('scenarioCheckContainer');
-
-  if (titleEl) titleEl.textContent = tt(scenario.title.ja, scenario.title.en);
-  if (descEl) descEl.textContent = tt(scenario.brief.ja, scenario.brief.en);
-  if (goalEl) goalEl.textContent = tt(scenario.goal.ja, scenario.goal.en);
-  if (hintEl) hintEl.textContent = (scenario.params.hint ? tt(scenario.params.hint.ja, scenario.params.hint.en) : '');
-  if (checkEl) checkEl.style.display = 'none';
-
-  document.getElementById('scenarioModal').classList.add('on');
-}
-
-function closeScenarios() {
-  document.getElementById('scenarioModal').classList.remove('on');
-}
-
-function closeScenarioIf(e) {
-  if (e.target === document.getElementById('scenarioModal')) closeScenarios();
-}
-
-function startScenario() {
-  const scenario = getWeeklyScenario();
-  applyScenarioParams(scenario);
-  switchTab(scenario.page);
-  closeScenarios();
-  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
-}
 
 function toggleHeaderMenu() {
   const menu = document.getElementById('headerMenu');
@@ -2489,60 +2263,6 @@ document.addEventListener('click', function(event) {
   }
 });
 
-function initWeeklyScenarioCard() {
-  if (!WEEKLY_ENABLED) return;
-
-  const scenario = getWeeklyScenario();
-  const isClear = _discovered.has(scenario.discoveryId);
-
-  document.getElementById('scenarioCardTitle').textContent = tt(scenario.title.ja, scenario.title.en);
-  document.getElementById('scenarioCardBrief').textContent = tt(scenario.brief.ja, scenario.brief.en);
-  document.getElementById('scenarioCardGoal').textContent = tt(scenario.goal.ja, scenario.goal.en);
-
-  const statusEl = document.getElementById('scenarioCardStatus');
-  const btnEl = document.getElementById('scenarioCardBtn');
-
-  if (isClear) {
-    statusEl.style.display = 'block';
-    statusEl.textContent = tt('✓ CLEARED — 来週のシナリオをお楽しみに！', '✓ CLEARED — Another challenge next week!');
-    btnEl.textContent = tt('来週のシナリオまで待機中', 'Waiting for next week');
-    btnEl.disabled = true;
-    btnEl.style.opacity = '0.5';
-    btnEl.style.cursor = 'default';
-  } else {
-    statusEl.style.display = 'none';
-    btnEl.disabled = false;
-    btnEl.style.opacity = '1';
-    btnEl.style.cursor = 'pointer';
-    btnEl.textContent = tt('▶ 挑戦する', '▶ Take the challenge');
-  }
-}
-
-function startWeeklyScenarioFromCard() {
-  const scenario = getWeeklyScenario();
-  applyScenarioParams(scenario);
-  switchTab(scenario.page);
-  showShareToast({ kind: 'scenario', title: tt(scenario.title.ja, scenario.title.en) });
-}
-
-function checkScenarioGoal(metricsObj) {
-  if (!WEEKLY_ENABLED) return; // fix: Web版では週次シナリオ無効のため判定自体をスキップ
-  const scenario = getWeeklyScenario();
-  if (!scenario || !scenario.check) return;
-  if (!document.getElementById('scenarioModal')?.classList.contains('on')) {
-    if (scenario.check(metricsObj)) {
-      const discId = scenario.discoveryId;
-      if (!_discovered.has(discId)) {
-        discover(discId); // fix: 未定義だった saveDiscoveries()/unlock() を既存の発見システム（保存・トースト込み）に置換
-        if (document.getElementById('scenarioCheckContainer')) {
-          document.getElementById('scenarioCheckContainer').style.display = 'block';
-        }
-        // Update scenario card status
-        initWeeklyScenarioCard();
-      }
-    }
-  }
-}
 
 // ── v5.1: イントロモーダル（4層モデルの概観） ─────────────
 function openIntro(){
@@ -3012,6 +2732,11 @@ function generateResultCard(ctx){
   c.fillText(tt('[ 社会デバッガー v6.346 ]','[ SOCIAL DEBUGGER v6.346 ]'),56,106);
   c.fillStyle='#5a6f94';c.font='20px '+MONO;
   c.fillText(cardPageLabel(ctx),56,134);
+  // task4: 週替わりシナリオをクリアした直後は「今週、街を守った」一文＋シナリオ名を刻む
+  if(window._weeklyCleared){
+    c.fillStyle='rgba(153,200,255,.9)';c.font='bold 19px '+MONO;
+    c.fillText(tt('🛡 あなたは今週、街を守った。','🛡 You protected your town this week.')+' 〈'+window._weeklyCleared.title+'〉',56,160,W-112);
+  }
   // 主要ゲージ
   const gs=cardGauges(ctx);
   let gy=gs.length>3?184:208;
