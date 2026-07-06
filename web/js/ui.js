@@ -674,7 +674,9 @@ function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();if(typeof updateDis
 
 // v6.345: プライバシーファーストの analytics ラッパー（外部スクリプト未導入時は no-op）
 function track(event,props){
-  try{if(window.plausible)window.plausible(event,{props:props||{}});}catch(e){}
+  // task6: 全イベント共通プロパティ app_platform（web / ios / android）を付与
+  const p=Object.assign({app_platform:(window.SSD&&SSD.platform)||'web'},props||{});
+  try{if(window.plausible)window.plausible(event,{props:p});}catch(e){}
 }
 
 // v6.343: ドキュメント導線の言語連動
@@ -1438,7 +1440,11 @@ function setVerdictBanner(alertId,state,key){
     track('verdict',{banner:alertId,state,key});
     // v6.35 (task2): 崩壊へ遷移した瞬間だけ短い振動（ネイティブのみ / Webは no-op）。
     // 上部の bst ガードで状態変化時にしか到達しないため連続振動しない。
-    if(state==='crash'&&window.SSD)SSD.haptic('crash');
+    if(state==='crash'){
+      if(window.SSD)SSD.haptic('crash');
+      // task6: 週替わりシナリオ挑戦中の崩壊は weekly_fail（scenario.js側で1回制御・Web no-op）
+      if(typeof noteWeeklyCollapse==='function')noteWeeklyCollapse();
+    }
   }else{
     al.classList.remove('on');
   }

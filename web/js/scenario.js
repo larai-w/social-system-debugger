@@ -89,6 +89,7 @@ const SCENARIOS = [
 ];
 
 let _remoteScenario = null;   // latest.json 取得成功時にセット
+let _weeklyAttempt = null;    // 現在挑戦中のシナリオ {id, failed} — weekly_fail の1回発火制御
 
 // intro/brief どちらの表記でも扱えるよう正規化し、goalConds を保証
 function normalizeScenario(s) {
@@ -240,11 +241,20 @@ function closeScenarioIf(e) { if (e.target === document.getElementById('scenario
 function startScenario() {
   const s = getActiveScenario();
   window._weeklyCleared = null;   // 新しい挑戦を始めるので前回クリア表示をリセット
+  _weeklyAttempt = { id: s.id, failed: false };
   applyScenarioParams(s);
   switchTab(s.page);
   closeScenarios();
   track('weekly_start', { id: s.id });
   showShareToast({ kind: 'scenario', title: tt(s.title.ja, s.title.en) });
+}
+
+// 崩壊（crash）バナー遷移時に ui.js から呼ばれる。挑戦中かつ未クリアなら weekly_fail を1回だけ。
+function noteWeeklyCollapse() {
+  if (!WEEKLY_ENABLED || !_weeklyAttempt || _weeklyAttempt.failed) return;
+  if (isWeeklyCleared(_weeklyAttempt.id)) return;   // クリア済みなら失敗扱いしない
+  _weeklyAttempt.failed = true;
+  track('weekly_fail', { id: _weeklyAttempt.id });
 }
 
 function initWeeklyScenarioCard() {
@@ -272,6 +282,7 @@ function initWeeklyScenarioCard() {
 function startWeeklyScenarioFromCard() {
   const s = getActiveScenario();
   window._weeklyCleared = null;
+  _weeklyAttempt = { id: s.id, failed: false };
   applyScenarioParams(s);
   switchTab(s.page);
   track('weekly_start', { id: s.id });

@@ -202,6 +202,30 @@ cd infra && npm install && npm run synth   # 構成確認（cdk synth）
 
 ---
 
+## 計測 / Analytics（フェーズ1 KPI）
+
+`track(event, props)` 経由で計測（現状 Plausible）。**全イベントに共通プロパティ `app_platform`（`web` / `ios` / `android`）が付く**ので、Web と ネイティブを分けて見られます。
+
+| イベント | props | 何を意味するか |
+|---|---|---|
+| `weekly_start` | `id` | 週替わりシナリオへの挑戦開始 |
+| `weekly_clear` | `id` | クリア（ゴール達成） |
+| `weekly_fail` | `id` | 挑戦中に崩壊 |
+| `share_x` / `share_line` / `card_saved` | `kind` | X / LINE / 画像保存 それぞれの共有 |
+| `share_other` | `kind` | OS共有シート |
+| `notification_optin` | `granted` | 週次通知の許可/拒否 |
+
+**「20人フェーズで何を見るか」対応表**
+
+| 見たい指標 | 近似する計測 |
+|---|---|
+| **週次リテンション**（戻ってくるか） | `weekly_start` のユニーク推移（週ごと・`app_platform` 別） |
+| **共有の質**（説得でなく好奇心の共有か） | 共有全体に占める **`share_line` の比率**（家族・地域向けの穏やかな導線） |
+| ネイティブ移行の効果 | `app_platform=ios/android` の各イベント比率 |
+| 通知の効きめ | `notification_optin` 許可率 → 翌週の `weekly_start` 復帰 |
+
+---
+
 ## CI/CD
 
 `development` ブランチで開発 → `main` へのPR時にCI自動チェック → マージで GitHub Pages に自動デプロイ。
