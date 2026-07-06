@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# pre-commit — コミット前にユニットテスト＋週替わりJSON検証を走らせ、壊れたコミットを防ぐ。
+# 有効化: git config core.hooksPath .githooks （初回のみ。make hooks / CONTRIBUTING 参照）
+# 一時的に無効化したいときは: git commit --no-verify
+set -e
+echo "pre-commit: npm run check ..."
+if ! npm run check --silent; then
+  echo "❌ テスト/検証に失敗しました。修正するか、緊急時は 'git commit --no-verify' で回避。" >&2
+  exit 1
+fi
+echo "✅ pre-commit OK"

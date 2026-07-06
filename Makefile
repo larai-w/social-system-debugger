@@ -3,12 +3,20 @@
 .DEFAULT_GOAL := help
 GITHUB_REPO ?= larai-w/social-system-debugger
 
-.PHONY: help serve test check gen-og synth handoff \
+.PHONY: help setup hooks serve test check gen-og synth handoff \
         aws-bootstrap aws-deploy aws-wire ios android
 
 help: ## このヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 	  | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+## ── 初回セットアップ ──────────────────────────────
+setup: ## 依存導入 + git hooks 有効化（クローン後まず実行）
+	npm install && (cd infra && npm ci) && git config core.hooksPath .githooks
+	@echo "✅ setup done（make help で操作一覧）"
+
+hooks: ## git pre-commit フックを有効化
+	git config core.hooksPath .githooks
 
 ## ── 開発 ──────────────────────────────────────────
 serve: ## ローカル配信（http://localhost:8000 / file:// 不可）

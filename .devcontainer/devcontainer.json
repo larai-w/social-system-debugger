@@ -1,0 +1,21 @@
+{
+  "name": "social-debugger",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/aws-cli:1": {}
+  },
+  "postCreateCommand": "npm install && (cd infra && npm install) && git config core.hooksPath .githooks",
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": { "label": "web (make serve)" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "aws-scripting-guy.cform"]
+    }
+  },
+  "remoteEnv": {
+    "CDK_DEFAULT_REGION": "ap-northeast-1"
+  }
+}
