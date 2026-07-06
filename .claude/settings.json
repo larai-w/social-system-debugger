@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/handoff-hook.sh",
+            "timeout": 15,
+            "statusMessage": "引き継ぎチェック..."
+          }
+        ]
+      }
+    ]
+  }
+}
