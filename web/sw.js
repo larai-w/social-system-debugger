@@ -1,7 +1,9 @@
 // 社会＆地域インフラ・デバッガー — Service Worker
-// 方針: メインドキュメントは network-first（新デプロイを必ず優先し、古いキャッシュに固定されない）。
-//       静的アセット/CDN は cache-first（オフライン動作）。
-const CACHE = 'ssd-cache-v6-351';
+// 方針:
+//   - メインドキュメント と 同一オリジンのアプリコード(js/css) は network-first
+//     （新デプロイを必ず優先し、古いキャッシュに固定されない。分割変更後の stale-JS 対策）。
+//   - それ以外の静的アセット(icon 等) / CDN(Chart.js) は cache-first（オフライン動作）。
+const CACHE = 'ssd-cache-v6-352';
 const CORE = ['./', './index.html', './manifest.json', './icon.svg',
   './css/app.css', './js/i18n.js', './js/engine.js', './js/native.js', './js/share.js', './js/scenario.js', './js/ui.js'];
 
@@ -32,6 +34,25 @@ self.addEventListener('fetch', (e) => {
           return res;
         })
         .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // 同一オリジンのアプリコード(js/css): network-first。
+  // デプロイ直後に古いJSを掴む問題を根絶する（オフライン時のみキャッシュへフォールバック）。
+  const url = new URL(req.url);
+  const sameOrigin = url.origin === self.location.origin;
+  const isAppCode = sameOrigin &&
+    (req.destination === 'script' || req.destination === 'style' || /\.(js|css)$/.test(url.pathname));
+  if (isAppCode) {
+    e.respondWith(
+      fetch(req)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
