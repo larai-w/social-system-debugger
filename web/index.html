@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社会デバッガー</title>
+<!-- v6.2: OGP / SNSカード -->
+<meta property="og:title" content="社会デバッガー">
+<meta property="og:description" content="あなたの街は、生き残れるか。— 社会が崩壊する構造をパラメータで操作できる教育用シミュレーター。特定の誰かではなく、どの社会にも起こる構造の話です">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!-- v6.342: PWA（インストール可能・オフライン対応。見た目は不変） -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070b14">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="社会デバッガー">
+<!-- og-image.png 制作仕様（アプリ内の結果カードPNGと同デザイン / generateResultCard 参照）:
+     ・サイズ 1200×630 / 背景 #070b14 + 48pxグリッド線 rgba(0,212,255,.06)
+     ・外枠 #00d4ff 3px + 内枠 rgba(0,212,255,.3) 1px
+     ・左上: [ 社会＆地域インフラ・デバッガー v6.2 ]（#00d4ff / 'Courier New' Bold 32px / シアン発光）
+     ・その下: サブタイトル（#5a6f94 / 20px）
+     ・左中央: 横ゲージバー3本（REDUNDANCY / INFRASTRUCTURE / COGNITION、ベース #172340・塗り #00ff88）
+     ・右中央: 斜めスタンプ風「SIMULATION ACTIVE」（#00ff88 / 二重枠 / -6°回転 / グロー）
+     ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="window.__chartLoadFailed=true"></script>
+<!-- v6.345: analytics placeholder — swap src for Plausible or CF Web Analytics when ready
+<script defer data-domain="larai-w.github.io" src="https://plausible.io/js/script.js"></script>
+-->
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-acts">
+    <button class="ibtn" id="langBtn" onclick="toggleLang()">EN</button>
+    <button class="ibtn" id="guideBtn" onclick="openIntro()" data-i18n="guide_btn">ℹ GUIDE</button>
+  </div>
+  <div class="hdr-c">
+    <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
+    <p id="hdrSub">あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい</p>
+    <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
+  </div>
+  <div class="hdr-acts">
+    <button class="ibtn" id="feedbackBtn" onclick="openFeedback()" data-i18n="feedback_short">💬 フィードバック</button>
+    <button class="ibtn" id="discHeaderBtn" style="display:none" onclick="openDiscoveryLog()">
+      <span data-i18n="discoveries_header">📖 発見</span> <span class="badge" style="padding:2px 8px;margin:0"><span class="bdot"></span><span id="discHeaderCount">0</span></span>
+    </button>
+    <button class="ibtn" id="shareBtn" onclick="shareURL()">⎘ SHARE</button>
+    <div class="menu-container">
+      <button class="ibtn" id="menuBtn" onclick="toggleHeaderMenu()" data-i18n="menu_more">≡ メニュー</button>
+      <div class="menu-dropdown" id="headerMenu" onclick="event.stopPropagation()">
+        <button class="menu-item" onclick="openIntro();closeHeaderMenu()" data-i18n="guide_btn">ℹ GUIDE</button>
+        <button class="menu-item" id="discMenuBtn" onclick="openDiscoveryLog();closeHeaderMenu()">📖 発見ログ (<span id="discMenuCount">0</span>/<span id="discMenuTotal">15</span>)</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openShareGuide();closeHeaderMenu()" data-i18n="sg_btn">⇪ 共有ガイド</button>
+        <button class="menu-item" onclick="copyPageLink(currentTab,this);closeHeaderMenu()" data-i18n="link_btn">🔗 このページへの直接リンク</button>
+        <hr class="menu-divider">
+        <button class="menu-item" onclick="openFeedback();closeHeaderMenu()" data-i18n="fb_btn">💬 フィードバック</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab1Btn" onclick="switchTab(1)">▶ PAGE 1: INFORMATION SPACE</button>
+  <button class="tab-btn" id="tab2Btn" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
+  <button class="tab-btn" id="tab3Btn" onclick="switchTab(3)">▶ PAGE 3: COGNITIVE RECOVERY</button>
+  <button class="tab-btn" id="tab4Btn" onclick="switchTab(4)">▶ PAGE 4: STAKEHOLDER ASYMMETRY</button>
+</div>
+
+<div id="page1" class="page active">
+<!-- v6.35: Weekly Scenario Card -->
+<div class="card scenario-card" id="scenarioCardContainer" style="border-color:rgba(153,200,255,.3);margin-bottom:14px">
+  <div class="ct" style="color:rgba(153,200,255,.8)"><span class="dot" style="background:rgba(153,200,255,.8);box-shadow:0 0 7px rgba(153,200,255,.6)"></span><span data-i18n="scenario_title">ウィークリーチャレンジ</span></div>
+  <div id="scenarioCardTitle" style="font-size:.85rem;color:var(--txt);font-weight:bold;margin-bottom:8px">Echo Chamber Trap</div>
+  <div id="scenarioCardBrief" style="font-size:.65rem;color:var(--muted);margin-bottom:12px;line-height:1.6">Your objective...</div>
+  <div id="scenarioCardGoal" style="font-size:.7rem;padding:10px;background:rgba(100,200,100,.08);border-left:3px solid rgba(100,200,100,.3);margin-bottom:12px;color:var(--txt)"></div>
+  <div id="scenarioCardStatus" style="font-size:.65rem;color:var(--green);margin-bottom:12px;display:none">✓ CLEARED — Another challenge next week!</div>
+  <button class="pbtn" id="scenarioCardBtn" onclick="startWeeklyScenarioFromCard()" style="border-color:rgba(153,200,255,.4);color:rgba(153,200,255,.8);width:100%;text-align:center" data-i18n="scenario_card_challenge">▶ 挑戦する</button>
+</div>
+
+<div class="preset-bar">
+  <span class="pl" id="presetLbl">SCENARIOS ▶</span>
+  <button class="pbtn" id="p-weimar"   onclick="setPreset('weimar')">⚡ ワイマール崩壊</button>
+  <button class="pbtn" id="p-populism" onclick="setPreset('populism')">🔥 ポピュリズム爆走</button>
+  <button class="pbtn" id="p-sns"      onclick="setPreset('sns')">📱 SNS社会 2024</button>
+  <button class="pbtn" id="p-techno"   onclick="setPreset('techno')">🔬 テクノクラシー</button>
+  <button class="pbtn" id="p-nordic"   onclick="setPreset('nordic')">🌿 北欧型民主主義</button>
+</div>
+
+<div class="alert" id="alertBanner">
+  <div class="at" data-i18n="banner_p1">⚠ &nbsp;あなたの社会が、暴走を始めた&nbsp; ⚠</div>
+  <div class="am" id="alertMsg"></div>
+</div>
+
+<div class="main">
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <div class="ct"><div class="ct-l"><span class="dot"></span><span id="paramTitle">INPUT PARAMETERS</span></div></div>
+      <div class="cs" id="paramDesc">社会システムの設計変数。スライダーを動かすとリアルタイムでシステム状態が変化する。</div>
+      <hr class="div">
+      <div style="margin-bottom:12px">
+        <div class="pl2">
+          <span class="pn" id="f1lbl">情報フィルタリング率 <span class="tag tc">OVERFITTING</span></span>
+          <span class="pv" id="filterVal">0%</span>
+        </div>
+        <div class="pd" id="f1desc">エコーチェンバー度。高いほど同質情報のみ流通し、現実OSとの互換性が喪失する（過学習）。</div>
+        <input type="range" id="filterRate" min="0" max="100" value="0">
+        <div class="rl"><span id="f1L">OPEN</span><span id="f1R">ECHO CHAMBER</span></div>
+      </div>
+      <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p1Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p1Details" style="display:none">
+      <div style="margin-bottom:12px">
+        <div class="pl2">
+          <span class="pn" id="f2lbl">リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span>
+          <span class="pv" id="ethicsVal">100</span>
+        </div>
+        <div class="pd" id="f2desc">意思決定の公正性。低下するとポピュリズムが進行し報酬関数がドーパミン（即時支持率）のみに最適化される。</div>
+        <input type="range" id="ethicsScore" min="0" max="100" value="100">
+        <div class="rl"><span id="f2L">POPULISM</span><span id="f2R">RULE OF LAW</span></div>
+      </div>
+      <hr class="div">
+      <div style="margin-bottom:12px">
+        <div class="pl2">
+          <span class="pn" id="f4lbl">歴史的免疫値 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">IMMUNITY</span></span>
+          <span class="pv" id="immunityVal" style="color:var(--pur)">50%</span>
+        </div>
+        <div class="pd" id="f4desc">法的・歴史的アーカイブへの参照能力。高いとファクトチェッカーの消滅を防ぎ、誤判定（False Positive）に抵抗できる。</div>
+        <input type="range" id="historicalImmunity" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
+        <div class="rl"><span id="f4L">歴史の忘却</span><span id="f4R">論理と法のアーカイブ</span></div>
+      </div>
+      <hr class="div">
+      <div>
+        <div class="pl2" style="margin-bottom:5px">
+          <span class="pn" id="f3lbl">意思決定アルゴリズム <span class="tag to">STRATEGY</span></span>
+        </div>
+        <div class="pd" id="f3desc">長期最適化 vs 短期利益最大化。Greedyは局所最適解に収束し大域的破綻を誘発する。</div>
+        <div class="tog">
+          <button class="tb" id="btnDP" onclick="setAlgo('dp')">
+            <span id="dpL">動的計画法 (DP)</span><br><span style="font-size:.57em;opacity:.7" id="dpS">長期最適化・将来コスト内部化</span>
+          </button>
+          <button class="tb on" id="btnGreedy" onclick="setAlgo('greedy')">
+            <span id="grL">Greedy Algorithm</span><br><span style="font-size:.57em;opacity:.7" id="grS">短期利益最大化・局所最適解</span>
+          </button>
+        </div>
+      </div>
+      </div><!-- /p1Details -->
+      <button class="sbtn" id="shareBtnFull" onclick="shareURL()">⎘ このシナリオのURLをコピー</button>
+      <button class="sbtn" id="pinBtn" onclick="pinScenario()">📌 <span id="pinLabel">SCENARIO A をロック</span></button>
+    </div>
+
+    <div class="card">
+      <div class="ct"><div class="ct-l"><span class="dot"></span><span id="stateTitle">SYSTEM STATE MONITOR</span></div></div>
+      <div style="margin-bottom:12px">
+        <div class="gr">
+          <span class="gl" onclick="openModal('entropy')"><span id="eLbl">エントロピー（無秩序度）</span><span class="gi">(?)</span></span>
+          <span class="gn" id="entropyNum" style="color:var(--ora)">0%</span>
+        </div>
+        <div class="gt"><div class="gf" id="entropyBar" style="width:0%;background:var(--ora)"></div></div>
+        <div class="gs" id="entropyStatus" style="color:var(--muted)">STABLE</div>
+      </div>
+      <div>
+        <div class="gr">
+          <span class="gl" onclick="openModal('paranoia')"><span id="pLbl">精神病・パラノイア発症リスク</span><span class="gi">(?)</span></span>
+          <span class="gn" id="paranoiaNum" style="color:var(--pur)">0%</span>
+        </div>
+        <div class="gt"><div class="gf" id="paranoiaBar" style="width:0%;background:var(--pur)"></div></div>
+        <div class="gs" id="paranoiaStatus" style="color:var(--muted)">LOW</div>
+      </div>
+      <div class="sg">
+        <div class="si" onclick="openModal('socialCap')"><div class="sl" id="lbl_scVal">SOCIAL CAPITAL</div><div class="sv" id="scVal" style="color:var(--cyan)">100</div></div>
+        <div class="si" onclick="openModal('dopamine')"><div class="sl" id="lbl_dpVal">DOPAMINE INDEX</div><div class="sv" id="dpVal" style="color:var(--green)">50</div></div>
+        <div class="si" onclick="openModal('infra')"><div class="sl" id="lbl_infVal">INFRASTRUCTURE</div><div class="sv" id="infVal" style="color:var(--cyan)">100</div></div>
+        <div class="si" onclick="openModal('diversity')"><div class="sl" id="lbl_divVal">DIVERSITY INDEX</div><div class="sv" id="divVal" style="color:var(--green)">100</div></div>
+      </div>
+      <div class="diag" id="diag"></div>
+      <div class="hist" id="histRef"></div>
+      <button class="sbtn" id="p1ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP1Result()">▶ この結果を送る</button>
+      <button class="sbtn" id="p1RewindBtn" style="display:none;border-color:#ff6b2b;color:#ff6b2b;margin-top:6px" onclick="openRewind()" data-i18n="rewind_btn">↩ もし1つだけ過去に戻せるなら？</button>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="charts-top">
+      <div class="card">
+        <div class="ct"><div class="ct-l"><span class="dot"></span>① DATA GENERALIZATION</div></div>
+        <div class="cs" id="s1sub">Detail vs. Consistency — 実データ（青）と過学習データ（赤）の分布。フィルタリング率が上がると赤クラスターへのドリフトが発生する。</div>
+        <div class="ch"><canvas id="scatterChart"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ct">
+          <div class="ct-l"><span class="dot"></span>② SOCIAL HEALTH TIMELINE</div>
+          <button class="ibtn" id="playBtn" onclick="playAnimation()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+        </div>
+        <div class="cs" id="s2sub">時系列シミュレーション。Greedy×低倫理 → ドーパミン爆発後に崩壊。DP×高倫理 → 持続的安定成長。</div>
+        <div class="ch"><canvas id="timelineChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct"><div class="ct-l"><span class="dot"></span>③ SYSTEM STABILITY MATRIX</div></div>
+      <div class="cs" id="s3sub">多次元健全性レーダー。各軸が内側に崩れると System Failure 閾値（赤破線）を超過する。</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center">
+        <div class="chsm"><canvas id="radarChart"></canvas></div>
+        <div>
+          <div style="font-size:.63rem;color:var(--muted);letter-spacing:.12em;margin-bottom:4px" id="metricLogHeader">[ METRIC LOG ]</div>
+          <div id="metricLogNote" style="display:none;font-size:.56rem;margin-bottom:6px;padding:3px 8px;border-radius:2px;line-height:1.6"></div>
+          <div class="mlog" id="metricLog"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">
+        <div class="ct-l"><span class="dot" style="background:var(--green);box-shadow:0 0 7px var(--green)"></span>④ AGENT NETWORK SIMULATION</div>
+        <button class="ibtn" onclick="restartAgents()" style="font-size:.58rem;padding:4px 9px" id="resetLbl">↺ RESET</button>
+      </div>
+      <div class="cs" id="s4sub">48エージェントによる情報伝播シミュレーション。フィルタリング率が上がると同信念エッジのみ残りクラスターが形成される。ノードをリアルタイムで観測せよ。</div>
+      <div class="ag-wrap">
+        <canvas id="agentCanvas"></canvas>
+        <div class="ag-ov">
+          <div class="ag-st" id="agSt1">ECHO EXPOSURE: 0%</div>
+          <div class="ag-st" id="agSt2">IN ECHO CHAMBER: 0/48</div>
+        </div>
+        <div class="ag-leg">
+          <div class="li"><div class="ld" style="background:var(--cyan)"></div><span id="leg1">健全 Healthy</span></div>
+          <div class="li"><div class="ld" style="background:var(--ora)"></div><span id="leg2">感染中 Contaminating</span></div>
+          <div class="li"><div class="ld" style="background:var(--red)"></div><span id="leg3">エコーチェンバー</span></div>
+          <div class="li"><div class="ld" style="background:var(--green);border:1px dashed var(--green)"></div><span id="leg4">ファクトチェッカー</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#page1 -->
+
+<div id="page2" class="page">
+
+<div class="preset-bar">
+  <span class="pl">SCENARIOS ▶</span>
+  <button class="pbtn" id="p2-deadlock" onclick="setPresetP2('deadlock')" data-i18n="p2_pr_dl">🏚 他責デッドロック</button>
+  <button class="pbtn" id="p2-efficiency" onclick="setPresetP2('efficiency')" data-i18n="p2_pr_eff">⚙ 効率至上都市</button>
+  <button class="pbtn" id="p2-smart" onclick="setPresetP2('smart')" data-i18n="p2_pr_smart">🌱 スマート縮退</button>
+  <button class="pbtn" id="p2-redundant" onclick="setPresetP2('redundant')" data-i18n="p2_pr_red">🛡 冗長性確保都市</button>
+  <span class="pl" style="opacity:.6" data-i18n="p2_pr_hint">→ 適用後に ⚡ショック注入 で耐性を比較せよ</span>
+</div>
+
+<div class="alert" id="alertBannerP2">
+  <div class="at" data-i18n="banner_p2">⚠ &nbsp;あなたの街は、崩壊しました&nbsp; ⚠<span style="display:block;font-size:.6em;opacity:.6;letter-spacing:.15em;margin-top:2px">SECTOR-T COLLAPSE</span></div>
+  <div class="am" id="alertMsgP2"></div>
+</div>
+
+<div class="main">
+  <!-- LEFT: P2 Input + State -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" style="border-color:rgba(255,107,43,.3)">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span><span>INPUT PARAMETERS — SECTOR-T</span></div></div>
+      <div class="cs" data-i18n="p2_cs_input">人口減少が進む地方都市（Sector-T）の財政・実務パラメーター。スライダーを操作してシミュレートせよ。</div>
+      <hr class="div">
+      <!-- Shrink Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
+        <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
+        <input type="range" id="shrinkRate" min="0" max="100" value="10" class="ora-range">
+        <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
+      </div>
+      <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p2Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p2Details" style="display:none">
+      <!-- DX Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
+        <div class="pd" data-i18n="p2_dx_d">スマート農業・自動化による地域ブランド産業の持続化投資。低いと高齢職人依存が継続し後継者断絶が起きる。</div>
+        <input type="range" id="dxRate" min="0" max="100" value="30">
+        <div class="rl"><span data-i18n="p2_dx_l">高齢農家の職人依存</span><span data-i18n="p2_dx_r">スマート自動化</span></div>
+      </div>
+      <hr class="div">
+      <!-- Leader Ethics P2 -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">68</span></div>
+        <div class="pd" data-i18n="p2_ethics_d">低下するとシステム目的関数が『生活者の生存』から『自己保身』へ乗っ取られ、実務を完全放棄して他責化処理にCPUが100%占有されます。</div>
+        <input type="range" id="ethicsScoreP2" min="0" max="100" value="68">
+        <div class="rl"><span data-i18n="p2_ethics_l">他責・責任回避</span><span data-i18n="p2_ethics_r">実務・法治</span></div>
+      </div>
+      <hr class="div">
+      <!-- Budget Strategy -->
+      <div>
+        <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f4n">予算配分戦略 <span class="tag to">STRATEGY</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 反証許容度</span></span></div>
+        <div class="pd" data-i18n="p2_strat_d">Greedy=自己保身・ネット選挙ゲーム最優先。DP=救命医療・コア産業を最優先。</div>
+        <div class="tog">
+          <button class="tb" id="btnDPP2" onclick="setAlgoP2('dp')">
+            <span data-i18n="p2_dp_t">DP戦略</span><br><span style="font-size:.57em;opacity:.7" data-i18n="p2_dp_s">救命医療・コア産業最優先</span>
+          </button>
+          <button class="tb on red-on" id="btnGreedyP2" onclick="setAlgoP2('greedy')">
+            <span data-i18n="p2_gr_t">Greedy戦略</span><br><span style="font-size:.57em;opacity:.7" data-i18n="p2_gr_s">自己保身・ネット選挙ゲーム最優先</span>
+          </button>
+        </div>
+      </div>
+      <hr class="div">
+      <!-- Public Reboot Mode -->
+      <div style="margin-bottom:12px">
+        <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f5n">公共性リブート <span class="tag tc">PUBLIC REBOOT</span></span></div>
+        <div class="pd" data-i18n="p2_reboot_d">再公営化・リダンダンシーの確保。ONにすると市場原理の効率主義を停止し公共性を最優先します。インフラ劣化速度を半減・救命ヘリを常時稼働させますが、自治体財政コストが増大します。</div>
+        <div class="tog">
+          <button class="tb on" id="btnRebootOff" onclick="setPublicReboot(false)">
+            OFF<br><span style="font-size:.57em;opacity:.7" data-i18n="p2_reb_off_s">効率主義・市場原理</span>
+          </button>
+          <button class="tb" id="btnRebootOn" onclick="setPublicReboot(true)">
+            ON<br><span style="font-size:.57em;opacity:.7" data-i18n="p2_reb_on_s">公共性最優先・冗長性確保</span>
+          </button>
+        </div>
+      </div>
+      </div><!-- /p2Details -->
+      <hr class="div">
+      <!-- System Shock Injection -->
+      <div>
+        <button class="shock-btn" id="shockBtn" onclick="injectSystemShock()" data-i18n="p2_shock_btn">⚡ 環境ショック注入 (Inject System Shock)</button>
+        <div class="pd" style="margin-top:6px" data-i18n="p2_shock_d">災害や未知の環境変化（ブラックスワン・イベント）をシステムに強制注入します。Redundancy Buffer &lt; 30%の社会は即時崩壊。≥ 60%なら生存継続。</div>
+        <div class="shock-result-panel" id="shockResultPanel"></div>
+        <button class="sbtn" id="shockShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareShockResult()">▶ この結果を送る</button>
+      </div>
+    </div>
+
+    <!-- P2 State Monitor -->
+    <div class="card" id="p2StateCard" style="border-color:rgba(255,107,43,.3)">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span><span>SECTOR-T SYSTEM STATE</span></div></div>
+      <!-- Infra gauge -->
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p2Infra')" data-i18n="p2_gl_infra">インフラ維持力 INFRASTRUCTURE<span class="gi">(?)</span></span><span class="gn" id="p2InfraNum" style="color:var(--cyan)">100</span></div>
+        <div class="gt"><div class="gf" id="p2InfraBar" style="width:100%;background:var(--cyan)"></div></div>
+        <div class="gs" id="p2InfraStatus" style="color:var(--muted)">STABLE</div>
+      </div>
+      <!-- Redundancy Buffer -->
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p2Redundancy')" data-i18n="p2_gl_redun">社会的耐故障性 REDUNDANCY BUFFER<span class="gi">(?)</span></span><span class="gn" id="p2RedundancyNum" style="color:var(--green)">68</span></div>
+        <div class="gt"><div class="gf" id="p2RedundancyBar" style="width:68%;background:var(--green)"></div></div>
+        <div class="gs" id="p2RedundancyStatus" style="color:var(--green)">RESILIENT</div>
+      </div>
+      <div class="reboot-indicator" id="p2RebootIndicator">○ PUBLIC REBOOT MODE: OFF — 市場原理</div>
+      <!-- Status grid -->
+      <div class="sg">
+        <div class="si" onclick="openModal('p2Heli')"><div class="sl" data-i18n="p2_sl_heli">救命ヘリ</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
+        <div class="si" onclick="openModal('p2Brand')"><div class="sl" data-i18n="p2_sl_brand">ブランド産業</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
+        <div class="si" onclick="openModal('p2Budget')"><div class="sl" data-i18n="p2_sl_budget">自治体財政</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
+        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl"><span data-i18n="p2_sl_deadlock">デッドロック状態</span> <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
+      </div>
+      <!-- CPU Allocation -->
+      <div class="cpu-meter">
+        <div class="cpu-label">▌ CPU ALLOCATION MATRIX</div>
+        <div class="cpu-bar-wrap">
+          <div class="cpu-repair-fill" id="p2CpuRepair" style="width:80%"></div>
+          <div class="cpu-blame-fill" id="p2CpuBlame" style="width:20%"></div>
+        </div>
+        <div class="cpu-nums">
+          <span style="color:var(--cyan)">REPAIR: <span id="p2CpuRepairPct">80</span>%</span>
+          <span style="color:var(--red)">BLAME-SHIFT: <span id="p2CpuBlamePct">20</span>%</span>
+        </div>
+      </div>
+      <div class="deadlock-panel deadlock-off" id="p2DeadlockPanel">
+        DEADLOCK INACTIVE — 実務・修復処理が正常稼働中
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: P2 Charts -->
+  <div class="charts">
+    <div class="card">
+      <div class="ct" style="color:var(--ora)">
+        <div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>① SECTOR-T INFRASTRUCTURE TIMELINE</div>
+        <button class="ibtn" id="playBtnP2" onclick="playAnimationP2()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+      </div>
+      <div class="cs" data-i18n="p2_cs_tl">地域インフラの時系列シミュレーション。他責デッドロック発生時、インフラ維持力は3倍速で崩壊する。</div>
+      <div class="ch" style="height:230px"><canvas id="timelineChartP2"></canvas></div>
+    </div>
+
+    <div class="charts-top">
+      <div class="card">
+        <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>② RESCUE HELI STATUS</div></div>
+        <div class="cs" data-i18n="p2_cs_heli">救命ヘリの稼働状況。インフラ維持力が35%を下回るか他責デッドロックが起きると長期運休に入る。</div>
+        <div style="text-align:center;padding:20px 0">
+          <div id="p2HeliIcon" style="font-size:3rem;filter:drop-shadow(0 0 12px var(--green));transition:filter .5s">🚁</div>
+          <div id="p2HeliLabel" style="color:var(--green);font-size:.75rem;letter-spacing:.18em;margin-top:10px">OPERATIONAL — 常時稼働中</div>
+          <div style="margin-top:12px">
+            <div class="gt"><div class="gf" id="p2HeliBar" style="width:100%;background:var(--green)"></div></div>
+            <div class="gs" id="p2HeliDetail" style="color:var(--muted);margin-top:4px">Dispatch Ready</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>③ BRAND INDUSTRY HEALTH</div></div>
+        <div class="cs" data-i18n="p2_cs_brand">地域ブランド産業（農業・特産品）の持続性。DX投資が低いと後継者断絶で崩壊危機に入る。</div>
+        <div style="padding:14px 0">
+          <div class="gr"><span style="font-size:.64rem;color:var(--muted)">BRAND HEALTH INDEX</span><span class="gn" id="p2BrandLarge" style="color:var(--green)">70</span></div>
+          <div class="gt" style="height:10px"><div class="gf" id="p2BrandBar" style="width:70%;background:var(--green)"></div></div>
+          <div class="gs" id="p2BrandStatus" style="color:var(--muted);margin-top:5px">SUSTAINABLE</div>
+          <!-- v6.346: 後継者ストック（暗黙知の残量）。遅い状態変数。DX投資を怠るとやがて崖のように落ちる（Task B） -->
+          <div class="gr" style="margin-top:12px"><span style="font-size:.6rem;color:var(--muted)" onclick="openModal('p2Brand')"><span data-i18n="p2_skill_lbl">後継者ストック</span></span><span class="gn" id="p2SkillNum" style="color:var(--green);font-size:1rem">60</span></div>
+          <div class="gt" style="height:7px"><div class="gf" id="p2SkillBar" style="width:60%;background:var(--green)"></div></div>
+          <div class="gs" id="p2SkillStatus" style="color:var(--muted);margin-top:4px;font-size:.56rem"></div>
+          <div style="margin-top:12px;padding:8px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--ora);font-size:.6rem;color:var(--muted);line-height:1.7" id="p2BrandDiag"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 Operation Log -->
+    <div class="card">
+      <div class="ct" style="color:var(--ora)"><div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>④ SECTOR-T OPERATION LOG</div></div>
+      <div class="cs" data-i18n="p2_cs_log">行政CPUのリアルタイム処理ログ。他責デッドロック中はBLAME_SHIFT処理で埋め尽くされる。</div>
+      <div class="p2log" id="p2Log"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#page2 -->
+
+<div id="page3" class="page">
+
+<div class="preset-bar">
+  <span class="pl">SCENARIOS ▶</span>
+  <button class="pbtn" id="p3-reflex" onclick="setPresetP3('reflex')" data-i18n="p3_pr_reflex">⚡ 脊髄反射モード</button>
+  <button class="pbtn" id="p3-frozen" onclick="setPresetP3('frozen')" data-i18n="p3_pr_frozen">🧊 アップデート拒否</button>
+  <button class="pbtn" id="p3-fasting" onclick="setPresetP3('fasting')" data-i18n="p3_pr_fast">📵 SNS断食</button>
+  <button class="pbtn" id="p3-debugger" onclick="setPresetP3('debugger')" data-i18n="p3_pr_debug">🔍 完全デバッガー</button>
+  <span class="pl" style="opacity:.6" data-i18n="p3_pr_hint">→ Canvasの毒入れ攻撃の変化を観測せよ</span>
+</div>
+
+<div class="alert" id="alertBannerP3">
+  <div class="at" data-i18n="banner_p3">⚠ &nbsp;あなたの正義感が、乗っ取られている&nbsp; ⚠</div>
+  <div class="am" id="alertMsgP3"></div>
+</div>
+
+<div class="main">
+  <!-- LEFT: P3 Input + State -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" id="p3InputCard" style="border-color:rgba(153,69,255,.35)">
+      <div class="ct" style="color:var(--pur)"><div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span><span>INPUT PARAMETERS — COGNITIVE LAYER</span></div></div>
+      <div class="cs" data-i18n="p3_cs_input">認知ハックの手口を見抜き、現実世界へ回帰（デバッグ）するための思考探索パラメーター。</div>
+      <hr class="div">
+      <!-- Search Depth -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">7</span></div>
+        <div class="pd" data-i18n="p3_depth_d">思考の探索段数。3以下ではバズへの脊髄反射で偽装ノードに騙される。7以上で多次元の因果関係を検証してから判断する。</div>
+        <input type="range" id="searchDepth" min="1" max="10" value="7" class="pur-range">
+        <div class="rl"><span data-i18n="p3_depth_l">脊髄反射・バズ即応</span><span data-i18n="p3_depth_r">多次元因果検証</span></div>
+      </div>
+      <hr class="div">
+      <button class="acc-tog" onclick="toggleAcc('p3Details',this)"><span class="cr">▶</span><span data-i18n="acc_more">詳細設定</span></button>
+      <div class="acc" id="p3Details" style="display:none">
+      <!-- Grounding Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
+        <div class="pd" data-i18n="p3_ground_d">物理現実との接続率。高いほどSNS断食・実世界の一次情報により認知の過学習（ノイズ蓄積）が洗い流される。</div>
+        <input type="range" id="groundingRate" min="0" max="100" value="20">
+        <div class="rl"><span data-i18n="p3_ground_l">ネット常時接続</span><span data-i18n="p3_ground_r">物理現実回帰・SNS断食</span></div>
+      </div>
+      <hr class="div">
+      <!-- Learning Rate -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
+        <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
+        <input type="range" id="learningRate" min="0" max="100" value="40">
+        <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・アップデート拒否</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
+      </div>
+      </div><!-- /p3Details -->
+      <hr class="div">
+      <!-- Recovery Actions -->
+      <button class="recover-btn dropout-btn" id="dropoutBtn" onclick="executeDropout()">▶ EXECUTE: DROP_OUT</button>
+      <div class="pd" style="margin-top:5px" data-i18n="p3_drop_d">3秒間、現実同期レートを強制100%へ。エコーチェンバーに陥った全ノードの汚染度を急速グラウンディング。</div>
+      <button class="recover-btn earlystop-btn" id="earlyStopBtn" onclick="executeEarlyStopping()">■ EXECUTE: EARLY_STOPPING</button>
+      <div class="pd" style="margin-top:5px" data-i18n="p3_es_d">過学習を検知して処理を強制停止。システム全体を最も健全な初期状態へロールバック。</div>
+      <button class="recover-btn root-btn" id="rootBtn" onclick="executeRestoreRoot()">▶ EXECUTE: RESTORE_ROOT_PREVISION</button>
+      <div class="pd" style="margin-top:5px" data-i18n="p3_root_d">司法・議会による「正則化ブレーキ」を物理インフラ（Page 2）に適用。リーダーが単独で <span style="color:var(--red)">sudo rm -rf</span> を実行できないよう多重防御をかける。 <span class="link-badge" onclick="switchTab(2)">⇄ P2 へ反映</span></div>
+    </div>
+
+    <!-- P3 State Monitor -->
+    <div class="card" style="border-color:rgba(153,69,255,.35)">
+      <div class="ct" style="color:var(--pur)"><div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span><span>COGNITIVE STATE MONITOR</span></div></div>
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p3Dopamine')" data-i18n="p3_gl_dop">正義感カウンター DOPAMINE SURGE<span class="gi">(?)</span></span><span class="gn" id="p3DopNum" style="color:var(--green)">0</span></div>
+        <div class="gt"><div class="gf" id="p3DopBar" style="width:0%;background:var(--green)"></div></div>
+        <div class="gs" id="p3DopStatus" style="color:var(--muted)">CALM</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p3Integrity')" data-i18n="p3_gl_int">認知健全性 COGNITIVE INTEGRITY<span class="gi">(?)</span></span><span class="gn" id="p3IntNum" style="color:var(--green)">100</span></div>
+        <div class="gt"><div class="gf" id="p3IntBar" style="width:100%;background:var(--green)"></div></div>
+        <div class="gs" id="p3IntStatus" style="color:var(--green)">HEALTHY</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p3Falsifiability')" data-i18n="p3_gl_fals">反証許容度 FALSIFIABILITY <span class="link-badge" onclick="event.stopPropagation();switchTab(2)">⇄ P2 戦略と連動</span><span class="gi">(?)</span></span><span class="gn" id="p3FalsNum" style="color:var(--cyan)">--</span></div>
+        <div class="gt"><div class="gf" id="p3FalsBar" style="width:0%;background:var(--cyan)"></div></div>
+        <div class="gs" id="p3FalsStatus" style="color:var(--muted)">Page 2 の予算配分戦略と連動</div>
+        <div id="p3ExcuseLog" style="display:none;margin-top:6px;padding:7px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--red);font-size:.58rem;line-height:1.9;color:#ff8899;font-family:inherit"></div>
+      </div>
+      <div class="sg">
+        <div class="si"><div class="sl" data-i18n="p3_sl_poison">毒入れ攻撃</div><div class="sv" id="p3AttackBadge" style="color:var(--muted);font-size:.75rem">—</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_fooled">汚染ノード</div><div class="sv" id="p3FooledNum" style="color:var(--ora)">0/32</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_neutral">中立ノード</div><div class="sv" id="p3NeutralNum" style="color:var(--cyan)">3</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_debug">デバッグ状態</div><div class="sv" id="p3DebugBadge" style="color:var(--muted);font-size:.75rem">RUNNING</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_model">モデル更新</div><div class="sv" id="p3ModelBadge" style="color:var(--green);font-size:.75rem">ADAPTIVE</div></div>
+        <div class="si"><div class="sl" data-i18n="p3_sl_root">Root権限</div><div class="sv" id="p3RootBadge" style="color:var(--ora);font-size:.75rem">sudo FREE</div></div>
+      </div>
+      <div class="diag" id="p3Diag" style="border-left-color:var(--pur)"></div>
+      <button class="sbtn" id="p3ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP3Result()">▶ この結果を送る</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: P3 Canvas + Chart -->
+  <div class="charts">
+    <div class="card">
+      <div class="ct" style="color:var(--pur)">
+        <div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span>① COGNITIVE NETWORK — POISONING ATTACK MONITOR</div>
+        <button class="ibtn" onclick="restartP3()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
+      </div>
+      <div class="cs" data-i18n="p3_cs_canvas">中央の偽装ノード（自称・良識派）が周囲の正義感をハックする。探索深度3以下で一般ノードが騙され、事実を述べる中立ノードへの「正義の毒入れ攻撃」（赤点線）が発生。深度7以上でデバッグ完了。</div>
+      <div class="ag-wrap" style="height:330px">
+        <canvas id="p3Canvas"></canvas>
+        <div class="ag-ov">
+          <div class="ag-st" id="p3St1">JUSTICE SURGE: 0%</div>
+          <div class="ag-st" id="p3St2">ATTACK EDGES: 0</div>
+        </div>
+        <div class="dropout-flash" id="p3DropFlash">▌ DROPOUT ACTIVE — GROUNDING… ▐</div>
+        <div class="ag-leg">
+          <div class="li"><div class="ld" style="background:var(--red);border:1px solid var(--green)"></div><span data-i18n="p3_leg_fake">偽装ノード（自称・良識派）</span></div>
+          <div class="li"><div class="ld" style="background:var(--cyan)"></div><span data-i18n="p3_leg_gen">一般ノード</span></div>
+          <div class="li"><div class="ld" style="background:#e8f4ff;border:1px dashed var(--cyan)"></div><span data-i18n="p3_leg_neu">中立ノード（事実）</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct" style="color:var(--pur)"><div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span>② RECOVERY TIMELINE</div></div>
+      <div class="cs" data-i18n="p3_cs_chart">正義感ドーパミンと認知健全性の時系列予測。探索深度と現実同期レートに応じて回復曲線が変化する。</div>
+      <div class="ch" style="height:230px"><canvas id="timelineChartP3"></canvas></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#page3 -->
+
+<div id="page4" class="page">
+
+<div class="preset-bar">
+  <span class="pl">SCENARIOS ▶</span>
+  <button class="pbtn" id="p4-flamewar" onclick="setPresetP4('flamewar')" data-i18n="p4_pr_flame">🔥 推し活炎上</button>
+  <button class="pbtn" id="p4-gamified" onclick="setPresetP4('gamified')" data-i18n="p4_pr_game">🎮 ゲーム化進行</button>
+  <button class="pbtn" id="p4-spectators" onclick="setPresetP4('spectators')" data-i18n="p4_pr_spec">🎪 見物人の殺到</button>
+  <button class="pbtn" id="p4-plaza" onclick="setPresetP4('plaza')" data-i18n="p4_pr_plaza">🏘 当事者の広場</button>
+  <span class="pl" style="opacity:.6" data-i18n="p4_pr_hint">→ PACKET LOGの多様性の変化を観測せよ</span>
+</div>
+
+<div class="alert" id="alertBannerP4">
+  <div class="at" data-i18n="banner_p4">⚠ &nbsp;あなたの街の議論が、勝ち負けゲームに乗っ取られた&nbsp; ⚠</div>
+  <div class="am" id="alertMsgP4"></div>
+</div>
+
+<div class="main">
+  <!-- LEFT: P4 Input + State -->
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card" style="border-color:rgba(255,204,0,.35)">
+      <div class="ct" style="color:var(--yel)"><div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span><span>INPUT PARAMETERS — TRAFFIC LAYER</span></div></div>
+      <div class="cs" data-i18n="p4_cs_input">当事者（生活者530万ノード）と部外者トラフィックの非対称性を制御するネットワーク・パラメーター。</div>
+      <hr class="div">
+      <!-- External Traffic -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
+        <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
+        <input type="range" id="extTraffic" min="0" max="100" value="15" class="red-range">
+        <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
+      </div>
+      <hr class="div">
+      <!-- Gamification -->
+      <div style="margin-bottom:12px">
+        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
+        <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
+        <input type="range" id="gamification" min="0" max="100" value="15" class="yel-range">
+        <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
+      </div>
+      <hr class="div">
+      <!-- Packet Filtering -->
+      <button class="recover-btn filter-btn" id="filterBtn" onclick="executePacketFiltering()">▶ EXECUTE: PACKET_FILTERING</button>
+      <div class="pd" style="margin-top:5px" data-i18n="p4_filter_d">地域プロトコルの保護。外部からの不正なシビル攻撃（部外者トラフィック）を5秒間フィルタリングし、生活者のパケット優先度を100%へ回復させる。</div>
+    </div>
+
+    <!-- P4 State Monitor -->
+    <div class="card" style="border-color:rgba(255,204,0,.35)">
+      <div class="ct" style="color:var(--yel)"><div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span><span>ASYMMETRY STATE MONITOR</span></div></div>
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p4Drop')" data-i18n="p4_gl_drop">サイレントマジョリティのパケットドロップ率 PACKET DROP<span class="gi">(?)</span></span><span class="gn" id="p4DropNum" style="color:var(--green)">0%</span></div>
+        <div class="gt"><div class="gf" id="p4DropBar" style="width:0%;background:var(--green)"></div></div>
+        <div class="gs" id="p4DropStatus" style="color:var(--muted)">NOMINAL</div>
+      </div>
+      <div style="margin-bottom:10px">
+        <div class="gr"><span class="gl" onclick="openModal('p4Ratio')" data-i18n="p4_gl_ratio">真の当事者コミット比率 TRUE STAKEHOLDER RATIO<span class="gi">(?)</span></span><span class="gn" id="p4RatioNum" style="color:var(--green)">100</span></div>
+        <div class="gt"><div class="gf" id="p4RatioBar" style="width:100%;background:var(--green)"></div></div>
+        <div class="gs" id="p4RatioStatus" style="color:var(--green)">GROUNDED</div>
+      </div>
+      <div class="sg">
+        <div class="si"><div class="sl" data-i18n="p4_sl_silent">サイレントマジョリティ</div><div class="sv" style="color:var(--cyan);font-size:.85rem">5.3M NODES</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_ext">外部ノード</div><div class="sv" id="p4ExtBadge" style="color:var(--muted)">0/36</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_obj">目的関数</div><div class="sv" id="p4ObjBadge" style="color:var(--green);font-size:.75rem">POLICY</div></div>
+        <div class="si"><div class="sl" data-i18n="p4_sl_filter">フィルタ状態</div><div class="sv" id="p4FilterBadge" style="color:var(--muted);font-size:.75rem">IDLE</div></div>
+      </div>
+      <div class="diag" id="p4Diag" style="border-left-color:var(--yel)"></div>
+      <button class="sbtn" id="p4ShareBtn" style="display:none;border-color:var(--cyan);color:var(--cyan)" onclick="shareP4Result()">▶ この結果を送る</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: P4 Canvas + Chart + Log -->
+  <div class="charts">
+    <div class="card">
+      <div class="ct" style="color:var(--yel)">
+        <div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>① STAKEHOLDER NETWORK — SYBIL FLOOD MONITOR</div>
+        <button class="ibtn" onclick="restartP4()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
+      </div>
+      <div class="cs" data-i18n="p4_cs_canvas">中央の青いクラスターは530万人の生活者（サイレントマジョリティ）。外部ノード流入率を上げると、画面外から1ビット思考のスパムノードが流入し、生活者同士の通信リンクを遮断・占拠する。</div>
+      <div class="ag-wrap" style="height:330px">
+        <canvas id="p4Canvas"></canvas>
+        <div class="ag-ov">
+          <div class="ag-st" id="p4St1">JAMMED LINKS: 0/0</div>
+          <div class="ag-st" id="p4St2">EXTERNAL NODES: 0/36</div>
+        </div>
+        <div class="filter-flash" id="p4FilterFlash">▌ PACKET_FILTERING ACTIVE — SYBIL TRAFFIC BLOCKED ▐</div>
+        <div class="ag-leg">
+          <div class="li"><div class="ld" style="background:var(--cyan)"></div><span data-i18n="p4_leg_res">生活者ノード（静かな明滅）</span></div>
+          <div class="li"><div class="ld" style="background:var(--red)"></div><span data-i18n="p4_leg_spam">外部スパムノード（1ビット思考）</span></div>
+          <div class="li"><div class="ld" style="background:transparent;border:1px dashed var(--red);border-radius:0"></div><span data-i18n="p4_leg_jam">遮断されたリンク</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-top">
+      <div class="card">
+        <div class="ct" style="color:var(--yel)"><div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>② ASYMMETRY TIMELINE</div></div>
+        <div class="cs" data-i18n="p4_cs_chart">パケットドロップ率と当事者コミット比率の時系列予測。流入率とゲーム化スコアに連動する。</div>
+        <div class="ch" style="height:230px"><canvas id="timelineChartP4"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="ct" style="color:var(--yel)"><div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>③ PACKET LOG</div></div>
+        <div class="cs" data-i18n="p4_cs_log">政策パケットの処理ログ。ゲーム化スコアが70%を超えると多様性が完全に消失し、政策を一切無視した低エントロピーなヘイトトークンで埋め尽くされる。</div>
+        <div class="p2log" id="p4Log"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /#page4 -->
+
+<div id="auditBar" style="display:none;text-align:center;margin-top:16px">
+  <button class="audit-btn" onclick="openAuditReport()" data-i18n="audit_btn">⎘ GENERATE AUDIT REPORT（監査報告書生成）</button>
+  <div style="font-size:.58rem;color:var(--green);margin-top:6px;letter-spacing:.1em" data-i18n="audit_hint">✓ GRAND OPTIMAL — 全レイヤーが健全域に到達。デバッグ功績を報告書として出力できます</div>
+</div>
+
+<div class="foot" id="footerTxt" data-i18n="footerTxt">社会デバッガー v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
+</div>
+
+<div class="mo" id="auditModal" onclick="closeAuditIf(event)">
+  <div class="mb" style="max-width:640px;border-color:var(--green);box-shadow:0 0 40px rgba(0,255,136,.25)">
+    <button class="mc" onclick="closeAudit()">✕</button>
+    <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
+    <div class="mti" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
+    <textarea id="auditText" readonly class="audit-ta"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
+      <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
+      <button class="sbtn" style="margin-top:0;border-color:var(--green);color:var(--green)" onclick="openShareComment({kind:'audit'})" data-i18n="audit_share">▶ 報告書ごと共有</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="introModal" onclick="closeIntroIf(event)">
+  <div class="mb" style="max-width:620px">
+    <button class="mc" onclick="closeIntro()">✕</button>
+    <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
+    <div class="mti" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
+    <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
+    <div class="intro-layers">
+      <button class="intro-layer" style="--lc:var(--cyan)" onclick="introGo(1)">
+        <span class="il-num">LAYER 1 — INFORMATION SPACE</span>
+        <span class="il-title" data-i18n="intro_l1t">情報空間</span>
+        <span class="il-desc" data-i18n="intro_l1d">エコーチェンバーと過学習 — 社会の「入力データ」が汚染される</span>
+      </button>
+      <div class="il-arrow" data-i18n="intro_arrow1">▼ 汚染された情報が意思決定を狂わせる</div>
+      <button class="intro-layer" style="--lc:var(--ora)" onclick="introGo(2)">
+        <span class="il-num">LAYER 2 — REGIONAL INFRASTRUCTURE</span>
+        <span class="il-title" data-i18n="intro_l2t">物理インフラ</span>
+        <span class="il-desc" data-i18n="intro_l2d">予算・救命ヘリ・冗長性 — 誤った最適化が物理層を破壊する</span>
+      </button>
+      <div class="il-arrow" data-i18n="intro_arrow2">▼ 崩壊する現実が個人の認知を追い詰める</div>
+      <button class="intro-layer" style="--lc:var(--pur)" onclick="introGo(3)">
+        <span class="il-num">LAYER 3 — COGNITIVE RECOVERY</span>
+        <span class="il-title" data-i18n="intro_l3t">個人の認知</span>
+        <span class="il-desc" data-i18n="intro_l3d">正義感ハックと毒入れ攻撃 — 個人の思考がハッキングされる</span>
+      </button>
+      <div class="il-arrow" data-i18n="intro_arrow3">▼ ハックされた群衆が当事者の声をかき消す</div>
+      <button class="intro-layer" style="--lc:var(--yel)" onclick="introGo(4)">
+        <span class="il-num">LAYER 4 — STAKEHOLDER ASYMMETRY</span>
+        <span class="il-title" data-i18n="intro_l4t">当事者性</span>
+        <span class="il-desc" data-i18n="intro_l4d">部外者の殺到とゲーム化 — 530万人の本当の声がドロップされる</span>
+      </button>
+    </div>
+    <div class="mfo" style="border-left-color:var(--green);color:var(--green)" data-i18n="intro_tip">💡 一部のパラメーターはページを跨いで連動します。緑の「⇄」バッジが目印です（クリックで連動先へジャンプ）。</div>
+    <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ あなたの街をデバッグする</button>
+    <!-- v6.345: 街の名前（任意スキップ可） -->
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bdr)">
+      <div style="font-size:.6rem;color:var(--muted);margin-bottom:6px;letter-spacing:.06em" data-i18n="town_label">▷ あなたの街に名前を付ける（任意）</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="townNameInput" maxlength="20" data-i18n-placeholder="town_placeholder"
+          placeholder="例: 東京 / 地元の市 / 未来の街"
+          style="flex:1;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:6px 10px;letter-spacing:.04em;outline:none" oninput="saveTownName(this.value)">
+      </div>
+      <div style="font-size:.56rem;color:var(--muted);margin-top:5px;line-height:1.5" data-i18n="town_hint">名前を付けると判定バナーと結果カードに反映されます。次回以降は再入力不要。GUIDE から変更できます。</div>
+    </div>
+  </div>
+</div>
+
+<!-- v6.2: 共有ポップオーバー（テンプレ選択 → OS共有 / LINE / X / コピー） -->
+<div class="mo" id="sharePopModal" onclick="closeSharePopIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeSharePop()">✕</button>
+    <div class="mtag">⇪ SHARE EXPERIMENT</div>
+    <div class="mti" id="sharePopTitle">実験を共有</div>
+    <div class="cs" id="sharePopHint" style="margin-bottom:8px"></div>
+    <div class="share-tpls" id="shareTplList"></div>
+    <div class="share-acts" id="shareActions"></div>
+    <div id="shareCardRow"></div>
+    <div class="mfo" id="sharePopFoot" style="margin-top:10px;border-left-color:var(--cyan);color:var(--muted)"></div>
+    <div style="margin-top:8px;font-size:.6rem;color:var(--muted);text-align:center">
+      💡 <span class="link-badge" onclick="openShareGuide()" style="cursor:pointer">
+        <span data-i18n="share_guide_link">SHARE GUIDE を見る</span> <span style="opacity:.6">— <span data-i18n="share_guide_hint">相手別の送り方・禁止事項</span></span>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- v6.2: プリセット適用直後の共有トースト -->
+<div class="share-toast" id="shareToast"><button id="shareToastBtn" onclick="shareFromToast()">⎘ このシナリオを送る</button></div>
+<!-- v6.334: 発見トースト（右下・非干渉・自動で消える） -->
+<div class="disc-toast" id="discToast"></div>
+
+<!-- v6.2: 共有ガイドモーダル -->
+<div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
+  <div class="mb" style="max-width:640px">
+    <button class="mc" onclick="closeShareGuide()">✕</button>
+    <div class="mtag" data-i18n="sg_tag">SHARE GUIDE — 共有のつかいかた</div>
+    <div class="mti" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
+    <div class="mbd" style="margin-bottom:12px" data-i18n="sg_body">このアプリで共有されるのは主張ではなく、誰でも再現できる実験（パラメータ状態のURL）です。
+      <br> おすすめの送り方:</div>
+    <div class="sg-tblwrap">
+      <table class="sg-tbl">
+        <thead><tr data-i18n="sg_th"><th>相手</th><th>送る実験</th><th>添える一言の型</th></tr></thead>
+        <tbody>
+          <tr data-i18n="sg_r1"><td>特定の情報空間に深く入っている家族</td><td>PAGE 1 エコーチェンバー実験</td><td>「これ自分にも当てはまって笑った」（自分を主語に）</td></tr>
+          <tr data-i18n="sg_r2"><td>騒動の話題に疲れている友人</td><td>PAGE 3 DROP_OUT実験</td><td>「政治の話じゃなくて脳の話」</td></tr>
+          <tr data-i18n="sg_r3"><td>政治に興味がない人</td><td>PAGE 2 ショック対決</td><td>「ゲームとして面白い」</td></tr>
+          <tr data-i18n="sg_r4"><td>職場・グループLINE</td><td>汎用テンプレ</td><td>実験結果だけ。解釈は書かない</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mbd" style="margin-top:12px">
+      <strong style="color:var(--red)" data-i18n="sg_dont_t">やらないことリスト</strong>
+      <ul class="sg-dont" data-i18n="sg_dont">
+        <li>実在の人名を添えて送らない</li>
+        <li>「これがまさに◯◯のこと」と答えを言わない（受け手に発見させる）</li>
+        <li>論争中のスレッドに貼らない</li>
+        <li>相手を説得する道具として使わない（好奇心の共有だけ）</li>
+      </ul>
+    </div>
+    <div class="mfo" data-i18n="sg_note">*あくまでオススメの使い方です。</div>
+    <button class="sbtn" id="etiquetteSaveBtn" style="margin-top:14px;border-color:var(--cyan);color:var(--cyan)" onclick="saveEtiquetteCard(this)" data-i18n="sg_save">⬇ このカードを保存</button>
+  </div>
+</div>
+
+<!-- v6.332: フィードバックモーダル -->
+<div class="mo" id="feedbackModal" onclick="closeFeedbackIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeFeedback()">✕</button>
+    <div class="mti" data-i18n="fb_title">フィードバック</div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
+      <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
+      <span data-i18n="fb_researcher">🔬 研究者・技術者として表示</span>
+    </label>
+    <!-- researcherMode ON 時に格上げされる開発者導線 -->
+    <div id="fbDevTop" style="display:none;margin-bottom:14px">
+      <a class="doclink sbtn" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_doc_link">📄 方法論・数式仕様（METHODOLOGY）</a>
+      <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
+    <form id="fbForm" onsubmit="return submitFeedback(event)">
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:.66rem;color:var(--txt)">
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="improvement" checked> <span data-i18n="fb_type_improve">改善案</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
+        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
+      </div>
+      <div class="pd" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
+      <textarea id="fbMessage" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
+      <div class="pd" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
+      <input type="email" id="fbEmail" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
+      <button type="submit" class="sbtn" id="fbSubmit" style="margin-top:14px;border-color:var(--green);color:var(--green)" data-i18n="fb_submit">送信</button>
+      <div id="fbStatus" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
+    </form>
+    <hr class="div" style="margin:14px 0">
+    <div class="mfo" id="fbDevNote" style="border-left-color:var(--muted)">
+      <span data-i18n="fb_dev">開発者に直接連絡したい方（研究者・技術者向け）→ </span>
+      <a href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="fb_dev_link">GitHub Issues へ</a>
+    </div>
+  </div>
+</div>
+
+<!-- v6.334: 発見ログモーダル -->
+<div class="mo" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
+  <div class="mb" style="max-width:480px">
+    <button class="mc" onclick="closeDiscoveryLog()">✕</button>
+    <div class="mti" data-i18n="disc_title">📖 発見ログ</div>
+    <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
+    <div id="discList"></div>
+  </div>
+</div>
+
+<!-- v6.35: Weekly Scenarios Modal -->
+<div class="mo" id="scenarioModal" onclick="closeScenarioIf(event)">
+  <div class="mb" style="max-width:520px">
+    <button class="mc" onclick="closeScenarios()">✕</button>
+    <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
+    <div class="mti" id="scenarioTitle" style="font-size:1.2em;margin-bottom:10px">Echo Chamber Trap</div>
+    <div class="cs" style="margin-bottom:10px" data-i18n="scenario_intro_hint">今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。</div>
+    <div id="scenarioDesc" style="font-size:.75rem;color:var(--muted);margin-bottom:14px">Your objective...</div>
+    <div id="scenarioHint" style="font-size:.7rem;padding:10px;background:rgba(153,200,255,.1);border-left:3px solid var(--cyan);margin-bottom:12px;color:var(--txt)"></div>
+    <div style="font-size:.75rem;color:var(--txt);margin-bottom:8px" data-i18n="scenario_goal_hint">今週のゴール：</div>
+    <div id="scenarioGoal" style="font-size:.75rem;padding:12px;background:rgba(100,200,100,.1);border:1px solid rgba(100,200,100,.3);border-radius:3px;margin-bottom:14px;color:var(--txt)"></div>
+    <div id="scenarioCheckContainer" style="display:none;padding:12px;background:rgba(100,200,100,.2);border:1px solid rgba(100,200,100,.4);border-radius:3px;font-size:.75rem;margin-bottom:14px">
+      <div style="color:var(--green);font-weight:bold" data-i18n="scenario_goal_reached">✓ ゴール達成！ 発見ログを獲得しました。</div>
+    </div>
+    <button class="sbtn" style="border-color:var(--green);color:var(--green);width:100%;text-align:center" onclick="startScenario()" data-i18n="scenario_start_btn">▶ シナリオ開始</button>
+  </div>
+</div>
+
+<!-- v6.345: 共有前コメントモーダル -->
+<div class="mo" id="rewindModal" onclick="closeRewindIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeRewind()">✕</button>
+    <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
+    <div class="mti" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
+    <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
+    <div id="rewindChoices" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+    <div id="rewindResult" style="display:none;padding:12px;border:1px solid var(--bdr);border-radius:3px;font-size:.65rem;line-height:1.6"></div>
+  </div>
+</div>
+
+<div class="mo" id="shareCommentModal" onclick="closeShareCommentIf(event)">
+  <div class="mb" style="max-width:460px">
+    <button class="mc" onclick="closeShareComment()">✕</button>
+    <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
+    <div class="mti" data-i18n="sc_title">一言添えて送る（任意）</div>
+    <textarea id="shareCommentInput" rows="2" maxlength="100"
+      style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:none;letter-spacing:.03em;margin-bottom:10px"
+      placeholder="自分の感想を一言…（スキップ可）"></textarea>
+    <div id="scChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="sbtn" onclick="proceedShare(false)" style="flex:1;border-color:var(--cyan);color:var(--cyan)" data-i18n="sc_send">▶ 共有する</button>
+      <button class="sbtn" onclick="proceedShare(true)" style="border-color:var(--bdr);color:var(--muted)" data-i18n="sc_skip">スキップ</button>
+    </div>
+  </div>
+</div>
+
+<div class="mo" id="modal" onclick="closeModalIf(event)">
+  <div class="mb">
+    <button class="mc" onclick="closeModal()">✕</button>
+    <div class="mtag" id="mTag">METRIC</div>
+    <div class="mti" id="mTitle"></div>
+    <div class="mbd" id="mBody"></div>
+    <div class="mfo" id="mFormula"></div>
+    <!-- v6.343: 数式仕様ドキュメントへの導線（数式を検証したい人が一番近い場所に置く） -->
+    <div class="mfo" id="mDocNote" style="border-left-color:var(--cyan);margin-top:10px">
+      <span data-i18n="mdoc_note">全メトリクスの計算式・しきい値・前提と限界は方法論ドキュメントに集約されています → </span>
+      <a class="doclink" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="color:var(--cyan)" data-i18n="mdoc_link">📄 METHODOLOGY を開く</a>
+    </div>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+<!-- v6.342: Service Worker 登録（PWA / オフライン。失敗しても本体動作に影響なし） -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
+}
+</script>
+</body>
+</html>
