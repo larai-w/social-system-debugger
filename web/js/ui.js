@@ -2903,45 +2903,8 @@ function renderSharePop(){
     b.onclick=()=>{shareSelIdx=i;renderSharePop();};
     list.appendChild(b);
   });
-  const act=document.getElementById('shareActions');
-  act.innerHTML='';
-  const mk=(label,fn,cls)=>{
-    const b=document.createElement('button');
-    b.className='sbtn'+(cls?' '+cls:'');b.style.marginTop='0';
-    b.textContent=label;b.onclick=fn;act.appendChild(b);return b;
-  };
-  if(window.SSD&&SSD.isNative){
-    // task2: ネイティブ実行時は @capacitor/share の共有シートへ委譲
-    mk(tt('⇪ 共有…（LINE等）','⇪ Share… (LINE etc.)'),async()=>{
-      await SSD.share({text:shareMessage()+'\n'+buildShareURL(),url:buildShareURL(),dialogTitle:tt('共有','Share')});
-    });
-  }else if(navigator.share){
-    // Web Share API: OS共有シート（LINEもここに出る）
-    mk(tt('⇪ 共有…（LINE等）','⇪ Share… (LINE etc.)'),async()=>{
-      try{await navigator.share({text:shareMessage()+'\n'+buildShareURL()});}catch(e){}
-    });
-  }else{
-    // フォールバック: LINE / X の直接リンク
-    mk(tt('💬 LINEで送る','💬 Send via LINE'),()=>{
-      window.open('https://line.me/R/share?text='+encodeURIComponent(shareMessage()+' '+buildShareURL()),'_blank');
-    });
-    mk(tt('𝕏 でポスト','𝕏 Post'),()=>{
-      window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(shareMessage()+'\n'+buildShareURL()),'_blank');
-    },'x-btn');
-  }
-  mk(tt('⎘ リンクをコピー','⎘ Copy link'),ev=>copyShareLink(ev.currentTarget));
-  // 判定・監査コンテキストのみ: 結果カードPNG
-  const row=document.getElementById('shareCardRow');
-  row.innerHTML='';
-  if(['shock','audit','p1','p3','p4'].includes(shareCtx.kind)){
-    const cb=document.createElement('button');
-    cb.className='sbtn';cb.style.cssText='margin-top:8px;border-color:var(--green);color:var(--green)';
-    cb.textContent=canShareFiles()
-      ?tt('🖼 結果カード（PNG）付きで共有','🖼 Share with result card (PNG)')
-      :tt('🖼 結果カード（PNG）を保存','🖼 Save result card (PNG)');
-    cb.onclick=()=>shareResultCard();
-    row.appendChild(cb);
-  }
+  // task3: 共有アクション（X / LINE / 画像を保存 ＋ その他のアプリで共有）は share.js に集約
+  renderShareActions();
 }
 
 function copyShareLink(btn){
