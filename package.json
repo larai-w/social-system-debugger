@@ -4,6 +4,9 @@
   "description": "社会デバッガー — educational simulator of how societies break. Web (GitHub Pages / AWS CloudFront) + native (Capacitor iOS/Android).",
   "private": true,
   "scripts": {
+    "test": "node --test \"tests/*.test.mjs\"",
+    "validate:weekly": "node scripts/validate-weekly.mjs",
+    "check": "npm test && npm run validate:weekly",
     "cap:sync": "cap sync",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
