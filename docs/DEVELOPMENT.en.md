@@ -8,45 +8,64 @@ Practical notes for anyone who touches the "Social System Debugger" (future me, 
 
 ## Architecture overview
 
-- **Single HTML file**: logic, style, and markup all live in `index.html` (`<style>` + HTML + one big `<script>`). **No build step** — just open `index.html` in a browser.
-- The only external dependency is **Chart.js v4 (CDN)**. Agents are drawn on raw Canvas.
-- **PWA**: `manifest.json` / `icon.svg` / `sw.js` (Service Worker).
-- **Docs**: `README.md` / `README.en.md` (top level), `docs/` (this guide + methodology), `CHANGELOG.md`.
+- **Front-end split into modules under `web/`** (separated from the single `index.html` in Phase 1). **No bundler** — plain classic `<script>` tags loaded in order, all sharing the **global scope** (not `type="module"`, so inline `onclick=` handlers keep working). No build step.
+- **Load order (important)**: `i18n → engine → native → share → scenario → ui`. Later files reference earlier files' functions/constants at runtime.
+- `engine.js` is the **DOM/window-free pure-logic layer** (`metrics`, etc.) — no `document`/`window`, so it can be reused for server-side validation and unit tests.
+- Native features (Capacitor) live behind the `window.SSD` facade in `native.js`, all gated by `SSD.isNative` → **web is a full no-op**.
+- The only runtime external dependency is **Chart.js v4 (CDN)**. Agents are drawn on raw Canvas.
+- **PWA**: `web/manifest.json` / `web/icon.svg` / `web/sw.js`.
+- **Delivery**: GitHub Pages (serves `web/`, URL unchanged) + AWS S3/CloudFront (CDK in `/infra`).
 
 ```
 social-system-debugger/
-├── index.html            # the app (the one and only app file)
-├── manifest.json         # PWA metadata
-├── sw.js                 # Service Worker (network-first)
-├── icon.svg              # app icon
-├── README.md / .en.md    # overview (JA / EN)
-├── CHANGELOG.md          # release history
-├── docs/
-│   ├── METHODOLOGY.md / .en.md   # formulas, thresholds, limits
-│   └── DEVELOPMENT.md / .en.md    # this file
-└── .github/workflows/    # ci.yml / deploy.yml
+├── web/                     # front-end assets (Capacitor webDir + delivery root)
+│   ├── index.html           #   markup + bootstrap (loads external css/js)
+│   ├── css/app.css
+│   └── js/
+│       ├── i18n.js          #   I18N dictionary (DOM-free)
+│       ├── engine.js        #   pure calc + model state (DOM/window-free)
+│       ├── native.js        #   Capacitor bridge (window.SSD, all isNative-gated)
+│       ├── share.js         #   share routing (X / LINE / save image)
+│       ├── scenario.js      #   weekly scenarios (declarative goalConds / fetch / notify)
+│       └── ui.js            #   DOM, charts, P1–P4, discovery, init (largest)
+│   ├── manifest.json / icon.svg / sw.js
+├── content/weekly/          # weekly scenario JSON (*.json + latest.json) + weekly.schema.json
+├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront + GitHub OIDC role
+├── tests/                   # engine.js unit tests (node:test)
+├── scripts/                 # validate-weekly.mjs (weekly JSON schema check)
+├── capacitor.config.json    # appId / webDir=web / plugin config
+├── package.json             # Capacitor deps + root scripts (test / validate:weekly / serve)
+├── README.md / .en.md
+├── CHANGELOG.md
+├── docs/                    # METHODOLOGY / DEVELOPMENT (this file)
+└── .github/workflows/       # ci.yml / deploy.yml(Pages) / deploy-aws.yml(OIDC)
 ```
 
 ---
 
-## Code map (the main parts inside `index.html`)
+## Code map (which file holds what)
 
-| Area | Key functions / variables | Role |
-|---|---|---|
-| **i18n** | `I18N = {ja, en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()` uses manual-list keys, `tt()` is for JS inline strings, and `data-i18n` attributes are handled by `applyI18nAuto()` |
-| **L1 Information Space** | `metrics(fr,es,al)`, `updateAll()`, `startAgents()`, `startScatter()`, `getModeCollapseLog()` | overfitting, mode-collapse log, agent/scatter animation |
-| **L2 Regional Infrastructure** | `metricsP2()`, `calcRedundancyBuffer()`, `updateAllP2()`, `injectSystemShock()` | redundancy, deadlock, shock, timeline chart |
-| **L3 Individual Cognition** | `stepP3()`/`drawP3()`/`updateP3Monitor()`, `p3Fooling()`, `executeDropout()`/`executeEarlyStopping()` | node simulation, poisoning, recovery |
-| **L4 Stakeholder Asymmetry** | `manageSpam()`/`drawP4()`/`updateP4Monitor()`, `executePacketFiltering()` | sybil flood, drop rate, stakeholder ratio |
-| **Verdict banners** | `setVerdictBanner(alertId, state, key)` (state = `crash`/`warn`/`good`/`''`) | the shared 3-tier banner on every page; swaps the `data-i18n` of `.at` (the headline) |
-| **DOM state guards** | `setText/setColor/setClassOn/setDisp` | in monitors that run every frame, "write only when the value changes" — prevents flicker |
-| **Discovery log** | `DISCOVERIES[]`, `discover(id)`, `noteSessionPage()`, `notePreset()`, `openDiscoveryLog()` | collection-style gamification; `localStorage['ssd_discoveries']` |
-| **Sharing** | `buildShareURL()`, `shareScenario()`, `generateResultCard()`, `generateEtiquetteCard()`, `shareWithEtiquette()` | reproducible URL, result-card PNG, etiquette-card co-send |
-| **Feedback** | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()`, `researcherMode`/`setResearcherMode()` | JSON POST to Formspree; GitHub Issues path |
-| **Nav / init** | `switchTab(n)`, `(function init(){…})()` | tab switch + address-bar sync, startup |
-| **PWA** | `sw.js` (separate file) + the trailing `serviceWorker.register` | install, offline |
+| Area | File | Key functions / variables | Role |
+|---|---|---|---|
+| **i18n** | `i18n.js`(dict) / `engine.js`(`t`,`tt`) / `ui.js`(`applyI18n`) | `I18N={ja,en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()` manual keys, `tt()` JS inline, `data-i18n` via `applyI18nAuto()` |
+| **Pure calc** | `engine.js` | `metrics(fr,es,al)`, `simTimeline()`, `clamp/lerp/seedRng/genScatter`, `HIST_REF/PRESETS/MDATA` | **DOM/window-free**. Tested by `tests/engine.test.mjs` |
+| **L1 Information Space** | `ui.js` | `updateAll()`, `startAgents()`, `startScatter()`, `getModeCollapseLog()` | overfitting, mode-collapse log, animation |
+| **L2 Regional Infrastructure** | `ui.js` | `metricsP2()`, `calcRedundancyBuffer()`, `updateAllP2()`, `injectSystemShock()` | redundancy, deadlock, shock |
+| **L3 Individual Cognition** | `ui.js` | `stepP3()/drawP3()/updateP3Monitor()`, `executeDropout()/executeEarlyStopping()` | node sim, poisoning, recovery |
+| **L4 Stakeholder Asymmetry** | `ui.js` | `drawP4()/updateP4Monitor()`, `executePacketFiltering()` | sybil flood, drop rate |
+| **Verdict banners** | `ui.js` | `setVerdictBanner(alertId, state, key)` (`crash`/`warn`/`good`/`''`) | 3-tier banner; on crash-transition fires haptic + `weekly_fail` |
+| **Discovery log** | `ui.js` | `DISCOVERIES[]`, `discover(id)`, `noteSessionPage()`, `notePreset()` | `localStorage['ssd_discoveries']`; `sce_*` reachable only when weekly (native) |
+| **Sharing** | `share.js`(routing) / `ui.js`(card gen) | `renderShareActions()`, `xIntentUrl/lineShareUrl`, `generateResultCard()`, `shareWithEtiquette()` | X/LINE/save 3-button + others; reproducible URL, result-card PNG |
+| **Native** | `native.js` | `window.SSD` (`isNative/platform/haptic/share/plugins`) | Capacitor bridge; all `isNative`-gated = web no-op |
+| **Weekly scenarios** | `scenario.js` | `SCENARIOS[]`, `getActiveScenario()`, `evalGoalConds()`, `checkScenarioGoal()`, `loadRemoteScenario()` | declarative `goalConds`, fetch(latest.json)+fallback, notifications; all `WEEKLY_ENABLED`(native)-gated |
+| **Analytics** | `ui.js`(`track`) | `track(event, props)` (adds common prop `app_platform`) | Plausible; event list in README "Analytics" |
+| **Feedback** | `ui.js` | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()` | JSON POST to Formspree |
+| **Nav / init** | `ui.js` | `switchTab(n)`, `(function init(){…})()` | tab switch + address-bar sync, startup |
+| **PWA** | `web/sw.js` | `CACHE` (bump on every change), `CORE[]` | install, offline; CORE lists all js/css |
 
 Every layer follows the same shape: **user input → compute in `metrics*` → update gauges/banners/logs in `updateAll*`**. P1/P2 update on input; P3/P4 update every frame via `requestAnimationFrame`.
+
+> **When adding a function**: all files are classic scripts sharing globals. Any function called from markup `onclick="foo()"` must be defined as `function foo(){…}` in some js file. Cross-file calls are safe at runtime (everything is defined by the time the user interacts), but **top-level immediate code** must not reference a not-yet-loaded function/constant.
 
 ---
 
@@ -67,9 +86,18 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 - **P3/P4 banners are decided instantly from parameters** (`searchDepth`/`learningRate`, `gamification`/`extTraffic`) so they track button presses stably (v6.338).
 
 ### Add a discovery
-1. Add one entry to `DISCOVERIES`: `{id, badge:()=>tt(...), learn:()=>tt(...)}`.
+1. Add one entry to `DISCOVERIES` (in `ui.js`): `{id, badge:()=>tt(...), learn:()=>tt(...)}`.
 2. Call `discover('id')` wherever the condition is met (`updateAll*` / `setPreset*` / action functions).
 3. The counter (`(x/N)`) is derived automatically from `DISCOVERIES.length`. **Forbidden**: streaks, notifications, time limits, anxiety-inducing copy (they contradict the app's own critique).
+- Note: `sce_`-prefixed discoveries are for weekly scenarios and are only reachable/counted when `WEEKLY_ENABLED` (native).
+
+### Add a weekly scenario (the human step is just "write one JSON file")
+1. Create `content/weekly/2026-Wxx.json`. Schema is `content/weekly.schema.json` (required: `id/title/intro/page/params/goal/goalConds/difficulty/discoveryId`; `title/intro/goal` need both ja/en).
+2. **Goals are declarative**: `goalConds: [{ "metric": "diversity", "op": ">=", "value": 80 }, …]` (AND-combined). `metric` is any key returned by `metrics*` (`diversity/entropy/legitimacy/brand/redundancy/infra/integrity/ratio/drop`…) plus params (`ethicsScore/skillStock/searchDepth`…). Evaluated by `evalGoalConds()` in `scenario.js`.
+3. Swap `content/weekly/latest.json` to this week's file (the app fetches `latest.json` at startup; `CONTENT_BASE_URL` in `scenario.js` is the origin).
+4. Validate locally: `npm run validate:weekly` (rejects missing ja/en or bad ops).
+5. PR → merge to main → `deploy-aws.yml` syncs to S3 and invalidates `latest.json` automatically.
+- **Forbidden**: naming real countries/municipalities/people (etiquette policy). Keep it abstract, a variation of existing presets.
 
 ### i18n
 - **Switch style (the Page 1 way)**: put `data-i18n="key"` on the element with Japanese inline (`applyI18nAuto` caches the ja) + English in `I18N.en.key`. → JA build shows only Japanese / EN build shows only English.
@@ -90,10 +118,12 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 
 ## Deploy (CI/CD)
 
-- `.github/workflows/ci.yml`: lightweight checks on PRs to `main`.
-- `.github/workflows/deploy.yml`: **push to `main` auto-deploys to GitHub Pages** (`actions/deploy-pages`).
-- Public URL: https://larai-w.github.io/social-system-debugger/
-- **If a deploy fails with "Deployment failed, try again later."**, that's a transient GitHub Pages backend issue. Fix: wait a bit and **Re-run failed jobs** from the Actions tab, or push again (it redeploys even with identical content). Check overall GitHub status at https://www.githubstatus.com.
+- `.github/workflows/ci.yml` (on PR): engine.js unit tests (`node --test`) / weekly JSON schema validation (`scripts/validate-weekly.mjs`) / `cdk synth`.
+- `.github/workflows/deploy.yml` (main push): **auto-deploy to GitHub Pages** (`actions/deploy-pages`; serves `web/`).
+- `.github/workflows/deploy-aws.yml` (main push / when web·content change): **assume an AWS role via OIDC** → sync `web/`+`content/` to S3 → invalidate only `latest.json`+`index.html`. No long-lived keys stored.
+- Public URL (unchanged): https://larai-w.github.io/social-system-debugger/ ; AWS via the CloudFront domain (an `infra` output).
+- Infra definition, deploy steps, and the OIDC/least-privilege rationale are in [`../infra/README.md`](../infra/README.md).
+- **If Pages fails with "Deployment failed, try again later."**, that's a transient GitHub Pages backend issue. Wait, then **Re-run failed jobs**, or push again. Status: https://www.githubstatus.com.
 
 ---
 
@@ -110,13 +140,23 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 ```bash
 git clone https://github.com/larai-w/social-system-debugger.git
 cd social-system-debugger
-open index.html            # just open in a browser (no build)
-# to check a change: save → reload
+npm run serve              # → http://localhost:8000 (open over http; file:// breaks PWA/fetch)
 ```
 
-- Quick syntax check (Node): extract the `<script>` and run it through `new vm.Script(...)` to catch parse errors in the inline JS.
-- If the PWA/SW cache serves a stale build, use the browser's "Update Service Worker" or DevTools → Application → Service Workers → Update/Unregister.
+- **Always open over http://** (`file://` breaks manifest, Service Worker, and `fetch()` due to CORS/origin rules).
+- Syntax check: `node --check web/js/xxx.js`.
+- **Run the same checks as CI, locally**:
+  ```bash
+  npm test                 # engine.js unit tests (node:test)
+  npm run validate:weekly  # weekly scenario JSON schema
+  (cd infra && npm run synth)   # cdk synth
+  ```
+- **If the SW serves stale JS** (common right after a deploy or a module change): DevTools → Application → Service Workers → check **Bypass for network** (easiest during dev) / or Unregister → hard reload / incognito. `sw.js` is cache-first, so whenever you change CORE, bump the `CACHE` version (`ssd-cache-v6-xxx`).
+
+### Native (Capacitor)
+- `npm install` → `npx cap add ios/android` → `npx cap sync` → `npx cap open ios` (Xcode) / `android` (Android Studio). Details in the "Native app" section of [`../README.md`](../README.md).
+- After touching web code, run `npx cap sync` to push it to each platform.
 
 ---
 
-*Applies to: v6.346*
+*Applies to: v6.346 / Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD) complete*
