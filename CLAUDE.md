@@ -39,7 +39,8 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
-- ✅ **フェーズ1 完了（タスク1〜7 / コミット済み・未push）**。残るはユーザー側の実設定（下記「保留中」）。
+- ✅ 仕上げ: `docs/DEVELOPMENT.md`/`.en.md` を新モジュール構成に更新（コードの地図をファイル別に・週替わり追加手順・http配信/SWキャッシュ対処）。ルート `package.json` に `test`(engine node:test)/`validate:weekly`/`check` を追加（ローカルでCI再現可）。
+- ✅ **フェーズ1 完了（タスク1〜7 / コミット済み・未push）**。残るはユーザー側の実設定（下記「ユーザーが手を動かす設定」）。
 - ✅ フェーズ1 タスク7（CI/CD + AWS OIDC）: CDK に **GitHub OIDC プロバイダ＋最小権限デプロイロール**（信頼= `repo:OWNER/REPO:ref:refs/heads/main` プレースホルダ、権限= S3 List/Get/Put/Delete＋CloudFront CreateInvalidation のみ、cdk deployは意図的に除外）。出力 `GithubDeployRoleArn`。`.github/workflows/ci.yml`（PR: engine.js `node:test`＋週次JSONスキーマ検証(ja/en)＋cdk synth）。`.github/workflows/deploy-aws.yml`（main/web・content変更時: OIDC Assume→S3同期→latest.json/index.html無効化）。**GitHub Pages の deploy.yml は維持**（Pages+AWS並行）。`tests/engine.test.mjs`(8)・`scripts/validate-weekly.mjs`・`content/weekly.schema.json`。README に CI/CD Mermaid・OIDC選定理由・最小権限・毎週更新手順。ローカルで tests/JSON検証/cdk synth 全通過。
 - ✅ フェーズ1 タスク6（計測拡充）: `track()` に共通プロパティ `app_platform`(web/ios/android=`SSD.platform`) 付与。`weekly_fail` 追加（scenario.js が挑戦を追跡し、ui.js の崩壊バナー遷移で1回発火・native/web no-op）。README に計測イベント表＋「20人フェーズKPI対応表」。sw cache v6-351。
 - ✅ フェーズ1 タスク5（AWS配信基盤 CDK）: `/infra` に TypeScript CDK。**S3(非公開/BlockPublicAccess ALL/SSE/enforceSSL) + CloudFront(OAC)** の静的配信最小構成。既定ビヘイビア=長TTL（ハッシュ運用の方針をコメント）、`content/weekly/latest.json` 専用=5分TTL。403/404→index.html。出力=BucketName/DistributionId/DistributionDomainName。`scripts/deploy.sh`=web/(content除外・--delete安全)＋content/ をS3同期→latest.json/index.html のみ無効化。account/region/profile は環境変数プレースホルダ。`infra/README.md`=Mermaid構成図・選定理由・コスト(無料枠)・セキュリティ・「Docker不要の理由」・フェーズ2拡張。**`cdk synth` 通過確認済み**（tsc/synth OK、S3+CloudFront+OAC+2キャッシュ生成確認）。node_modules/cdk.out は gitignore。**残: scenario.js の CONTENT_BASE_URL を実CloudFrontドメインに差し替え（deploy後）**。
