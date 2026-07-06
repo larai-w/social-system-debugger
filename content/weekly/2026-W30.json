@@ -1,0 +1,26 @@
+{
+  "id": "2026-W30",
+  "title": { "ja": "認知のグラウンディング", "en": "Cognitive Grounding" },
+  "intro": {
+    "ja": "浅い反射だけで判断する頭に、偽装された声が「正義」を注ぎ込む。事実を述べる者が、集団で赤く攻撃されはじめる。深い探索と現実への同期で、汚染された認知を洗い流せるか。",
+    "en": "A mind that judges by shallow reflex gets fed 'justice' by a disguised voice. Those who state facts start getting mobbed in red. Can deeper reasoning and reality-sync wash the contaminated cognition clean?"
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 3, "ground": 20, "lr": 20 },
+    "hint": {
+      "ja": "パラメータを調整し、赤い『毒入れ攻撃』が消えて認知健全性が上がるかを観察してください。",
+      "en": "Adjust the parameters and watch the red 'poisoning attack' fade as cognitive integrity climbs."
+    }
+  },
+  "goal": {
+    "ja": "認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする",
+    "en": "Raise cognitive integrity above 80 and reach search depth 7+"
+  },
+  "goalConds": [
+    { "metric": "integrity", "op": ">=", "value": 80 },
+    { "metric": "searchDepth", "op": ">=", "value": 7 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_cognitive_grounding"
+}
