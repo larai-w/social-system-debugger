@@ -21,11 +21,11 @@ jobs:
           done
           echo "✅ web assets present"
 
-      - name: Unit tests (engine.js — pure logic, node:test, no deps)
-        run: node --test 'tests/*.test.mjs'
+      - name: Install dev deps (eslint / prettier)
+        run: npm ci
 
-      - name: Validate weekly scenario JSON (schema + ja/en presence)
-        run: node scripts/validate-weekly.mjs
+      - name: Check (tests + weekly JSON + eslint + prettier — mirrors `make check`)
+        run: npm run check
 
   # ── インフラ: cdk synth が通ることの確認 ──
   infra:

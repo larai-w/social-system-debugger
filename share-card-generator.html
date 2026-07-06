@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>共有作法カード / OGP画像ジェネレーター</title>
+<style>
+:root{--bg0:#070b14;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:#d8e4ff;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;gap:12px}
+h1{font-size:.85rem;color:var(--cyan);letter-spacing:.12em}
+.tabs{display:flex;gap:8px}
+.tab{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;cursor:pointer;letter-spacing:.08em}
+.tab.on{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25)}
+.stage{width:min(96vw,760px);border:1px solid var(--bdr);border-radius:4px;overflow:hidden;background:var(--bg0)}
+#cv{width:100%;display:block}
+.dl{padding:9px 22px;background:var(--bg2);border:1px solid var(--green);border-radius:3px;color:var(--green);font-family:inherit;font-size:.7rem;cursor:pointer;letter-spacing:.1em}
+.dl:hover{box-shadow:0 0 10px rgba(0,255,136,.3)}
+.note{font-size:.55rem;color:var(--muted);text-align:center;line-height:1.8}
+</style>
+</head>
+<body>
+<h1>⇪ 共有カード・ジェネレーター（1200×630）</h1>
+<div class="tabs">
+  <button class="tab on" id="tab0" onclick="setMode(0)">作法カード（3か条）</button>
+  <button class="tab" id="tab1" onclick="setMode(1)">OGP用アプリカード</button>
+</div>
+<div class="stage"><canvas id="cv" width="1200" height="630"></canvas></div>
+<button class="dl" onclick="dl()">⬇ PNGをダウンロード</button>
+<div class="note">
+  作法カード = LINEで転送する「送り方の3か条」画像 / OGPカード = og-image.png としてアプリに設置<br>
+  ダウンロードしたPNGはそのままSNS・LINE・OGPメタタグに使えます
+</div>
+<script>
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+const W=1200,H=630;
+let mode=0;
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.045)';cx.lineWidth=1;
+  for(let x=0;x<W;x+=60){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,H);cx.stroke();}
+  for(let y=0;y<H;y+=60){cx.beginPath();cx.moveTo(0,y);cx.lineTo(W,y);cx.stroke();}}
+function base(){
+  cx.fillStyle='#070b14';cx.fillRect(0,0,W,H);grid();
+  // corner accents
+  cx.strokeStyle='#00d4ff';cx.lineWidth=3;
+  [[24,24,1,1],[W-24,24,-1,1],[24,H-24,1,-1],[W-24,H-24,-1,-1]].forEach(([x,y,dx,dy])=>{
+    cx.beginPath();cx.moveTo(x,y+34*dy);cx.lineTo(x,y);cx.lineTo(x+34*dx,y);cx.stroke();});
+}
+function stampIcon(x,y,text,col,rot=-0.07,size=26){
+  cx.save();cx.translate(x,y);cx.rotate(rot);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;
+  cx.font='bold '+size+'px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+36;
+  cx.strokeRect(-w/2,-size*0.85,w,size*1.55);
+  cx.shadowBlur=20;cx.shadowColor=col;cx.fillText(text,0,size*0.35);cx.shadowBlur=0;
+  cx.restore();cx.textAlign='left';
+}
+// ============ カード1: 共有作法（3か条） ============
+function drawEtiquette(){
+  base();
+  // header
+  cx.fillStyle='#00d4ff';cx.font='bold 30px Courier New';cx.textAlign='center';
+  cx.shadowBlur=18;cx.shadowColor='#00d4ff';
+  cx.fillText('⇪ 共有のつかいかた — 送るときの3か条',W/2,86);cx.shadowBlur=0;
+  cx.fillStyle='#5a6f94';cx.font='16px Courier New';
+  cx.fillText('気まずい話題ほど、送り方がすべて。',W/2,120);
+  cx.textAlign='left';
+  // three rules
+  const rules=[
+    ['01','人名を、添えない。','構造の話は、名指しした瞬間に「政局の話」に変わる。','#ff2244'],
+    ['02','答えを、言わない。','「これがまさに◯◯」は禁止。発見は、受け手のもの。','#ffcc00'],
+    ['03','好奇心だけ、添える。','説得の道具ではなく、実験の共有。「面白くない？」で十分。','#00ff88'],
+  ];
+  rules.forEach((r,i)=>{
+    const y=158+i*118;
+    cx.strokeStyle=r[3];cx.lineWidth=1.6;
+    cx.fillStyle='rgba(15,24,41,.85)';rrect(90,y,1020,96,6);cx.fill();cx.stroke();
+    // number badge
+    cx.fillStyle=r[3];cx.font='bold 40px Courier New';
+    cx.shadowBlur=14;cx.shadowColor=r[3];
+    cx.fillText(r[0],130,y+62);cx.shadowBlur=0;
+    // title & body
+    cx.fillStyle='#d8e4ff';cx.font='bold 30px Courier New';
+    cx.fillText(r[1],250,y+42);
+    cx.fillStyle='#8fa5cc';cx.font='18px Courier New';
+    cx.fillText(r[2],250,y+74);
+  });
+  // footer
+  cx.fillStyle='rgba(15,24,41,.9)';rrect(90,522,1020,74,6);cx.fill();
+  cx.strokeStyle='#172340';cx.stroke();
+  cx.textAlign='center';
+  cx.fillStyle='#5a6f94';cx.font='16px Courier New';
+  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話として送ってください',W/2,552);
+  cx.fillStyle='#00d4ff';cx.font='bold 17px Courier New';
+  cx.fillText('社会＆地域インフラ・デバッガー v6.1 — SOCIAL OS DEBUGGER',W/2,582);
+  cx.textAlign='left';
+}
+// ============ カード2: OGP用アプリカード ============
+function drawOGP(){
+  base();
+  // left: title block
+  cx.fillStyle='#5a6f94';cx.font='bold 18px Courier New';
+  cx.fillText('▶ SOCIAL OS DEBUGGER v6.1',80,110);
+  cx.fillStyle='#00d4ff';cx.font='bold 46px Courier New';
+  cx.shadowBlur=22;cx.shadowColor='#00d4ff';
+  cx.fillText('社会＆地域インフラ・',80,170);
+  cx.fillText('デバッガー',80,226);cx.shadowBlur=0;
+  cx.fillStyle='#d8e4ff';cx.font='bold 24px Courier New';
+  cx.fillText('社会の崩壊は、感情ではなく構造で起きる。',80,290);
+  cx.fillStyle='#00ff88';cx.font='bold 26px Courier New';
+  cx.shadowBlur=14;cx.shadowColor='#00ff88';
+  cx.fillText('だから、構造で直せる。',80,330);cx.shadowBlur=0;
+  // feature chips
+  const chips=['⚡ ショック注入','🏚 他責デッドロック','🚁 救命ヘリ判定','📍 歴史照合','4層の社会OS'];
+  let cxp=80, cyp=368;
+  chips.forEach(c=>{
+    cx.font='bold 17px Courier New';const w=cx.measureText(c).width+30;
+    if(cxp+w>760){cxp=80;cyp+=50;}
+    cx.strokeStyle='#172340';cx.fillStyle='rgba(15,24,41,.9)';
+    rrect(cxp,cyp,w,40,5);cx.fill();cx.stroke();
+    cx.fillStyle='#8fa5cc';cx.fillText(c,cxp+15,cyp+26);
+    cxp+=w+14;
+  });
+  // right: mini simulator visual (gauges + network + stamp)
+  cx.strokeStyle='#172340';cx.fillStyle='rgba(15,24,41,.7)';
+  rrect(800,90,330,360,8);cx.fill();cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='13px Courier New';cx.fillText('▌ CPU ALLOCATION MATRIX',826,126);
+  cx.fillStyle='#172340';cx.fillRect(826,140,278,16);
+  cx.fillStyle='#00d4ff';cx.fillRect(826,140,278*.3,16);
+  cx.fillStyle='#ff2244';cx.fillRect(826+278*.3,140,278*.7,16);
+  cx.fillStyle='#00d4ff';cx.font='bold 13px Courier New';cx.fillText('REPAIR: 30%',826,176);
+  cx.fillStyle='#ff2244';cx.textAlign='right';cx.fillText('BLAME-SHIFT: 70%',1104,176);cx.textAlign='left';
+  // network dots
+  for(let i=0;i<26;i++){
+    const a=i/26*Math.PI*2, r=60+((i*23)%50);
+    const x=965+Math.cos(a)*r*1.1, y=300+Math.sin(a)*r*.62;
+    const col=i%4===0?'#ff2244':(i%7===0?'#00ff88':'#00d4ff');
+    cx.shadowBlur=8;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(x,y,4.5,0,7);cx.fill();cx.shadowBlur=0;
+    if(i%3===0){cx.strokeStyle='rgba(0,212,255,.15)';cx.beginPath();cx.moveTo(x,y);cx.lineTo(965,300);cx.stroke();}
+  }
+  stampIcon(965,410,'SURVIVED','#00ff88',-0.07,22);
+  // bottom band
+  cx.fillStyle='rgba(15,24,41,.9)';rrect(80,486,1040,104,8);cx.fill();
+  cx.strokeStyle='#00d4ff';cx.lineWidth=1.4;cx.stroke();
+  cx.textAlign='center';
+  cx.fillStyle='#ffcc00';cx.font='bold 24px Courier New';
+  cx.fillText('あなたの街の設定なら、生き残れるか。',W/2,528);
+  cx.fillStyle='#5a6f94';cx.font='16px Courier New';
+  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',W/2,564);
+  cx.textAlign='left';
+}
+function render(){mode===0?drawEtiquette():drawOGP();}
+function setMode(m){mode=m;
+  document.getElementById('tab0').className='tab'+(m===0?' on':'');
+  document.getElementById('tab1').className='tab'+(m===1?' on':'');
+  render();}
+function dl(){
+  render();
+  const a=document.createElement('a');
+  a.download=mode===0?'share-etiquette-card.png':'og-image.png';
+  a.href=cv.toDataURL('image/png');a.click();}
+render();
+</script>
+</body>
+</html>

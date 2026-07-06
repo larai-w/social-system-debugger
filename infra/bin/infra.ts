@@ -25,7 +25,7 @@ const app = new cdk.App();
 
 new SocialDebuggerStack(app, 'SocialDebuggerStack', {
   env: {
-    account: process.env.CDK_DEFAULT_ACCOUNT,          // プレースホルダ（環境変数）
+    account: process.env.CDK_DEFAULT_ACCOUNT, // プレースホルダ（環境変数）
     region: process.env.CDK_DEFAULT_REGION || 'ap-northeast-1',
   },
   description:

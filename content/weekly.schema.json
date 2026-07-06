@@ -5,7 +5,17 @@
   "description": "社会デバッガー 週替わりシナリオの配信スキーマ（content/weekly/*.json と latest.json）",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "title", "intro", "page", "params", "goal", "goalConds", "difficulty", "discoveryId"],
+  "required": [
+    "id",
+    "title",
+    "intro",
+    "page",
+    "params",
+    "goal",
+    "goalConds",
+    "difficulty",
+    "discoveryId"
+  ],
   "properties": {
     "id": { "type": "string", "description": "ISO週番号（例 2026-W28）またはシナリオID" },
     "title": { "$ref": "#/$defs/i18n" },

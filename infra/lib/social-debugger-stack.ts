@@ -28,7 +28,7 @@ export class SocialDebuggerStack extends cdk.Stack {
       // バケットは決して公開しない（パブリックアクセス全ブロック）。到達は OAC 経由のみ。
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED, // 保存時暗号化（SSE-S3）
-      enforceSSL: true,                           // 非HTTPSアクセスを拒否
+      enforceSSL: true, // 非HTTPSアクセスを拒否
       versioned: false,
       // デモ/ポートフォリオ用途: cdk destroy で綺麗に消せるように。
       // 本番運用なら RemovalPolicy.RETAIN + autoDeleteObjects:false が定石。
@@ -84,8 +84,18 @@ export class SocialDebuggerStack extends cdk.Stack {
       },
       // 直リンク時の 403/404 は index.html にフォールバック（単一HTMLアプリのため）。
       errorResponses: [
-        { httpStatus: 403, responseHttpStatus: 200, responsePagePath: '/index.html', ttl: cdk.Duration.minutes(5) },
-        { httpStatus: 404, responseHttpStatus: 200, responsePagePath: '/index.html', ttl: cdk.Duration.minutes(5) },
+        {
+          httpStatus: 403,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+          ttl: cdk.Duration.minutes(5),
+        },
+        {
+          httpStatus: 404,
+          responseHttpStatus: 200,
+          responsePagePath: '/index.html',
+          ttl: cdk.Duration.minutes(5),
+        },
       ],
 
       // ── カスタムドメイン（任意・雛形。使う場合のみコメント解除）─────────
@@ -100,7 +110,8 @@ export class SocialDebuggerStack extends cdk.Stack {
     const githubRepo = (this.node.tryGetContext('githubRepo') as string) || 'OWNER/REPO';
     // ★任意: 既に token.actions.githubusercontent.com の OIDC プロバイダがある場合は
     //   -c existingOidcProviderArn=arn:... を渡して重複作成を回避。
-    const existingOidcArn = this.node.tryGetContext('existingOidcProviderArn') as string | undefined;
+    const existingOidcArn = this.node.tryGetContext('existingOidcProviderArn') as
+      string | undefined;
 
     const oidcProvider = existingOidcArn
       ? iam.OpenIdConnectProvider.fromOpenIdConnectProviderArn(this, 'GithubOidc', existingOidcArn)
@@ -111,7 +122,8 @@ export class SocialDebuggerStack extends cdk.Stack {
 
     const deployRole = new iam.Role(this, 'GithubDeployRole', {
       roleName: 'ssd-github-deploy',
-      description: 'OIDC role assumed by GitHub Actions to sync web/+content/ to S3 and invalidate CloudFront',
+      description:
+        'OIDC role assumed by GitHub Actions to sync web/+content/ to S3 and invalidate CloudFront',
       maxSessionDuration: cdk.Duration.hours(1),
       // 信頼ポリシー: 対象リポジトリの main ブランチに限定（必要ならPRも追記可）。
       assumedBy: new iam.WebIdentityPrincipal(oidcProvider.openIdConnectProviderArn, {
@@ -125,23 +137,31 @@ export class SocialDebuggerStack extends cdk.Stack {
     });
 
     // 最小権限 ①: バケット一覧（aws s3 sync の差分計算に List が必要）
-    deployRole.addToPolicy(new iam.PolicyStatement({
-      sid: 'S3SyncListBucket',
-      actions: ['s3:ListBucket'],
-      resources: [bucket.bucketArn],
-    }));
+    deployRole.addToPolicy(
+      new iam.PolicyStatement({
+        sid: 'S3SyncListBucket',
+        actions: ['s3:ListBucket'],
+        resources: [bucket.bucketArn],
+      })
+    );
     // 最小権限 ②: オブジェクトの読み書き削除（--delete 同期のため Delete も。対象バケット配下のみ）
-    deployRole.addToPolicy(new iam.PolicyStatement({
-      sid: 'S3SyncObjects',
-      actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'],
-      resources: [bucket.arnForObjects('*')],
-    }));
+    deployRole.addToPolicy(
+      new iam.PolicyStatement({
+        sid: 'S3SyncObjects',
+        actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'],
+        resources: [bucket.arnForObjects('*')],
+      })
+    );
     // 最小権限 ③: 対象ディストリビューションの無効化「作成」のみ（削除や設定変更は不可）
-    deployRole.addToPolicy(new iam.PolicyStatement({
-      sid: 'CloudFrontInvalidateOnly',
-      actions: ['cloudfront:CreateInvalidation'],
-      resources: [`arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`],
-    }));
+    deployRole.addToPolicy(
+      new iam.PolicyStatement({
+        sid: 'CloudFrontInvalidateOnly',
+        actions: ['cloudfront:CreateInvalidation'],
+        resources: [
+          `arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`,
+        ],
+      })
+    );
     // 注: インフラ変更（cdk deploy）は CI ロールに含めない。スタック変更は管理者権限で手動実行し、
     //     CI ロールは「資産同期＋無効化」だけに絞る（最小権限を優先）。CIでcdk deployしたい場合のみ
     //     CloudFormation/対象リソースの権限を別途付与すること。
@@ -151,7 +171,8 @@ export class SocialDebuggerStack extends cdk.Stack {
     new cdk.CfnOutput(this, 'DistributionId', { value: distribution.distributionId });
     new cdk.CfnOutput(this, 'DistributionDomainName', {
       value: distribution.distributionDomainName,
-      description: 'この値を web/js/scenario.js の CONTENT_BASE_URL (https://<domain>/content/weekly) に反映',
+      description:
+        'この値を web/js/scenario.js の CONTENT_BASE_URL (https://<domain>/content/weekly) に反映',
     });
     new cdk.CfnOutput(this, 'GithubDeployRoleArn', {
       value: deployRole.roleArn,
@@ -162,12 +183,32 @@ export class SocialDebuggerStack extends cdk.Stack {
     // 小規模な教育用・静的サイトという文脈で、各ルールを理解した上で受容する。
     // 事業成長時に最初に足すべきは CFR2(WAF) と CFR3/S1(アクセスログ)。
     NagSuppressions.addStackSuppressions(this, [
-      { id: 'AwsSolutions-S1', reason: 'S3 は OAC 経由でのみ到達（公開なし）。可視性は CloudFront 層で確保する方が有効なため、S3 サーバアクセスログは付けない（コスト最小化）。' },
+      {
+        id: 'AwsSolutions-S1',
+        reason:
+          'S3 は OAC 経由でのみ到達（公開なし）。可視性は CloudFront 層で確保する方が有効なため、S3 サーバアクセスログは付けない（コスト最小化）。',
+      },
       { id: 'AwsSolutions-CFR1', reason: '全世界向けの教育コンテンツのため地域制限は設けない。' },
-      { id: 'AwsSolutions-CFR2', reason: '動的オリジンを持たない純粋な静的配信で攻撃対象面が小さいため WAF は付けない（有料。事業成長時に追加検討）。' },
-      { id: 'AwsSolutions-CFR3', reason: 'アプリ側で Plausible による計測を行うため CloudFront アクセスログは無効（ログ用バケット追加のコスト回避。必要時に有効化）。' },
-      { id: 'AwsSolutions-CFR4', reason: 'デフォルトの *.cloudfront.net 証明書で配信（min TLS は cdk.json の TLSv1.2_2021 フラグで担保）。カスタムドメイン利用時は us-east-1 の ACM 証明書に差し替える（雛形をコメントで用意済み）。' },
-      { id: 'AwsSolutions-IAM5', reason: 'デプロイロールのオブジェクト権限は単一バケット配下 (bucket/*) に限定。aws s3 sync に必要な最小の対象内ワイルドカードであり、バケット横断ではない。' },
+      {
+        id: 'AwsSolutions-CFR2',
+        reason:
+          '動的オリジンを持たない純粋な静的配信で攻撃対象面が小さいため WAF は付けない（有料。事業成長時に追加検討）。',
+      },
+      {
+        id: 'AwsSolutions-CFR3',
+        reason:
+          'アプリ側で Plausible による計測を行うため CloudFront アクセスログは無効（ログ用バケット追加のコスト回避。必要時に有効化）。',
+      },
+      {
+        id: 'AwsSolutions-CFR4',
+        reason:
+          'デフォルトの *.cloudfront.net 証明書で配信（min TLS は cdk.json の TLSv1.2_2021 フラグで担保）。カスタムドメイン利用時は us-east-1 の ACM 証明書に差し替える（雛形をコメントで用意済み）。',
+      },
+      {
+        id: 'AwsSolutions-IAM5',
+        reason:
+          'デプロイロールのオブジェクト権限は単一バケット配下 (bucket/*) に限定。aws s3 sync に必要な最小の対象内ワイルドカードであり、バケット横断ではない。',
+      },
     ]);
   }
 }

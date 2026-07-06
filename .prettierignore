@@ -1,0 +1,20 @@
+# 依存・生成物
+node_modules
+**/node_modules
+package-lock.json
+infra/package-lock.json
+infra/cdk.out
+cdk.out
+*.png
+
+# 既存の密な手書きフロントは整形対象外（意図的な圧縮スタイル・大差分/退行回避）
+web/js
+web/css
+web/index.html
+web/*.html
+web/config.js
+share-card-generator.html
+
+# 手書きのドキュメントは整形対象外（プロズのリフロー/大差分回避）。対象はコード/データ/設定のみ。
+*.md
+**/*.md

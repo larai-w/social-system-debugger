@@ -9,13 +9,37 @@ import { fileURLToPath } from 'node:url';
 const src = readFileSync(fileURLToPath(new URL('../web/js/scenario.js', import.meta.url)), 'utf8');
 const documentStub = { addEventListener() {} };
 const windowStub = {}; // SSD_CONFIG 未設定 → CONTENT_BASE_URL は相対パスにフォールバック
-const sc = new Function('document', 'window', src + '\nreturn { evalGoalConds, scenarioContext, normalizeScenario };')(documentStub, windowStub);
+const sc = new Function(
+  'document',
+  'window',
+  src + '\nreturn { evalGoalConds, scenarioContext, normalizeScenario };'
+)(documentStub, windowStub);
 
 test('evalGoalConds: all conditions must pass (AND)', () => {
   const ctx = { diversity: 85, entropy: 60 };
-  assert.equal(eval2([{ metric: 'diversity', op: '>=', value: 80 }, { metric: 'entropy', op: '<', value: 70 }], ctx), true);
-  assert.equal(eval2([{ metric: 'diversity', op: '>=', value: 80 }, { metric: 'entropy', op: '<', value: 50 }], ctx), false);
-  function eval2(c, x) { return sc.evalGoalConds(c, x); }
+  assert.equal(
+    eval2(
+      [
+        { metric: 'diversity', op: '>=', value: 80 },
+        { metric: 'entropy', op: '<', value: 70 },
+      ],
+      ctx
+    ),
+    true
+  );
+  assert.equal(
+    eval2(
+      [
+        { metric: 'diversity', op: '>=', value: 80 },
+        { metric: 'entropy', op: '<', value: 50 },
+      ],
+      ctx
+    ),
+    false
+  );
+  function eval2(c, x) {
+    return sc.evalGoalConds(c, x);
+  }
 });
 
 test('evalGoalConds: every operator behaves', () => {
@@ -43,8 +67,8 @@ test('scenarioContext: merges globals (default 0) with page metrics', () => {
 
 test('normalizeScenario: aliases intro/brief and guarantees goalConds array', () => {
   const a = sc.normalizeScenario({ brief: { ja: 'あ', en: 'a' } });
-  assert.equal(a.intro.en, 'a');            // brief -> intro
+  assert.equal(a.intro.en, 'a'); // brief -> intro
   assert.ok(Array.isArray(a.goalConds));
   const b = sc.normalizeScenario({ intro: { ja: 'い', en: 'b' } });
-  assert.equal(b.brief.en, 'b');            // intro -> brief
+  assert.equal(b.brief.en, 'b'); // intro -> brief
 });

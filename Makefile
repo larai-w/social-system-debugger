@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 GITHUB_REPO ?= larai-w/social-system-debugger
 
-.PHONY: help setup hooks serve test check gen-og synth handoff \
+.PHONY: help setup hooks serve test check lint format gen-og synth handoff protect \
         aws-bootstrap aws-deploy aws-wire ios android
 
 help: ## このヘルプを表示
@@ -28,6 +28,12 @@ test: ## ユニットテスト（engine / goal / share）
 check: ## テスト＋週替わりJSON検証（CIと同じ）
 	npm run check
 
+lint: ## ESLint（構文・明白なバグ検知）
+	npm run lint
+
+format: ## Prettier で整形（対象は .prettierignore 以外）
+	npm run format
+
 gen-og: ## og-image.png を再生成
 	npm run gen:og
 
@@ -37,6 +43,9 @@ synth: ## cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
 ## ── 引き継ぎ ──────────────────────────────────────
 handoff: ## セッション終了前チェック（クリーン・未push・テスト）
 	bash scripts/handoff-check.sh
+
+protect: ## main をブランチ保護（PR＋CI必須。要 gh admin）
+	bash scripts/setup-branch-protection.sh
 
 ## ── AWS（要 AWS 認証情報 / gh CLI）────────────────
 aws-bootstrap: ## 初回のみ: CDK ブートストラップ
