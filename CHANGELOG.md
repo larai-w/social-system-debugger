@@ -4,6 +4,19 @@
 
 ---
 
+## Phase 1 — 2026-07-06 — モバイル化・週替わりシナリオ・AWS配信基盤
+
+配信・アーキテクチャの基盤整備（アプリのUI見た目は不変・Web挙動は維持）。7タスク。
+
+- **タスク1 モジュール分割**: 単一 `index.html` を `web/` 配下へ機械的に分割（`css/app.css` ＋ `js/{i18n,engine,ui}.js`、以降 `native/share/scenario` を追加）。古典スクリプトでグローバル共有＝**挙動不変**（連結すると元とバイト一致）。`engine.js` は **DOM/window 非依存**（サーバー再利用・テスト用）。`deploy.yml` は `web/` を公開＝**公開URL不変**。
+- **タスク2 Capacitor（iOS/Android）**: バンドラなしでネイティブ化。`native.js` の `window.SSD` ファサードに StatusBar/SplashScreen・Preferences 耐久ミラー・Haptics・Share を集約。**全て `isNative` ガードで Web は no-op**。
+- **タスク3 共有経路**: 共有ポップを **X / LINE / 画像を保存** の3ボタン＋「その他のアプリで共有」に再設計（`share.js`）。LINE を `lineit/share` で X と同格に。`track('share_x'/'share_line'/'card_saved')`。
+- **タスク4 週替わりシナリオ**: `check()` を宣言的 `goalConds[{metric,op,value}]` に変換（JSON化）。静的配信 `content/weekly/*.json` ＋ `latest.json`（起動時fetch・失敗時バンドルへフォールバック）。クリアで結果カードに「あなたは今週、街を守った。」＋発見「今週の守り人」、初回クリア後に週次通知許可。全て native ガード。
+- **タスク5 AWS配信基盤（CDK/TS）**: `/infra` に **S3(非公開/OAC)+CloudFront**（`latest.json` のみ短TTL）。`deploy.sh` で S3同期＋最小無効化。`infra/README.md` に構成図・選定理由・コスト・セキュリティ・「Docker不要の理由」。`cdk synth` 検証済み。
+- **タスク6 計測拡充**: `track()` に共通プロパティ **`app_platform`**（web/ios/android）。`weekly_fail` 追加。README に KPI 対応表。
+- **タスク7 CI/CD（GitHub Actions + AWS OIDC）**: 長期キーを持たない OIDC デプロイ（main 限定・最小権限ロールを CDK 定義）。`ci.yml`（engine.js ユニットテスト・週次JSONスキーマ検証・`cdk synth`）、`deploy-aws.yml`（OIDC→S3同期→最小無効化）。**GitHub Pages の deploy は維持**（Pages＋AWS 並行）。
+- **ドキュメント/DX**: `docs/DEVELOPMENT`（日英）を新モジュール構成へ更新、ルート `npm test`/`validate:weekly`/`check` を追加。
+
 ## v6.346 — 2026-07-05
 - **PAGE 2 エンジン改修（ブランド閉ループ・後継者ストック・ヘリ3状態）**
 - **Task A**: ブランドを因果ループへ組み込み。`brand → 税収(budget) → 保守財源 → infra → heli` の多段連鎖。財政に `budgetShortfall`（財政 < 45 で保守不足）を追加。
