@@ -187,6 +187,21 @@ npx cap open android        # → Android Studio
 
 ---
 
+## インフラ / Infrastructure (AWS)
+
+配信基盤は **AWS CDK (TypeScript)** で IaC 定義（`/infra`）。**S3(非公開/OAC) + CloudFront** の
+「静的配信＋サーバーレス」最小構成で、`web/` と `content/weekly/*.json` をホスティングします
+（`latest.json` のみ 5分TTL）。構成図・選定理由・コスト根拠・セキュリティ判断・「Dockerを使わない理由」・
+フェーズ2の拡張余地は **[`infra/README.md`](infra/README.md)** に記載。
+
+```bash
+cd infra && npm install && npm run synth   # 構成確認（cdk synth）
+```
+
+> GitHub Pages は現行の公開URL維持のため並行運用。AWS は本命の配信基盤／就活ポートフォリオとして構築。
+
+---
+
 ## CI/CD
 
 `development` ブランチで開発 → `main` へのPR時にCI自動チェック → マージで GitHub Pages に自動デプロイ。
