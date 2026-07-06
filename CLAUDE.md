@@ -39,7 +39,8 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
-- ✅ 仕上げ: `docs/DEVELOPMENT.md`/`.en.md` を新モジュール構成に更新（コードの地図をファイル別に・週替わり追加手順・http配信/SWキャッシュ対処）。ルート `package.json` に `test`(engine node:test)/`validate:weekly`/`check` を追加（ローカルでCI再現可）。
+- ✅ 仕上げ2: `sw.js` を**同一オリジンのjs/cssも network-first**化（デプロイ後の stale-JS を根絶・オフラインはキャッシュ、cache v6-352）。`web/og-image.png`(1200×630) を生成（`scripts/gen-og-image.mjs`＋`@napi-rs/canvas` devDep、`npm run gen:og`。og:imageは相対URLでPages/AWS両対応）。`tests/scenario-goals.test.mjs`・`tests/share-url.test.mjs` 追加（計15テスト）。`deploy-aws.yml` は `if: vars.S3_BUCKET != ''` で未設定時スキップ。
+- ✅ 仕上げ1: `docs/DEVELOPMENT.md`/`.en.md` を新モジュール構成に更新（コードの地図をファイル別に・週替わり追加手順・http配信/SWキャッシュ対処）。ルート `package.json` に `test`(engine node:test)/`validate:weekly`/`check`/`gen:og` を追加（ローカルでCI再現可）。
 - ✅ **フェーズ1 完了（タスク1〜7 / コミット済み・未push）**。残るはユーザー側の実設定（下記「ユーザーが手を動かす設定」）。
 - ✅ フェーズ1 タスク7（CI/CD + AWS OIDC）: CDK に **GitHub OIDC プロバイダ＋最小権限デプロイロール**（信頼= `repo:OWNER/REPO:ref:refs/heads/main` プレースホルダ、権限= S3 List/Get/Put/Delete＋CloudFront CreateInvalidation のみ、cdk deployは意図的に除外）。出力 `GithubDeployRoleArn`。`.github/workflows/ci.yml`（PR: engine.js `node:test`＋週次JSONスキーマ検証(ja/en)＋cdk synth）。`.github/workflows/deploy-aws.yml`（main/web・content変更時: OIDC Assume→S3同期→latest.json/index.html無効化）。**GitHub Pages の deploy.yml は維持**（Pages+AWS並行）。`tests/engine.test.mjs`(8)・`scripts/validate-weekly.mjs`・`content/weekly.schema.json`。README に CI/CD Mermaid・OIDC選定理由・最小権限・毎週更新手順。ローカルで tests/JSON検証/cdk synth 全通過。
 - ✅ フェーズ1 タスク6（計測拡充）: `track()` に共通プロパティ `app_platform`(web/ios/android=`SSD.platform`) 付与。`weekly_fail` 追加（scenario.js が挑戦を追跡し、ui.js の崩壊バナー遷移で1回発火・native/web no-op）。README に計測イベント表＋「20人フェーズKPI対応表」。sw cache v6-351。
