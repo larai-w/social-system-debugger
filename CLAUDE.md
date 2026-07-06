@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ 仕組み化（継続性・自動化・簡素化）: `AGENTS.md`(Codex向け入口)・`CONTRIBUTING.md`・`Makefile`(`make help` 単一入口)。`cdk-nag`(AWS Solutions)を CDK に組込み6件を理由付き抑制、`infra/.env.example`。`dependabot.yml`、Issue/PRテンプレ。CONTENT_BASE_URL を `web/config.js` に分離（`deploy-aws.yml` が `CLOUDFRONT_DOMAIN` から自動生成）。**AWS簡素化: `make aws-deploy`→`make aws-wire` で CDK出力→GitHub Secrets/Variables と config.js を gh CLI で自動配線**。**`make handoff`（`scripts/handoff-check.sh`）でセッション終了前に競合コピー/未コミット/未push/テストを一括検証**。⚠️ iCloud(`~/Documents`)がindex.html編集を巻き戻し competing copy を作った事例あり→リポジトリのiCloud外移設を推奨。
 - ✅ 仕上げ2: `sw.js` を**同一オリジンのjs/cssも network-first**化（デプロイ後の stale-JS を根絶・オフラインはキャッシュ、cache v6-352）。`web/og-image.png`(1200×630) を生成（`scripts/gen-og-image.mjs`＋`@napi-rs/canvas` devDep、`npm run gen:og`。og:imageは相対URLでPages/AWS両対応）。`tests/scenario-goals.test.mjs`・`tests/share-url.test.mjs` 追加（計15テスト）。`deploy-aws.yml` は `if: vars.S3_BUCKET != ''` で未設定時スキップ。
 - ✅ 仕上げ1: `docs/DEVELOPMENT.md`/`.en.md` を新モジュール構成に更新（コードの地図をファイル別に・週替わり追加手順・http配信/SWキャッシュ対処）。ルート `package.json` に `test`(engine node:test)/`validate:weekly`/`check`/`gen:og` を追加（ローカルでCI再現可）。
 - ✅ **フェーズ1 完了（タスク1〜7 / コミット済み・未push）**。残るはユーザー側の実設定（下記「ユーザーが手を動かす設定」）。
@@ -64,9 +65,11 @@
 
 A. **push**: `git push`（7タスク分＋docsコミットが未push）。pushで Pages(web/) 再デプロイ・CI稼働。
 B. **Capacitor 実機**（ネイティブ機能の実挙動確認に必須）: `npm install` → `npx cap add ios/android` → `npx cap open ...`。`capacitor.config.json` の `appId`(現 `dev.socialdebugger.app`)を自分のIDに。Xcodeで署名Team、Android Studio/JDK17、通知権限。
-C. **AWS デプロイ**: `cd infra && npm install` → 環境変数(`CDK_DEFAULT_ACCOUNT/REGION`, 任意`AWS_PROFILE`) → `npm run bootstrap` → `npm run deploy:stack`（`-c githubRepo=larai-w/social-system-debugger` を付与）→ `npm run deploy`。出力の `DistributionDomainName` を `web/js/scenario.js` の `CONTENT_BASE_URL` に反映。
-D. **GitHub OIDC/CI設定**: リポジトリ Secrets `AWS_DEPLOY_ROLE_ARN`(=出力 GithubDeployRoleArn) / Variables `AWS_REGION`,`S3_BUCKET`(=BucketName),`CLOUDFRONT_DIST_ID`(=DistributionId)。CDKの `githubRepo` を実リポジトリ名に（既定 OWNER/REPO のまま synth可）。既存OIDCプロバイダがある場合 `-c existingOidcProviderArn=...`。
-E. （任意）カスタムドメイン: infra スタックの ACM(us-east-1)/Route53 コメント解除。
+C. **AWS デプロイ（簡素化済み）**: 環境変数(`CDK_DEFAULT_ACCOUNT/REGION`, 任意`AWS_PROFILE`。`infra/.env.example` 参照) → `make aws-bootstrap`（初回のみ）→ `make aws-deploy` → **`make aws-wire`**。
+   - `make aws-wire` が **CDK出力から GitHub の Secret/Variables（AWS_DEPLOY_ROLE_ARN / AWS_REGION / S3_BUCKET / CLOUDFRONT_DIST_ID / CLOUDFRONT_DOMAIN）を gh CLI で自動設定＋`web/config.js` に配信元を自動書込み**（＝旧D手順とscenario.js手書きが不要に）。前提: `aws` 認証済み＋`gh auth login` 済み。
+   - CDKの `githubRepo` は Makefile 既定（`larai-w/social-system-debugger`）。既存OIDCプロバイダがある場合のみ `cd infra && npm run deploy:stack -- -c existingOidcProviderArn=...`。
+D. （任意）カスタムドメイン: infra スタックの ACM(us-east-1)/Route53 コメント解除。
+- 全操作は `make help` に一覧。**セッション終了前は `make handoff`**（クリーン・未push・テストを検証）。
 4. タスク4 週替わりシナリオ（静的JSON配信 `/content/weekly/*.json`＋latest.json）。scenario.js 新規。**注意: ハードコードの `SCENARIOS` の `check` 関数はJSON化不可 → 宣言的条件配列(metric/op/value)へ変換**。通知は初回クリア直後に許可要求。サンプル3週分。
 5. タスク5 AWS 配信基盤（CDK/TS, `/infra`）: S3(非公開/OAC)+CloudFront。README に構成図・選定理由・「Dockerを使わない理由(静的配信＋サーバーレスで常駐なし)」。cdk synth 通過まで（deployはユーザー）。
 6. タスク6 計測拡充（weekly_*/share_*/card_saved/notification_optin、共通プロパティ app_platform）。

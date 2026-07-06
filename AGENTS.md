@@ -17,13 +17,16 @@ Web（GitHub Pages / AWS CloudFront）＋ネイティブ（Capacitor iOS/Android
 - `.github/workflows/` … `ci.yml`(PR) / `deploy.yml`(Pages) / `deploy-aws.yml`(OIDC)。
 
 ## よく使うコマンド
+`make help` で全コマンドを一覧できる（操作の単一入口）。主なもの:
 ```bash
-npm run serve            # http://localhost:8000 （file:// では PWA/fetch が動かない）
-npm test                 # engine/goal/share のユニットテスト（node:test）
-npm run validate:weekly  # 週替わり JSON のスキーマ検証（ja/en 必須）
-npm run check            # test + validate をまとめて
-npm run gen:og           # og-image.png 再生成
-(cd infra && npm run synth)   # cdk synth（cdk-nag 込み・AWS認証情報不要）
+make help         # 全タスク一覧
+make serve        # http://localhost:8000 （file:// では PWA/fetch が動かない）
+make check        # ユニットテスト + 週替わりJSON検証（CI相当）
+make synth        # cdk synth（cdk-nag 込み・AWS不要）
+make handoff      # ★セッション終了前チェック（競合コピー/未コミット/未push/テスト）
+make aws-deploy   # CDKデプロイ→S3同期（要AWS）
+make aws-wire     # デプロイ後: CDK出力から GitHub Secrets/Variables と config.js を自動設定
+make ios / android
 ```
 
 ## 変更時の必須ルール（退行防止）
@@ -36,9 +39,10 @@ npm run gen:og           # og-image.png 再生成
 5. **倫理方針**: 実在の国・自治体・人物を名指ししない（抽象型で語る）。
 6. **段階実装＋タスクごとに完了報告**。コミットメッセージは英語。秘密情報はコミットしない。
 
-## 完了前チェック
-`npm run check` と（infra を触ったら）`cd infra && npm run synth` を通す。ブラウザ Console にアプリ由来の
-エラーが無いことを確認（拡張機能のログは無視可）。詳細な手順は `docs/DEVELOPMENT.md`。
+## 完了前チェック / セッション終了
+`npm run check`（＝`make check`）と、infra を触ったら `make synth` を通す。ブラウザ Console にアプリ由来の
+エラーが無いことを確認（拡張機能のログは無視可）。**セッションを終える前に必ず `make handoff`** を実行し、
+競合コピー無し・未コミット無し・未push無し・テスト通過を確認する（＝次の担当がそのまま続けられる状態）。
 
 ## 引き継ぎ（別エージェント/別マシンへ）
 - **一次ソースは `CLAUDE.md`**（進捗・次タスク・ユーザーがやる設定）。
