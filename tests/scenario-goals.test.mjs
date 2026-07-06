@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const src = readFileSync(fileURLToPath(new URL('../web/js/scenario.js', import.meta.url)), 'utf8');
 const documentStub = { addEventListener() {} };
-const sc = new Function('document', src + '\nreturn { evalGoalConds, scenarioContext, normalizeScenario };')(documentStub);
+const windowStub = {}; // SSD_CONFIG 未設定 → CONTENT_BASE_URL は相対パスにフォールバック
+const sc = new Function('document', 'window', src + '\nreturn { evalGoalConds, scenarioContext, normalizeScenario };')(documentStub, windowStub);
 
 test('evalGoalConds: all conditions must pass (AND)', () => {
   const ctx = { diversity: 85, entropy: 60 };
