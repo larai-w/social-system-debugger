@@ -1,0 +1,57 @@
+name: Deploy to AWS (S3 + CloudFront)
+
+# GitHub Pages のデプロイ(deploy.yml)はそのまま維持し、これは AWS への配信を「追加」するもの。
+# 長期アクセスキーは保存しない。OIDC で一時クレデンシャルを取得する。
+on:
+  push:
+    branches: [main]
+    # web/ か content/ が変わった時だけ動かす（インフラや docs だけの変更では動かさない）
+    paths:
+      - 'web/**'
+      - 'content/**'
+      - '.github/workflows/deploy-aws.yml'
+  workflow_dispatch:
+
+# ★ユーザー設定（GitHub リポジトリ側）:
+#   Secrets:   AWS_DEPLOY_ROLE_ARN = cdk 出力 GithubDeployRoleArn
+#   Variables: AWS_REGION / S3_BUCKET(=BucketName) / CLOUDFRONT_DIST_ID(=DistributionId)
+
+permissions:
+  id-token: write   # OIDC トークン発行に必須
+  contents: read
+
+concurrency:
+  group: deploy-aws
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC — no long-lived keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      # web/ を同期。--delete で不要ファイルを掃除するが content/ は別管理なので除外。
+      - name: Sync web/
+        run: |
+          aws s3 sync web/ "s3://${{ vars.S3_BUCKET }}/" \
+            --delete --exclude "content/*" \
+            --cache-control "public,max-age=300"
+
+      # content/ を個別に同期（週替わりシナリオJSON）。
+      - name: Sync content/
+        run: |
+          aws s3 sync content/ "s3://${{ vars.S3_BUCKET }}/content/" \
+            --delete --cache-control "public,max-age=300"
+
+      # 無効化は latest.json と index.html のみ（全パス /* はコストと時間の無駄）。
+      - name: Invalidate latest.json + index.html
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_DIST_ID }}" \
+            --paths "/content/weekly/latest.json" "/index.html"

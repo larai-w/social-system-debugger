@@ -5,38 +5,42 @@ on:
     branches: [main]
 
 jobs:
-  check:
+  # ── フロント: engine.js のユニットテスト + 週替わりJSONスキーマ検証 ──
+  web:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Check web/index.html exists and is non-empty
+      - name: Check web assets exist
         run: |
-          if [ ! -f web/index.html ]; then
-            echo "❌ web/index.html not found"
-            exit 1
-          fi
-          SIZE=$(wc -c < web/index.html)
-          echo "✅ web/index.html found (${SIZE} bytes)"
-          if [ "$SIZE" -lt 1000 ]; then
-            echo "❌ web/index.html is too small (${SIZE} bytes) — something may be wrong"
-            exit 1
-          fi
-
-      - name: Check for required sections
-        run: |
-          for keyword in "chart.js" "agentCanvas" "filterRate" "ethicsScore"; do
-            if grep -qi "$keyword" web/index.html; then
-              echo "✅ Found: $keyword"
-            else
-              echo "❌ Missing: $keyword"
-              exit 1
-            fi
+          for f in web/index.html web/js/engine.js web/js/ui.js web/js/scenario.js; do
+            [ -f "$f" ] || { echo "❌ missing $f"; exit 1; }
           done
+          echo "✅ web assets present"
 
-      - name: Report file size
-        run: |
-          SIZE=$(wc -c < web/index.html)
-          LINES=$(wc -l < web/index.html)
-          echo "📦 web/index.html — ${SIZE} bytes / ${LINES} lines"
+      - name: Unit tests (engine.js — pure logic, node:test, no deps)
+        run: node --test 'tests/*.test.mjs'
+
+      - name: Validate weekly scenario JSON (schema + ja/en presence)
+        run: node scripts/validate-weekly.mjs
+
+  # ── インフラ: cdk synth が通ることの確認 ──
+  infra:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install infra deps
+        run: npm ci
+      - name: cdk synth
+        run: npx cdk synth --quiet
+        env:
+          CDK_DEFAULT_REGION: ap-northeast-1

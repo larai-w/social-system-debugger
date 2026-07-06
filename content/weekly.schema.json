@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://socialdebugger.dev/schemas/weekly.json",
+  "title": "Weekly Scenario",
+  "description": "社会デバッガー 週替わりシナリオの配信スキーマ（content/weekly/*.json と latest.json）",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "intro", "page", "params", "goal", "goalConds", "difficulty", "discoveryId"],
+  "properties": {
+    "id": { "type": "string", "description": "ISO週番号（例 2026-W28）またはシナリオID" },
+    "title": { "$ref": "#/$defs/i18n" },
+    "intro": { "$ref": "#/$defs/i18n" },
+    "page": { "type": "integer", "minimum": 1, "maximum": 4 },
+    "params": {
+      "type": "object",
+      "description": "プリセットと同形式の初期パラメータ（p1〜p4 のいずれか＋任意の hint）",
+      "properties": {
+        "p1": { "type": "object" },
+        "p2": { "type": "object" },
+        "p3": { "type": "object" },
+        "p4": { "type": "object" },
+        "hint": { "$ref": "#/$defs/i18n" }
+      }
+    },
+    "goal": { "$ref": "#/$defs/i18n" },
+    "goalConds": {
+      "type": "array",
+      "minItems": 1,
+      "description": "宣言的ゴール条件（AND 結合）",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["metric", "op", "value"],
+        "properties": {
+          "metric": { "type": "string" },
+          "op": { "type": "string", "enum": [">=", "<=", ">", "<", "==", "!="] },
+          "value": { "type": "number" }
+        }
+      }
+    },
+    "difficulty": { "type": "string", "enum": ["easy", "normal", "hard"] },
+    "discoveryId": { "type": "string", "pattern": "^sce_" }
+  },
+  "$defs": {
+    "i18n": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ja", "en"],
+      "properties": {
+        "ja": { "type": "string", "minLength": 1 },
+        "en": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
