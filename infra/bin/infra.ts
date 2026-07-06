@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
+import { AwsSolutionsChecks } from 'cdk-nag';
 import { SocialDebuggerStack } from '../lib/social-debugger-stack';
 
 /**
@@ -30,3 +31,7 @@ new SocialDebuggerStack(app, 'SocialDebuggerStack', {
   description:
     'Social Debugger — static web + weekly content delivery via private S3 (OAC) behind CloudFront.',
 });
+
+// cdk-nag: AWS Solutions ルールセットで synth 時にセキュリティ静的検査（AWS認証情報不要・CIで走る）。
+// 受容する指摘はスタック側で NagSuppressions に理由付きで明示（面接で説明できる素材にする）。
+cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
