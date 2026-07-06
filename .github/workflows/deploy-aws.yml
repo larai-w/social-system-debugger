@@ -27,6 +27,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # AWS 未設定の間はこのジョブを丸ごとスキップ（赤い失敗にせず neutral/skipped にする）。
+    # S3_BUCKET の Variable を設定した時点で自動的に有効化される。
+    if: ${{ vars.S3_BUCKET != '' }}
     steps:
       - uses: actions/checkout@v4
 
