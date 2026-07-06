@@ -1,2 +1,17 @@
 .DS_Store
 Thumbs.db
+
+# Node / Capacitor (Phase 1)
+node_modules/
+dist/
+.env
+.env.*
+
+# Capacitor native projects (regenerated via `npx cap add`)
+/ios/
+/android/
+
+# AWS CDK (Phase 1 infra)
+infra/node_modules/
+infra/cdk.out/
+cdk.out/
