@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ フェーズ1 タスク2（Capacitor 導入 / iOS・Android）: バンドラなしで既存Webをネイティブ化。`package.json`＋`capacitor.config.json`（appId プレースホルダ `dev.socialdebugger.app`, `webDir=web`）、Capacitor 8系プラグイン一式。`web/js/native.js`（`window.SSD` ファサード）に集約=StatusBar/SplashScreen ダーク統一・Preferences 耐久ミラー（一度だけ移行＋write-through＋起動時復元。localStorageは同期のソース・オブ・トゥルースのまま）・`haptic()`・`share()`(=@capacitor/share委譲)。ui.js は**全てガード付き**で崩壊遷移時(setVerdictBanner crash)＋巻き戻し成功に触覚、共有はネイティブ時のみ委譲。**`isNativePlatform()` ガードで Web は完全 no-op＝GitHub Pages 挙動不変**。native.js は ui.js の前に読み込み（localStorage ラップを先に有効化）、sw.js cache v6-348。ios/android は .gitignore（`npx cap add`で再生成）。READMEにビルド手順＋実機チェックリスト。
 - ✅ フェーズ1 タスク1（リポジトリ再構成・モジュール分割）: 単一 `index.html` を `/web` 配下へ分割。`web/index.html`（マークアップ＋起動）／`web/css/app.css`／`web/js/i18n.js`（辞書）／`web/js/engine.js`（HIST_REF/PRESETS/MDATA＋モデル状態＋純粋計算。**DOM/window非依存**＝将来サーバー再利用可）／`web/js/ui.js`（DOM・チャート・P2〜P4・共有・図鑑・週次・init）。**古典スクリプトのままグローバルスコープ共有で挙動不変**（連結すると元とバイト一致。唯一 `WEEKLY_ENABLED` だけ engine→ui へ安全に移動）。`manifest.json`/`sw.js`/`icon.svg` も `/web` へ移動、`sw.js` CORE に css/js 追加（cache名 v6-347）。`deploy.yml` は成果物パスを `web/` に変更＝**GitHub Pages のURLは不変**。`ci.yml` は `web/index.html` を参照。share.js/scenario.js/discovery.js の切り出しはタスク3/4で実施予定。
 - ✅ PAGE 2 モデル検証（要ユーザー確認）: ユーザーが「確認済み」と回答。DX0固定→skillStock枯渇→ブランド崖→HELI:SUSPENDED の連鎖は動作するものとして確定。
 - ✅ Web版UX改修（プロンプト1）: プロダクト名「社会デバッガー」、二人称バナー、街の命名(`ssd_town_name`)、共有前の一言、PAGE 1 巻き戻し、計測ラッパー `track()`、ヘッダー整理（左 EN/GUIDE、右 フィードバック/SHARE/≡メニュー、発見ログは初発見後に出現）、週替わりシナリオは `WEEKLY_ENABLED`(ネイティブ判定)でWeb非表示。
@@ -49,8 +50,8 @@
 
 - 決定事項（このセッションで確定）: 配信は「**GitHub Pages 維持＋AWS 追加**」（今のURLは常に不変）。進め方は「**タスクごとに一旦停止**」。応答は日本語。
 - ✅ タスク1（モジュール分割）完了。
-2. **タスク2 Capacitor 導入（次）**: `npm init` → Capacitor、`webDir=web`、iOS/Android 追加。appId 例 `dev.socialdebugger.app`。プラグイン: share / preferences（ssd_* を localStorage から移行・二重移行フラグ）/ local-notifications / haptics / status-bar / splash-screen。すべて `Capacitor.isNativePlatform()` でガードし **Web版はlocalStorage継続でフル機能**。README にビルド手順。
-3. タスク3 共有経路（X / LINE / 画像保存 の3ボタン＋その他共有）。track に share_x/share_line/card_saved。share.js を ui.js から切り出す。
+- ✅ タスク2（Capacitor 導入）完了。
+3. **タスク3 共有経路（次）**: 「X / LINE / 画像を保存」の3ボタン＋その下に「その他のアプリで共有」。LINEは `https://social-plugins.line.me/lineit/share?url=...&text=...`、Xと同格。画像保存はネイティブ=Share/Filesystem、Web=既存DL。track に share_x/share_line/card_saved を区別。share.js を ui.js から切り出す。native時は `SSD.share()` に委譲済み（タスク2）。
 4. タスク4 週替わりシナリオ（静的JSON配信 `/content/weekly/*.json`＋latest.json）。scenario.js 新規。**注意: ハードコードの `SCENARIOS` の `check` 関数はJSON化不可 → 宣言的条件配列(metric/op/value)へ変換**。通知は初回クリア直後に許可要求。サンプル3週分。
 5. タスク5 AWS 配信基盤（CDK/TS, `/infra`）: S3(非公開/OAC)+CloudFront。README に構成図・選定理由・「Dockerを使わない理由(静的配信＋サーバーレスで常駐なし)」。cdk synth 通過まで（deployはユーザー）。
 6. タスク6 計測拡充（weekly_*/share_*/card_saved/notification_optin、共通プロパティ app_platform）。
