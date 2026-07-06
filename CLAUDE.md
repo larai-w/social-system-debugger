@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ 引き継ぎ自動化: **Stop フック**（`.claude/settings.json`→`scripts/handoff-hook.sh`）でセッション停止毎に競合コピー/未コミット/未pushを自動警告（systemMessage・非ブロッキング）。**pre-commit フック**（`.githooks/`＋`core.hooksPath`、`make setup`/`make hooks`で有効化）でコミット前に `npm run check`。**devcontainer**（Node20＋gh＋aws-cli、postCreateで依存導入＋hooks有効化）で別マシン/Codespaces/Codex でも同一環境。※`.claude/settings.json` は今セッション開始時に未存在だったため、Stopフックは次回起動 or `/hooks` を一度開くと有効化。
 - ✅ 仕組み化（継続性・自動化・簡素化）: `AGENTS.md`(Codex向け入口)・`CONTRIBUTING.md`・`Makefile`(`make help` 単一入口)。`cdk-nag`(AWS Solutions)を CDK に組込み6件を理由付き抑制、`infra/.env.example`。`dependabot.yml`、Issue/PRテンプレ。CONTENT_BASE_URL を `web/config.js` に分離（`deploy-aws.yml` が `CLOUDFRONT_DOMAIN` から自動生成）。**AWS簡素化: `make aws-deploy`→`make aws-wire` で CDK出力→GitHub Secrets/Variables と config.js を gh CLI で自動配線**。**`make handoff`（`scripts/handoff-check.sh`）でセッション終了前に競合コピー/未コミット/未push/テストを一括検証**。⚠️ iCloud(`~/Documents`)がindex.html編集を巻き戻し competing copy を作った事例あり→リポジトリのiCloud外移設を推奨。
 - ✅ 仕上げ2: `sw.js` を**同一オリジンのjs/cssも network-first**化（デプロイ後の stale-JS を根絶・オフラインはキャッシュ、cache v6-352）。`web/og-image.png`(1200×630) を生成（`scripts/gen-og-image.mjs`＋`@napi-rs/canvas` devDep、`npm run gen:og`。og:imageは相対URLでPages/AWS両対応）。`tests/scenario-goals.test.mjs`・`tests/share-url.test.mjs` 追加（計15テスト）。`deploy-aws.yml` は `if: vars.S3_BUCKET != ''` で未設定時スキップ。
 - ✅ 仕上げ1: `docs/DEVELOPMENT.md`/`.en.md` を新モジュール構成に更新（コードの地図をファイル別に・週替わり追加手順・http配信/SWキャッシュ対処）。ルート `package.json` に `test`(engine node:test)/`validate:weekly`/`check`/`gen:og` を追加（ローカルでCI再現可）。
