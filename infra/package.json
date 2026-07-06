@@ -1,0 +1,26 @@
+{
+  "name": "social-debugger-infra",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AWS CDK (S3 + CloudFront, OAC) for Social Debugger static + weekly-content delivery.",
+  "bin": { "infra": "bin/infra.js" },
+  "scripts": {
+    "build": "tsc",
+    "synth": "cdk synth",
+    "diff": "cdk diff",
+    "bootstrap": "cdk bootstrap",
+    "deploy:stack": "cdk deploy",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "aws-cdk": "2.1129.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.261.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  }
+}
