@@ -39,6 +39,9 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **フェーズ1 完了（タスク1〜7 / コミット済み・未push）**。残るはユーザー側の実設定（下記「保留中」）。
+- ✅ フェーズ1 タスク7（CI/CD + AWS OIDC）: CDK に **GitHub OIDC プロバイダ＋最小権限デプロイロール**（信頼= `repo:OWNER/REPO:ref:refs/heads/main` プレースホルダ、権限= S3 List/Get/Put/Delete＋CloudFront CreateInvalidation のみ、cdk deployは意図的に除外）。出力 `GithubDeployRoleArn`。`.github/workflows/ci.yml`（PR: engine.js `node:test`＋週次JSONスキーマ検証(ja/en)＋cdk synth）。`.github/workflows/deploy-aws.yml`（main/web・content変更時: OIDC Assume→S3同期→latest.json/index.html無効化）。**GitHub Pages の deploy.yml は維持**（Pages+AWS並行）。`tests/engine.test.mjs`(8)・`scripts/validate-weekly.mjs`・`content/weekly.schema.json`。README に CI/CD Mermaid・OIDC選定理由・最小権限・毎週更新手順。ローカルで tests/JSON検証/cdk synth 全通過。
+- ✅ フェーズ1 タスク6（計測拡充）: `track()` に共通プロパティ `app_platform`(web/ios/android=`SSD.platform`) 付与。`weekly_fail` 追加（scenario.js が挑戦を追跡し、ui.js の崩壊バナー遷移で1回発火・native/web no-op）。README に計測イベント表＋「20人フェーズKPI対応表」。sw cache v6-351。
 - ✅ フェーズ1 タスク5（AWS配信基盤 CDK）: `/infra` に TypeScript CDK。**S3(非公開/BlockPublicAccess ALL/SSE/enforceSSL) + CloudFront(OAC)** の静的配信最小構成。既定ビヘイビア=長TTL（ハッシュ運用の方針をコメント）、`content/weekly/latest.json` 専用=5分TTL。403/404→index.html。出力=BucketName/DistributionId/DistributionDomainName。`scripts/deploy.sh`=web/(content除外・--delete安全)＋content/ をS3同期→latest.json/index.html のみ無効化。account/region/profile は環境変数プレースホルダ。`infra/README.md`=Mermaid構成図・選定理由・コスト(無料枠)・セキュリティ・「Docker不要の理由」・フェーズ2拡張。**`cdk synth` 通過確認済み**（tsc/synth OK、S3+CloudFront+OAC+2キャッシュ生成確認）。node_modules/cdk.out は gitignore。**残: scenario.js の CONTENT_BASE_URL を実CloudFrontドメインに差し替え（deploy後）**。
 - ✅ フェーズ1 タスク4（週替わりシナリオ）: `web/js/scenario.js` を新規（読込順 …share→scenario→ui）。週次ロジックを ui.js から切り出し。**`check` 関数を宣言的 `goalConds[{metric,op,value}]` ＋ `evalGoalConds`（param/metrics 統合文脈）に変換**＝JSON化可能。静的配信 `content/weekly/2026-W28..W30.json`＋`latest.json`（id/title/intro/page/params/goal/goalConds/difficulty/discoveryId, 日英, 実名なし）。起動時 `latest.json` を CloudFront(プレースホルダURL) から fetch、失敗時バンドル版フォールバック。`ssd_weekly_cleared[]` 永続化＋**DISCOVERIES に未登録だった `sce_*` 発見を追加**（`sce_weekly_guardian`「今週の守り人」含む）。クリア時=結果カードに「あなたは今週、街を守った。」＋シナリオ名／成功ハプティクス／**初回クリア直後に通知許可**（月19:00 週次 local-notifications）。track: weekly_start/weekly_clear/notification_optin。潜在バグ修正: applyScenarioParams の未定義 updateP1Chart/updateP2Chart→updateAll/updateAllP2。**全体 WEEKLY_ENABLED(native) ガードで Web は no-op**。sw cache v6-350。`content/` は task5 で S3/CloudFront 配信（Pages(web/)では配信されない）。
 - ✅ フェーズ1 タスク3（共有経路 X/LINE/画像保存）: `web/js/share.js` を新規（読込順 i18n→engine→native→share→ui）。共有ポップの単一「共有…」ボタンを **3ボタン等格（𝕏 / LINE / 画像を保存）＋ 下に「その他のアプリで共有」** に再設計。LINE は `social-plugins.line.me/lineit/share` で X と同格。画像保存=Webは既存 `shareResultCard`（モバイル共有シート/デスクトップDL）、ネイティブは `@capacitor/filesystem` で書出し→`@capacitor/share`（全て `SSD.isNative` ガード、失敗時Webへフォールバック）。`track('share_x'/'share_line'/'card_saved'/'share_other')`。`renderSharePop` はアクション部を `renderShareActions()` に委譲。CSS `.line-btn/.save-btn`、sw cache v6-349。動的文言は `tt(ja,en)` インライン。
@@ -52,13 +55,16 @@
 ## 次のタスク（フェーズ1・タスクごとに一旦停止して報告する運用）
 
 - 決定事項（このセッションで確定）: 配信は「**GitHub Pages 維持＋AWS 追加**」（今のURLは常に不変）。進め方は「**タスクごとに一旦停止**」。応答は日本語。
-- ✅ タスク1（モジュール分割）完了。
-- ✅ タスク2（Capacitor 導入）完了。
-- ✅ タスク3（共有経路 X/LINE/画像保存）完了。
-- ✅ タスク4（週替わりシナリオ）完了。
-- ✅ タスク5（AWS配信基盤 CDK / cdk synth 通過）完了。
-6. **タスク6 計測拡充（次）**: `track()` に **共通プロパティ `app_platform`（web/ios/android）** を全イベントへ付与（`SSD.platform` 利用）。個別イベント weekly_start/weekly_clear/weekly_fail・share_x/share_line/card_saved・notification_optin は tasks3-4で導入済み（**weekly_fail は未実装なので追加**）。READMEに「20人フェーズで何を見るか」対応表（週次リテンション≒weekly_startユニーク、共有の質≒share_line比率）。
-7. タスク7 CI/CD（GitHub Actions + AWS OIDC、最小権限IAMロールをCDKに追加、engine.js ユニットテスト(node:test)、週次JSONスキーマ検証(ja/en存在)、cdk synth、mainマージでOIDCデプロイ）。scenario.js の CONTENT_BASE_URL 差し替えもここ/デプロイ時。
+**フェーズ1（タスク1〜7）はコード完了・全コミット済み（未push）。** コーディング側の残作業なし。
+次はユーザーの実設定（下記「ユーザーが手を動かす設定」）→ 20人フェーズ運用 → フェーズ2。
+
+## ユーザーが手を動かす設定（コードは完了。ここは人間の作業）
+
+A. **push**: `git push`（7タスク分＋docsコミットが未push）。pushで Pages(web/) 再デプロイ・CI稼働。
+B. **Capacitor 実機**（ネイティブ機能の実挙動確認に必須）: `npm install` → `npx cap add ios/android` → `npx cap open ...`。`capacitor.config.json` の `appId`(現 `dev.socialdebugger.app`)を自分のIDに。Xcodeで署名Team、Android Studio/JDK17、通知権限。
+C. **AWS デプロイ**: `cd infra && npm install` → 環境変数(`CDK_DEFAULT_ACCOUNT/REGION`, 任意`AWS_PROFILE`) → `npm run bootstrap` → `npm run deploy:stack`（`-c githubRepo=larai-w/social-system-debugger` を付与）→ `npm run deploy`。出力の `DistributionDomainName` を `web/js/scenario.js` の `CONTENT_BASE_URL` に反映。
+D. **GitHub OIDC/CI設定**: リポジトリ Secrets `AWS_DEPLOY_ROLE_ARN`(=出力 GithubDeployRoleArn) / Variables `AWS_REGION`,`S3_BUCKET`(=BucketName),`CLOUDFRONT_DIST_ID`(=DistributionId)。CDKの `githubRepo` を実リポジトリ名に（既定 OWNER/REPO のまま synth可）。既存OIDCプロバイダがある場合 `-c existingOidcProviderArn=...`。
+E. （任意）カスタムドメイン: infra スタックの ACM(us-east-1)/Route53 コメント解除。
 4. タスク4 週替わりシナリオ（静的JSON配信 `/content/weekly/*.json`＋latest.json）。scenario.js 新規。**注意: ハードコードの `SCENARIOS` の `check` 関数はJSON化不可 → 宣言的条件配列(metric/op/value)へ変換**。通知は初回クリア直後に許可要求。サンプル3週分。
 5. タスク5 AWS 配信基盤（CDK/TS, `/infra`）: S3(非公開/OAC)+CloudFront。README に構成図・選定理由・「Dockerを使わない理由(静的配信＋サーバーレスで常駐なし)」。cdk synth 通過まで（deployはユーザー）。
 6. タスク6 計測拡充（weekly_*/share_*/card_saved/notification_optin、共通プロパティ app_platform）。
