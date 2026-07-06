@@ -1,0 +1,29 @@
+name: CodeQL
+
+# GitHub の意味解析による自動コードレビュー（セキュリティ/バグ）。PR毎＋週次で走り、
+# 結果は Security タブに出る。公開リポジトリは無料。誰が書いたコードでも機械が検査する。
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1' # 毎週月曜 03:00 UTC
+
+jobs:
+  analyze:
+    name: Analyze (javascript-typescript)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+      - name: Analyze
+        uses: github/codeql-action/analyze@v3
