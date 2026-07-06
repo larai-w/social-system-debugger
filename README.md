@@ -228,7 +228,40 @@ cd infra && npm install && npm run synth   # 構成確認（cdk synth）
 
 ## CI/CD
 
-`development` ブランチで開発 → `main` へのPR時にCI自動チェック → マージで GitHub Pages に自動デプロイ。
+GitHub Actions で CI/CD を構築（**長期アクセスキーを保存しない**＝AWSは OIDC 連携）。
+
+```mermaid
+flowchart TD
+    PR[Pull Request → main] --> CI{CI ci.yml}
+    CI --> T[engine.js ユニットテスト<br/>node:test]
+    CI --> J[週替わりJSON スキーマ検証<br/>ja/en 存在チェック]
+    CI --> S[cdk synth]
+    T & J & S --> M[main へマージ]
+    M --> P[deploy.yml → GitHub Pages<br/>（現行URL維持）]
+    M --> A[deploy-aws.yml → AWS<br/>OIDCでロールAssume]
+    A --> Sync[web/ + content/ を S3 同期]
+    Sync --> Inv[CloudFront 無効化<br/>latest.json + index.html のみ]
+```
+
+**ワークフロー**
+- `.github/workflows/ci.yml`（PR時）: engine.js ユニットテスト（`node:test`・追加依存なし）／週替わりJSONのスキーマ検証（`scripts/validate-weekly.mjs`・ja/en両方チェック）／`cdk synth`。
+- `.github/workflows/deploy.yml`（main）: GitHub Pages へ（**現行の公開URLを維持**）。
+- `.github/workflows/deploy-aws.yml`（main / web・content 変更時）: **OIDCでロールをAssume** → `web/`+`content/` を S3 同期 → `latest.json` と `index.html` のみ無効化。
+
+**なぜ OIDC か**：GitHub に長期の AWS アクセスキーを置かない（漏洩リスクの排除）。ワークフロー実行ごとに STS の一時クレデンシャルを取得し、信頼ポリシーで **対象リポジトリの `main` ブランチに限定**（`repo:OWNER/REPO:ref:refs/heads/main`）。
+
+**最小権限**（`infra/lib/social-debugger-stack.ts`）：デプロイロールは
+①対象バケットの `ListBucket` ②配下オブジェクトの `Get/Put/Delete` ③対象ディストリビューションの `CreateInvalidation` のみ。
+インフラ変更（`cdk deploy`）は CI ロールに含めず、管理者権限で手動実行（権限を絞るため）。
+
+### 毎週のシナリオ更新手順（人間がやるのは「JSONを1ファイル書いてPR」だけ）
+
+1. `content/weekly/2026-Wxx.json` を1つ追加（`content/weekly.schema.json` に準拠）
+2. `content/weekly/latest.json` を今週分に差し替え
+3. PR を出す → **CIがスキーマ検証**（ja/en欠けなどを自動で弾く）
+4. main にマージ → **`deploy-aws.yml` が S3 反映＋`latest.json` 無効化**まで自動
+
+> Docker は使いません（静的配信＋サーバーレスで常駐プロセスが無いため）。理由の詳細は [`infra/README.md`](infra/README.md)。
 
 ---
 

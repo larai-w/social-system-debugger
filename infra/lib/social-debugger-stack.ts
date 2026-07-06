@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 /**
  * フェーズ1 の配信基盤（意図的に最小構成）。
@@ -93,12 +94,67 @@ export class SocialDebuggerStack extends cdk.Stack {
       //   this, 'SiteCert', 'arn:aws:acm:us-east-1:<ACCOUNT>:certificate/<ID>'),
     });
 
-    // ── 出力（deploy スクリプト / scenario.js の URL 反映に使う）──────────
+    // ── GitHub Actions OIDC デプロイロール（タスク7 / 長期キーを持たせない）──────
+    // ★ユーザー設定: リポジトリ名。 cdk deploy -c githubRepo=owner/repo で上書き。
+    const githubRepo = (this.node.tryGetContext('githubRepo') as string) || 'OWNER/REPO';
+    // ★任意: 既に token.actions.githubusercontent.com の OIDC プロバイダがある場合は
+    //   -c existingOidcProviderArn=arn:... を渡して重複作成を回避。
+    const existingOidcArn = this.node.tryGetContext('existingOidcProviderArn') as string | undefined;
+
+    const oidcProvider = existingOidcArn
+      ? iam.OpenIdConnectProvider.fromOpenIdConnectProviderArn(this, 'GithubOidc', existingOidcArn)
+      : new iam.OpenIdConnectProvider(this, 'GithubOidc', {
+          url: 'https://token.actions.githubusercontent.com',
+          clientIds: ['sts.amazonaws.com'],
+        });
+
+    const deployRole = new iam.Role(this, 'GithubDeployRole', {
+      roleName: 'ssd-github-deploy',
+      description: 'OIDC role assumed by GitHub Actions to sync web/+content/ to S3 and invalidate CloudFront',
+      maxSessionDuration: cdk.Duration.hours(1),
+      // 信頼ポリシー: 対象リポジトリの main ブランチに限定（必要ならPRも追記可）。
+      assumedBy: new iam.WebIdentityPrincipal(oidcProvider.openIdConnectProviderArn, {
+        StringEquals: { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
+        StringLike: {
+          // main ブランチのワークフローのみ Assume 可。
+          // PR でもデプロイしたい場合は次を追加: `repo:${githubRepo}:pull_request`
+          'token.actions.githubusercontent.com:sub': `repo:${githubRepo}:ref:refs/heads/main`,
+        },
+      }),
+    });
+
+    // 最小権限 ①: バケット一覧（aws s3 sync の差分計算に List が必要）
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      sid: 'S3SyncListBucket',
+      actions: ['s3:ListBucket'],
+      resources: [bucket.bucketArn],
+    }));
+    // 最小権限 ②: オブジェクトの読み書き削除（--delete 同期のため Delete も。対象バケット配下のみ）
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      sid: 'S3SyncObjects',
+      actions: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'],
+      resources: [bucket.arnForObjects('*')],
+    }));
+    // 最小権限 ③: 対象ディストリビューションの無効化「作成」のみ（削除や設定変更は不可）
+    deployRole.addToPolicy(new iam.PolicyStatement({
+      sid: 'CloudFrontInvalidateOnly',
+      actions: ['cloudfront:CreateInvalidation'],
+      resources: [`arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`],
+    }));
+    // 注: インフラ変更（cdk deploy）は CI ロールに含めない。スタック変更は管理者権限で手動実行し、
+    //     CI ロールは「資産同期＋無効化」だけに絞る（最小権限を優先）。CIでcdk deployしたい場合のみ
+    //     CloudFormation/対象リソースの権限を別途付与すること。
+
+    // ── 出力（deploy スクリプト / scenario.js の URL 反映 / GitHub Secrets に使う）──
     new cdk.CfnOutput(this, 'BucketName', { value: bucket.bucketName });
     new cdk.CfnOutput(this, 'DistributionId', { value: distribution.distributionId });
     new cdk.CfnOutput(this, 'DistributionDomainName', {
       value: distribution.distributionDomainName,
       description: 'この値を web/js/scenario.js の CONTENT_BASE_URL (https://<domain>/content/weekly) に反映',
+    });
+    new cdk.CfnOutput(this, 'GithubDeployRoleArn', {
+      value: deployRole.roleArn,
+      description: 'GitHub Actions の Secret AWS_DEPLOY_ROLE_ARN に設定',
     });
   }
 }
