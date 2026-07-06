@@ -1,0 +1,26 @@
+{
+  "appId": "dev.socialdebugger.app",
+  "appName": "社会デバッガー",
+  "webDir": "web",
+  "backgroundColor": "#070b14",
+  "loggingBehavior": "none",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "backgroundColor": "#070b14",
+      "showSpinner": false,
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": true
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#070b14",
+      "overlaysWebView": false
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#00d4ff"
+    }
+  }
+}

@@ -119,15 +119,55 @@
 
 ## 動作環境 / Requirements
 
-- **スタンドアロン型SPA** — ビルド不要。`index.html` をブラウザで開くだけ
+- **スタンドアロン型SPA** — バンドル不要。フロント資産は `web/` 配下（Capacitor の `webDir` 兼 配信元）
 - HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/)（CDN読み込み）
 - 推奨ブラウザ: Chrome / Edge / Safari / Firefox 最新版（スマートフォン対応）
 
 ```bash
 git clone https://github.com/larai-w/social-system-debugger.git
 cd social-system-debugger
-open index.html   # またはブラウザにドラッグ&ドロップ
+# PWA(manifest/Service Worker)と fetch を使うため、file:// ではなく http:// で開く
+npm run serve            # → http://localhost:8000 （python3 -m http.server の薄いラッパ）
+# 単純にファイルを開くだけなら: open web/index.html （ただし manifest/SW は動きません）
 ```
+
+> フロントは `web/index.html`（マークアップ＋起動）／`web/css/app.css`／`web/js/{i18n,engine,native,ui}.js` に分割済み。
+> `engine.js` は DOM 非依存の純粋計算層（将来のサーバー側検証に再利用可能）。
+
+---
+
+## ネイティブアプリ / Native App（Capacitor · iOS / Android）
+
+Web は今まで通り（GitHub Pages / AWS で配信）動きつつ、同じ `web/` を [Capacitor](https://capacitorjs.com/) でネイティブアプリ化します。ネイティブ機能はすべて `Capacitor.isNativePlatform()` でガードしており、**Web版はフル機能のまま**です。
+
+**導入済みプラグイン**: `@capacitor/share`（共有シート）・`preferences`（`ssd_*` の耐久ミラー）・`local-notifications`（週次通知＝タスク4）・`haptics`（崩壊/巻き戻しの触覚）・`status-bar` / `splash-screen`（ダークテーマ `#070b14` 統一）。橋渡しは [`web/js/native.js`](web/js/native.js) に集約。
+
+### ビルド手順（実機ビルドはユーザーが実施）
+
+```bash
+npm install                 # 依存取得（初回のみ）
+
+# ネイティブプロジェクトを生成（初回のみ / ios・android は .gitignore 済み＝再生成可能）
+npx cap add ios
+npx cap add android
+
+# web/ の変更を各プラットフォームへ同期（フロントを触るたびに実行）
+npx cap sync
+
+# IDE で開いて実機/シミュレータへ
+npx cap open ios            # → Xcode
+npx cap open android        # → Android Studio
+```
+
+### 実機ビルド前に必要な作業（チェックリスト）
+
+- [ ] **`capacitor.config.json` の `appId`** を自分のものに変更（現在はプレースホルダ `dev.socialdebugger.app`）。App Store / Play Console のバンドルIDと一致させる
+- [ ] **iOS**: Xcode（＋Command Line Tools）と [CocoaPods](https://cocoapods.org/) を導入。Xcode の *Signing & Capabilities* で自分の Apple Developer Team を選択
+- [ ] **Android**: Android Studio と JDK 17 を導入。初回は Gradle 同期が走る
+- [ ] **アイコン/スプラッシュ**: 現状は `#070b14` 単色。必要なら [`@capacitor/assets`](https://github.com/ionic-team/capacitor-assets) 等で生成
+- [ ] **通知権限**（タスク4）: 初回シナリオのクリア直後に許可を求める設計。iOS は `Info.plist`、Android 13+ は `POST_NOTIFICATIONS` の実行時許可が必要
+
+> `ios/` `android/` は `.gitignore` 済み。`npx cap add` でいつでも再生成できるため、リポジトリには含めません。
 
 ---
 
