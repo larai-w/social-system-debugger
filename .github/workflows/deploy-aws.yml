@@ -39,6 +39,15 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      # 配信元URLを web/config.js に自動注入（手でソースを書き換えない）。
+      # CLOUDFRONT_DOMAIN 未設定なら既定(空=相対パス)のまま。
+      - name: Inject content base URL into web/config.js
+        if: ${{ vars.CLOUDFRONT_DOMAIN != '' }}
+        run: |
+          printf 'window.SSD_CONFIG = { contentBaseUrl: "https://%s/content/weekly" };\n' \
+            "${{ vars.CLOUDFRONT_DOMAIN }}" > web/config.js
+          echo "config.js →"; cat web/config.js
+
       # web/ を同期。--delete で不要ファイルを掃除するが content/ は別管理なので除外。
       - name: Sync web/
         run: |

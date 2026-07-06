@@ -3,8 +3,8 @@
 //   - メインドキュメント と 同一オリジンのアプリコード(js/css) は network-first
 //     （新デプロイを必ず優先し、古いキャッシュに固定されない。分割変更後の stale-JS 対策）。
 //   - それ以外の静的アセット(icon 等) / CDN(Chart.js) は cache-first（オフライン動作）。
-const CACHE = 'ssd-cache-v6-352';
-const CORE = ['./', './index.html', './manifest.json', './icon.svg',
+const CACHE = 'ssd-cache-v6-353';
+const CORE = ['./', './index.html', './manifest.json', './icon.svg', './config.js',
   './css/app.css', './js/i18n.js', './js/engine.js', './js/native.js', './js/share.js', './js/scenario.js', './js/ui.js'];
 
 self.addEventListener('install', (e) => {

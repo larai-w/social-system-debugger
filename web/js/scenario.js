@@ -9,8 +9,9 @@
 //   ui.js より前に読み込むが中身は宣言のみ（即時実行は DOMContentLoaded 内だけ）。
 // ══════════════════════════════════════════════════════════
 
-// 配信元（タスク5の CloudFront ドメインに置換する）。取得失敗時はバンドルへフォールバック。
-const CONTENT_BASE_URL = 'https://REPLACE_WITH_CLOUDFRONT_DOMAIN/content/weekly';
+// 配信元は web/config.js（window.SSD_CONFIG.contentBaseUrl）から取得。未設定なら相対パスへ
+// フォールバック（同一オリジン配信時）。取得失敗時はバンドル版シナリオへフォールバック。
+const CONTENT_BASE_URL = (((window.SSD_CONFIG && window.SSD_CONFIG.contentBaseUrl) || 'content/weekly')).replace(/\/+$/, '');
 const LATEST_URL = CONTENT_BASE_URL + '/latest.json';
 
 // 週次通知の曜日・時刻（変更可能な定数）: 月曜 19:00
