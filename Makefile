@@ -52,7 +52,9 @@ aws-bootstrap: ## 初回のみ: CDK ブートストラップ
 	cd infra && npm ci && npm run bootstrap
 
 aws-deploy: ## CDKスタック作成→web/・content/ をS3同期
-	cd infra && npm run deploy:stack -- -c githubRepo=$(GITHUB_REPO) && npm run deploy
+	cd infra && npm run deploy:stack -- -c githubRepo=$(GITHUB_REPO) \
+		$(if $(EXISTING_OIDC_PROVIDER_ARN),-c existingOidcProviderArn=$(EXISTING_OIDC_PROVIDER_ARN),) \
+		--require-approval never && npm run deploy
 
 aws-wire: ## デプロイ後: CDK出力から GitHub Secrets/Variables と web/config.js を自動設定
 	bash scripts/aws-wire.sh
