@@ -11,7 +11,10 @@ const sh = new Function(src + '\nreturn { xIntentUrl, lineShareUrl };')();
 test('xIntentUrl encodes the text into the X intent URL', () => {
   const u = sh.xIntentUrl('hello world & 崩壊');
   assert.ok(u.startsWith('https://twitter.com/intent/tweet?text='));
-  assert.equal(u, 'https://twitter.com/intent/tweet?text=' + encodeURIComponent('hello world & 崩壊'));
+  assert.equal(
+    u,
+    'https://twitter.com/intent/tweet?text=' + encodeURIComponent('hello world & 崩壊')
+  );
   // 生の空白/アンパサンドが残っていない（正しくエンコードされている）
   assert.ok(!/ /.test(u.split('text=')[1]));
 });

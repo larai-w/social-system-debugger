@@ -17,7 +17,7 @@ on:
 #   Variables: AWS_REGION / S3_BUCKET(=BucketName) / CLOUDFRONT_DIST_ID(=DistributionId)
 
 permissions:
-  id-token: write   # OIDC トークン発行に必須
+  id-token: write # OIDC トークン発行に必須
   contents: read
 
 concurrency:

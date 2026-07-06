@@ -14,9 +14,27 @@ const sw = readFileSync(web('sw.js'), 'utf8');
 // ── 1) マークアップの inline ハンドラが呼ぶ関数は、必ずどこかの js で定義されている ──
 // （モジュール分割・関数移動でグローバル参照が切れる＝過去に何度も起きた退行を防ぐ）
 test('every inline on*="fn()" handler resolves to a defined function', () => {
-  const BUILTINS = new Set(['event', 'window', 'document', 'Math', 'JSON', 'console',
-    'stopPropagation', 'preventDefault', 'parseInt', 'parseFloat', 'alert', 'confirm',
-    'prompt', 'setTimeout', 'clearTimeout', 'requestAnimationFrame', 'Number', 'String', 'Boolean']);
+  const BUILTINS = new Set([
+    'event',
+    'window',
+    'document',
+    'Math',
+    'JSON',
+    'console',
+    'stopPropagation',
+    'preventDefault',
+    'parseInt',
+    'parseFloat',
+    'alert',
+    'confirm',
+    'prompt',
+    'setTimeout',
+    'clearTimeout',
+    'requestAnimationFrame',
+    'Number',
+    'String',
+    'Boolean',
+  ]);
   const handlers = html.match(/on[a-z]+="[^"]*"/g) || [];
   const names = new Set();
   for (const h of handlers) {
@@ -25,7 +43,9 @@ test('every inline on*="fn()" handler resolves to a defined function', () => {
   const missing = [];
   for (const fn of names) {
     if (BUILTINS.has(fn)) continue;
-    const def = new RegExp(`function\\s+${fn}\\b|(?:const|let|var)\\s+${fn}\\b|\\b${fn}\\s*=\\s*(?:function|\\()`);
+    const def = new RegExp(
+      `function\\s+${fn}\\b|(?:const|let|var)\\s+${fn}\\b|\\b${fn}\\s*=\\s*(?:function|\\()`
+    );
     if (!def.test(allJs)) missing.push(fn);
   }
   assert.deepEqual(missing, [], `未定義のハンドラ関数: ${missing.join(', ')}`);

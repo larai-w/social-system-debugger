@@ -2,26 +2,26 @@ version: 2
 updates:
   # ルートの npm 依存（Capacitor / 生成・テスト用ツール）
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps)"
+      prefix: 'chore(deps)'
 
   # インフラ（AWS CDK）の npm 依存
   - package-ecosystem: npm
-    directory: "/infra"
+    directory: '/infra'
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
     commit-message:
-      prefix: "chore(deps-infra)"
+      prefix: 'chore(deps-infra)'
 
   # GitHub Actions のバージョン更新
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: weekly
     commit-message:
-      prefix: "chore(ci)"
+      prefix: 'chore(ci)'

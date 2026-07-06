@@ -4,8 +4,20 @@
 //     （新デプロイを必ず優先し、古いキャッシュに固定されない。分割変更後の stale-JS 対策）。
 //   - それ以外の静的アセット(icon 等) / CDN(Chart.js) は cache-first（オフライン動作）。
 const CACHE = 'ssd-cache-v6-353';
-const CORE = ['./', './index.html', './manifest.json', './icon.svg', './config.js',
-  './css/app.css', './js/i18n.js', './js/engine.js', './js/native.js', './js/share.js', './js/scenario.js', './js/ui.js'];
+const CORE = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icon.svg',
+  './config.js',
+  './css/app.css',
+  './js/i18n.js',
+  './js/engine.js',
+  './js/native.js',
+  './js/share.js',
+  './js/scenario.js',
+  './js/ui.js',
+];
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
@@ -14,7 +26,8 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys()
+    caches
+      .keys()
       .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
@@ -30,7 +43,10 @@ self.addEventListener('fetch', (e) => {
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          caches
+            .open(CACHE)
+            .then((c) => c.put(req, copy))
+            .catch(() => {});
           return res;
         })
         .catch(() => caches.match(req).then((r) => r || caches.match('./index.html')))
@@ -42,14 +58,20 @@ self.addEventListener('fetch', (e) => {
   // デプロイ直後に古いJSを掴む問題を根絶する（オフライン時のみキャッシュへフォールバック）。
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
-  const isAppCode = sameOrigin &&
-    (req.destination === 'script' || req.destination === 'style' || /\.(js|css)$/.test(url.pathname));
+  const isAppCode =
+    sameOrigin &&
+    (req.destination === 'script' ||
+      req.destination === 'style' ||
+      /\.(js|css)$/.test(url.pathname));
   if (isAppCode) {
     e.respondWith(
       fetch(req)
         .then((res) => {
           const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          caches
+            .open(CACHE)
+            .then((c) => c.put(req, copy))
+            .catch(() => {});
           return res;
         })
         .catch(() => caches.match(req))
@@ -59,15 +81,19 @@ self.addEventListener('fetch', (e) => {
 
   // その他（icon / Chart.js CDN 等）: cache-first、無ければネットワーク取得してキャッシュ
   e.respondWith(
-    caches.match(req).then((cached) =>
-      cached ||
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});
-          return res;
-        })
-        .catch(() => cached)
+    caches.match(req).then(
+      (cached) =>
+        cached ||
+        fetch(req)
+          .then((res) => {
+            const copy = res.clone();
+            caches
+              .open(CACHE)
+              .then((c) => c.put(req, copy))
+              .catch(() => {});
+            return res;
+          })
+          .catch(() => cached)
     )
   );
 });

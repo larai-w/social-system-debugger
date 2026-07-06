@@ -8,7 +8,9 @@ import { fileURLToPath } from 'node:url';
 
 const src = readFileSync(fileURLToPath(new URL('../web/js/engine.js', import.meta.url)), 'utf8');
 // engine.js の中の関数/定数はこの Function スコープに閉じる。必要なものだけ返す。
-const eng = new Function(src + '\nreturn { clamp, lerp, seedRng, genScatter, simTimeline, metrics };')();
+const eng = new Function(
+  src + '\nreturn { clamp, lerp, seedRng, genScatter, simTimeline, metrics };'
+)();
 
 test('clamp bounds values', () => {
   assert.equal(eng.clamp(5, 0, 10), 5);
@@ -23,7 +25,8 @@ test('lerp interpolates linearly', () => {
 });
 
 test('seedRng is deterministic and in [0,1)', () => {
-  const a = eng.seedRng(123), b = eng.seedRng(123);
+  const a = eng.seedRng(123),
+    b = eng.seedRng(123);
   for (let i = 0; i < 5; i++) {
     const x = a();
     assert.equal(x, b(), 'same seed -> same sequence');
@@ -33,7 +36,20 @@ test('seedRng is deterministic and in [0,1)', () => {
 
 test('metrics returns all keys within [0,100] and a boolean crash', () => {
   const m = eng.metrics(50, 50, 'dp');
-  const keys = ['entropy','paranoia','socialCap','dopamine','infra','diversity','trust','resilience','legitimacy','infoH','viability','mentalWB'];
+  const keys = [
+    'entropy',
+    'paranoia',
+    'socialCap',
+    'dopamine',
+    'infra',
+    'diversity',
+    'trust',
+    'resilience',
+    'legitimacy',
+    'infoH',
+    'viability',
+    'mentalWB',
+  ];
   for (const k of keys) assert.ok(m[k] >= 0 && m[k] <= 100, `${k} in range (got ${m[k]})`);
   assert.equal(typeof m.crash, 'boolean');
 });
