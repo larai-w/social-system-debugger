@@ -1436,6 +1436,9 @@ function setVerdictBanner(alertId,state,key){
     else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
     al.classList.add('on');
     track('verdict',{banner:alertId,state,key});
+    // v6.35 (task2): 崩壊へ遷移した瞬間だけ短い振動（ネイティブのみ / Webは no-op）。
+    // 上部の bst ガードで状態変化時にしか到達しないため連続振動しない。
+    if(state==='crash'&&window.SSD)SSD.haptic('crash');
   }else{
     al.classList.remove('on');
   }
@@ -2859,6 +2862,7 @@ function applyRewind(key){
     res.innerHTML='<span style="color:var(--green)">✔ '+line+'</span><br><span style="color:var(--muted);font-size:.58rem">'+tt('エントロピー','Entropy')+' '+Math.round(m2.entropy)+' / '+tt('多様性','Diversity')+' '+Math.round(m2.diversity)+'</span>';
     discover('d_p1_rewind');
     track('rewind_success',{key});
+    if(window.SSD)SSD.haptic('success'); // task2: 巻き戻し成功の触覚フィードバック（Webは no-op）
     // 成功フラグ → 結果カードに反映するために保存
     window._rewindSuccess={label:chosenLabel,metrics:m2};
   } else {
@@ -2906,7 +2910,12 @@ function renderSharePop(){
     b.className='sbtn'+(cls?' '+cls:'');b.style.marginTop='0';
     b.textContent=label;b.onclick=fn;act.appendChild(b);return b;
   };
-  if(navigator.share){
+  if(window.SSD&&SSD.isNative){
+    // task2: ネイティブ実行時は @capacitor/share の共有シートへ委譲
+    mk(tt('⇪ 共有…（LINE等）','⇪ Share… (LINE etc.)'),async()=>{
+      await SSD.share({text:shareMessage()+'\n'+buildShareURL(),url:buildShareURL(),dialogTitle:tt('共有','Share')});
+    });
+  }else if(navigator.share){
     // Web Share API: OS共有シート（LINEもここに出る）
     mk(tt('⇪ 共有…（LINE等）','⇪ Share… (LINE etc.)'),async()=>{
       try{await navigator.share({text:shareMessage()+'\n'+buildShareURL()});}catch(e){}
