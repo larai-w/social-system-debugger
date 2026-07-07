@@ -1,4 +1,5 @@
 # 依存・生成物
+.claude/settings.local.json
 node_modules
 **/node_modules
 package-lock.json
