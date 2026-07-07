@@ -2399,8 +2399,8 @@ function postAuditToX(){
   url.searchParams.set('f',filterRate);url.searchParams.set('e',ethicsScore);
   url.searchParams.set('a',algo);url.searchParams.set('l',lang);
   const txt=lang==='ja'
-    ?`社会OSのデバッグに成功しました。[ステータス: GRAND OPTIMAL]\n適用パッチ: 冗長性の復元 / 思考の再学習 / シビル攻撃の遮断\n\nあなたも狂ったアルゴリズムから社会システムを救い出せ。\n#社会OSデバッガー ${url.toString()}`
-    :`Successfully debugged the Social OS. [STATUS: GRAND OPTIMAL]\nPatches applied: redundancy restored / cognition retrained / sybil attacks filtered\n\nCan you rescue society from its broken algorithms?\n#SocialOSDebugger ${url.toString()}`;
+    ?`社会OSのデバッグに成功しました。[ステータス: GRAND OPTIMAL]\n適用パッチ: 冗長性の復元 / 思考の再学習 / シビル攻撃の遮断\n\nあなたも狂ったアルゴリズムから社会システムを救い出せ。\n${shareHashtag()} ${url.toString()}`
+    :`Successfully debugged the Social OS. [STATUS: GRAND OPTIMAL]\nPatches applied: redundancy restored / cognition retrained / sybil attacks filtered\n\nCan you rescue society from its broken algorithms?\n${shareHashtag()} ${url.toString()}`;
   window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(txt),'_blank');
 }
 
@@ -2433,6 +2433,9 @@ function shareFooter(){
             '*Not about anyone specific — this is about structures any society can fall into.');
 }
 
+// MARKETING.md: 固定ハッシュタグ（全X投稿に付与。検索での発見可能性とユーザー投稿の集約）
+function shareHashtag(){return tt('#社会デバッガー','#SocialDebugger');}
+
 // 状態別メッセージテンプレート（フック1行＋説明、URL手前まで120字以内）
 function buildShareTemplates(ctx){
   const T=[];
@@ -2449,6 +2452,9 @@ function buildShareTemplates(ctx){
     'Crank up screen time and you can watch the cognitive network turn red in real time. Seeing it visualized is unsettling.');
   const addHijack=()=>add('外部の声を増やしていくと、当事者の意見が静かにかき消されていくのが数値で見える',
     'Add more outside noise and you can watch the actual stakeholders’ voices get quietly drowned out, in real time.');
+  // MARKETING.md: 防災文脈（PAGE 2系）はLINEで回る → 「防災」の語を含む変種を用意
+  const addBousai=()=>add('家族や地域の防災の話のきっかけに。同じ災害が来ても、備えの設定しだいで街が生き残れるか試せるシミュレーター',
+    'A conversation starter for family disaster preparedness: a sim where the same disaster hits, and whether the town survives depends only on how it prepared.');
   if(ctx.kind==='shock'){
     if(ctx.type==='crash') add('同じ災害を2回入れて、設定だけで生き残れるか試すやつ。この設定だと落ちた…',
       'A sim where you inject the same disaster twice and see if the settings alone survive. This setup collapsed…');
@@ -2456,6 +2462,7 @@ function buildShareTemplates(ctx){
       'A sim where you inject the same disaster twice and see if parameters alone keep society alive. This setup survived.');
     else add('同じ災害を入れて、設定だけで耐えられるか試すやつ。この設定だと一部損傷で踏みとどまった',
       'A sim where you inject a disaster and see if settings alone hold. This setup took partial damage but held on.');
+    addBousai();
     if(metricsP2(shrinkRate,dxRate,algoP2,ethicsP2).deadlock)addDeadlock();else addGame();
     addGeneric();
   }else if(ctx.kind==='audit'){
@@ -2493,6 +2500,7 @@ function buildShareTemplates(ctx){
       if(ctx.preset==='deadlock')addDeadlock();
       else add('人口減少都市のインフラを自分で設計して、災害ショックに耐えられるか試せるシミュレーター',
         'A simulator where you design a shrinking city’s infrastructure and test whether it survives a disaster shock.');
+      addBousai();
     }else if(ctx.page===3){
       add('怒りが止まらなくなる仕組みを「脳のシミュレーター」として再現するやつ。政治の話じゃなくて脳の話',
         'A “brain simulator” that recreates why outrage becomes unstoppable. It’s about brains, not politics.');

@@ -89,7 +89,8 @@ function renderShareActions() {
   // ── 3ボタン等格: X / LINE / 画像を保存 ──
   mk(tt('𝕏 でポスト', '𝕏 Post'), function () {
     track('share_x', { kind: kind });
-    openShareWindow(xIntentUrl(msg() + '\n' + url()));
+    // 固定ハッシュタグは X のみ（LINE は家族・地域グループ宛て＝タグ文化がない）
+    openShareWindow(xIntentUrl(msg() + '\n' + shareHashtag() + ' ' + url()));
   }, 'x-btn');
 
   mk(tt('💬 LINEで送る', '💬 Send via LINE'), function () {
