@@ -1,0 +1,27 @@
+{
+  "id": "2026-W34",
+  "title": { "ja": "濁った街を、澄ませる", "en": "Clearing a Clouded Town" },
+  "intro": {
+    "ja": "あなたが引き継いだ街は、すでに濁っていた。強いフィルターと痩せた倫理が当たり前になり、住民は互いを疑うことに慣れてしまっている。ここから多様性と信頼を取り戻す——崩壊を見るより、ずっと難しい仕事だ。",
+    "en": "The town you inherit is already clouded. Heavy filtering and thinned-out ethics have become normal, and residents are used to distrusting each other. Restoring diversity and trust from here is a far harder job than watching a collapse."
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 60, "e": 40, "al": "greedy" },
+    "hint": {
+      "ja": "アルゴリズムの切替・フィルタ解除・倫理の再建、どの順番で手を打つかで回復の速さが変わります。3つの数字を同時に満たしてください。",
+      "en": "The order you act — switching the algorithm, releasing the filter, rebuilding ethics — changes how fast recovery comes. Satisfy all three numbers at once."
+    }
+  },
+  "goal": {
+    "ja": "多様性を80以上・信頼指数を70以上に戻し、エントロピーを50未満まで下げる",
+    "en": "Restore diversity to 80+, trust to 70+, and bring entropy below 50"
+  },
+  "goalConds": [
+    { "metric": "diversity", "op": ">=", "value": 80 },
+    { "metric": "trust", "op": ">=", "value": 70 },
+    { "metric": "entropy", "op": "<", "value": 50 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_echo_trap"
+}

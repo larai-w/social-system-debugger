@@ -1,0 +1,26 @@
+{
+  "id": "2026-W33",
+  "title": { "ja": "当事者の声を取り戻す", "en": "Restore Stakeholder Voice" },
+  "intro": {
+    "ja": "議論が盛り上がるほど、当事者の声は観客の歓声にかき消されていく。ゲーム化された外野のトラフィックが帯域を食い潰し、本来届くべきパケットが静かにドロップする。あなたの街の回線を、取り戻せるか。",
+    "en": "The livelier the debate, the more the stakeholders' voices drown under the spectators' cheers. Gamified outside traffic eats the bandwidth, and the packets that should get through are quietly dropped. Can you reclaim your town's channel?"
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 50, "gam": 40 },
+    "hint": {
+      "ja": "ゲーム化とパケットドロップ率の関係を観察し、外部トラフィックを絞って当事者比率を改善してください。",
+      "en": "Watch how gamification links to packet drop, then throttle outside traffic to improve the stakeholder ratio."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる",
+    "en": "Raise the stakeholder commit ratio above 70 and cut the packet drop rate to 40 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 70 },
+    { "metric": "drop", "op": "<=", "value": 40 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_stakeholder_voice"
+}

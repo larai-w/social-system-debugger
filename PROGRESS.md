@@ -15,6 +15,7 @@
 | T5 | 30秒縦型リール `promo/reel-30s.html` | MARKETING.md「X プロフィール固定ポストに30秒動画」。vertical-reel スキル PART 1 の30秒構成に準拠 | ✅ |
 | T6 | CI に browser verify ジョブ追加（`ci.yml`） | T1 の Console ゼロ検証を PR にも適用（助言的ジョブ・保護必須には未指定）。TODO.md も手動作業を最新化 | ✅ |
 | T7 | Zenn 記事ドラフト2本（`docs/articles/`） | MARKETING.md「Zenn/Qiita は就活の本命」。記事1 Capacitor 化・記事2 AWS CDK+OIDC（Dockerを使わない理由の節入り）。公開はフェーズ2で X と連動 | ✅ |
+| T8 | 週替わりシナリオ W31〜W34（`content/weekly/`） | 在庫が W30 まで＝約3週で枯渇するところを8月下旬まで延長。PM.md「帰ってくる理由」の継続 | ✅ |
 
 ## 実施順
 
@@ -22,6 +23,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T8 週替わりシナリオ W31〜W34**: `2026-W31`＝冗長性ショック対抗（P2・hard）／`W32`＝リーダー倫理観の滝（P1・normal）／`W33`＝当事者の声を取り戻す（P4・normal）＝バンドル済みで未配信だった3本を配信用に本文リライト（W28〜W30と同じ二人称・物語調）。`W34`＝**新規「濁った街を、澄ませる」**（P1・hard・悪化状態 f60/e40/greedy から3条件同時回復）。**実エンジンで達成可能（f10/e85/dp で3条件成立）かつ開始即クリアでないことを確認**。スキーマ検証8件 green・実名ゼロ。W34 は既存 `sce_echo_trap` を再利用（DISCOVERIES 総数を増やさない設計。W28クリア済みユーザーにはCLEAREDバッジが先に見えるが挑戦は可能）。**在庫は8月下旬（W34=8/17週）まで**。※毎週月曜: その週のJSONを `latest.json` へコピーして配信（README の週次手順どおり）。
 
 - ✅ **T7 Zenn 記事ドラフト2本**: `docs/articles/zenn-01-capacitor.md`（33万文字単一HTML→バンドラなし分割→Capacitor化。SSDファサード・Preferences二重化・退行3事例と自動検証）／`docs/articles/zenn-02-aws-cdk-oidc.md`（S3非公開+OAC+CloudFront・latest.json 5分TTL・OIDC最小権限・「Dockerを使わない理由」・ハマり所2つ・make aws-wire）。ともに `published: false` のZenn形式。実名ゼロ・アカウントIDは伏せ字。MARKETING.md にドラフト所在を追記。公開はフェーズ2（Xと同日）。
 - ✅ **T6 CI 強化＋TODO最新化**: `ci.yml` に `verify` ジョブ追加（npm ci → playwright chromium → `npm run verify`。web/infra とは独立の助言的ジョブ＝ブランチ保護の必須には未指定）。TODO.md を全面更新: ☐0 push（未pushコミット）、☐5 リール録画→X固定ポスト（※演出用注記の規約付き）、☐6 classroom.html のPDF化、☐7 iCloud外への移設（競合コピー3件の実績を明記）、別マシンでの playwright 初回導入。

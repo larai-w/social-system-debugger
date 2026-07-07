@@ -1,0 +1,26 @@
+{
+  "id": "2026-W31",
+  "title": { "ja": "冗長性ショック対抗", "en": "Redundancy Shock Resilience" },
+  "intro": {
+    "ja": "効率化の名の下に、あなたの街のインフラは1か所に集約されていく。数字の上では順調だ——未知の衝撃が来るまでは。ムダに見える余白を、間に合ううちに取り戻せるか。",
+    "en": "In the name of efficiency, your town's infrastructure keeps consolidating into one place. The numbers look great — until an unknown shock arrives. Can you win back the slack that looks like waste, while there is still time?"
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 50, "d": 30, "e": 80, "al": "dp", "reboot": false },
+    "hint": {
+      "ja": "集約化を下げて冗長性バッファを積み上げ、そのあと ⚡ショック注入 で生存の分岐点を確かめてください。",
+      "en": "Lower consolidation to build up the redundancy buffer, then inject ⚡ shock and see the survival branching point."
+    }
+  },
+  "goal": {
+    "ja": "冗長性バッファを75以上に上げ、ショック注入後もインフラを維持して生き残る",
+    "en": "Raise the redundancy buffer above 75 and keep infrastructure alive through the shock"
+  },
+  "goalConds": [
+    { "metric": "redundancy", "op": ">=", "value": 75 },
+    { "metric": "infra", "op": ">=", "value": 20 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_redundancy_shock"
+}
