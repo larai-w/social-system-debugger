@@ -75,6 +75,7 @@ make aws-wire          # CDK出力から Secrets/Variables と web/config.js を
 
 > 未設定でも今の手動デプロイ済みサイトは動く。設定すると以後 `main` への push で AWS も自動更新。
 > 手動で再デプロイしたい時はいつでも: `make aws-deploy`
+> ※未設定の間、Actions の「Deploy to AWS」は**灰色（skipped）**で表示される。これは意図した挙動（赤=失敗にしない設計）。設定後に緑で動き始める。
 
 ---
 

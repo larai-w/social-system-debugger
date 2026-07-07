@@ -8,7 +8,7 @@
 
 🔗 **[ライブデモ / Live Demo](https://larai-w.github.io/social-system-debugger/)**
 
-🏫 **[授業で使える1枚ガイド（公共・情報I・探究 / A4印刷→PDF）](https://larai-w.github.io/social-system-debugger/classroom.html)**
+🏫 **[授業で使える1枚ガイド（公共・情報I・探究 / A4印刷→PDF）](https://larai-w.github.io/social-system-debugger/classroom.html)** ／ [English classroom guide](https://larai-w.github.io/social-system-debugger/classroom.en.html)
 
 ---
 

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Debugger — One-page classroom guide (civics, CS, inquiry learning)</title>
+<meta name="description" content="A free educational simulator of how societies and regional infrastructure fail. No prep, browser-only, ~10 minutes per theme. How to use it in class, with discussion questions.">
+<!--
+  English edition of web/classroom.html (teacher one-pager, MARKETING.md education channel).
+  Dark terminal look on screen, white A4 in print (Ctrl/Cmd+P -> save as PDF).
+  Self-contained: no dependency on the app's i18n/JS.
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.65;}
+  .sheet{max-width:800px;margin:0 auto;padding:28px 26px;}
+  h1{font-size:1.25rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 14px;font-size:.8rem;}
+  h2{font-size:.92rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:18px 0 8px;letter-spacing:.06em;}
+  .urlbox{border:1px solid var(--cy);border-radius:6px;padding:8px 12px;margin:10px 0;
+          background:var(--bg1);font-size:.95rem;word-break:break-all;}
+  .urlbox a{color:var(--cy);text-decoration:none;font-weight:bold;}
+  .facts{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;padding:0;list-style:none;}
+  .facts li{border:1px solid var(--bdr);border-radius:4px;padding:2px 8px;font-size:.74rem;color:var(--muted);}
+  ol,ul{margin:6px 0;padding-left:1.4em;}
+  li{margin:3px 0;}
+  table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.8rem;}
+  th,td{border:1px solid var(--bdr);padding:5px 8px;text-align:left;vertical-align:top;}
+  th{color:var(--cy);white-space:nowrap;}
+  .q{color:var(--ora);}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:8px 12px;margin:10px 0;font-size:.78rem;color:var(--muted);}
+  footer{margin-top:18px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.72rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:9mm;}
+    :root{--bg0:#fff;--bg1:#fff;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;}
+    body{font-size:9.2px;line-height:1.36;-webkit-print-color-adjust:exact;}
+    ol,ul{margin:4px 0;}
+    li{margin:2px 0;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h1{font-size:1.05rem;}
+    h2{margin:7px 0 4px;}
+    th,td{padding:3px 6px;}
+    .note{padding:5px 10px;margin:7px 0;}
+    footer{margin-top:8px;}
+    a{color:var(--cy);}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="classroom.html">日本語版はこちら</a></div>
+<button class="printbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+<div class="sheet">
+
+<h1>Social Debugger</h1>
+<p class="tagline">Will your town survive? — An educational simulator where students experience <em>how</em> societies and regional infrastructure fail, by moving sliders</p>
+
+<div class="urlbox">▶ <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+<ul class="facts">
+  <li>No prep (browser only)</li><li>Free, no ads, no sign-up</li><li>~10 min per theme</li>
+  <li>Phones, tablets, PCs</li><li>Japanese / English</li><li>Privacy-first analytics only</li>
+</ul>
+
+<h2>1. Get started in 5 minutes</h2>
+<ol>
+  <li>Open the URL above (the intro screen can be skipped).</li>
+  <li>Pick today's theme from the top tabs (four pages, see the table below).</li>
+  <li><b>Tap one preset</b> → the society starts running → move the sliders to "intervene".</li>
+</ol>
+
+<h2>2. The four themes, with discussion questions</h2>
+<table>
+  <tr><th>Page</th><th>Structure students experience</th><th class="q">Example question</th></tr>
+  <tr><td>PAGE 1<br>Information</td><td>Filter bubbles and overfitting: how information bias quietly erodes diversity and trust</td>
+      <td class="q">"When we only see what we like, why does the whole society become fragile?"</td></tr>
+  <tr><td>PAGE 2<br>Infrastructure</td><td>Shrinking population, efficiency drives, successor shortage — the paradox of becoming efficient yet disaster-fragile</td>
+      <td class="q">"When is optimization the right answer — and when is it fatal? (the value of redundancy)"</td></tr>
+  <tr><td>PAGE 3<br>Cognition</td><td>The cognitive mechanics of unstoppable outrage, and the way back from it</td>
+      <td class="q">"Is runaway anger a weakness of will, or a structure?"</td></tr>
+  <tr><td>PAGE 4<br>Stakeholders</td><td>The channel dynamics by which the voices of those actually affected get drowned out by spectators</td>
+      <td class="q">"When do stakeholders' voices stop getting through — when someone is at fault, or when no one is?"</td></tr>
+</table>
+<p class="q">Inquiry question: "If you could rewind one thing in a collapsed town, what would you protect?" (students can actually try this with the rewind feature on PAGE 1)</p>
+
+<h2>3. Lesson formats</h2>
+<table>
+  <tr><th>10 min (opener)</th><td>Teacher projects one preset → class watches the collapse → pairs discuss one question.</td></tr>
+  <tr><th>50 min (full period)</th><td>① Individual play on one theme (10 min) → ② form a hypothesis for a "surviving configuration" (10 min) → ③ test it by experimenting with parameters (15 min) → ④ groups share: which intervention worked, and what it corresponds to in the real world (15 min).</td></tr>
+  <tr><th>Inquiry / projects</th><td>The menu's "📊 Export data (JSON/CSV)" saves all parameters and results for comparison experiments and reports. Share URLs reproduce any experiment exactly.</td></tr>
+</table>
+
+<h2>4. Handling notes (important)</h2>
+<div class="note">
+  This app is a <b>fictional simulation</b>. No real place names, people, or ongoing political topics appear in it.
+  In class, we recommend treating it as <b>"a story about structures that can happen to any society"</b> —
+  not about anyone or anywhere in particular. Using its results to judge real regions, people, or parties
+  goes beyond what this model can support.
+</div>
+
+<footer>
+  Free, non-commercial, open source (GitHub: larai-w/social-system-debugger).
+  If something is missing for your classroom, please tell us via the in-app "💬 Feedback" — an educator's
+  perspective is the best improvement input we can get.<br>
+  * This guide prints to a single A4 PDF via your browser (Ctrl/Cmd + P).
+</footer>
+
+</div>
+</body>
+</html>
