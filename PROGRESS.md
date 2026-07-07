@@ -10,7 +10,7 @@
 |---|---|---|---|
 | T1 | 検証基盤 `scripts/verify.mjs`（Playwright・Consoleゼロ自動検証） | SKILL.md「変更後: Console ゼロ確認（必須）」の自動化。以降の全タスクの退行防止 | ✅ |
 | T2 | US-08 研究者向けエクスポート（JSON/CSV） | PM.md フェーズ1で唯一残っていたコーディングストーリー（P1）。研究者ペルソナの「教材・引用可能な再現性」 | ✅ |
-| T3 | 共有チャネル最適化（PAGE 2 防災変種テンプレ＋固定ハッシュタグ #社会デバッガー） | MARKETING.md「防災文脈はXよりLINEで回る」「固定タグを1つ決めて全投稿に付ける」 | ⏳ |
+| T3 | 共有チャネル最適化（PAGE 2 防災変種テンプレ＋固定ハッシュタグ #社会デバッガー） | MARKETING.md「防災文脈はXよりLINEで回る」「固定タグを1つ決めて全投稿に付ける」 | ✅ |
 | T4 | 教員向け1枚モノ `web/classroom.html`（A4印刷→PDF） | MARKETING.md 教育チャネル「授業で使える1枚モノを用意しておくと採用されやすい」。教員1人＝生徒30〜40人の乗数 | ⏳ |
 | T5 | 30秒縦型リール `promo/reel-30s.html` | MARKETING.md「X プロフィール固定ポストに30秒動画」。vertical-reel スキル PART 1 の30秒構成に準拠 | ⏳ |
 
@@ -20,6 +20,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T3 共有チャネル最適化**: `shareHashtag()` 新設（ja=`#社会デバッガー` / en=`#SocialDebugger`）。X導線2箇所（share.js の𝕏ボタン・監査成功ツイート）に付与し、旧 `#社会OSデバッガー` を統一。LINE はタグなし（家族・地域グループ宛てのため意図的）。`addBousai()` テンプレ変種（「防災」の語を含む）を PAGE 2 系文脈（ショック共有・P2プリセット共有）に追加。sw cache v6-355。**実ブラウザで shock/preset2 テンプレに防災変種が入ること・ja/en ハッシュタグを確認。check/verify green**。
 
 - ✅ **T2 US-08 エクスポート（JSON/CSV）**: ≡メニューに「📊 データを書き出す (JSON)/(CSV)」を追加。`buildExportData()`（全4ページのパラメータ＋P1/P2主要メトリクス＋再現用共有URL＋街名＋schema/exported_at）→ `exportData('json'|'csv')` でダウンロード。CSVは `key,value` のフラット形式（46行）・カンマ/引用符エスケープ対応。track: `export_json`/`export_csv`。i18n は既存パターン（ja=DOM原文キャッシュ・enのみ辞書追加）。sw cache v6-354。**check green・verify green（Console ゼロ×2ケース）・実ブラウザでdownloadイベント発火まで確認**。PM.md US-08 に ✅。
 
