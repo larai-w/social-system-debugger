@@ -246,6 +246,9 @@ const I18N = {
     disc_hint:'Every time you tinker, a new discovery (a short lesson) is collected.',
     // v6.332: フィードバック導線 / 直接リンク
     link_btn:'🔗 Direct link to this page',
+    // US-08: 研究者向けエクスポート
+    export_json:'📊 Export data (JSON)',
+    export_csv:'📊 Export data (CSV)',
     fb_btn:'💬 Feedback',
     fb_title:'Feedback',
     fb_researcher:'🔬 Show as researcher / engineer',

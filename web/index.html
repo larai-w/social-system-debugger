@@ -62,6 +62,9 @@
         <button class="menu-item" onclick="openShareGuide();closeHeaderMenu()" data-i18n="sg_btn">⇪ 共有ガイド</button>
         <button class="menu-item" onclick="copyPageLink(currentTab,this);closeHeaderMenu()" data-i18n="link_btn">🔗 このページへの直接リンク</button>
         <hr class="menu-divider">
+        <button class="menu-item" onclick="exportData('json');closeHeaderMenu()" data-i18n="export_json">📊 データを書き出す (JSON)</button>
+        <button class="menu-item" onclick="exportData('csv');closeHeaderMenu()" data-i18n="export_csv">📊 データを書き出す (CSV)</button>
+        <hr class="menu-divider">
         <button class="menu-item" onclick="openFeedback();closeHeaderMenu()" data-i18n="fb_btn">💬 フィードバック</button>
       </div>
     </div>
