@@ -13,6 +13,8 @@
 | T3 | 共有チャネル最適化（PAGE 2 防災変種テンプレ＋固定ハッシュタグ #社会デバッガー） | MARKETING.md「防災文脈はXよりLINEで回る」「固定タグを1つ決めて全投稿に付ける」 | ✅ |
 | T4 | 教員向け1枚モノ `web/classroom.html`（A4印刷→PDF） | MARKETING.md 教育チャネル「授業で使える1枚モノを用意しておくと採用されやすい」。教員1人＝生徒30〜40人の乗数 | ✅ |
 | T5 | 30秒縦型リール `promo/reel-30s.html` | MARKETING.md「X プロフィール固定ポストに30秒動画」。vertical-reel スキル PART 1 の30秒構成に準拠 | ✅ |
+| T6 | CI に browser verify ジョブ追加（`ci.yml`） | T1 の Console ゼロ検証を PR にも適用（助言的ジョブ・保護必須には未指定）。TODO.md も手動作業を最新化 | ✅ |
+| T7 | Zenn 記事ドラフト2本（`docs/articles/`） | MARKETING.md「Zenn/Qiita は就活の本命」。記事1 Capacitor 化・記事2 AWS CDK+OIDC（Dockerを使わない理由の節入り）。公開はフェーズ2で X と連動 | ✅ |
 
 ## 実施順
 
@@ -20,6 +22,9 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T7 Zenn 記事ドラフト2本**: `docs/articles/zenn-01-capacitor.md`（33万文字単一HTML→バンドラなし分割→Capacitor化。SSDファサード・Preferences二重化・退行3事例と自動検証）／`docs/articles/zenn-02-aws-cdk-oidc.md`（S3非公開+OAC+CloudFront・latest.json 5分TTL・OIDC最小権限・「Dockerを使わない理由」・ハマり所2つ・make aws-wire）。ともに `published: false` のZenn形式。実名ゼロ・アカウントIDは伏せ字。MARKETING.md にドラフト所在を追記。公開はフェーズ2（Xと同日）。
+- ✅ **T6 CI 強化＋TODO最新化**: `ci.yml` に `verify` ジョブ追加（npm ci → playwright chromium → `npm run verify`。web/infra とは独立の助言的ジョブ＝ブランチ保護の必須には未指定）。TODO.md を全面更新: ☐0 push（未pushコミット）、☐5 リール録画→X固定ポスト（※演出用注記の規約付き）、☐6 classroom.html のPDF化、☐7 iCloud外への移設（競合コピー3件の実績を明記）、別マシンでの playwright 初回導入。
 
 - ✅ **T5 30秒縦型リール**: `promo/reel-30s.html` 新規（単一HTML+canvas 420×740・9:16。スマホ全画面→画面録画でSNS動画化）。構成=フック2秒「同じ災害。生き残る街と、崩れる街。」→ 実験1つ（⚙効率至上都市 RB22%→⚡ショック→CRASHED ／ 断の溜め ／ 🛡冗長性確保都市 RB68%→同じショック→SURVIVED）→ 対句の結論「効率は、平時の速さ。／冗長性は、最悪の日の命。」→ エンドカード（アプリ名・URL・CTA点滅・#社会デバッガー）。**UI文言は全て実コードから転記**（プリセット名・ゲージ名・ショックボタン・ヘリ3状態・判定バナー・ターミナルログ、RB<30%崩壊/≥60%生存の実判定条件と整合）。ゴーストカーソル・4拍演出（静転動断復）・PAUSE/RESTART・プログレスバー・REC●・固定免責フッター。promo/ 配下＝本番配信(web/)対象外。**タイムライン10点のスクリーンショットQAでエラーゼロ・全シーン描画確認**。※SNS投稿時は「演出用に簡略化したデモ映像です」を添える（スキル規約）。
 

@@ -32,8 +32,10 @@
 
 ### Zenn / Qiita（就活の本命）
 - 記事1「単一HTML 33万文字のシミュレーターをCapacitorでアプリ化した話」
+  → **ドラフト済み: `docs/articles/zenn-01-capacitor.md`**
 - 記事2「S3+CloudFront+CDK+GitHub Actions(OIDC)で、コンテンツ配信をCI/CDに載せた話」
   （Dockerを使わない理由の節を含める — 技術選定を語れる証明として採用側に効く）
+  → **ドラフト済み: `docs/articles/zenn-02-aws-cdk-oidc.md`**
 - 記事3「開発者自身が2拠点生活の意思決定にこのモデルを使った話」（真正性の物語。
   アプリ内には載せない個人的文脈は、こちらで語る）
 - 各記事末尾にアプリ導線。記事公開日はXの投稿と連動させる。
