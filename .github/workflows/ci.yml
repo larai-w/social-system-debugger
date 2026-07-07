@@ -27,6 +27,22 @@ jobs:
       - name: Check (tests + weekly JSON + eslint + prettier — mirrors `make check`)
         run: npm run check
 
+  # ── ブラウザ実機検証: Console ゼロ（Chart.js 正常/失敗の両ケース・4タブ・プリセット・スライダー）──
+  # ローカルの `make verify` と同一スクリプト。web/infra とは独立ジョブ（ブランチ保護の必須には未指定＝助言的）。
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install deps
+        run: npm ci
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser verification (scripts/verify.mjs)
+        run: npm run verify
+
   # ── インフラ: cdk synth が通ることの確認 ──
   infra:
     runs-on: ubuntu-latest
