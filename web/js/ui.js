@@ -3028,6 +3028,55 @@ function copyPageLink(n,btn){
   try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
 }
 
+// US-08: 研究者向けエクスポート — 全パラメータ＋主要メトリクス＋再現用共有URL（JSON/CSV）
+function buildExportData(){
+  return{
+    app:'social-system-debugger',
+    schema:1,
+    exported_at:new Date().toISOString(),
+    lang,
+    town_name:getTownName()||null,
+    share_url:buildShareURL(), // このURLを開くと同じパラメータ状態を再現できる
+    params:{
+      p1_information:{filterRate,ethicsScore,algo,historicalImmunity},
+      p2_infrastructure:{shrinkRate,dxRate,ethicsP2,algoP2,publicReboot,rootRestricted,skillStock},
+      p3_cognition:{searchDepth,groundingRate,learningRate},
+      p4_stakeholder:{extTraffic,gamification}
+    },
+    metrics:{
+      p1_information:metrics(filterRate,ethicsScore,algo),
+      p2_infrastructure:metricsP2(shrinkRate,dxRate,algoP2,ethicsP2)
+    }
+  };
+}
+function exportFlatRows(obj,prefix,rows){
+  Object.entries(obj).forEach(([k,v])=>{
+    const key=prefix?prefix+'.'+k:k;
+    if(v&&typeof v==='object')exportFlatRows(v,key,rows);
+    else rows.push([key,v]);
+  });
+  return rows;
+}
+function downloadTextFile(name,mime,text){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:mime}));
+  a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+function exportData(fmt){
+  const d=buildExportData();
+  const stamp=d.exported_at.slice(0,19).replace(/[:T]/g,'-');
+  if(fmt==='csv'){
+    const esc=v=>{const s=String(v==null?'':v);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+    const csv='key,value\n'+exportFlatRows(d,'',[]).map(r=>esc(r[0])+','+esc(r[1])).join('\n');
+    downloadTextFile('social-debugger-'+stamp+'.csv','text/csv;charset=utf-8',csv);
+    track('export_csv');
+  }else{
+    downloadTextFile('social-debugger-'+stamp+'.json','application/json;charset=utf-8',JSON.stringify(d,null,2));
+    track('export_json');
+  }
+}
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();closeDiscoveryLog();}});
 
 (function init(){
