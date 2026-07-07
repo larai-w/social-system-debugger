@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T9/T10**: X投稿テンプレ集 `docs/x-post-templates.md`（月/木/日雛形＋W31〜W34下書き＋チェックリスト）と `web/classroom.en.html`（教員ガイド英語版・A4 1枚実測確認・ja⇔en相互リンク・README導線）。※Actions「Deploy to AWS」の灰色は AWS未設定間の意図的 skipped（TODO ☐2 後に緑）。
 - ✅ **push 済み（`1c8ac15..e0b1ea5`）＋ T8 週替わりシナリオ W31〜W34 追加**: 配信在庫を W30→W34（8月下旬）まで延長。W31〜W33 はバンドル済み3本の配信版リライト、W34 は新規ハード「濁った街を、澄ませる」（実エンジンで達成可能性検証済み）。詳細は `PROGRESS.md`。
 - ✅ **スプリント追加2タスク（T6/T7・詳細は `PROGRESS.md`）**: **T6** `ci.yml` に verify ジョブ（PRでも Playwright Console ゼロ検証・助言的）＋ TODO.md 全面更新（☐0 push / ☐5 リール録画 / ☐6 教員PDF / ☐7 iCloud移設）。**T7** Zenn 記事ドラフト2本を `docs/articles/` に（記事1 Capacitor化・記事2 AWS CDK+OIDC。`published: false`、公開はフェーズ2でXと連動）。
 - ✅ **戦略実装スプリント（5タスク・詳細は `PROGRESS.md`）**: 戦略文書（PM.md/MARKETING.md/OUTREACH.md/SKILL.md/vertical-reel スキル）を追加コミットし、そこから切り出した5タスクを完了。**T1** `scripts/verify.mjs`＝SKILL.md 必須Consoleゼロ検証の自動化（Playwright、Chart.js正常/失敗の2ケース、`npm run verify`/`make verify`。CIには含めずブラウザ非依存を維持）。**T2** US-08 エクスポート＝≡メニューから全パラメータ＋P1/P2メトリクス＋再現URLを JSON/CSV でDL（track: export_json/export_csv）。**T3** 共有最適化＝固定ハッシュタグ `shareHashtag()`（ja #社会デバッガー / en #SocialDebugger、X導線2箇所に統一適用）＋PAGE 2 系文脈に「防災」語入りテンプレ変種 `addBousai()`（LINE拡散狙い）。**T4** `web/classroom.html`＝教員向けA4・1枚ガイド（自己完結・印刷は白地・README導線あり、Pages/AWS両配信）。**T5** `promo/reel-30s.html`＝30秒縦型リール（実UI文言転記・免責フッター固定・配信対象外の promo/ 配下）。sw cache v6-355。PM.md US-08 に✅。全コミット済み（未push）。

@@ -16,6 +16,8 @@
 | T6 | CI に browser verify ジョブ追加（`ci.yml`） | T1 の Console ゼロ検証を PR にも適用（助言的ジョブ・保護必須には未指定）。TODO.md も手動作業を最新化 | ✅ |
 | T7 | Zenn 記事ドラフト2本（`docs/articles/`） | MARKETING.md「Zenn/Qiita は就活の本命」。記事1 Capacitor 化・記事2 AWS CDK+OIDC（Dockerを使わない理由の節入り）。公開はフェーズ2で X と連動 | ✅ |
 | T8 | 週替わりシナリオ W31〜W34（`content/weekly/`） | 在庫が W30 まで＝約3週で枯渇するところを8月下旬まで延長。PM.md「帰ってくる理由」の継続 | ✅ |
+| T9 | X投稿テンプレ集（`docs/x-post-templates.md`） | MARKETING.md コンテンツカレンダーの運用を「埋めるだけ」に。W31〜W34の月曜告知は下書き済み | ✅ |
+| T10 | classroom 英語版（`web/classroom.en.html`） | 将来の Show HN・海外研究者向け（MARKETING.md 海外チャネル）。ja/en 相互リンク | ✅ |
 
 ## 実施順
 
@@ -23,6 +25,10 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T10 classroom 英語版**: `web/classroom.en.html` 新規（自己完結・アプリJS非依存）。ja版と同構成（5-minute start / 4 themes+questions / lesson formats / handling notes）。ja⇔en の相互リンク（印刷時は非表示）、README に EN リンク追加。**A4・1枚に収まることを実測で確認**（印刷幅726pxで1029px < 1054px、Playwright の pageRanges 検査で1ページ確定。EN は文章が長く2ページに溢れたため印刷時フォント/行間を ja より詰めて調整）。
+- ✅ **T9 X投稿テンプレ集**: `docs/x-post-templates.md` 新規。全投稿共通の固定ルール6条（#社会デバッガー 1本・URL1本・実名ゼロ・免責1行・演出動画注記・宣伝でなく結果）／月曜告知（**W31〜W34 はそのまま投稿できる下書き済み**）／木曜中間経過（無人の広場回避の注記付き）／日曜結果スレッド3部構成／随時ネタ5種（プリセット変奏・巻き戻し・発見図鑑・開発ログ・許可制引用RT）／送信前チェックリスト。MARKETING.md から参照リンク。
+- ℹ️ **Actions の灰色表示は正常**: 「Deploy to AWS」は Secrets 未設定の間 `if: vars.S3_BUCKET != ''` で **skipped（灰色）になる設計**（赤=失敗にしない）。TODO ☐2 完了後に緑で稼働。TODO.md に注記を追加。
 
 - ✅ **T8 週替わりシナリオ W31〜W34**: `2026-W31`＝冗長性ショック対抗（P2・hard）／`W32`＝リーダー倫理観の滝（P1・normal）／`W33`＝当事者の声を取り戻す（P4・normal）＝バンドル済みで未配信だった3本を配信用に本文リライト（W28〜W30と同じ二人称・物語調）。`W34`＝**新規「濁った街を、澄ませる」**（P1・hard・悪化状態 f60/e40/greedy から3条件同時回復）。**実エンジンで達成可能（f10/e85/dp で3条件成立）かつ開始即クリアでないことを確認**。スキーマ検証8件 green・実名ゼロ。W34 は既存 `sce_echo_trap` を再利用（DISCOVERIES 総数を増やさない設計。W28クリア済みユーザーにはCLEAREDバッジが先に見えるが挑戦は可能）。**在庫は8月下旬（W34=8/17週）まで**。※毎週月曜: その週のJSONを `latest.json` へコピーして配信（README の週次手順どおり）。
 
