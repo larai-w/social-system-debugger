@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // SKILL.md「完了ごとの必須チェック」の自動化（Node + Playwright 版）
 //   ケース1: Chart.js 正常時（スタブ注入）／ケース2: Chart.js 失敗時（CDN遮断）
-//   両ケースで 4タブ遷移・プリセット1つ・スライダー操作を行い、Console/pageerror ゼロを確認する。
+//   両ケースで 4タブ遷移・プリセット・スライダー操作に加え、P2ショック注入・
+//   P3/P4 スライダー・エクスポート生成までをスモークし、Console/pageerror ゼロを確認する。
 // 使い方: npm run verify   （または node scripts/verify.mjs [path/to/index.html]）
 import { chromium } from 'playwright';
 import path from 'node:path';
@@ -49,13 +50,32 @@ async function run(withChartStub) {
   await page.evaluate('typeof setPreset==="function" && setPreset(Object.keys(PRESETS)[0])');
   await page.waitForTimeout(500);
   // スライダー操作（input/change 両イベントを実発火）
-  await page.evaluate(`
-    const s = document.getElementById('filterRate');
-    if (s) { s.value = 60;
+  const drag = (id, v) =>
+    page.evaluate(`
+    const s = document.getElementById('${id}');
+    if (s) { s.value = ${v};
       s.dispatchEvent(new Event('input', { bubbles: true }));
       s.dispatchEvent(new Event('change', { bubbles: true })); }
   `);
+  await drag('filterRate', 60);
   await page.waitForTimeout(500);
+  // P2: ショック注入（判定バナー・ヘリ状態遷移まで走らせる）
+  await page.evaluate('switchTab(2)');
+  await page.waitForTimeout(400);
+  await page.evaluate('typeof injectSystemShock==="function" && injectSystemShock()');
+  await page.waitForTimeout(900);
+  // P3/P4: 各ページの主要スライダー
+  await page.evaluate('switchTab(3)');
+  await drag('searchDepth', 9);
+  await page.waitForTimeout(400);
+  await page.evaluate('switchTab(4)');
+  await drag('gamification', 80);
+  await page.waitForTimeout(400);
+  // エクスポート（US-08）のデータ生成経路
+  await page.evaluate(
+    'typeof buildExportData==="function" && JSON.stringify(buildExportData()).length > 0'
+  );
+  await page.waitForTimeout(200);
   await browser.close();
   return errors;
 }
