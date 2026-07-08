@@ -34,6 +34,9 @@
 </div>
 <script>
 'use strict';
+// ── 言語（?lang=en で英語キャプション版） ─────────
+const EN=new URLSearchParams(location.search).get('lang')==='en';
+const T=(ja,en)=>EN?en:ja;
 // ── 基本セットアップ ─────────────────────────────
 const CW=420,CH=740,DUR=30;
 const cv=document.getElementById('cv'),cx=cv.getContext('2d');
@@ -52,19 +55,25 @@ const T_HOOK=2.2, T_CLICK_WEIMAR=3.6, T_FLASH=4.4, T_BANNER_A=9.8,
       T_BANNER_B=20.6, T_CONC=23.2, T_END=25.8;
 
 // ── 実アプリからの転記文言 ───────────────────────
-// スローガンループ（排外モード）: ui.js phase1Ja / phase2Ja
-const L_SLOGAN=['既得権益の打破','利権の殲滅','非効率の排除','無駄の削減','身を切る改革'];
-const L_RADICAL=['敵対イデオロギーの完全掃討','外集団（アウトグループ）の強制排斥','異分子ノードのデリート','単一信念への強制同期（多様性の完全拒絶）'];
-// 回復後のメトリクスログ行: ui.js logRowsJa
-const L_RECOVER=['信頼指数','回復力','正当性','情報健全性','長期持続性','精神的健全性'];
+// スローガンループ（排外モード）: ui.js phase1Ja/En / phase2Ja/En（実文言）
+const L_SLOGAN=EN
+  ?['PURGE_VESTED_NODES','ELIMINATE_PRIVILEGE','PURGE_INEFFICIENCY','SLASH_WASTE','CUT_TO_THE_BONE']
+  :['既得権益の打破','利権の殲滅','非効率の排除','無駄の削減','身を切る改革'];
+const L_RADICAL=EN
+  ?['PURGE_HOSTILE_IDEOLOGY','FORCE_EXPEL_OUTGROUP','DELETE_DEVIANT_NODES','FORCE_SYNC_MONOBELIEF']
+  :['敵対イデオロギーの完全掃討','外集団（アウトグループ）の強制排斥','異分子ノードのデリート','単一信念への強制同期（多様性の完全拒絶）'];
+// 回復後のメトリクスログ行: ui.js logRowsJa/En
+const L_RECOVER=EN
+  ?['Trust Index','Resilience','Legitimacy','Info Health','Viability','Mental WB']
+  :['信頼指数','回復力','正当性','情報健全性','長期持続性','精神的健全性'];
 
 // ── ログのスケジュール（事前計算） ────────────────
 const LOGS=[];
 (function(){
   let i=0;
-  for(let t=T_FLASH+0.1;t<7.4;t+=0.3)LOGS.push({t,s:'▌ '+L_SLOGAN[i++%L_SLOGAN.length]+' ▐',c:ORA,tag:'スローガン 具体策:ゼロ'});
+  for(let t=T_FLASH+0.1;t<7.4;t+=0.3)LOGS.push({t,s:'▌ '+L_SLOGAN[i++%L_SLOGAN.length]+' ▐',c:ORA,tag:T('スローガン 具体策:ゼロ','SLOGAN policy:null')});
   i=0;
-  for(let t=7.4;t<T_BLACK-0.4;t+=0.32)LOGS.push({t,s:'▌ '+L_RADICAL[i++%L_RADICAL.length]+' ▐',c:RED,tag:'排外'});
+  for(let t=7.4;t<T_BLACK-0.4;t+=0.32)LOGS.push({t,s:'▌ '+L_RADICAL[i++%L_RADICAL.length]+' ▐',c:RED,tag:T('排外','RADICAL')});
   i=0;
   for(let t=T_DP+0.3;t<T_CONC-0.4;t+=0.55){
     const v=Math.min(96,60+i*6);
@@ -148,8 +157,8 @@ function banner(big,tech,col,t0,t){
   if(t<t0)return;const k=ss(t0,t0+0.4,t);cx.globalAlpha=k;
   cx.fillStyle='rgba(7,11,20,.92)';rrect(30,238,360,150,10);cx.fill();
   cx.strokeStyle=col;cx.lineWidth=2;cx.stroke();cx.lineWidth=1;
-  cx.textAlign='center';cx.fillStyle=col;cx.font='bold 18px Menlo,monospace';cx.fillText(big,CW/2,292);
-  cx.fillStyle=MUT;cx.font='10.5px Menlo,monospace';cx.fillText(tech,CW/2,322);cx.globalAlpha=1;
+  cx.textAlign='center';cx.fillStyle=col;cx.font=EN?'bold 14px Menlo,monospace':'bold 18px Menlo,monospace';cx.fillText(big,CW/2,292);
+  cx.fillStyle=MUT;cx.font=EN?'9px Menlo,monospace':'10.5px Menlo,monospace';cx.fillText(tech,CW/2,322);cx.globalAlpha=1;
 }
 
 // ── メイン描画 ───────────────────────────────────
@@ -165,20 +174,20 @@ function draw(t){
     const st=stateAt(t);
     // ヘッダ
     cx.textAlign='left';cx.font='10px Menlo,monospace';cx.fillStyle=MUT;
-    cx.fillText('PAGE 1 — 情報空間',16,26);
+    cx.fillText(T('PAGE 1 — 情報空間','PAGE 1 — INFORMATION SPACE'),16,26);
     cx.fillStyle=CY;cx.font='bold 15px Menlo,monospace';
     cx.fillText('INFORMATION SPACE',16,50);
     cx.strokeStyle=BDR;cx.beginPath();cx.moveTo(16,64);cx.lineTo(404,64);cx.stroke();
     // プリセット＋アルゴリズム（実ボタン名）
-    chip(21,152,'⚡ ワイマール崩壊',!st.B||t<T_DP,RED);
+    chip(21,152,T('⚡ ワイマール崩壊','⚡ Weimar Collapse'),!st.B||t<T_DP,RED);
     chip(185,100,'Greedy',st.algo==='greedy',RED);
     chip(297,100,'DP',st.algo==='dp',GRN);
     // スライダー（実ラベル名＋実タグ）
-    slider(196,'情報フィルタリング率','OVERFITTING',CY,st.f,st.f>60?RED:CY);
-    slider(256,'リーダーの倫理観','GOVERNANCE',GRN,st.e,st.e<40?RED:GRN);
+    slider(196,T('情報フィルタリング率','Information Filter Rate'),'OVERFITTING',CY,st.f,st.f>60?RED:CY);
+    slider(256,T('リーダーの倫理観',"Leader's Ethics Score"),'GOVERNANCE',GRN,st.e,st.e<40?RED:GRN);
     // ゲージ（実ラベル名）
-    gauge(318,'エントロピー（無秩序度） ENTROPY',st.entropy,st.entropy>65?RED:st.entropy>28?ORA:GRN);
-    gauge(372,'DIVERSITY INDEX 多様性指数',st.diversity,st.diversity<30?RED:st.diversity<70?ORA:GRN);
+    gauge(318,T('エントロピー（無秩序度） ENTROPY','ENTROPY'),st.entropy,st.entropy>65?RED:st.entropy>28?ORA:GRN);
+    gauge(372,T('DIVERSITY INDEX 多様性指数','DIVERSITY INDEX'),st.diversity,st.diversity<30?RED:st.diversity<70?ORA:GRN);
     // ターミナルログ
     cx.strokeStyle=BDR;cx.beginPath();cx.moveTo(16,412);cx.lineTo(404,412);cx.stroke();
     const vis=LOGS.filter(l=>l.t<=t&&(st.B?l.t>=T_RUNB:l.t<T_BLACK)).slice(-8);
@@ -195,15 +204,17 @@ function draw(t){
       cx.fillStyle=g;cx.fillRect(0,0,CW,CH);}
     // 判定バナー＋スタンプ（実バナー文言 / 実カード判定語 COLLAPSE・STABLE）
     if(!st.B){
-      banner('⚠ あなたの社会が、暴走を始めた ⚠','エントロピー 78% — 社会秩序が臨界値を突破',RED,T_BANNER_A,t);
+      banner(T('⚠ あなたの社会が、暴走を始めた ⚠','⚠ YOUR SOCIETY IS SPIRALING OUT ⚠'),
+        T('エントロピー 78% — 社会秩序が臨界値を突破','Entropy 78% — social order breached critical threshold'),RED,T_BANNER_A,t);
       stamp('COLLAPSE',RED,T_BANNER_A+0.5,t);
     }else{
-      banner('✓ あなたの街の情報空間は、澄んでいる ✓','🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています',GRN,T_BANNER_B,t);
+      banner(T('✓ あなたの街の情報空間は、澄んでいる ✓',"✓ YOUR TOWN'S INFORMATION SPACE IS CLEAR ✓"),
+        T('🌐 エントロピー低位 ／ 情報多様性が保たれ、現実OSと同期しています','🌐 Low entropy · diversity preserved · synced with the real-world OS'),GRN,T_BANNER_B,t);
       stamp('STABLE',GRN,T_BANNER_B+0.5,t);
     }
     // キャプション
-    if(t>2.5&&t<4.2)caption('1933年の崩壊を、1タップで再現する');
-    if(t>T_RUNB+0.3&&t<19.2)caption('同じ1933年から、パラメータだけ変える');
+    if(t>2.5&&t<4.2)caption(T('1933年の崩壊を、1タップで再現する','Recreating the 1933 collapse in one tap'));
+    if(t>T_RUNB+0.3&&t<19.2)caption(T('同じ1933年から、パラメータだけ変える','Same 1933 — change only the parameters'));
     // ゴーストカーソル
     const c=cursorAt(t);
     if(c){cx.beginPath();cx.arc(c.x,c.y,7,0,7);cx.fillStyle='rgba(255,255,255,.92)';
@@ -217,51 +228,53 @@ function draw(t){
   if(t<T_HOOK){
     const k=1-ss(T_HOOK-0.3,T_HOOK,t);cx.globalAlpha=k;
     cx.textAlign='center';cx.fillStyle='#e8f4fa';cx.font='bold 26px Menlo,monospace';
-    cx.fillText('1933年は、',CW/2,320);
-    cx.fillStyle=CY;cx.font='bold 22px Menlo,monospace';
-    cx.fillText('1タップで再現できる。',CW/2,376);cx.globalAlpha=1;
+    cx.fillText(T('1933年は、','1933 —'),CW/2,320);
+    cx.fillStyle=CY;cx.font=EN?'bold 19px Menlo,monospace':'bold 22px Menlo,monospace';
+    cx.fillText(T('1タップで再現できる。','recreated in a single tap.'),CW/2,376);cx.globalAlpha=1;
   }
   // 転: 全画面フラッシュ＋警告
   if(t>T_FLASH&&t<T_FLASH+0.15){cx.fillStyle='rgba(255,255,255,.85)';cx.fillRect(0,0,CW,CH);}
   if(t>T_FLASH&&t<T_FLASH+1.1){cx.textAlign='center';cx.fillStyle=RED;cx.font='bold 22px Menlo,monospace';
-    cx.globalAlpha=1-ss(T_FLASH+0.7,T_FLASH+1.1,t);cx.fillText('⚠ OVERFITTING — 過学習',CW/2,180);cx.globalAlpha=1;}
+    cx.globalAlpha=1-ss(T_FLASH+0.7,T_FLASH+1.1,t);cx.fillText(T('⚠ OVERFITTING — 過学習','⚠ OVERFITTING CASCADE'),CW/2,180);cx.globalAlpha=1;}
   // 断（1.5秒の溜め）
   if(t>=T_BLACK&&t<T_RUNB){
     cx.fillStyle='#000';cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_BLACK,T_BLACK+0.4,t);
     cx.textAlign='center';cx.fillStyle='#e8f4fa';cx.font='16px Menlo,monospace';
-    cx.fillText('— 歴史は、変えられない。 —',CW/2,360);
-    cx.fillStyle=GRN;cx.fillText('構造は、変えられる。',CW/2,396);cx.globalAlpha=1;
+    cx.fillText(T('— 歴史は、変えられない。 —','— History cannot be changed. —'),CW/2,360);
+    cx.fillStyle=GRN;cx.fillText(T('構造は、変えられる。','Structures can.'),CW/2,396);cx.globalAlpha=1;
   }
   // 結論（対句）
   if(t>=T_CONC&&t<T_END){
     cx.fillStyle=BG0;cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_CONC,T_CONC+0.5,t);cx.textAlign='center';
-    cx.fillStyle=ORA;cx.font='bold 19px Menlo,monospace';cx.fillText('同じ1933年から始めても、',CW/2,330);
+    cx.fillStyle=ORA;cx.font=EN?'bold 16px Menlo,monospace':'bold 19px Menlo,monospace';
+    cx.fillText(T('同じ1933年から始めても、','Even starting from the same 1933,'),CW/2,330);
     cx.fillStyle=GRN;cx.globalAlpha*=ss(T_CONC+0.9,T_CONC+1.4,t);
-    cx.fillText('違う結末に、辿り着ける。',CW/2,386);cx.globalAlpha=1;
+    cx.fillText(T('違う結末に、辿り着ける。','you can reach a different ending.'),CW/2,386);cx.globalAlpha=1;
   }
   // エンドカード
   if(t>=T_END){
     cx.fillStyle=BG0;cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_END,T_END+0.5,t);cx.textAlign='center';
     cx.strokeStyle=CY;cx.lineWidth=2;rrect(60,258,300,84,10);cx.stroke();cx.lineWidth=1;
-    cx.fillStyle=CY;cx.font='bold 26px Menlo,monospace';cx.fillText('社会デバッガー',CW/2,302);
-    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText('あなたの街は、生き残れるか。',CW/2,328);
+    cx.fillStyle=CY;cx.font=EN?'bold 22px Menlo,monospace':'bold 26px Menlo,monospace';
+    cx.fillText(T('社会デバッガー','SOCIAL DEBUGGER'),CW/2,302);
+    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText(T('あなたの街は、生き残れるか。','Will your town survive?'),CW/2,328);
     cx.fillStyle=BG1;rrect(38,376,344,34,7);cx.fill();cx.strokeStyle=BDR;cx.stroke();
     cx.fillStyle='#e8f4fa';cx.font='11px Menlo,monospace';
     cx.fillText('larai-w.github.io/social-system-debugger',CW/2,398);
     if(Math.sin(t*5)>-0.3){cx.fillStyle=GRN;cx.font='bold 14px Menlo,monospace';
-      cx.fillText('▶ ブラウザで60秒、無料',CW/2,448);}
-    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText('#社会デバッガー',CW/2,478);
-    if(t>28.5){cx.fillStyle=MUT;cx.font='10px Menlo,monospace';cx.fillText('↺ RESTART で最初から',CW/2,560);}
+      cx.fillText(T('▶ ブラウザで60秒、無料','▶ Free · 60 seconds in your browser'),CW/2,448);}
+    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText(T('#社会デバッガー','#SocialDebugger'),CW/2,478);
+    if(t>28.5){cx.fillStyle=MUT;cx.font='10px Menlo,monospace';cx.fillText(T('↺ RESTART で最初から','↺ RESTART to replay'),CW/2,560);}
     cx.globalAlpha=1;
   }
   // 常設: REC●・免責フッター・プログレスバー
   if(Math.sin(t*4)>0){cx.beginPath();cx.arc(376,24,5,0,7);cx.fillStyle=RED;cx.fill();
     cx.textAlign='left';cx.fillStyle=MUT;cx.font='9px Menlo,monospace';cx.fillText('REC',386,27);}
-  cx.textAlign='center';cx.fillStyle='rgba(123,147,164,.75)';cx.font='8.5px Menlo,monospace';
-  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション・歴史題材）',CW/2,722);
+  cx.textAlign='center';cx.fillStyle='rgba(123,147,164,.75)';cx.font=EN?'7px Menlo,monospace':'8.5px Menlo,monospace';
+  cx.fillText(T('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション・歴史題材）','*Not about anyone specific — structures any society can fall into (fictional, historical)'),CW/2,722);
   const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,CY);g.addColorStop(1,GRN);
   cx.fillStyle='rgba(29,51,69,.8)';cx.fillRect(0,CH-5,CW,5);
   cx.fillStyle=g;cx.fillRect(0,CH-5,CW*Math.min(1,t/DUR),5);
