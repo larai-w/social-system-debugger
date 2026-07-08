@@ -1,0 +1,27 @@
+{
+  "id": "2026-W40",
+  "title": { "ja": "学びすぎる頭", "en": "A Mind That Learns Too Fast" },
+  "intro": {
+    "ja": "あなたの街の認知エンジンは、速く学びすぎている。浅く考えたまま更新速度だけを上げれば、毒までも高速で取り込んでしまう。深く考える力を取り戻し、学習の暴走を落ち着かせられるか。",
+    "en": "Your town's cognitive engine is learning too fast. If it keeps thinking shallow while cranking the update speed, it will absorb the poison at high speed too. Can you restore deeper reasoning and calm the runaway learning?"
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 4, "ground": 30, "lr": 85 },
+    "hint": {
+      "ja": "探索深度を8以上まで上げて毒入れを無効化し、そのうえで学習率を上げすぎない値まで下げてください。深さと落ち着き、両方が要ります。",
+      "en": "Raise search depth to 8+ to neutralize the poisoning, then bring the learning rate down to a not-too-high level. You need both depth and calm."
+    }
+  },
+  "goal": {
+    "ja": "認知健全性を80以上・探索深度を8以上に保ちつつ、学習率を55以下まで落ち着かせる",
+    "en": "Reach cognitive integrity 80+ and search depth 8+ while calming the learning rate to 55 or below"
+  },
+  "goalConds": [
+    { "metric": "integrity", "op": ">=", "value": 80 },
+    { "metric": "searchDepth", "op": ">=", "value": 8 },
+    { "metric": "learningRate", "op": "<=", "value": 55 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_cognitive_grounding"
+}

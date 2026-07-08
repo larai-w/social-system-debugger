@@ -1,0 +1,26 @@
+{
+  "id": "2026-W41",
+  "title": { "ja": "記憶する街", "en": "The Town That Remembers" },
+  "intro": {
+    "ja": "あなたが受け継いだ街は、過去の失敗をきれいに忘れていた。短期の報酬ばかりを追ううちに、長い目で見た体力——回復力と持続力——が痩せ細っている。過去を思い出す仕組みを取り戻し、長く生き残れる街に戻せるか。",
+    "en": "The town you inherit has cleanly forgotten its past failures. Chasing short-term rewards, it has let its long-run stamina — resilience and viability — waste away. Can you restore the machinery of memory and make it a town that survives the long haul?"
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 45, "e": 50, "al": "greedy" },
+    "hint": {
+      "ja": "アルゴリズムを長期最適（dp）へ切り替え、フィルタを下げ、倫理を高く保ってください。回復力と持続力の両方が同時に立ち上がります。",
+      "en": "Switch the algorithm to long-term (dp), lower the filter, and keep ethics high. Both resilience and viability will rise together."
+    }
+  },
+  "goal": {
+    "ja": "長期持続性（Viability）と回復力（Resilience）をどちらも70以上に立て直す",
+    "en": "Rebuild both viability and resilience to 70 or above"
+  },
+  "goalConds": [
+    { "metric": "viability", "op": ">=", "value": 70 },
+    { "metric": "resilience", "op": ">=", "value": 70 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_ethics_cascade"
+}
