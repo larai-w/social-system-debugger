@@ -18,6 +18,8 @@
 | T8 | 週替わりシナリオ W31〜W34（`content/weekly/`） | 在庫が W30 まで＝約3週で枯渇するところを8月下旬まで延長。PM.md「帰ってくる理由」の継続 | ✅ |
 | T9 | X投稿テンプレ集（`docs/x-post-templates.md`） | MARKETING.md コンテンツカレンダーの運用を「埋めるだけ」に。W31〜W34の月曜告知は下書き済み | ✅ |
 | T10 | classroom 英語版（`web/classroom.en.html`） | 将来の Show HN・海外研究者向け（MARKETING.md 海外チャネル）。ja/en 相互リンク | ✅ |
+| T11 | UIフィードバック3点修正（点滅速度・モバイルログ・六角形余白） | ユーザーからの直接フィードバック（2026-07-08）。20人フェーズの「改善が最良のマーケティング」 | ✅ |
+| T12 | latest.json 週次自動切替（`weekly-rotate.yml`） | 毎週月曜の手作業を恒久ゼロに。W34まで完全放置で回る | ✅ |
 
 ## 実施順
 
@@ -25,6 +27,9 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T12 latest.json 週次自動切替**: `.github/workflows/weekly-rotate.yml` 新規。毎週月曜 0:00 JST（cron: 日曜15:00 UTC）に `TZ=Asia/Tokyo date +%G-W%V` でISO週を計算し、`content/weekly/<週>.json` を `latest.json` へコピーして bot コミット。**GITHUB_TOKEN の push は他ワークフローを発火させないため、Pages/AWS デプロイを `gh workflow run` で明示起動**（AWS未配線なら既存の if で安全にスキップ）。**在庫切れ週は意図的に失敗**＝書き足しリマインダー。手動 `workflow_dispatch` も可。README の週次手順を「JSONを書いてPRするだけ・切替は全自動」に更新。
+- ✅ **T11 UIフィードバック3点**: ①排外モードの点滅を増速（makeP1 1.2+0.28i→0.9+0.22i / makeP2 下限1.0→0.7s / モバイル一律減速 2.6s→1.8s。可読下限は維持）。②モバイルで METRIC LOG が1文字ずつ折返されていた根本原因は **STABILITY MATRIX 内グリッドがインラインstyle `1fr 1fr` 固定**だったこと → `.stab-grid` クラス化し ≤640px で縦積み＋ログ .72rem。③レーダー（六角形）の `pointLabels.padding` 5→1・凡例 padding 5 で描画半径を拡大。**モバイル390px/デスクトップ1280px 両方をスクリーンショットで確認、verify/check green**。sw cache v6-356。PM.md US-08 にエクスポートの立場別メリット（ユーザー/研究者/開発者）を記録。
 
 - ✅ **T10 classroom 英語版**: `web/classroom.en.html` 新規（自己完結・アプリJS非依存）。ja版と同構成（5-minute start / 4 themes+questions / lesson formats / handling notes）。ja⇔en の相互リンク（印刷時は非表示）、README に EN リンク追加。**A4・1枚に収まることを実測で確認**（印刷幅726pxで1029px < 1054px、Playwright の pageRanges 検査で1ページ確定。EN は文章が長く2ページに溢れたため印刷時フォント/行間を ja より詰めて調整）。
 - ✅ **T9 X投稿テンプレ集**: `docs/x-post-templates.md` 新規。全投稿共通の固定ルール6条（#社会デバッガー 1本・URL1本・実名ゼロ・免責1行・演出動画注記・宣伝でなく結果）／月曜告知（**W31〜W34 はそのまま投稿できる下書き済み**）／木曜中間経過（無人の広場回避の注記付き）／日曜結果スレッド3部構成／随時ネタ5種（プリセット変奏・巻き戻し・発見図鑑・開発ログ・許可制引用RT）／送信前チェックリスト。MARKETING.md から参照リンク。
