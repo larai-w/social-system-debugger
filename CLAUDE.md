@@ -44,6 +44,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T25〜T29（Opus委任を初運用・パイロット成功）**: 委任プロトコル明文化（本ファイル「開発ツールの方針」参照）／リール自動録画 `make reels`（Opus実装・親レビュー済み）／プライバシーポリシー ja/en（Opus実装）／ストア用アイコン・スプラッシュ生成 `make gen-icons`／Zenn記事3質問票（TODO ☐10）。詳細は `PROGRESS.md`。
 - ✅ **T20〜T24**: 週次シナリオ到達可能性テスト（**実バグ検出: W28/W32＋バンドル2本が開始即クリア → 回復型に修正**）／デモモード `?demo=1`（実エンジン自動再生・通常はno-op・sw v6-359）／DATA-DICTIONARY.en＋README鮮度更新＋研究者導線／ストア掲載文ドラフト／KPI週次ログ＋計測有効化（TODO ☐9）。詳細は `PROGRESS.md`。
 - ✅ **T15〜T19（自走）**: 週次シナリオ W35〜W38（在庫9/14週まで・実式検証済）／リール2本に `?lang=en` 英語モード／classroom に OGP／`docs/DATA-DICTIONARY.md`（エクスポート式対応表）／`docs/interview-guide.md`（15分×5人キット、TODO☐8）。詳細は `PROGRESS.md`。
 - ✅ **T13/T14**: リール第2弾・安全版 `promo/reel-30s-history.html`（ワイマール1933・実文言/実エンジン整合・10点QA済み）＋ EN ローンチキット `docs/launch-en.md`（Show HN/PH ドラフト＋フェーズ2ゲートのチェックリスト）。詳細は `PROGRESS.md`。
