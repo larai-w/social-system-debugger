@@ -74,25 +74,17 @@
 - ✅ PAGE 2 モデル改修（プロンプト1.5）: ブランドの閉ループ化（brand→財政→インフラ→ヘリ）、後継者ストック `skillStock`(遅い状態変数・崖・手遅れ閾値)、ヘリ3状態(OPERATIONAL/WEATHER HOLD/SUSPENDED)。
 - ✅ 退行バグ修正: (1)`updateAll` の `avg` をブロック外へ (2)`checkScenarioGoal` の未定義 `saveDiscoveries/unlock` を `discover()` に置換＋Web版早期リターン (3)Chart.js `onerror` を定義前関数呼び出しからフラグ方式へ。
 
-## 次のタスク（フェーズ1・タスクごとに一旦停止して報告する運用）
+## 次のタスク
 
-- 決定事項（このセッションで確定）: 配信は「**GitHub Pages 維持＋AWS 追加**」（今のURLは常に不変）。進め方は「**タスクごとに一旦停止**」。応答は日本語。
-**フェーズ1（タスク1〜7）はコード完了・全コミット済み（未push）。** コーディング側の残作業なし。
-次はユーザーの実設定（下記「ユーザーが手を動かす設定」）→ 20人フェーズ運用 → フェーズ2。
+- 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
+- **フェーズ1は完了・全push済み。T1〜T33 のスプリント履歴と詳細は `PROGRESS.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
+- **提案済み・未着手の次スプリント（T34〜T38）**: T34=週次 W43〜W46 を「PAGE 5 素材の小出し」化（design-note-page5.md §4。SILENT CAPTURE/LOUD CRASH を既存メトリクスで物語化・Opus委任）／T35=アプリ内に privacy/classroom への導線（直営）／T36=本節の継続整備（直営）／T37=CHANGELOG 更新（委任）／T38=教員向け投影スライド（委任可）。
+- **PAGE 5 / SWAP THE LEADER の投入判定**: design-note-page5.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
-## ユーザーが手を動かす設定（コードは完了。ここは人間の作業）
+## ユーザーが手を動かす設定
 
-A. **push**: `git push`（7タスク分＋docsコミットが未push）。pushで Pages(web/) 再デプロイ・CI稼働。
-B. **Capacitor 実機**（ネイティブ機能の実挙動確認に必須）: `npm install` → `npx cap add ios/android` → `npx cap open ...`。`capacitor.config.json` の `appId`(現 `dev.socialdebugger.app`)を自分のIDに。Xcodeで署名Team、Android Studio/JDK17、通知権限。
-C. **AWS デプロイ（簡素化済み）**: 環境変数(`CDK_DEFAULT_ACCOUNT/REGION`, 任意`AWS_PROFILE`。`infra/.env.example` 参照) → `make aws-bootstrap`（初回のみ）→ `make aws-deploy` → **`make aws-wire`**。
-   - `make aws-wire` が **CDK出力から GitHub の Secret/Variables（AWS_DEPLOY_ROLE_ARN / AWS_REGION / S3_BUCKET / CLOUDFRONT_DIST_ID / CLOUDFRONT_DOMAIN）を gh CLI で自動設定＋`web/config.js` に配信元を自動書込み**（＝旧D手順とscenario.js手書きが不要に）。前提: `aws` 認証済み＋`gh auth login` 済み。
-   - CDKの `githubRepo` は Makefile 既定（`larai-w/social-system-debugger`）。既存OIDCプロバイダがある場合のみ `cd infra && npm run deploy:stack -- -c existingOidcProviderArn=...`。
-D. （任意）カスタムドメイン: infra スタックの ACM(us-east-1)/Route53 コメント解除。
-- 全操作は `make help` に一覧。**セッション終了前は `make handoff`**（クリーン・未push・テストを検証）。
-4. タスク4 週替わりシナリオ（静的JSON配信 `/content/weekly/*.json`＋latest.json）。scenario.js 新規。**注意: ハードコードの `SCENARIOS` の `check` 関数はJSON化不可 → 宣言的条件配列(metric/op/value)へ変換**。通知は初回クリア直後に許可要求。サンプル3週分。
-5. タスク5 AWS 配信基盤（CDK/TS, `/infra`）: S3(非公開/OAC)+CloudFront。README に構成図・選定理由・「Dockerを使わない理由(静的配信＋サーバーレスで常駐なし)」。cdk synth 通過まで（deployはユーザー）。
-6. タスク6 計測拡充（weekly_*/share_*/card_saved/notification_optin、共通プロパティ app_platform）。
-7. タスク7 CI/CD（GitHub Actions + AWS OIDC、最小権限、engine.js のユニットテスト、週次JSONのスキーマ検証）。
+**`TODO.md` に一本化した**（所要時間・手順・おすすめプラン付き）。ここには重複を書かない。
+全操作は `make help` に一覧。**セッション終了前は `make handoff`**（ポリシー: `docs/session-handoff.md`）。
 
 ## 保留中（条件を満たすまで着手しない）
 
