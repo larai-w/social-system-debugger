@@ -179,6 +179,13 @@ npx playwright install chromium
 記録は同ガイドのテンプレ行で `docs/interview-log.md` に追記（ファイルは初回に作成）。
 5人たまったら PM.md の優先度を見直す。**返信・反映報告は1週間以内**（OUTREACH と同じ作法）。
 
+## ☐ 9.（告知開始の週に）アナリティクス有効化 — 10分
+
+現状 `track()` は no-op（スクリプト未導入）で、**KPI イベントは1件も記録されていない**。
+選択肢と手順は `docs/kpi-log.md` の表を参照。推奨は 20人フェーズの告知開始と同じ週に
+Plausible（30日トライアル）を有効化 → `web/index.html` のコメントアウト済み script 行を解除して push。
+以後、毎週日曜に `docs/kpi-log.md` へ1行記入。
+
 ## 週替わりシナリオの在庫メモ（自動運用の前提）
 
 - 在庫は **W38（9/14の週）まで**。毎週月曜 0:00 JST に `weekly-rotate.yml` が自動切替。
