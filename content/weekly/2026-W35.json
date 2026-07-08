@@ -1,0 +1,27 @@
+{
+  "id": "2026-W35",
+  "title": { "ja": "毒の底からの帰還", "en": "Back from the Bottom of the Poison" },
+  "intro": {
+    "ja": "浅い反射と速すぎる学習。あなたの街の認知ネットワークは、すでに毒の底に沈んでいる。ここから戻るには、深く考える力と、現実に触れる時間の両方が要る。片方だけでは、浮上できない。",
+    "en": "Shallow reflexes and learning that runs too fast. Your town's cognitive network has already sunk to the bottom of the poison. Coming back needs both deeper reasoning and time spent touching reality — either one alone won't get you to the surface."
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 2, "ground": 5, "lr": 70 },
+    "hint": {
+      "ja": "探索深度と現実同期の両方を高水準まで戻してください。どちらか片方では認知健全性が85に届きません。",
+      "en": "Bring both search depth and grounding back to high levels. Either one alone won't get cognitive integrity to 85."
+    }
+  },
+  "goal": {
+    "ja": "認知健全性85以上・探索深度8以上・現実同期60以上を同時に満たす",
+    "en": "Reach cognitive integrity 85+, search depth 8+, and grounding 60+ at the same time"
+  },
+  "goalConds": [
+    { "metric": "integrity", "op": ">=", "value": 85 },
+    { "metric": "searchDepth", "op": ">=", "value": 8 },
+    { "metric": "groundingRate", "op": ">=", "value": 60 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_cognitive_grounding"
+}
