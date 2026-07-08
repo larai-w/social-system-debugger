@@ -32,6 +32,11 @@
 | T22 | README鮮度更新＋DATA-DICTIONARY.en＋研究者導線 | launch-en.md「EN磨き」。HN来訪者と海外研究者の受け皿 | ✅ |
 | T23 | ストア掲載文 `docs/store-listing.md` | ☐4 実機ビルドの次工程を先回り（審査想定問答つき） | ✅ |
 | T24 | KPI週次ログ `docs/kpi-log.md`＋計測有効化手順（TODO ☐9） | 「数字なき実績は実績にならない」の運用開始準備 | ✅ |
+| T25 | リール自動録画 `scripts/record-reel.mjs`（**Opus委任パイロット**） | TODO ☐5 の手作業削減。委任プロトコルの実地検証 | ✅ |
+| T26 | プライバシーポリシー `web/privacy.html`/`privacy.en.html`（**Opus委任2件目**） | ストア審査の必須物（store-listing の準備物を1つ消し込み） | ✅ |
+| T27 | アイコン/スプラッシュ生成 `scripts/gen-icons.mjs` → `resources/` | ☐4 実機ビルドの前提物（capacitor-assets 入力規約準拠） | ✅ |
+| T28 | 委任プロトコル（CLAUDE.md＋`docs/task-spec-template.md`） | 「Fable=仕様/レビュー、Opus=自己完結実装」を毎セッション自動適用のルールに | ✅ |
+| T29 | Zenn記事3 取材質問票 `docs/articles/zenn-03-interview.md` | 記事3はユーザーの実体験が素材 → 回答が埋まれば執筆可能な形に（TODO ☐10） | ✅ |
 
 ## 実施順
 
@@ -39,6 +44,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T25〜T29（第5スプリント・Opus委任を初運用）**: **T28** 委任プロトコルを CLAUDE.md に明文化（委任可=自己完結ファイル／直営=本体コア、サブエージェントはコミット禁止、受け入れ=check/verify green）＋仕様書テンプレ。**T25=Opus委任パイロット成功**: `scripts/record-reel.mjs`（Playwright録画でリール4本＋`?demo=1` 実機映像を dist/reels/ へ自動生成、ffmpeg あれば mp4 化。`make reels`）。親レビューで中間ファイル後始末を追加し、**録画済み webm の10秒地点フレームを実際に再生して内容確認**（demo=実エンジンの介入中画面／EN リール=COLLAPSE シーン）。**T26=委任2件目成功**: `web/privacy.html`/`privacy.en.html`（classroom と同一デザイン系・印刷白地・事実ベース7項目・制定日2026-07-09。エージェント自身が「現状は計測ゼロ」と kpi-log の事実を優先する良い判断）。**T27** `scripts/gen-icons.mjs`＝icon.svg のデザインを 1024 アイコン＋2732 スプラッシュに忠実再描画（`resources/`、capacitor-assets 入力規約）。**T29** 記事3の取材質問票10問＋記事骨子（TODO ☐10 で回答待ち）。委任の学び: 仕様書が具体的なら Opus の成果物はレビュー微修正のみで合格水準。並行作業中はサブエージェントの一時ファイルが pre-commit に掛かることがある（完了を待ってからコミットで回避）。
 
 - ✅ **T20〜T24（第4スプリント）**: **T20** `tests/weekly-reachability.test.mjs`＝①goalConds の metric 名がページ判定文脈に実在（タイポ＝永久にクリア不能、を CI で検出）②P1系は実エンジンのグリッド全探索で「到達可能＋開始即クリアなし」を検証。配信JSON＋バンドル版の両方が対象。**導入即、実バグ2件を検出**: W28/latest と W32（＋バンドル echo_trap/ethics_cascade）が開始パラメータでゴール達成済み＝開始と同時にクリアされる設計だった → 劣化状態からの回復型に修正（テスト22件 green・sw v6-357）。**T21** `web/js/demo.js`＝`?demo=1` でゴーストカーソルが実DOMを操作（ワイマール→崩壊→フィルタ/倫理/DP介入→回復→ループ）。値の偽装なし＝実エンジン録画用。通常起動は完全 no-op を実測確認、実ブラウザで f15/e88/dp 到達と緑バナーまで確認（sw v6-359・CORE/読込順/invariants 整合）。**T22** DATA-DICTIONARY.en.md 新規／両READMEの「単一ファイルSPA」記述を現構成に更新＋classroom/辞書リンク追加／アプリ研究者モードに📊データ辞書 doclink（ja/en切替対応・sw v6-358）。**T23** `docs/store-listing.md`＝App Store/Play の掲載文（字数制限内 ja/en）・キーワード・スクショ6枚プラン・審査想定問答（政治性・最小機能・通知・データ収集）・ユーザー準備物。**T24** `docs/kpi-log.md`＝週1行のKPI表＋「track() は現状 no-op」の明示＋有効化3案の比較（Plausible/CF/なし）。TODO ☐9 登録。
 

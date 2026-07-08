@@ -189,6 +189,11 @@ npx playwright install chromium
 Plausible（30日トライアル）を有効化 → `web/index.html` のコメントアウト済み script 行を解除して push。
 以後、毎週日曜に `docs/kpi-log.md` へ1行記入。
 
+## ☐ 10.（余裕のある時に）Zenn記事3の質問票に回答 — 15分
+
+`docs/articles/zenn-03-interview.md` の10問に箇条書きで回答（雑なメモでOK・skip可）。
+埋まったら Claude Code に「記事3を仕上げて」と頼めば、骨子どおりに執筆します。
+
 ## 週替わりシナリオの在庫メモ（自動運用の前提）
 
 - 在庫は **W38（9/14の週）まで**。毎週月曜 0:00 JST に `weekly-rotate.yml` が自動切替。
