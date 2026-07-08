@@ -9,7 +9,7 @@
 ## アーキテクチャ概要
 
 - **フロントは `web/` 配下にモジュール分割**（フェーズ1で単一 `index.html` から分離）。**バンドラなし**＝古典的 `<script>` を順に読み込むだけで、全スクリプトが**グローバルスコープを共有**する（`type="module"` にはしていない＝インラインの `onclick=` 等がそのまま動く）。ビルド不要。
-- **読み込み順（重要）**: `i18n → engine → native → share → scenario → ui`。この順で、後のファイルが前のファイルの関数/定数を実行時に参照できる。
+- **読み込み順（重要）**: `i18n → engine → native → share → scenario → ui → demo`。この順で、後のファイルが前のファイルの関数/定数を実行時に参照できる。
 - `engine.js` は **DOM/window 非依存の純粋計算層**（`metrics` 等）。将来のサーバー側検証やユニットテストに再利用するため、`document`/`window` に触れない。
 - ネイティブ機能（Capacitor）は `native.js` の `window.SSD` ファサードに集約し、すべて `SSD.isNative` でガード → **Web は完全 no-op**。
 - 外部依存（実行時）は **Chart.js v4（CDN）** のみ。エージェント表現は素の Canvas。
@@ -27,18 +27,23 @@ social-system-debugger/
 │       ├── native.js        #   Capacitor 橋渡し（window.SSD / 全て isNative ガード）
 │       ├── share.js         #   共有ルーティング（X/LINE/画像保存）
 │       ├── scenario.js      #   週替わりシナリオ（宣言的 goalConds / fetch / 通知）
-│       └── ui.js            #   DOM・チャート・P1〜P4・発見・init（最大）
+│       ├── ui.js            #   DOM・チャート・P1〜P4・発見・init（最大）
+│       └── demo.js          #   ?demo=1 のデモモード（本物のエンジンを自動操作。既定 no-op）
 │   ├── manifest.json / icon.svg / sw.js
+│   ├── classroom.html / .en.html   # 教員向け1枚ガイド（自己完結・印刷でA4）
+│   └── privacy.html / .en.html     # プライバシーポリシー（ストア提出／フッター導線）
 ├── content/weekly/          # 週替わりシナリオJSON（*.json + latest.json）＋ weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront＋GitHub OIDCロール
-├── tests/                   # engine.js ユニットテスト（node:test）
-├── scripts/                 # validate-weekly.mjs（週次JSONスキーマ検証）
+├── promo/                   # プロモリールHTML（?lang=en 対応。make reels で自動録画）
+├── tests/                   # ユニット/ガードレール（engine / goal / share / invariants / weekly-reachability）
+├── scripts/                 # validate-weekly / verify / record-reel / gen-icons / gen-og-image 等
 ├── capacitor.config.json    # appId / webDir=web / プラグイン設定
-├── package.json             # Capacitor 依存 ＋ ルートスクリプト(test / validate:weekly / serve)
+├── package.json             # Capacitor 依存 ＋ ルートスクリプト（test / check / verify / reels / gen:icons …）
+├── Makefile                 # 全操作の単一入口（make help で一覧）
 ├── README.md / .en.md       # 概要（日 / 英）
 ├── CHANGELOG.md
-├── docs/                    # METHODOLOGY / DEVELOPMENT（本ファイル）
-└── .github/workflows/       # ci.yml / deploy.yml(Pages) / deploy-aws.yml(OIDC)
+├── docs/                    # METHODOLOGY / DEVELOPMENT（本ファイル） / DATA-DICTIONARY（エクスポート項目）
+└── .github/workflows/       # ci.yml / deploy.yml(Pages) / deploy-aws.yml(OIDC) / weekly-rotate.yml
 ```
 
 ---
@@ -61,6 +66,7 @@ social-system-debugger/
 | **計測** | `ui.js`(`track`) | `track(event, props)`（共通prop `app_platform` 付与） | Plausible。イベント一覧は README「計測」節 |
 | **フィードバック** | `ui.js` | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()` | Formspree へ JSON POST |
 | **ナビ/初期化** | `ui.js` | `switchTab(n)`, `(function init(){…})()` | タブ切替＋アドレスバー同期、起動処理 |
+| **デモモード** | `demo.js` | `?demo=1` 判定＋ゴーストカーソル | 本物のエンジンを自動操作（値の偽装なし）。プロモ録画/展示用。既定は完全 no-op |
 | **PWA** | `web/sw.js` | `CACHE`（更新の度に版を上げる）, `CORE[]` | インストール・オフライン。CORE に全js/cssを列挙 |
 
 各レイヤーは「**ユーザー操作 → `metrics*` で計算 → `updateAll*` でゲージ/バナー/ログ更新**」という共通構造。P1/P2 は操作時、P3/P4 は requestAnimationFrame ループで毎フレーム更新。
@@ -94,8 +100,8 @@ social-system-debugger/
 ### 週替わりシナリオを追加する（人間の作業は「JSONを1枚書く」だけ）
 1. `content/weekly/2026-Wxx.json` を作成。スキーマは `content/weekly.schema.json`（必須: `id/title/intro/page/params/goal/goalConds/difficulty/discoveryId`、`title/intro/goal` は ja/en 両方）。
 2. **ゴールは宣言的**に：`goalConds: [{ "metric": "diversity", "op": ">=", "value": 80 }, …]`（AND結合）。`metric` は `metrics*` の返り値キー（`diversity/entropy/legitimacy/brand/redundancy/infra/integrity/ratio/drop` など）＋パラメータ（`ethicsScore/skillStock/searchDepth` 等）。判定は `scenario.js` の `evalGoalConds()` が評価。
-3. `content/weekly/latest.json` を今週分に差し替え（アプリは起動時に `latest.json` を fetch。`scenario.js` の `CONTENT_BASE_URL` が配信元）。
-4. ローカル検証: `npm run validate:weekly`（ja/en 欠けやopの不正を弾く）。
+3. **`latest.json` の差し替えは自動**：`weekly-rotate.yml` が毎週月曜 0:00 JST にその週の `2026-Wxx.json` を `latest.json` へコピー＆コミットし、Pages/AWS デプロイまで起動する。**人間の作業は「その週のJSONを1枚追加して PR する」だけ**（アプリは起動時に `latest.json` を fetch。`scenario.js` の `CONTENT_BASE_URL` が配信元）。在庫が無い週はローテが失敗して「書き足して」というリマインダーになる。
+4. ローカル検証: `npm run validate:weekly`（ja/en 欠けやopの不正を弾く）＋ `npm test`（`weekly-reachability.test.mjs` が **goalConds の metric 名の実在＝クリア可能性**を自動検証。タイポで誰もクリアできないシナリオを CI で弾く）。
 5. PR → main マージで `deploy-aws.yml` が S3 反映＋`latest.json` 無効化まで自動。
 - **禁止**: 実在の特定の国・自治体・人物の名指し（エチケット方針）。既存プリセットの変奏で抽象的に。
 
@@ -118,9 +124,10 @@ social-system-debugger/
 
 ## デプロイ（CI/CD）
 
-- `.github/workflows/ci.yml`（PR時）: engine.js ユニットテスト（`node --test`）／週次JSONスキーマ検証（`scripts/validate-weekly.mjs`）／`cdk synth`。
+- `.github/workflows/ci.yml`（PR時）: web ジョブは `npm ci` → **`npm run check`**（ローカルと完全一致＝ユニット/ガードレールテスト＋週次JSONスキーマ検証＋eslint＋prettier）。infra ジョブは `cdk synth`（cdk-nag込み）。
 - `.github/workflows/deploy.yml`（main push）: **GitHub Pages に自動デプロイ**（`actions/deploy-pages`。公開元は `web/`）。
 - `.github/workflows/deploy-aws.yml`（main push / web・content 変更時）: **AWS OIDC でロールをAssume** → `web/`+`content/` を S3 同期 → `latest.json`+`index.html` のみ CloudFront 無効化。長期キーは保存しない。
+- `.github/workflows/weekly-rotate.yml`（毎週月曜 0:00 JST / 手動可）: その週の `content/weekly/<ISO週>.json` を `latest.json` へコピー＆コミット → Pages/AWS デプロイを `workflow_dispatch` で起動。在庫切れの週は失敗して通知（＝シナリオ追加のリマインダー）。
 - 公開URL（不変）: https://larai-w.github.io/social-system-debugger/ ／ AWS は CloudFront ドメイン（`infra` の出力）。
 - AWSインフラの定義・デプロイ手順・OIDC/最小権限の説明は [`../infra/README.md`](../infra/README.md)。
 - **Pages が「Deployment failed, try again later.」で落ちたら**、GitHub Pages バックエンドの一時障害。少し待って Actions から **Re-run failed jobs** か再 push。稼働は https://www.githubstatus.com。
@@ -145,12 +152,15 @@ npm run serve              # → http://localhost:8000 （http で開く。file:
 
 - **必ず http:// で開く**（`file://` は manifest・Service Worker・`fetch()` が CORS/オリジン制約で動かない）。
 - 構文チェック: `node --check web/js/xxx.js`。
-- **CI と同じ検証をローカルで**:
+- **操作は `make help` に一覧**（人間 / Claude Code / Codex 共通の単一入口）。主なもの:
   ```bash
-  npm test                 # engine.js ユニットテスト（node:test）
-  npm run validate:weekly  # 週次シナリオJSONのスキーマ検証
-  (cd infra && npm run synth)   # cdk synth
+  make check       # CIと同じ（テスト＋週次JSON検証＋eslint＋prettier）＝ npm run check
+  make verify      # ★完了ごとの必須チェックの自動化（下記）
+  make reels       # プロモリールを自動録画（dist/reels/ へ webm、ffmpegがあれば mp4 も）
+  make gen-icons   # ストア用アイコン/スプラッシュを resources/ に生成
+  make synth       # cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
   ```
+- **★「完了ごとの必須チェック」の自動化 = `make verify`**（`scripts/verify.mjs`。Playwright）: CLAUDE.md の手動チェック（Console エラーゼロ・4タブ遷移・プリセット・スライダー・Chart.js 失敗時のグレースフルデグラデーション）を **Chart.js 正常時／CDN遮断時の2ケース**で自動再生し、Console/pageerror がゼロであることを検証する。手で毎回ブラウザを触る代わりにこれを回す（初回のみ `npx playwright install chromium`）。
 - **PWA/SW のキャッシュで古いJSが出たら**（デプロイ直後や分割変更後に起きやすい）: DevTools → Application → Service Workers → **Bypass for network** にチェック（開発中はこれが楽）／または Unregister → ハード再読み込み／シークレットウィンドウ。`sw.js` は cache-first なので、CORE を変えたら `CACHE` の版番号（`ssd-cache-v6-xxx`）を必ず上げること。
 
 ### ネイティブ（Capacitor）
