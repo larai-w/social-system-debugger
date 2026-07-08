@@ -1,0 +1,26 @@
+{
+  "id": "2026-W37",
+  "title": { "ja": "満員の観客席", "en": "A Packed Spectator Stand" },
+  "intro": {
+    "ja": "議論の会場は満員だ——ただし、当事者ではなく観客で。ゲーム化された歓声が帯域を埋め尽くし、生活者のパケットは4本に3本が落ちている。この騒がしさの中で、本来の声を通せるか。",
+    "en": "The debate hall is packed — with spectators, not stakeholders. Gamified cheering floods the bandwidth, and three out of four resident packets are being dropped. Can you route the real voices through all this noise?"
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 70, "gam": 75 },
+    "hint": {
+      "ja": "ゲーム化と外部トラフィックの両方を大きく絞る必要があります。片方だけではドロップ率が下がりきりません。",
+      "en": "You need to throttle both gamification and outside traffic hard. Either one alone won't bring the drop rate down far enough."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を75以上に上げ、パケットドロップ率を30以下に下げる",
+    "en": "Raise the stakeholder commit ratio above 75 and cut the packet drop rate to 30 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 75 },
+    { "metric": "drop", "op": "<=", "value": 30 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_stakeholder_voice"
+}

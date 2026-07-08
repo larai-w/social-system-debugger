@@ -1,0 +1,27 @@
+{
+  "id": "2026-W36",
+  "title": { "ja": "他責デッドロックを解除せよ", "en": "Release the Blame Deadlock" },
+  "intro": {
+    "ja": "直せるのに、誰も直さない。行政のCPUは100%「責任回避」に回り、修復キューは止まり、後継者は育っていない。責める相手を探すのをやめた瞬間から、街は直りはじめる。",
+    "en": "It could be fixed, but nobody fixes it. The admin CPU runs 100% blame-avoidance, the repair queue is frozen, and no successors are being trained. The town starts healing the moment it stops looking for someone to blame."
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 40, "d": 15, "e": 30, "al": "greedy", "reboot": false },
+    "hint": {
+      "ja": "倫理とアルゴリズムでデッドロックを解除し、行政CPUを修復に戻してから、DX投資で後継者ストックを立て直してください。",
+      "en": "Break the deadlock with ethics and the algorithm, put the admin CPU back on repair, then rebuild the successor stock with DX investment."
+    }
+  },
+  "goal": {
+    "ja": "他責デッドロックを解除し、行政CPUの修復割当75以上・後継者ストック50以上へ",
+    "en": "Release the blame deadlock, get the admin CPU to 75+ repair allocation and successor stock to 50+"
+  },
+  "goalConds": [
+    { "metric": "deadlock", "op": "==", "value": 0 },
+    { "metric": "cpuRepair", "op": ">=", "value": 75 },
+    { "metric": "skillStock", "op": ">=", "value": 50 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_successor_crisis"
+}

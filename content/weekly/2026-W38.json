@@ -1,0 +1,27 @@
+{
+  "id": "2026-W38",
+  "title": { "ja": "静かな劣化", "en": "The Quiet Degradation" },
+  "intro": {
+    "ja": "派手な崩壊は起きていない。ただ、フィルターは少し強めで、倫理は少し緩めで、みんな少しずつ疲れている。壊れる前の街は、こういう顔をしている。数字が悪化しきる前に、流れを反転できるか。",
+    "en": "There is no dramatic collapse. The filter is just a bit strong, ethics just a bit loose, and everyone is just a bit tired. This is what a town looks like before it breaks. Can you reverse the current before the numbers bottom out?"
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 45, "e": 60, "al": "greedy" },
+    "hint": {
+      "ja": "情報健全性と精神的健全性の両方を見てください。フィルタ解除と倫理の再建、どちらが先でも構いませんが、両方必要です。",
+      "en": "Watch both information health and mental well-being. Filter release or ethics rebuilding can come first — but you need both."
+    }
+  },
+  "goal": {
+    "ja": "倫理スコア75以上・情報健全性80以上・精神的健全性75以上を同時に満たす",
+    "en": "Reach ethics 75+, information health 80+, and mental well-being 75+ at the same time"
+  },
+  "goalConds": [
+    { "metric": "ethicsScore", "op": ">=", "value": 75 },
+    { "metric": "infoH", "op": ">=", "value": 80 },
+    { "metric": "mentalWB", "op": ">=", "value": 75 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_ethics_cascade"
+}
