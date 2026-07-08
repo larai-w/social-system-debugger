@@ -1,0 +1,27 @@
+{
+  "id": "2026-W39",
+  "title": { "ja": "再公営化の請求書", "en": "The Bill for Going Public Again" },
+  "intro": {
+    "ja": "効率化で削った公共サービスを、あなたはもう一度立ち上げようとしている。だが再公営化のスイッチには請求書がついてくる——財政という名の。インフラを取り戻しながら、街を破産させずにいられるか。",
+    "en": "You are trying to bring back the public services that efficiency once cut away. But the re-municipalization switch comes with a bill — one written in the town's budget. Can you win the infrastructure back without bankrupting the town?"
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 45, "d": 40, "e": 45, "al": "greedy", "reboot": false },
+    "hint": {
+      "ja": "再公営化を実行するとインフラと冗長性は戻りますが、財政を圧迫します。DX投資と倫理・長期最適アルゴリズムで税収基盤を厚くし、予算を割らせないでください。",
+      "en": "Re-municipalization restores infrastructure and redundancy but strains the budget. Thicken the tax base with DX investment, ethics, and the long-term algorithm so the budget doesn't crack."
+    }
+  },
+  "goal": {
+    "ja": "再公営化しても財政を割らせず、冗長性バッファ80以上・インフラ70以上・自治体財政45以上を同時に満たす",
+    "en": "Keep the budget solvent through re-municipalization: reach redundancy 80+, infrastructure 70+, and budget 45+ at the same time"
+  },
+  "goalConds": [
+    { "metric": "redundancy", "op": ">=", "value": 80 },
+    { "metric": "infra", "op": ">=", "value": 70 },
+    { "metric": "budget", "op": ">=", "value": 45 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_redundancy_shock"
+}

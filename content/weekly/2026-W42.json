@@ -1,0 +1,26 @@
+{
+  "id": "2026-W42",
+  "title": { "ja": "シビルの洪水を堰き止める", "en": "Damming the Sybil Flood" },
+  "intro": {
+    "ja": "議論の広場に、当事者でない大量のノードが四方から流れ込んでいる。生活者どうしをつなぐ通信リンクは次々と詰まり、当事者の声は洪水に飲み込まれていく。プロトコル保護を実行し、この洪水を堰き止められるか。",
+    "en": "From every direction, a flood of non-stakeholder nodes pours into the public square. The links that connect residents jam one after another, and the real voices drown in the surge. Can you execute protocol protection and dam this flood?"
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 80, "gam": 80 },
+    "hint": {
+      "ja": "ゲーム化を下げて当事者比率を回復させ、フィルタ実行で外部ノードの洪水を排出してリンクの詰まりを解消してください。",
+      "en": "Lower gamification to recover the stakeholder ratio, then execute the filter to flush the external nodes and clear the jammed links."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を72以上に上げ、パケットドロップ率を35以下に下げる",
+    "en": "Raise the stakeholder commit ratio to 72+ and cut the packet drop rate to 35 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 72 },
+    { "metric": "drop", "op": "<=", "value": 35 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_stakeholder_voice"
+}
