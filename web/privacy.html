@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社会デバッガー — プライバシーポリシー</title>
+<meta name="description" content="社会デバッガーのプライバシーポリシー。アカウント不要・個人情報を収集しません。設定や記録は端末内にのみ保存されます。">
+<!--
+  プライバシーポリシー（App Store / Google Play 提出とWeb版フッター導線に使う公開ページ）。
+  画面ではアプリと同じダーク・ターミナル調、印刷（Ctrl/Cmd+P → PDF保存）では白地A4。
+  アプリ本体の i18n/JS には依存しない自己完結ページ。
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.65;}
+  .sheet{max-width:800px;margin:0 auto;padding:28px 26px;}
+  h1{font-size:1.25rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 14px;font-size:.8rem;}
+  h2{font-size:.92rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:18px 0 8px;letter-spacing:.06em;}
+  ol,ul{margin:6px 0;padding-left:1.4em;}
+  li{margin:3px 0;}
+  b{color:var(--tx);}
+  a{color:var(--cy);text-decoration:none;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:8px 12px;margin:10px 0;font-size:.78rem;color:var(--muted);}
+  footer{margin-top:18px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.72rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:11mm;}
+    :root{--bg0:#fff;--bg1:#fff;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;}
+    body{font-size:10.2px;line-height:1.5;-webkit-print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h2{margin:10px 0 5px;}
+    a{color:var(--cy);}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="privacy.en.html">English version</a></div>
+<button class="printbtn" onclick="window.print()">🖨 印刷 / PDF保存</button>
+<div class="sheet">
+
+<h1>社会デバッガー — プライバシーポリシー</h1>
+<p class="tagline">短くまとめると: アカウント不要。個人情報を集めません。あなたの記録は、あなたの端末の中だけに残ります。</p>
+
+<h2>1. 収集しない情報</h2>
+<p>このアプリを使うのにアカウント登録は不要です。氏名・メールアドレス・電話番号などの個人情報を、こちらから収集することはありません。</p>
+<ul>
+  <li>例外として、アプリ内の「💬 フィードバック」からご連絡をいただく際に、あなたが<b>任意で</b>メールアドレスを入力した場合のみ、そのアドレスを<b>返信のためだけ</b>に使います。それ以外の目的には使いません。</li>
+</ul>
+
+<h2>2. 端末内に保存する情報</h2>
+<p>設定・街の名前・発見ログ・週次クリアの記録などは、ブラウザの localStorage（ネイティブ版はアプリの Preferences にも複製）に、<b>あなたの端末内にのみ</b>保存されます。</p>
+<ul>
+  <li>これらのデータがこちらのサーバーに送信されることはありません。</li>
+  <li>ブラウザのサイトデータを削除する、またはアプリを削除すると、これらの記録は消えます。</li>
+</ul>
+
+<h2>3. アナリティクス（利用状況の集計）</h2>
+<p>現在、アナリティクスは<b>導入していません</b>。訪問数を含め、何も計測していません。</p>
+<ul>
+  <li>将来、Cookie を使わない匿名の集計計測（Plausible などの、個人を特定しない仕組み）を有効にする可能性があります。その場合は、このページを更新してお知らせします。</li>
+</ul>
+
+<h2>4. 第三者サービス</h2>
+<ul>
+  <li><b>グラフ描画ライブラリ（Chart.js）</b>を CDN（外部の配信ネットワーク）から読み込みます。そのため、CDN の事業者側に、通常の Web アクセスと同様のログ（IPアドレス等）が残り得ます。</li>
+  <li><b>X・LINE への共有</b>は、あなたが共有ボタンを明示的に押したときにのみ行われ、それぞれのサービスの規約のもとで処理されます。押さなければ、これらのサービスに情報は渡りません。</li>
+</ul>
+
+<h2>5. 通知（ネイティブ版のみ）</h2>
+<p>ネイティブ版（iOS / Android アプリ）の通知は、週1回のローカル通知だけです。端末の中で完結し、端末の外へ情報が出ることはありません。</p>
+<ul>
+  <li>通知の許可は、いつでも OS の設定から取り消せます。</li>
+</ul>
+
+<h2>6. お問い合わせ</h2>
+<p>プライバシーに関するご質問は、アプリ内の「💬 フィードバック」、または GitHub リポジトリ
+（<a href="https://github.com/larai-w/social-system-debugger/issues">larai-w/social-system-debugger</a> の Issues）からお寄せください。</p>
+
+<div class="note">
+  このアプリは無料・非営利のオープンソースです。上に書いたこと以上のデータは扱っていません。
+  「特定の誰かの情報を集める」のではなく、「どの社会にも起こる構造」を体験してもらうことが目的のアプリです。
+</div>
+
+<footer>
+  制定日: 2026年7月9日。内容を変更した場合は、このページで告知します。<br>
+  ※このページはブラウザの印刷（Ctrl/Cmd + P）でA4のPDFとして保存できます。
+</footer>
+
+</div>
+</body>
+</html>

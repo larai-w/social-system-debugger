@@ -115,5 +115,5 @@ An educational sim of how societies fail. Move sliders, rewind collapse. Weekly 
 ## ユーザー（あなた）が用意するもの
 
 - Apple Developer Program（年99ドル）／ Google Play デベロッパー登録（初回25ドル）
-- プライバシーポリシーの公開URL（`web/privacy.html` を作れば Pages で配信可能 — 必要になったら Claude Code に依頼）
+- ~~プライバシーポリシーの公開URL~~ → **作成済み**: `https://larai-w.github.io/social-system-debugger/privacy.html`（EN: `privacy.en.html`。push 後に有効）
 - `capacitor.config.json` の appId 確定（現: `dev.socialdebugger.app` はプレースホルダ）

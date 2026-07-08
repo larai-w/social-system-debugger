@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Debugger — Privacy Policy</title>
+<meta name="description" content="Privacy policy for Social Debugger. No account needed, no personal data collected. Your settings and records stay on your device only.">
+<!--
+  Privacy policy (public page for App Store / Google Play submission and the web footer link).
+  Dark terminal look on screen, white A4 in print (Ctrl/Cmd+P -> save as PDF).
+  Self-contained: no dependency on the app's i18n/JS.
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.65;}
+  .sheet{max-width:800px;margin:0 auto;padding:28px 26px;}
+  h1{font-size:1.25rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 14px;font-size:.8rem;}
+  h2{font-size:.92rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:18px 0 8px;letter-spacing:.06em;}
+  ol,ul{margin:6px 0;padding-left:1.4em;}
+  li{margin:3px 0;}
+  b{color:var(--tx);}
+  a{color:var(--cy);text-decoration:none;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:8px 12px;margin:10px 0;font-size:.78rem;color:var(--muted);}
+  footer{margin-top:18px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.72rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:11mm;}
+    :root{--bg0:#fff;--bg1:#fff;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;}
+    body{font-size:10.2px;line-height:1.5;-webkit-print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h2{margin:10px 0 5px;}
+    a{color:var(--cy);}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="privacy.html">日本語版はこちら</a></div>
+<button class="printbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+<div class="sheet">
+
+<h1>Social Debugger — Privacy Policy</h1>
+<p class="tagline">In short: no account, no personal data collected. Your records stay only on your own device.</p>
+
+<h2>1. Information we do not collect</h2>
+<p>No account is required to use this app. We do not collect personal information such as your name, email address, or phone number.</p>
+<ul>
+  <li>The only exception: if you <b>choose</b> to enter your email address when contacting us through the in-app "💬 Feedback", we use that address <b>only to reply to you</b>, and for nothing else.</li>
+</ul>
+
+<h2>2. Information stored on your device</h2>
+<p>Your settings, town name, discovery log, and weekly-clear records are stored in your browser's localStorage (the native app also mirrors them into the app's Preferences), <b>on your device only</b>.</p>
+<ul>
+  <li>This data is never sent to our servers.</li>
+  <li>Clearing your browser's site data, or deleting the app, removes these records.</li>
+</ul>
+
+<h2>3. Analytics</h2>
+<p>We currently use <b>no analytics</b>. Nothing is measured — not even visit counts.</p>
+<ul>
+  <li>In the future we may enable anonymous, cookie-free aggregate analytics (a privacy-preserving tool such as Plausible that does not identify individuals). If we do, we will update this page.</li>
+</ul>
+
+<h2>4. Third-party services</h2>
+<ul>
+  <li>We load a <b>charting library (Chart.js)</b> from a CDN (an external content delivery network). As a result, the CDN provider may keep the usual web access logs (such as your IP address), as with any web request.</li>
+  <li><b>Sharing to X or LINE</b> happens only when you explicitly tap a share button, and is handled under each service's own terms. If you don't tap it, no information is passed to those services.</li>
+</ul>
+
+<h2>5. Notifications (native app only)</h2>
+<p>In the native app (iOS / Android), notifications are limited to a once-a-week local notification. It stays within your device; no information leaves the device.</p>
+<ul>
+  <li>You can revoke notification permission at any time from your OS settings.</li>
+</ul>
+
+<h2>6. Contact</h2>
+<p>For any privacy questions, please reach us through the in-app "💬 Feedback", or via the Issues on our GitHub repository
+(<a href="https://github.com/larai-w/social-system-debugger/issues">larai-w/social-system-debugger</a>).</p>
+
+<div class="note">
+  This app is free, non-commercial, and open source. We handle no data beyond what is described above.
+  Its purpose is not to gather anyone's information, but to let you experience "structures that can happen to any society".
+</div>
+
+<footer>
+  Effective date: July 9, 2026. If we change this policy, we will announce it on this page.<br>
+  * This page can be saved as an A4 PDF via your browser's print function (Ctrl/Cmd + P).
+</footer>
+
+</div>
+</body>
+</html>
