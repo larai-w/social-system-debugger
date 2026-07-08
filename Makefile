@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 GITHUB_REPO ?= larai-w/social-system-debugger
 
-.PHONY: help setup hooks serve test check verify lint format gen-og reels synth handoff protect \
+.PHONY: help setup hooks serve test check verify lint format gen-og gen-icons reels synth handoff protect \
         aws-bootstrap aws-deploy aws-wire ios android
 
 help: ## このヘルプを表示
@@ -39,6 +39,9 @@ format: ## Prettier で整形（対象は .prettierignore 以外）
 
 gen-og: ## og-image.png を再生成
 	npm run gen:og
+
+gen-icons: ## ストア用アイコン/スプラッシュを resources/ に生成
+	npm run gen:icons
 
 reels: ## リール5本を自動録画（dist/reels/ へ webm、ffmpegがあればmp4も）
 	npm run record:reels
