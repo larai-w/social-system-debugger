@@ -14,7 +14,7 @@
 
 ## 概要 / Overview
 
-機械学習・分散システム工学の概念（過学習、デッドロック、冗長性、Dropout、学習率、シビル攻撃）を社会現象へマッピングした**シングルファイルSPA**です。ブラウザで `index.html` を開くだけで動作し、スライダー操作に対してエージェント・シミュレーション、Chart.js、Canvasアニメーションが即座に応答します。
+機械学習・分散システム工学の概念（過学習、デッドロック、冗長性、Dropout、学習率、シビル攻撃）を社会現象へマッピングした**バンドラ不要のバニラJSアプリ**（`web/` 配下・古典スクリプト分割）です。スライダー操作に対してエージェント・シミュレーション、Chart.js、Canvasアニメーションが即座に応答し、同じコードが Capacitor で iOS/Android アプリにもなります。
 
 パラメーターを調整して4レイヤーすべてを健全域へ導くと **GRAND OPTIMAL** が認定され、Markdown形式の「デバッグ監査報告書」を出力・𝕏 (Twitter) へシェアできます。講義課題の提出物としても利用できます。
 
@@ -184,6 +184,7 @@ npx cap open android        # → Android Studio
 ## ドキュメント / Documentation
 
 - [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md) — 全レイヤーの計算式・しきい値・カスケード・**前提と限界**（[English](docs/METHODOLOGY.en.md)）
+- [`docs/DATA-DICTIONARY.md`](docs/DATA-DICTIONARY.md) — **研究者向け**: アプリ内エクスポート（JSON/CSV）の全項目と実装式の対応表・再現URLの使い方（[English](docs/DATA-DICTIONARY.en.md)）
 - [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) — 開発ガイド（コードの地図・変更手順・バージョン方針・デプロイ・運用注意）（[English](docs/DEVELOPMENT.en.md)）
 - [`CHANGELOG.md`](CHANGELOG.md) — 変更履歴
 

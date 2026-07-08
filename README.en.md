@@ -6,13 +6,15 @@
 
 An interactive literacy tool that treats society as one giant distributed system (an "OS") and visualizes, in real time, how information contamination and governance failure trigger a **cascade collapse** through physical infrastructure, individual cognition, and stakeholder representation.
 
-🔗 **[Live Demo](https://larai-w.github.io/social-system-debugger/)**
+🔗 **[Live Demo](https://larai-w.github.io/social-system-debugger/)** — free, no login, ~60 seconds to try
+
+🏫 **[One-page classroom guide (prints to A4 PDF)](https://larai-w.github.io/social-system-debugger/classroom.en.html)**
 
 ---
 
 ## Overview
 
-A **single-file SPA** that maps concepts from machine learning and distributed-systems engineering (overfitting, deadlock, redundancy, dropout, learning rate, sybil attacks) onto social phenomena. Just open `index.html` in a browser — agent simulation, Chart.js, and Canvas animations respond instantly as you move the sliders.
+A **buildless vanilla-JS web app** (classic scripts, no bundler — the app under `web/`) that maps concepts from machine learning and distributed-systems engineering (overfitting, deadlock, redundancy, dropout, learning rate, sybil attacks) onto social phenomena. Agent simulation, Chart.js, and Canvas animations respond instantly as you move the sliders. The same code ships as iOS/Android apps via Capacitor.
 
 Tune the parameters to bring all four layers into a healthy range and you earn **GRAND OPTIMAL**, which lets you export a Markdown "debug audit report" and share it to 𝕏 (Twitter). It also works as a submittable assignment for coursework.
 
@@ -119,14 +121,14 @@ Sharing here is designed as an **experiment link for observing structure togethe
 
 ## Requirements
 
-- **Standalone SPA** — no build step; just open `index.html` in a browser
-- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/) (loaded from CDN)
+- **No build step** — classic scripts under `web/`; serve locally and open
+- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/) (loaded from CDN, with graceful degradation when blocked)
 - Recommended browsers: latest Chrome / Edge / Safari / Firefox (mobile supported)
 
 ```bash
 git clone https://github.com/larai-w/social-system-debugger.git
 cd social-system-debugger
-open index.html   # or drag & drop into a browser
+npm run serve   # http://localhost:8000 (PWA/service worker needs http, not file://)
 ```
 
 ---
@@ -142,6 +144,7 @@ This app is designed as teaching material for information literacy, social-syste
 ## Documentation
 
 - [`docs/METHODOLOGY.en.md`](docs/METHODOLOGY.en.md) — every layer's formulas, thresholds, cascades, and **assumptions & limitations** ([日本語](docs/METHODOLOGY.md))
+- [`docs/DATA-DICTIONARY.en.md`](docs/DATA-DICTIONARY.en.md) — **for researchers**: every field of the in-app JSON/CSV export mapped to its implementation formula, with reproducible share URLs ([日本語](docs/DATA-DICTIONARY.md))
 - [`docs/DEVELOPMENT.en.md`](docs/DEVELOPMENT.en.md) — developer guide: code map, how to change things, versioning, deploy, operational notes ([日本語](docs/DEVELOPMENT.md))
 - [`CHANGELOG.md`](CHANGELOG.md) — release history
 
