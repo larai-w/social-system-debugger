@@ -9,7 +9,7 @@ Practical notes for anyone who touches the "Social System Debugger" (future me, 
 ## Architecture overview
 
 - **Front-end split into modules under `web/`** (separated from the single `index.html` in Phase 1). **No bundler** — plain classic `<script>` tags loaded in order, all sharing the **global scope** (not `type="module"`, so inline `onclick=` handlers keep working). No build step.
-- **Load order (important)**: `i18n → engine → native → share → scenario → ui`. Later files reference earlier files' functions/constants at runtime.
+- **Load order (important)**: `i18n → engine → native → share → scenario → ui → demo`. Later files reference earlier files' functions/constants at runtime.
 - `engine.js` is the **DOM/window-free pure-logic layer** (`metrics`, etc.) — no `document`/`window`, so it can be reused for server-side validation and unit tests.
 - Native features (Capacitor) live behind the `window.SSD` facade in `native.js`, all gated by `SSD.isNative` → **web is a full no-op**.
 - The only runtime external dependency is **Chart.js v4 (CDN)**. Agents are drawn on raw Canvas.
@@ -27,18 +27,23 @@ social-system-debugger/
 │       ├── native.js        #   Capacitor bridge (window.SSD, all isNative-gated)
 │       ├── share.js         #   share routing (X / LINE / save image)
 │       ├── scenario.js      #   weekly scenarios (declarative goalConds / fetch / notify)
-│       └── ui.js            #   DOM, charts, P1–P4, discovery, init (largest)
+│       ├── ui.js            #   DOM, charts, P1–P4, discovery, init (largest)
+│       └── demo.js          #   ?demo=1 demo mode (auto-drives the real engine; no-op by default)
 │   ├── manifest.json / icon.svg / sw.js
+│   ├── classroom.html / .en.html   # one-page teacher guide (self-contained; prints to A4)
+│   └── privacy.html / .en.html     # privacy policy (store submission / footer link)
 ├── content/weekly/          # weekly scenario JSON (*.json + latest.json) + weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront + GitHub OIDC role
-├── tests/                   # engine.js unit tests (node:test)
-├── scripts/                 # validate-weekly.mjs (weekly JSON schema check)
+├── promo/                   # promo reel HTML (?lang=en supported; auto-recorded by make reels)
+├── tests/                   # unit / guardrail tests (engine / goal / share / invariants / weekly-reachability)
+├── scripts/                 # validate-weekly / verify / record-reel / gen-icons / gen-og-image, etc.
 ├── capacitor.config.json    # appId / webDir=web / plugin config
-├── package.json             # Capacitor deps + root scripts (test / validate:weekly / serve)
+├── package.json             # Capacitor deps + root scripts (test / check / verify / reels / gen:icons …)
+├── Makefile                 # single entry point for all ops (make help)
 ├── README.md / .en.md
 ├── CHANGELOG.md
-├── docs/                    # METHODOLOGY / DEVELOPMENT (this file)
-└── .github/workflows/       # ci.yml / deploy.yml(Pages) / deploy-aws.yml(OIDC)
+├── docs/                    # METHODOLOGY / DEVELOPMENT (this file) / DATA-DICTIONARY (export fields)
+└── .github/workflows/       # ci.yml / deploy.yml(Pages) / deploy-aws.yml(OIDC) / weekly-rotate.yml
 ```
 
 ---
@@ -61,6 +66,7 @@ social-system-debugger/
 | **Analytics** | `ui.js`(`track`) | `track(event, props)` (adds common prop `app_platform`) | Plausible; event list in README "Analytics" |
 | **Feedback** | `ui.js` | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()` | JSON POST to Formspree |
 | **Nav / init** | `ui.js` | `switchTab(n)`, `(function init(){…})()` | tab switch + address-bar sync, startup |
+| **Demo mode** | `demo.js` | `?demo=1` check + ghost cursor | auto-drives the real engine (no faked values); for promo recording / kiosks. Full no-op by default |
 | **PWA** | `web/sw.js` | `CACHE` (bump on every change), `CORE[]` | install, offline; CORE lists all js/css |
 
 Every layer follows the same shape: **user input → compute in `metrics*` → update gauges/banners/logs in `updateAll*`**. P1/P2 update on input; P3/P4 update every frame via `requestAnimationFrame`.
@@ -94,8 +100,8 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 ### Add a weekly scenario (the human step is just "write one JSON file")
 1. Create `content/weekly/2026-Wxx.json`. Schema is `content/weekly.schema.json` (required: `id/title/intro/page/params/goal/goalConds/difficulty/discoveryId`; `title/intro/goal` need both ja/en).
 2. **Goals are declarative**: `goalConds: [{ "metric": "diversity", "op": ">=", "value": 80 }, …]` (AND-combined). `metric` is any key returned by `metrics*` (`diversity/entropy/legitimacy/brand/redundancy/infra/integrity/ratio/drop`…) plus params (`ethicsScore/skillStock/searchDepth`…). Evaluated by `evalGoalConds()` in `scenario.js`.
-3. Swap `content/weekly/latest.json` to this week's file (the app fetches `latest.json` at startup; `CONTENT_BASE_URL` in `scenario.js` is the origin).
-4. Validate locally: `npm run validate:weekly` (rejects missing ja/en or bad ops).
+3. **Swapping `latest.json` is automated**: `weekly-rotate.yml` runs every Monday 00:00 JST, copies that week's `2026-Wxx.json` to `latest.json`, commits it, and triggers the Pages/AWS deploys. **The human step is only "add one JSON for the week and open a PR."** (The app fetches `latest.json` at startup; `CONTENT_BASE_URL` in `scenario.js` is the origin.) A week with no stock makes the rotation fail — a built-in "write more scenarios" reminder.
+4. Validate locally: `npm run validate:weekly` (rejects missing ja/en or bad ops) + `npm test` (`weekly-reachability.test.mjs` checks that every `goalConds` metric name **actually exists = the scenario is clearable**, so a typo that makes it unbeatable is caught in CI).
 5. PR → merge to main → `deploy-aws.yml` syncs to S3 and invalidates `latest.json` automatically.
 - **Forbidden**: naming real countries/municipalities/people (etiquette policy). Keep it abstract, a variation of existing presets.
 
@@ -118,9 +124,10 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 
 ## Deploy (CI/CD)
 
-- `.github/workflows/ci.yml` (on PR): engine.js unit tests (`node --test`) / weekly JSON schema validation (`scripts/validate-weekly.mjs`) / `cdk synth`.
+- `.github/workflows/ci.yml` (on PR): the web job runs `npm ci` → **`npm run check`** (identical to local = unit/guardrail tests + weekly JSON schema validation + eslint + prettier). The infra job runs `cdk synth` (with cdk-nag).
 - `.github/workflows/deploy.yml` (main push): **auto-deploy to GitHub Pages** (`actions/deploy-pages`; serves `web/`).
 - `.github/workflows/deploy-aws.yml` (main push / when web·content change): **assume an AWS role via OIDC** → sync `web/`+`content/` to S3 → invalidate only `latest.json`+`index.html`. No long-lived keys stored.
+- `.github/workflows/weekly-rotate.yml` (every Monday 00:00 JST / manual): copies that week's `content/weekly/<ISO-week>.json` to `latest.json`, commits it, and kicks off the Pages/AWS deploys via `workflow_dispatch`. A week with no stock fails loudly (a reminder to add scenarios).
 - Public URL (unchanged): https://larai-w.github.io/social-system-debugger/ ; AWS via the CloudFront domain (an `infra` output).
 - Infra definition, deploy steps, and the OIDC/least-privilege rationale are in [`../infra/README.md`](../infra/README.md).
 - **If Pages fails with "Deployment failed, try again later."**, that's a transient GitHub Pages backend issue. Wait, then **Re-run failed jobs**, or push again. Status: https://www.githubstatus.com.
@@ -145,12 +152,15 @@ npm run serve              # → http://localhost:8000 (open over http; file:// 
 
 - **Always open over http://** (`file://` breaks manifest, Service Worker, and `fetch()` due to CORS/origin rules).
 - Syntax check: `node --check web/js/xxx.js`.
-- **Run the same checks as CI, locally**:
+- **All ops are listed in `make help`** (a single entry point shared by humans / Claude Code / Codex). The main ones:
   ```bash
-  npm test                 # engine.js unit tests (node:test)
-  npm run validate:weekly  # weekly scenario JSON schema
-  (cd infra && npm run synth)   # cdk synth
+  make check       # same as CI (tests + weekly JSON validation + eslint + prettier) = npm run check
+  make verify      # ★ automated "checks before reporting done" (see below)
+  make reels       # auto-record promo reels (webm to dist/reels/, mp4 too if ffmpeg is present)
+  make gen-icons   # generate store icons/splash into resources/
+  make synth       # cdk synth (with cdk-nag security checks; no AWS needed)
   ```
+- **★ Automated "checks before reporting done" = `make verify`** (`scripts/verify.mjs`, Playwright): replays CLAUDE.md's manual checklist (zero Console errors, all 4 tabs, a preset, slider input, and graceful degradation when Chart.js fails) across **two cases — Chart.js OK and CDN blocked** — and asserts zero Console/pageerror. Run this instead of poking the browser by hand every time (first run: `npx playwright install chromium`).
 - **If the SW serves stale JS** (common right after a deploy or a module change): DevTools → Application → Service Workers → check **Bypass for network** (easiest during dev) / or Unregister → hard reload / incognito. `sw.js` is cache-first, so whenever you change CORE, bump the `CACHE` version (`ssd-cache-v6-xxx`).
 
 ### Native (Capacitor)
