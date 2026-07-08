@@ -7,9 +7,10 @@
 <!--
   30秒縦型リール（vertical-reel-and-civic-ux-SKILL.md PART 1 準拠）。
   使い方: スマホで全画面表示 → 画面録画 → そのまま 9:16 のSNS動画になる。
+  英語キャプション版: URL に ?lang=en を付ける（Show HN / 海外向け録画用）。
   構成: フック2秒 → 実験1つ（同じ災害・備えの差）→ 結論（対句）→ エンドカード。
   忠実性: 画面に映るUI文言（プリセット名/ボタン/ゲージ名/ログ/ヘリ状態/判定バナー）は
-  web/js/ui.js・web/index.html の実文言を転記。数値の動きは実装の因果関係
+  web/js/ui.js・web/js/i18n.js・web/index.html の実文言（ja/en とも）を転記。数値の動きは実装の因果関係
   （Redundancy Buffer <30% 即時崩壊 / ≥60% 生存継続）に沿った手付けの演出。
   SNS投稿文には「※演出用に簡略化したデモ映像です」を添えること（スキルの規約）。
   このファイルは promo/ 配下＝本番配信(web/)対象外。アプリ本体へ移植しない。
@@ -34,13 +35,15 @@
 </div>
 <script>
 'use strict';
+// ── 言語（?lang=en で英語キャプション版） ─────────
+const EN=new URLSearchParams(location.search).get('lang')==='en';
+const T=(ja,en)=>EN?en:ja;
 // ── 基本セットアップ ─────────────────────────────
 const CW=420,CH=740,DUR=30;
 const cv=document.getElementById('cv'),cx=cv.getContext('2d');
 function fit(){const d=Math.min(devicePixelRatio||1,3);cv.width=CW*d;cv.height=CH*d;cx.setTransform(d,0,0,d,0,0);}
 fit();addEventListener('resize',fit);
 const ss=(a,b,x)=>{const k=Math.min(1,Math.max(0,(x-a)/(b-a)));return k*k*(3-2*k);};
-const clamp=(v,l,h)=>Math.max(l,Math.min(h,v));
 const lerp=(a,b,k)=>a+(b-a)*k;
 function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
 
@@ -52,11 +55,19 @@ const T_HOOK=2.2, T_CLICK_EFF=3.4, T_CLICK_SHOCK1=5.6, T_FLASH1=5.8, T_BANNER_A=
       T_BLACK=12.6, T_RUNB=14.1, T_CLICK_RED=15.1, T_CLICK_SHOCK2=17.2, T_FLASH2=17.4,
       T_BANNER_B=20.4, T_CONC=23.2, T_END=25.8;
 
-// ── 実アプリからの転記文言（ui.js / index.html） ──
-const L_NORMAL=['インフラ保守予定 … OK','救命ヘリ出動状況 … ONLINE','予算配分 … BALANCED','保守キュー … CLEAR','SECTOR-T 状態 … GREEN'];
-const L_SHOCK=['ブラックスワン事象 … DETECTED','システムショック … INJECTED','冗長性テスト … RUNNING','インフラ耐性試験 … CRITICAL','緊急プロトコル … ACTIVATED','復元力チェック … IN_PROGRESS'];
-const L_WARN=['インフラ劣化 … WARNING','財政赤字検知 … ALERT','救命ヘリ燃料備蓄 … LOW','修復キュー逼迫 … HIGH','コスト超過検知 … TRUE'];
-const L_REBOOT=['公共性リブート … ACTIVE','市場ロジック … SUSPENDED','冗長性バッファ … RESTORING','救命ヘリ強制稼働 … FORCED_ONLINE','インフラ劣化速度 … HALVED','公共サービス優先度 … MAXIMUM'];
+// ── 実アプリからの転記文言（ui.js / index.html / i18n.js、ja・en とも実物） ──
+const L_NORMAL=EN
+  ?['INFRA_MAINT_SCHEDULED ..... OK','HELI_DISPATCH_STATUS ...... ONLINE','BUDGET_ALLOCATION ......... BALANCED','MAINTENANCE_QUEUE ......... CLEAR','SECTOR_T_STATUS ........... GREEN']
+  :['インフラ保守予定 … OK','救命ヘリ出動状況 … ONLINE','予算配分 … BALANCED','保守キュー … CLEAR','SECTOR-T 状態 … GREEN'];
+const L_SHOCK=EN
+  ?['BLACK_SWAN_EVENT .......... DETECTED','SYSTEM_SHOCK .............. INJECTED','REDUNDANCY_TEST ........... RUNNING','INFRA_STRESS_TEST ......... CRITICAL','EMERGENCY_PROTOCOL ........ ACTIVATED','RESILIENCE_CHECK .......... IN_PROGRESS']
+  :['ブラックスワン事象 … DETECTED','システムショック … INJECTED','冗長性テスト … RUNNING','インフラ耐性試験 … CRITICAL','緊急プロトコル … ACTIVATED','復元力チェック … IN_PROGRESS'];
+const L_WARN=EN
+  ?['INFRA_DEGRADATION ......... WARNING','BUDGET_DEFICIT_DETECTED ... ALERT','HELI_FUEL_RESERVE ......... LOW','REPAIR_QUEUE_OVERFLOW ..... HIGH','COST_OVERRUN_DETECTED ..... TRUE']
+  :['インフラ劣化 … WARNING','財政赤字検知 … ALERT','救命ヘリ燃料備蓄 … LOW','修復キュー逼迫 … HIGH','コスト超過検知 … TRUE'];
+const L_REBOOT=EN
+  ?['PUBLIC_REBOOT_MODE ........ ACTIVE','MARKET_LOGIC .............. SUSPENDED','REDUNDANCY_BUFFER ......... RESTORING','HELI_OVERRIDE ............. FORCED_ONLINE','INFRA_DECAY_RATE .......... HALVED','PUBLIC_SERVICE_PRIORITY ... MAXIMUM']
+  :['公共性リブート … ACTIVE','市場ロジック … SUSPENDED','冗長性バッファ … RESTORING','救命ヘリ強制稼働 … FORCED_ONLINE','インフラ劣化速度 … HALVED','公共サービス優先度 … MAXIMUM'];
 
 // ── ログのスケジュール（事前計算） ────────────────
 const LOGS=[];
@@ -66,7 +77,9 @@ const LOGS=[];
   for(let t=T_FLASH1+0.1;t<T_BLACK-0.4;t+=0.27)LOGS.push({t,s:chaos[i++%chaos.length],c:i%3?RED:ORA});          // 動: マシンガン
   i=0;for(let t=T_RUNB+0.2;t<T_CLICK_SHOCK2;t+=0.62)LOGS.push({t,s:L_REBOOT[i++%L_REBOOT.length],c:CY});        // 復帰準備
   i=0;for(let t=T_FLASH2+0.1;t<19;t+=0.4)LOGS.push({t,s:L_SHOCK[i++%L_SHOCK.length],c:ORA});                    // 2度目のショック
-  i=0;const rec=['冗長性テスト … RUNNING','復元力チェック … IN_PROGRESS','救命ヘリ出動状況 … ONLINE','SECTOR-T 状態 … GREEN'];
+  i=0;const rec=EN
+    ?['REDUNDANCY_TEST ........... RUNNING','RESILIENCE_CHECK .......... IN_PROGRESS','HELI_DISPATCH_STATUS ...... ONLINE','SECTOR_T_STATUS ........... GREEN']
+    :['冗長性テスト … RUNNING','復元力チェック … IN_PROGRESS','救命ヘリ出動状況 … ONLINE','SECTOR-T 状態 … GREEN'];
   for(let t=19.1;t<T_CONC-0.4;t+=0.65)LOGS.push({t,s:rec[i++%rec.length],c:GRN});                               // 復
 })();
 
@@ -123,7 +136,7 @@ function gauge(y,label,val,col){
 function chip(x,label,sel,selCol){
   const w=178;cx.fillStyle=sel?'rgba(57,213,255,.12)':BG1;rrect(x,108,w,36,7);cx.fill();
   cx.strokeStyle=sel?selCol:BDR;cx.lineWidth=sel?2:1;cx.stroke();cx.lineWidth=1;
-  cx.fillStyle=sel?selCol:MUT;cx.font='12px Menlo,monospace';cx.textAlign='center';cx.fillText(label,x+w/2,131);
+  cx.fillStyle=sel?selCol:MUT;cx.font=EN?'10px Menlo,monospace':'12px Menlo,monospace';cx.textAlign='center';cx.fillText(label,x+w/2,131);
 }
 function stamp(text,col,t0,t){
   if(t<t0)return;const k=ss(t0,t0+0.35,t),beat=1+0.05*Math.sin((t-t0)*9);
@@ -154,30 +167,30 @@ function draw(t){
     const st=stateAt(t);
     // ヘッダ
     cx.textAlign='left';cx.font='10px Menlo,monospace';cx.fillStyle=MUT;
-    cx.fillText('PAGE 2 — 地域インフラ',16,26);
+    cx.fillText(T('PAGE 2 — 地域インフラ','PAGE 2 — REGIONAL INFRASTRUCTURE'),16,26);
     cx.fillStyle=CY;cx.font='bold 15px Menlo,monospace';
     cx.fillText('SECTOR-T INFRASTRUCTURE',16,50);
     cx.strokeStyle=BDR;cx.beginPath();cx.moveTo(16,64);cx.lineTo(404,64);cx.stroke();
     // プリセット（実ボタン名）
-    chip(21,'⚙ 効率至上都市',st.preset==='eff',ORA);
-    chip(221,'🛡 冗長性確保都市',st.preset==='red',GRN);
+    chip(21,T('⚙ 効率至上都市','⚙ Efficiency-Max City'),st.preset==='eff',ORA);
+    chip(221,T('🛡 冗長性確保都市','🛡 Redundant City'),st.preset==='red',GRN);
     // ゲージ（実ラベル名）
     const bcol=st.buffer>=60?GRN:st.buffer>=30?ORA:RED;
-    gauge(184,'社会的耐故障性 REDUNDANCY BUFFER',st.buffer,bcol);
-    gauge(238,'インフラ維持力 INFRASTRUCTURE',st.infra,st.infra>=65?GRN:st.infra>=30?ORA:RED);
+    gauge(184,T('社会的耐故障性 REDUNDANCY BUFFER','REDUNDANCY BUFFER'),st.buffer,bcol);
+    gauge(238,T('インフラ維持力 INFRASTRUCTURE','INFRASTRUCTURE'),st.infra,st.infra>=65?GRN:st.infra>=30?ORA:RED);
     // 救命ヘリ（実ラベル）
     cx.font='30px Menlo,monospace';cx.textAlign='left';
     cx.globalAlpha=st.heliOp?1:0.35;cx.fillText('🚁',30,320);cx.globalAlpha=1;
     cx.font='11px Menlo,monospace';cx.fillStyle=st.heliOp?GRN:RED;
-    cx.fillText(st.heliOp?'OPERATIONAL — 常時稼働中':'LONG-TERM SUSPENSION — 救命ヘリ長期運休',78,308);
+    cx.fillText(st.heliOp?T('OPERATIONAL — 常時稼働中','OPERATIONAL — always on duty'):T('LONG-TERM SUSPENSION — 救命ヘリ長期運休','LONG-TERM SUSPENSION — rescue heli grounded'),78,308);
     cx.fillStyle=MUT;cx.font='9px Menlo,monospace';cx.fillText(st.heliOp?'Dispatch Ready':'RESCUE HELI STATUS',78,324);
     // ショック注入ボタン（実ボタン名）
     const glow=(t>T_CLICK_SHOCK1-0.9&&t<T_FLASH1)||(t>T_CLICK_SHOCK2-0.9&&t<T_FLASH2);
     cx.strokeStyle=glow?RED:'#a33';cx.lineWidth=glow?2.5:1.5;
     cx.fillStyle='rgba(255,84,112,.08)';rrect(40,388,340,48,8);cx.fill();cx.stroke();cx.lineWidth=1;
     cx.textAlign='center';cx.fillStyle=glow?'#ffdce3':RED;cx.font='bold 14px Menlo,monospace';
-    cx.fillText('⚡ 環境ショック注入',CW/2,409);
-    cx.font='9px Menlo,monospace';cx.fillStyle=MUT;cx.fillText('(Inject System Shock)',CW/2,426);
+    cx.fillText(T('⚡ 環境ショック注入','⚡ Inject System Shock'),CW/2,409);
+    cx.font='9px Menlo,monospace';cx.fillStyle=MUT;cx.fillText(T('(Inject System Shock)','(Black-swan event)'),CW/2,426);
     // ターミナルログ
     cx.strokeStyle=BDR;cx.beginPath();cx.moveTo(16,452);cx.lineTo(404,452);cx.stroke();
     const vis=LOGS.filter(l=>l.t<=t&&(st.B?l.t>=T_RUNB:l.t<T_BLACK)).slice(-8);
@@ -189,16 +202,16 @@ function draw(t){
       cx.fillStyle=g;cx.fillRect(0,0,CW,CH);}
     // 判定バナー＋スタンプ（実バナー文言）
     if(!st.B){
-      banner('⚠ あなたの街は、崩壊しました','Redundancy Buffer: 22% (< 30%)',RED,T_BANNER_A,t);
+      banner(T('⚠ あなたの街は、崩壊しました','⚠ Your town has collapsed'),'Redundancy Buffer: 22% (< 30%)',RED,T_BANNER_A,t);
       stamp('CRASHED',RED,T_BANNER_A+0.5,t);
     }else{
-      banner('✓ あなたの街は、生き残った','Redundancy Buffer: 68% (≥ 60%)',GRN,T_BANNER_B,t);
+      banner(T('✓ あなたの街は、生き残った','✓ Your town survived'),'Redundancy Buffer: 68% (≥ 60%)',GRN,T_BANNER_B,t);
       stamp('SURVIVED',GRN,T_BANNER_B+0.5,t);
     }
     // キャプション
-    if(t>2.5&&t<5.3)caption('効率をきわめた街に、災害が来る');
-    if(t>T_RUNB+0.3&&t<17)caption('同じ街。今度は「ムダ」を残す');
-    if(t>17.9&&t<20.2)caption('同じ災害。');
+    if(t>2.5&&t<5.3)caption(T('効率をきわめた街に、災害が来る','Disaster comes to an efficiency-maxed town'));
+    if(t>T_RUNB+0.3&&t<17)caption(T('同じ街。今度は「ムダ」を残す','Same town — this time, keep the “waste”'));
+    if(t>17.9&&t<20.2)caption(T('同じ災害。','The same disaster.'));
     // ゴーストカーソル
     const c=cursorAt(t);
     if(c){cx.beginPath();cx.arc(c.x,c.y,7,0,7);cx.fillStyle='rgba(255,255,255,.92)';
@@ -212,9 +225,9 @@ function draw(t){
   if(t<T_HOOK){
     const k=1-ss(T_HOOK-0.3,T_HOOK,t);cx.globalAlpha=k;
     cx.textAlign='center';cx.fillStyle='#e8f4fa';cx.font='bold 26px Menlo,monospace';
-    cx.fillText('同じ災害。',CW/2,320);
-    cx.fillStyle=CY;cx.font='bold 20px Menlo,monospace';
-    cx.fillText('生き残る街と、崩れる街。',CW/2,376);cx.globalAlpha=1;
+    cx.fillText(T('同じ災害。','The same disaster.'),CW/2,320);
+    cx.fillStyle=CY;cx.font=EN?'bold 17px Menlo,monospace':'bold 20px Menlo,monospace';
+    cx.fillText(T('生き残る街と、崩れる街。','One town survives. One collapses.'),CW/2,376);cx.globalAlpha=1;
   }
   // 転: 全画面フラッシュ＋警告
   for(const tf of [T_FLASH1,T_FLASH2]){
@@ -227,38 +240,40 @@ function draw(t){
     cx.fillStyle='#000';cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_BLACK,T_BLACK+0.4,t);
     cx.textAlign='center';cx.fillStyle='#e8f4fa';cx.font='16px Menlo,monospace';
-    cx.fillText('— 同じ街で、もう一度。 —',CW/2,360);
-    cx.fillStyle=GRN;cx.fillText('今度は、備えて。',CW/2,396);cx.globalAlpha=1;
+    cx.fillText(T('— 同じ街で、もう一度。 —','— The same town, once more. —'),CW/2,360);
+    cx.fillStyle=GRN;cx.fillText(T('今度は、備えて。','This time, prepared.'),CW/2,396);cx.globalAlpha=1;
   }
   // 結論（対句）
   if(t>=T_CONC&&t<T_END){
     cx.fillStyle=BG0;cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_CONC,T_CONC+0.5,t);cx.textAlign='center';
-    cx.fillStyle=ORA;cx.font='bold 19px Menlo,monospace';cx.fillText('効率は、平時の速さ。',CW/2,330);
+    cx.fillStyle=ORA;cx.font=EN?'bold 15px Menlo,monospace':'bold 19px Menlo,monospace';
+    cx.fillText(T('効率は、平時の速さ。','Efficiency is speed on a normal day.'),CW/2,330);
     cx.fillStyle=GRN;cx.globalAlpha*=ss(T_CONC+0.9,T_CONC+1.4,t);
-    cx.fillText('冗長性は、最悪の日の命。',CW/2,386);cx.globalAlpha=1;
+    cx.fillText(T('冗長性は、最悪の日の命。','Redundancy is life on the worst day.'),CW/2,386);cx.globalAlpha=1;
   }
   // エンドカード
   if(t>=T_END){
     cx.fillStyle=BG0;cx.fillRect(0,0,CW,CH);
     cx.globalAlpha=ss(T_END,T_END+0.5,t);cx.textAlign='center';
     cx.strokeStyle=CY;cx.lineWidth=2;rrect(60,258,300,84,10);cx.stroke();cx.lineWidth=1;
-    cx.fillStyle=CY;cx.font='bold 26px Menlo,monospace';cx.fillText('社会デバッガー',CW/2,302);
-    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText('あなたの街は、生き残れるか。',CW/2,328);
+    cx.fillStyle=CY;cx.font=EN?'bold 22px Menlo,monospace':'bold 26px Menlo,monospace';
+    cx.fillText(T('社会デバッガー','SOCIAL DEBUGGER'),CW/2,302);
+    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText(T('あなたの街は、生き残れるか。','Will your town survive?'),CW/2,328);
     cx.fillStyle=BG1;rrect(38,376,344,34,7);cx.fill();cx.strokeStyle=BDR;cx.stroke();
     cx.fillStyle='#e8f4fa';cx.font='11px Menlo,monospace';
     cx.fillText('larai-w.github.io/social-system-debugger',CW/2,398);
     if(Math.sin(t*5)>-0.3){cx.fillStyle=GRN;cx.font='bold 14px Menlo,monospace';
-      cx.fillText('▶ ブラウザで60秒、無料',CW/2,448);}
-    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText('#社会デバッガー',CW/2,478);
-    if(t>28.5){cx.fillStyle=MUT;cx.font='10px Menlo,monospace';cx.fillText('↺ RESTART で最初から',CW/2,560);}
+      cx.fillText(T('▶ ブラウザで60秒、無料','▶ Free · 60 seconds in your browser'),CW/2,448);}
+    cx.fillStyle=MUT;cx.font='11px Menlo,monospace';cx.fillText(T('#社会デバッガー','#SocialDebugger'),CW/2,478);
+    if(t>28.5){cx.fillStyle=MUT;cx.font='10px Menlo,monospace';cx.fillText(T('↺ RESTART で最初から','↺ RESTART to replay'),CW/2,560);}
     cx.globalAlpha=1;
   }
   // 常設: REC●・免責フッター・プログレスバー
   if(Math.sin(t*4)>0){cx.beginPath();cx.arc(376,24,5,0,7);cx.fillStyle=RED;cx.fill();
     cx.textAlign='left';cx.fillStyle=MUT;cx.font='9px Menlo,monospace';cx.fillText('REC',386,27);}
-  cx.textAlign='center';cx.fillStyle='rgba(123,147,164,.75)';cx.font='8.5px Menlo,monospace';
-  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,722);
+  cx.textAlign='center';cx.fillStyle='rgba(123,147,164,.75)';cx.font=EN?'7px Menlo,monospace':'8.5px Menlo,monospace';
+  cx.fillText(T('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）','*Not about anyone specific — structures any society can fall into (fictional simulation)'),CW/2,722);
   const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,CY);g.addColorStop(1,GRN);
   cx.fillStyle='rgba(29,51,69,.8)';cx.fillRect(0,CH-5,CW,5);
   cx.fillStyle=g;cx.fillRect(0,CH-5,CW*Math.min(1,t/DUR),5);
