@@ -375,8 +375,9 @@ if (typeof Chart !== 'undefined') {
         ]
       },
       options:{responsive:true,maintainAspectRatio:false,animation:{duration:280},
-        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10}}}},
-        scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5}}}}
+        plugins:{legend:{labels:{color:'#5a6f94',boxWidth:10,font:{size:10},padding:5}}},
+        // v6.356: 六角形の周囲余白を削減（pointLabels.padding 既定5→1）＝同じ枠内で描画半径を拡大
+        scales:{r:{min:0,max:100,grid:{color:'rgba(23,35,64,.8)'},angleLines:{color:'rgba(23,35,64,.8)'},ticks:{color:'#5a6f94',backdropColor:'transparent',stepSize:25,font:{size:8}},pointLabels:{color:'#5a6f94',font:{size:8.5},padding:1}}}
       }
     });
   } catch (e) {
@@ -419,13 +420,14 @@ function getModeCollapseLog(m){
   const radicalTag=`<span style="font-size:.5em;color:#7a0010;background:rgba(255,0,60,.2);border:1px solid rgba(255,0,60,.4);border-radius:2px;padding:0 4px;margin-left:5px;vertical-align:middle">${lang==='ja'?'排外':'RADICAL'}</span>`;
 
   // v6.33: 読めるように減速（旧: makeP1 0.6〜/ makeP2 0.3〜秒 は速すぎた）＋ opacityを深く落とさない logpulse
+  // v6.356: 危機感が伝わるよう少しだけ増速（可読の下限 0.7s は維持）
   const makeP1=(i,alpha=1)=>{
-    const speed=1.2+i*0.28;
+    const speed=0.9+i*0.22;
     const col=i%2===0?`rgba(255,34,68,${alpha})`:`rgba(255,107,43,${alpha})`;
     return`<span class="mode-log-blink" style="color:${col};animation:logpulse ${speed}s infinite ease-in-out">▌ ${phase1[i%phase1.length]} ▐${sloganTag}</span>`;
   };
   const makeP2=(i,alpha=1)=>{
-    const speed=Math.max(1.0,1.3-i*0.08);
+    const speed=Math.max(0.7,1.0-i*0.08);
     return`<span class="mode-log-blink" style="color:rgba(255,0,60,${alpha});animation:logpulse ${speed}s infinite ease-in-out">▌ ${phase2[i%phase2.length]} ▐${radicalTag}</span>`;
   };
 

@@ -110,6 +110,8 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .sbtn.pin-on{border-color:var(--yel)!important;color:var(--yel)!important}
 .ch{position:relative;height:222px}
 .chsm{position:relative;height:198px}
+/* v6.356: STABILITY MATRIX 内部グリッド（旧: インラインstyleの 1fr 1fr 固定 → モバイルで縦積み可能に） */
+.stab-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:center}
 .ag-wrap{position:relative;width:100%;height:296px;background:var(--bg1);border-radius:2px;overflow:hidden}
 #agentCanvas{width:100%;height:100%;display:block}
 .ag-ov{position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
@@ -217,8 +219,8 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 /* v6.0: モバイル最適化 — 縦積み・タッチ操作性・ログ可読性 */
 @media(max-width:640px){
   .wrap{padding:10px 10px 24px}
-  /* v6.33: モバイルではモード崩壊ログの点滅をさらに遅く＆浅くして可読性を確保 */
-  .mode-log-blink{animation-duration:2.6s!important}
+  /* v6.33: モバイルでは点滅を遅めにして可読性を確保（v6.356: 2.6s→1.8s 危機感とのバランス調整） */
+  .mode-log-blink{animation-duration:1.8s!important}
   .hdr{flex-direction:column;gap:8px;padding-bottom:10px}
   .hdr h1{font-size:1.02rem;letter-spacing:.06em}
   .hdr p{font-size:.6rem;line-height:1.6}
@@ -255,7 +257,9 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .diag,.hist{font-size:.65rem;line-height:1.7}
   /* ログ可読性: 重なり解消＋スクロール */
   .p2log{font-size:.66rem;line-height:1.95;max-height:210px;overflow-y:auto}
-  .mlog{font-size:.64rem;line-height:2.0}
+  .mlog{font-size:.72rem;line-height:1.9;letter-spacing:.01em}
+  /* レーダーとMETRIC LOGを縦積み（横並びだとログが1文字ずつ折り返されて読めない） */
+  .stab-grid{grid-template-columns:1fr;gap:10px}
   /* Canvas: 横幅フィット＋高さ抑制（インラインstyleを上書き） */
   .ag-wrap{height:240px!important}
   .ch{height:200px!important}
