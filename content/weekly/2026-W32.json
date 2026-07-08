@@ -1,16 +1,23 @@
 {
   "id": "2026-W32",
-  "title": { "ja": "リーダー倫理観の滝", "en": "Leader Ethics Waterfall" },
+  "title": {
+    "ja": "リーダー倫理観の滝",
+    "en": "Leader Ethics Waterfall"
+  },
   "intro": {
     "ja": "トップの倫理観が少し緩むだけで、パラノイアが増え、信頼が痩せ、正当性が滝のように流れ落ちていく。壊すのは一瞬、戻すのは何倍も遅い。この非対称の中で、あなたの街の正当性を守り切れるか。",
     "en": "When the leader's ethics slips just a little, paranoia grows, trust thins out, and legitimacy pours away like a waterfall. Breaking is instant; rebuilding is many times slower. Inside this asymmetry, can you keep your town's legitimacy intact?"
   },
   "page": 1,
   "params": {
-    "p1": { "f": 30, "e": 100, "al": "dp" },
+    "p1": {
+      "f": 30,
+      "e": 45,
+      "al": "dp"
+    },
     "hint": {
-      "ja": "倫理スコアをゆっくり下げて、パラノイア・信頼・正当性の悪化を観察してから、間に合う水準まで戻してください。",
-      "en": "Slowly lower the ethics score and watch paranoia, trust and legitimacy deteriorate — then bring it back before it is too late."
+      "ja": "すでに緩んだ倫理を立て直し、正当性を60以上まで回復させてください。壊すのは一瞬でも、戻す道はあります。",
+      "en": "Rebuild the ethics that have already slipped and recover legitimacy above 60. Breaking was instant — but there is a way back."
     }
   },
   "goal": {
@@ -18,8 +25,16 @@
     "en": "Keep legitimacy above 60 while raising the ethics score back to 50+"
   },
   "goalConds": [
-    { "metric": "legitimacy", "op": ">=", "value": 60 },
-    { "metric": "ethicsScore", "op": ">=", "value": 50 }
+    {
+      "metric": "legitimacy",
+      "op": ">=",
+      "value": 60
+    },
+    {
+      "metric": "ethicsScore",
+      "op": ">=",
+      "value": 50
+    }
   ],
   "difficulty": "normal",
   "discoveryId": "sce_ethics_cascade"

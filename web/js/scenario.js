@@ -26,7 +26,8 @@ const SCENARIOS = [
     title: { ja: 'エコーチェンバーの罠', en: 'Echo Chamber Trap' },
     intro: { ja: 'フィルタリングが徐々に強まる世界で、情報空間は澄むか、濁るか？', en: 'As filtering gradually increases, will your information space stay clear or become clouded?' },
     page: 1,
-    params: { p1: { f: 0, e: 100, al: 'dp' }, hint: { ja: 'フィルタリングを少しずつ上げていき、多様性とエントロピーがどう変わるかを観察してください。', en: 'Gradually increase filtering and observe how diversity and entropy change.' } },
+    // v6.357: 開始即クリアの修正（旧 f0/e100/dp はゴールを最初から満たしていた）→ 劣化状態から回復させる
+    params: { p1: { f: 55, e: 75, al: 'greedy' }, hint: { ja: 'フィルタリングを下げて多様性を取り戻し、エントロピーが70を超える前に情報空間を澄ませてください。', en: 'Lower the filtering to win diversity back, and clear the information space before entropy crosses 70.' } },
     goal: { ja: 'エントロピーを70以上に上昇させずに、多様性を80以上に保つ', en: 'Keep diversity above 80 while preventing entropy from rising above 70' },
     goalConds: [ { metric: 'diversity', op: '>=', value: 80 }, { metric: 'entropy', op: '<', value: 70 } ],
     difficulty: 'normal',
@@ -37,7 +38,8 @@ const SCENARIOS = [
     title: { ja: 'リーダー倫理観の滝', en: 'Leader Ethics Waterfall' },
     intro: { ja: 'リーダーの倫理観が低下するとき、社会全体がどうカスケードするか？', en: 'When a leader\'s ethics drops, how does the entire society cascade?' },
     page: 1,
-    params: { p1: { f: 30, e: 100, al: 'dp' }, hint: { ja: 'リーダーの倫理スコアをゆっくり下げ、パラノイア、信頼、正当性がどう悪化するかを見てください。', en: 'Slowly lower the leader\'s ethics score and watch paranoia, trust, and legitimacy deteriorate.' } },
+    // v6.357: 開始即クリアの修正（旧 e100 はゴールを最初から満たしていた）→ 緩んだ倫理からの回復に変更
+    params: { p1: { f: 30, e: 45, al: 'dp' }, hint: { ja: 'すでに緩んだ倫理を立て直し、正当性を60以上まで回復させてください。壊すのは一瞬でも、戻す道はあります。', en: 'Rebuild the ethics that have already slipped and recover legitimacy above 60. Breaking was instant — but there is a way back.' } },
     goal: { ja: '正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に上げ直す', en: 'Keep legitimacy above 60 while raising the ethics score back to 50+' },
     goalConds: [ { metric: 'legitimacy', op: '>=', value: 60 }, { metric: 'ethicsScore', op: '>=', value: 50 } ],
     difficulty: 'normal',
