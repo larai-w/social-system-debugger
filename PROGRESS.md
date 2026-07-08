@@ -20,6 +20,8 @@
 | T10 | classroom 英語版（`web/classroom.en.html`） | 将来の Show HN・海外研究者向け（MARKETING.md 海外チャネル）。ja/en 相互リンク | ✅ |
 | T11 | UIフィードバック3点修正（点滅速度・モバイルログ・六角形余白） | ユーザーからの直接フィードバック（2026-07-08）。20人フェーズの「改善が最良のマーケティング」 | ✅ |
 | T12 | latest.json 週次自動切替（`weekly-rotate.yml`） | 毎週月曜の手作業を恒久ゼロに。W34まで完全放置で回る | ✅ |
+| T13 | リール第2弾・安全版（`promo/reel-30s-history.html`） | vertical-reel スキル「安全版（歴史題材）を先に出す」二本立て戦略 | ✅ |
+| T14 | EN ローンチキット（`docs/launch-en.md`） | MARKETING.md 海外チャネル。Show HN/PH はフェーズ2ゲート付きで準備だけ先行 | ✅ |
 
 ## 実施順
 
@@ -27,6 +29,9 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T14 EN ローンチキット**: `docs/launch-en.md` 新規。Show HN のタイトル3案＋本文（個人開発・非営利・教育用・プライバシー・技術ノート・「モデルの粗を1つ指摘してほしい」で締める＝OUTREACH と同じ姿勢）＋想定問答の1コメント目。Product Hunt の tagline/description/メーカーコメント。**投稿前チェックリスト9項目をフェーズ2ゲートとして明記**（EN磨き・ENリール・upvote依頼禁止・投稿タイミング・批判対応方針・PH と同日にしない等）。投稿後の KPI 観測もMARKETING.md に接続。
+- ✅ **T13 リール第2弾・安全版**: `promo/reel-30s-history.html` 新規（歴史題材＝二本立て戦略の先行安全版）。フック「1933年は、1タップで再現できる。」→ ⚡ワイマール崩壊プリセット（実パラメータ f88/e12/greedy）→ スローガンループ（実文言・スローガン/排外バッジ付き）→ COLLAPSE → 断「歴史は、変えられない。構造は、変えられる。」→ 同じ1933年からスライダー介入（f18/e90/DP）→ STABLE → 対句「同じ1933年から始めても、違う結末に、辿り着ける。」**数値遷移は実エンジン式と整合（entropy 78=crash / 11=p1Good）、判定語 COLLAPSE/STABLE も実カードの実文言**。タイムライン10点スクリーンショットQAでエラーゼロ。
 
 - ✅ **T12 latest.json 週次自動切替**: `.github/workflows/weekly-rotate.yml` 新規。毎週月曜 0:00 JST（cron: 日曜15:00 UTC）に `TZ=Asia/Tokyo date +%G-W%V` でISO週を計算し、`content/weekly/<週>.json` を `latest.json` へコピーして bot コミット。**GITHUB_TOKEN の push は他ワークフローを発火させないため、Pages/AWS デプロイを `gh workflow run` で明示起動**（AWS未配線なら既存の if で安全にスキップ）。**在庫切れ週は意図的に失敗**＝書き足しリマインダー。手動 `workflow_dispatch` も可。README の週次手順を「JSONを書いてPRするだけ・切替は全自動」に更新。
 - ✅ **T11 UIフィードバック3点**: ①排外モードの点滅を増速（makeP1 1.2+0.28i→0.9+0.22i / makeP2 下限1.0→0.7s / モバイル一律減速 2.6s→1.8s。可読下限は維持）。②モバイルで METRIC LOG が1文字ずつ折返されていた根本原因は **STABILITY MATRIX 内グリッドがインラインstyle `1fr 1fr` 固定**だったこと → `.stab-grid` クラス化し ≤640px で縦積み＋ログ .72rem。③レーダー（六角形）の `pointLabels.padding` 5→1・凡例 padding 5 で描画半径を拡大。**モバイル390px/デスクトップ1280px 両方をスクリーンショットで確認、verify/check green**。sw cache v6-356。PM.md US-08 にエクスポートの立場別メリット（ユーザー/研究者/開発者）を記録。
