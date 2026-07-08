@@ -259,9 +259,10 @@ flowchart TD
 ### 毎週のシナリオ更新手順（人間がやるのは「JSONを1ファイル書いてPR」だけ）
 
 1. `content/weekly/2026-Wxx.json` を1つ追加（`content/weekly.schema.json` に準拠）
-2. `content/weekly/latest.json` を今週分に差し替え
-3. PR を出す → **CIがスキーマ検証**（ja/en欠けなどを自動で弾く）
-4. main にマージ → **`deploy-aws.yml` が S3 反映＋`latest.json` 無効化**まで自動
+2. PR を出す → **CIがスキーマ検証**（ja/en欠けなどを自動で弾く）
+3. main にマージ → 以降は全自動:
+   - **毎週月曜 0:00 JST に `weekly-rotate.yml` がその週のJSONを `latest.json` へ自動切替**（在庫切れ週は失敗して通知＝書き足しリマインダー）
+   - 切替コミット後、Pages / **`deploy-aws.yml`（S3 反映＋`latest.json` 無効化）** を自動起動
 
 > Docker は使いません（静的配信＋サーバーレスで常駐プロセスが無いため）。理由の詳細は [`infra/README.md`](infra/README.md)。
 

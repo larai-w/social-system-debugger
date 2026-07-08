@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T11/T12**: UIフィードバック3点（排外モード点滅増速・モバイルでレーダー+METRIC LOGを縦積み（根本原因=インライン`1fr 1fr`）・六角形の余白削減、sw v6-356）＋ `weekly-rotate.yml`（月曜0:00 JSTにlatest.json自動切替→Pages/AWSデプロイをdispatch起動、在庫切れは失敗で通知）。PM.md US-08 に立場別メリットを記録。詳細は `PROGRESS.md`。
 - ✅ **T9/T10**: X投稿テンプレ集 `docs/x-post-templates.md`（月/木/日雛形＋W31〜W34下書き＋チェックリスト）と `web/classroom.en.html`（教員ガイド英語版・A4 1枚実測確認・ja⇔en相互リンク・README導線）。※Actions「Deploy to AWS」の灰色は AWS未設定間の意図的 skipped（TODO ☐2 後に緑）。
 - ✅ **push 済み（`1c8ac15..e0b1ea5`）＋ T8 週替わりシナリオ W31〜W34 追加**: 配信在庫を W30→W34（8月下旬）まで延長。W31〜W33 はバンドル済み3本の配信版リライト、W34 は新規ハード「濁った街を、澄ませる」（実エンジンで達成可能性検証済み）。詳細は `PROGRESS.md`。
 - ✅ **スプリント追加2タスク（T6/T7・詳細は `PROGRESS.md`）**: **T6** `ci.yml` に verify ジョブ（PRでも Playwright Console ゼロ検証・助言的）＋ TODO.md 全面更新（☐0 push / ☐5 リール録画 / ☐6 教員PDF / ☐7 iCloud移設）。**T7** Zenn 記事ドラフト2本を `docs/articles/` に（記事1 Capacitor化・記事2 AWS CDK+OIDC。`published: false`、公開はフェーズ2でXと連動）。
