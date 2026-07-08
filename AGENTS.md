@@ -16,6 +16,9 @@ Web（GitHub Pages / AWS CloudFront）＋ネイティブ（Capacitor iOS/Android
 - `tests/` … `node:test`（engine・宣言的ゴール・共有URL）。`scripts/` … 検証・生成スクリプト。
 - `.github/workflows/` … `ci.yml`(PR) / `deploy.yml`(Pages) / `deploy-aws.yml`(OIDC)。
 
+## 委任プロトコル（サブエージェントとして呼ばれた場合）
+CLAUDE.md「開発ツールの方針 > 委任プロトコル」が一次ソース。要点: 仕様書（`docs/task-spec-template.md` 形式）の範囲外に触れない／**git commit・push は禁止**（親セッションがレビュー後に行う）／受け入れ条件は最低 `npm run check` green、web/ に触れたら `npm run verify` も green／完了報告には検証コマンドの実行結果と判断に迷った点を含める。
+
 ## よく使うコマンド
 `make help` で全コマンドを一覧できる（操作の単一入口）。主なもの:
 ```bash

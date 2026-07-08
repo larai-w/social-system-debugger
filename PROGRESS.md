@@ -37,6 +37,10 @@
 | T27 | アイコン/スプラッシュ生成 `scripts/gen-icons.mjs` → `resources/` | ☐4 実機ビルドの前提物（capacitor-assets 入力規約準拠） | ✅ |
 | T28 | 委任プロトコル（CLAUDE.md＋`docs/task-spec-template.md`） | 「Fable=仕様/レビュー、Opus=自己完結実装」を毎セッション自動適用のルールに | ✅ |
 | T29 | Zenn記事3 取材質問票 `docs/articles/zenn-03-interview.md` | 記事3はユーザーの実体験が素材 → 回答が埋まれば執筆可能な形に（TODO ☐10） | ✅ |
+| T30 | 週次シナリオ W39〜W42（**Opus委任3件目**） | 在庫を10月中旬（W42=10/12週）まで延長 | ✅ |
+| T31 | DEVELOPMENT.md/.en 鮮度更新（**Opus委任4件目**） | コードの地図を現状に同期（demo.js・promo/・weekly-rotate・verify 等） | ✅ |
+| T32 | verify.mjs のスモーク範囲拡張 | P2ショック注入・P3/P4操作・エクスポート生成まで Console ゼロ検証 | ✅ |
+| T33 | X固定ポスト文面＋AGENTS.md に委任プロトコル | 発信初手の素材と、Codex経由サブエージェントへのルール伝播 | ✅ |
 
 ## 実施順
 
@@ -44,6 +48,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T30〜T33（第6スプリント・Opus並行委任）**: **T30=Opus委任** W39「再公営化の請求書」(P2 hard・リブートの財政コストがテーマ)／W40「学びすぎる頭」(P3・学習率の暴走)／W41「記憶する街」(P1・viability/resilience)／W42「シビルの洪水を堰き止める」(P4 hard)。エージェントのサンドボックスで Bash が拒否されたため**受け入れコマンドは親が代行実行**: prettier 差分ゼロ（手書きで正規形＝驚異的）・スキーマ16件・テスト22件 green（W41はグリッド自動検証、P2〜P4はエージェントの数値トレース表を親が妥当性確認）。**T31=Opus委任** DEVELOPMENT.md/.en を現状同期（読込順 …→demo、地図に promo/classroom/privacy/scripts5本/weekly-rotate、週次手順を「JSON追加だけ・ローテ自動」に、make verify を必須チェックの自動化版と明記）。**T32** verify.mjs を拡張＝P2ショック注入→P3/P4スライダー→buildExportData まで両ケースで Console ゼロ。**T33** X固定ポスト文面（動画注記ルール付き）＋AGENTS.md に委任プロトコル要点（Codexがサブエージェントに入る場合の commit 禁止等）。委任の学び: エージェント環境で Bash が拒否されるケースがある→**受け入れコマンドの親側代行**をプロトコルの正式手順に含める。
 
 - ✅ **T25〜T29（第5スプリント・Opus委任を初運用）**: **T28** 委任プロトコルを CLAUDE.md に明文化（委任可=自己完結ファイル／直営=本体コア、サブエージェントはコミット禁止、受け入れ=check/verify green）＋仕様書テンプレ。**T25=Opus委任パイロット成功**: `scripts/record-reel.mjs`（Playwright録画でリール4本＋`?demo=1` 実機映像を dist/reels/ へ自動生成、ffmpeg あれば mp4 化。`make reels`）。親レビューで中間ファイル後始末を追加し、**録画済み webm の10秒地点フレームを実際に再生して内容確認**（demo=実エンジンの介入中画面／EN リール=COLLAPSE シーン）。**T26=委任2件目成功**: `web/privacy.html`/`privacy.en.html`（classroom と同一デザイン系・印刷白地・事実ベース7項目・制定日2026-07-09。エージェント自身が「現状は計測ゼロ」と kpi-log の事実を優先する良い判断）。**T27** `scripts/gen-icons.mjs`＝icon.svg のデザインを 1024 アイコン＋2732 スプラッシュに忠実再描画（`resources/`、capacitor-assets 入力規約）。**T29** 記事3の取材質問票10問＋記事骨子（TODO ☐10 で回答待ち）。委任の学び: 仕様書が具体的なら Opus の成果物はレビュー微修正のみで合格水準。並行作業中はサブエージェントの一時ファイルが pre-commit に掛かることがある（完了を待ってからコミットで回避）。
 
