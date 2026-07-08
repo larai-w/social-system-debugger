@@ -39,6 +39,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T15〜T19（自走）**: 週次シナリオ W35〜W38（在庫9/14週まで・実式検証済）／リール2本に `?lang=en` 英語モード／classroom に OGP／`docs/DATA-DICTIONARY.md`（エクスポート式対応表）／`docs/interview-guide.md`（15分×5人キット、TODO☐8）。詳細は `PROGRESS.md`。
 - ✅ **T13/T14**: リール第2弾・安全版 `promo/reel-30s-history.html`（ワイマール1933・実文言/実エンジン整合・10点QA済み）＋ EN ローンチキット `docs/launch-en.md`（Show HN/PH ドラフト＋フェーズ2ゲートのチェックリスト）。詳細は `PROGRESS.md`。
 - ✅ **T11/T12**: UIフィードバック3点（排外モード点滅増速・モバイルでレーダー+METRIC LOGを縦積み（根本原因=インライン`1fr 1fr`）・六角形の余白削減、sw v6-356）＋ `weekly-rotate.yml`（月曜0:00 JSTにlatest.json自動切替→Pages/AWSデプロイをdispatch起動、在庫切れは失敗で通知）。PM.md US-08 に立場別メリットを記録。詳細は `PROGRESS.md`。
 - ✅ **T9/T10**: X投稿テンプレ集 `docs/x-post-templates.md`（月/木/日雛形＋W31〜W34下書き＋チェックリスト）と `web/classroom.en.html`（教員ガイド英語版・A4 1枚実測確認・ja⇔en相互リンク・README導線）。※Actions「Deploy to AWS」の灰色は AWS未設定間の意図的 skipped（TODO ☐2 後に緑）。
