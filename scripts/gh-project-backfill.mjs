@@ -1,0 +1,416 @@
+#!/usr/bin/env node
+// T44: プロジェクト履歴を GitHub Issues / Milestones / Labels にバックフィルする（英語・ポートフォリオ用）。
+//   - PROGRESS.md / CHANGELOG.md で管理してきた Phase 1 + T1〜T43 を、採用担当者が読める形で
+//     GitHub 上に「計画 → 実行 → 完了」の履歴として再構成する。
+//   - 冪等: 同名タイトルの issue が既にあればスキップ（何度実行しても重複しない）。
+//   - 前提: gh CLI 導入済み・`gh auth login` 済み（TODO ☐11）。実行は `make gh-project`。
+//   - オプション: --dry-run（作成せず一覧表示）
+// 以後の運用: スプリント開始時に英語で issue を起票し、完了コミットの末尾に
+// 「Closes #N」を書く（GitHub が自動で close する）。手順は docs/github-project.md。
+import { execFileSync } from 'node:child_process';
+
+const DRY = process.argv.includes('--dry-run');
+
+const gh = (args, opts = {}) =>
+  execFileSync('gh', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts });
+
+// ── 前提チェック ─────────────────────────────────────────────
+let repo;
+try {
+  gh(['auth', 'status']);
+  repo = gh(['repo', 'view', '--json', 'nameWithOwner', '-q', '.nameWithOwner']).trim();
+} catch {
+  console.error(
+    '❌ gh CLI が使えません。`brew install gh && gh auth login` の後に再実行してください（TODO ☐11）。'
+  );
+  process.exit(1);
+}
+console.log(`対象リポジトリ: ${repo}${DRY ? '（dry-run）' : ''}`);
+
+// ── ラベル ───────────────────────────────────────────────────
+const LABELS = [
+  ['area:app', '00b8d9', 'Web app (web/) — UI, engine, PWA'],
+  ['area:infra', '0e8a16', 'AWS CDK, CI/CD, GitHub Actions'],
+  ['area:testing', 'fbca04', 'Automated tests & verification harnesses'],
+  ['area:content', 'd93f0b', 'Weekly scenarios & in-app content'],
+  ['area:docs', '0075ca', 'Documentation'],
+  ['area:marketing', 'c2185b', 'Promotion, education & outreach assets'],
+  [
+    'process:ai-subagent',
+    '8250df',
+    'Implemented by an AI subagent under a written spec; reviewed & verified by the maintainer',
+  ],
+];
+
+// ── マイルストーン ───────────────────────────────────────────
+const MILESTONES = [
+  {
+    title: 'Phase 1 — Mobile, weekly scenarios & AWS foundation',
+    description:
+      'Module split of the monolith, Capacitor wrapper, share paths, declarative weekly scenarios, S3+CloudFront via CDK, keyless OIDC CI/CD.',
+  },
+  {
+    title: 'Strategy sprints (T1–T24)',
+    description:
+      'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
+  },
+  {
+    title: 'Delegation sprints (T25–T43)',
+    description:
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks.',
+  },
+];
+const msOf = (id) =>
+  id.startsWith('P')
+    ? MILESTONES[0].title
+    : Number(id.slice(1)) <= 24
+      ? MILESTONES[1].title
+      : MILESTONES[2].title;
+
+// ── タスク（英語タイトル＝issue タイトル。done は close 済みで作成） ──────────
+// [id, title, areas, delegated, note]
+const TASKS = [
+  [
+    'P1',
+    'Split the 330k-char monolith index.html into web/ modules with byte-identical behavior',
+    ['area:app'],
+    false,
+    'Classic scripts sharing global scope; concatenating the split files reproduces the original byte-for-byte. engine.js is DOM-free for reuse and testing.',
+  ],
+  [
+    'P2',
+    'Wrap the web app for iOS/Android with Capacitor (no bundler)',
+    ['area:app'],
+    false,
+    'window.SSD facade: StatusBar/SplashScreen, Preferences durability mirror, haptics, share. Fully no-op on web.',
+  ],
+  [
+    'P3',
+    'Redesign share paths: X / LINE / save-image as equal first-class actions',
+    ['area:app'],
+    false,
+    'share.js; native filesystem+share behind isNative guards with web fallback.',
+  ],
+  [
+    'P4',
+    'Weekly scenarios: declarative goalConds + remote latest.json with bundled fallback',
+    ['area:app', 'area:content'],
+    false,
+    'JSON-serializable goal conditions; first-clear notification opt-in; native-gated.',
+  ],
+  [
+    'P5',
+    'AWS delivery infrastructure: private S3 (OAC) + CloudFront via CDK (TypeScript)',
+    ['area:infra'],
+    false,
+    'Long-TTL hashed assets, 5-min TTL for latest.json, 403/404 SPA fallback, cdk-nag.',
+  ],
+  [
+    'P6',
+    'Analytics groundwork: app_platform common property + weekly_fail event',
+    ['area:app'],
+    false,
+    'Privacy-first wrapper; no-op until Plausible is enabled.',
+  ],
+  [
+    'P7',
+    'CI/CD with GitHub Actions + AWS OIDC (keyless deploy, least privilege)',
+    ['area:infra'],
+    false,
+    'Trust policy pinned to repo:main; S3 sync + minimal CloudFront invalidation; GitHub Pages kept in parallel.',
+  ],
+  [
+    'T1',
+    'Playwright console-zero verification harness (scripts/verify.mjs)',
+    ['area:testing'],
+    false,
+    'Runs the app with Chart.js working and blocked; asserts zero console/page errors across tabs, presets and sliders.',
+  ],
+  [
+    'T2',
+    'Researcher export: all parameters + metrics + repro URL as JSON/CSV',
+    ['area:app'],
+    false,
+    'US-08. Every export field maps to an implementation formula (see DATA-DICTIONARY).',
+  ],
+  [
+    'T3',
+    'Share optimization: fixed hashtag + disaster-prep template variant for LINE',
+    ['area:app', 'area:marketing'],
+    false,
+    '',
+  ],
+  [
+    'T4',
+    'Teacher one-pager web/classroom.html (prints to A4 PDF)',
+    ['area:marketing'],
+    false,
+    'Self-contained page; white print layout while the app stays dark-terminal.',
+  ],
+  [
+    'T5',
+    '30-second vertical promo reel (promo/reel-30s.html)',
+    ['area:marketing'],
+    false,
+    'Real UI copy transcribed; disclaimer footer pinned.',
+  ],
+  ['T6', 'Add advisory browser-verify job to CI', ['area:infra', 'area:testing'], false, ''],
+  ['T7', 'Zenn article drafts: Capacitor port & CDK+OIDC without Docker', ['area:docs'], false, ''],
+  [
+    'T8',
+    'Weekly scenarios W31–W34 (stock through late August)',
+    ['area:content'],
+    false,
+    'W34 verified reachable against the real engine.',
+  ],
+  ['T9', 'X post template kit with fixed operating rules', ['area:marketing'], false, ''],
+  [
+    'T10',
+    'English classroom guide (classroom.en.html) with cross-links',
+    ['area:marketing'],
+    false,
+    '',
+  ],
+  [
+    'T11',
+    'UI feedback fixes: blink rate, mobile radar/log stacking, hexagon padding',
+    ['area:app'],
+    false,
+    'Root cause of the mobile issue was an inline 1fr 1fr grid.',
+  ],
+  [
+    'T12',
+    'Weekly auto-rotation workflow (latest.json swap every Monday 0:00 JST)',
+    ['area:infra'],
+    false,
+    'Out-of-stock weeks fail loudly as a restock reminder; triggers Pages/AWS deploys.',
+  ],
+  [
+    'T13',
+    'Second promo reel: history-themed safe variant',
+    ['area:marketing'],
+    false,
+    '10-point QA against real engine copy.',
+  ],
+  [
+    'T14',
+    'English launch kit: Show HN / Product Hunt drafts behind phase-2 gates',
+    ['area:docs', 'area:marketing'],
+    false,
+    '',
+  ],
+  ['T15', 'Weekly scenarios W35–W38 (stock through mid-September)', ['area:content'], false, ''],
+  ['T16', 'English caption mode (?lang=en) for both reels', ['area:marketing'], false, ''],
+  ['T17', 'OGP meta for classroom pages', ['area:marketing'], false, ''],
+  [
+    'T18',
+    'Data dictionary: every export field mapped to its implementation formula',
+    ['area:docs'],
+    false,
+    'Enables sensitivity analysis and model critique by researchers.',
+  ],
+  ['T19', 'User interview kit (15 min × 5 people)', ['area:docs'], false, ''],
+  [
+    'T20',
+    'Weekly-scenario reachability tests — caught 2 real shipping bugs',
+    ['area:testing'],
+    false,
+    'Two scenarios were already cleared at their start parameters; redesigned as recovery-type. Grid search against the real engine for PAGE 1.',
+  ],
+  [
+    'T21',
+    'Demo mode ?demo=1: ghost cursor drives the real engine (no faked values)',
+    ['area:app'],
+    false,
+    'Complete no-op on normal startup.',
+  ],
+  [
+    'T22',
+    'README freshness + English data dictionary + researcher entry points',
+    ['area:docs'],
+    false,
+    '',
+  ],
+  ['T23', 'App/Play store listing drafts with review Q&A', ['area:docs'], false, ''],
+  ['T24', 'KPI weekly log + analytics enablement plan', ['area:docs'], false, ''],
+  [
+    'T25',
+    'Automated reel recording pipeline (make reels)',
+    ['area:marketing'],
+    true,
+    'Playwright records 5 reels to dist/reels/, mp4 via ffmpeg when available. Pilot task of the delegation protocol.',
+  ],
+  ['T26', 'Privacy policy ja/en (store submission requirement)', ['area:docs'], true, ''],
+  ['T27', 'Store icon/splash generation (capacitor-assets input spec)', ['area:app'], false, ''],
+  [
+    'T28',
+    'Delegation protocol: spec template + rules (main session reviews, verifies, commits)',
+    ['area:docs'],
+    false,
+    'Subagents never commit; acceptance commands are always re-run by the parent session.',
+  ],
+  ['T29', 'Interview question sheet for Zenn article #3', ['area:docs'], false, ''],
+  [
+    'T30',
+    'Weekly scenarios W39–W42 (stock through mid-October)',
+    ['area:content'],
+    true,
+    'Numeric clearability traces reviewed against the real formulas by the parent session.',
+  ],
+  ['T31', 'DEVELOPMENT docs synchronized to current architecture', ['area:docs'], true, ''],
+  [
+    'T32',
+    'Extend verify.mjs smoke scope: P2 shock, P3/P4 sliders, export generation',
+    ['area:testing'],
+    false,
+    '',
+  ],
+  [
+    'T33',
+    'Pinned X post copy + delegation rules in AGENTS.md',
+    ['area:marketing', 'area:docs'],
+    false,
+    '',
+  ],
+  [
+    'T34',
+    'Weekly W43–W46: PAGE 5 material teasers (silent-capture / loud-crash framing)',
+    ['area:content'],
+    true,
+    'Sandbox denied file writes; the subagent delivered full designs + numeric traces, parent transcribed and verified.',
+  ],
+  [
+    'T35',
+    'In-app menu links to classroom & privacy pages (language-aware)',
+    ['area:app'],
+    false,
+    '',
+  ],
+  [
+    'T36',
+    'Compress CLAUDE.md progress log into CHANGELOG/PROGRESS pointers',
+    ['area:docs'],
+    false,
+    '',
+  ],
+  ['T37', 'CHANGELOG entry covering strategy sprints T1–T35', ['area:docs'], true, ''],
+  [
+    'T38',
+    'Teacher projector slide decks ja/en (9 slides, self-contained, JS-optional)',
+    ['area:marketing'],
+    true,
+    '',
+  ],
+  [
+    'T39',
+    'Weekly W47–W50: PAGE 5 teasers batch 2 (hope / audit themes)',
+    ['area:content'],
+    true,
+    'Stock extended to the week of Dec 7.',
+  ],
+  [
+    'T40',
+    'Automated reachability tests for pages 2–4 (headless execution of extracted ui.js functions)',
+    ['area:testing'],
+    false,
+    'Caught a start-instantly-cleared bug in W49 on first run; replaces manual numeric-trace review for delegated content.',
+  ],
+  [
+    'T41',
+    'X drafts for W43–W46 + failure-mode reaction comparison in the KPI log',
+    ['area:marketing'],
+    true,
+    '',
+  ],
+  [
+    'T42',
+    'Weekly stock-level guard in the content validator (warns under 3 weeks)',
+    ['area:testing'],
+    false,
+    '',
+  ],
+  [
+    'T43',
+    'Docs freshness (README/DEVELOPMENT) + educator outreach message templates ja/en',
+    ['area:docs', 'area:marketing'],
+    true,
+    '',
+  ],
+];
+
+// ── 実行 ─────────────────────────────────────────────────────
+if (DRY) {
+  for (const [id, title, areas, delegated] of TASKS)
+    console.log(`[${msOf(id)}] ${title} ${areas.join(',')}${delegated ? ' +ai-subagent' : ''}`);
+  process.exit(0);
+}
+
+console.log('1/4 ラベル作成...');
+for (const [name, color, desc] of LABELS)
+  gh(['label', 'create', name, '--color', color, '--description', desc, '--force']);
+
+console.log('2/4 マイルストーン作成...');
+const existingMs = JSON.parse(gh(['api', `repos/${repo}/milestones?state=all&per_page=100`]));
+for (const m of MILESTONES) {
+  if (!existingMs.some((e) => e.title === m.title)) {
+    gh([
+      'api',
+      '-X',
+      'POST',
+      `repos/${repo}/milestones`,
+      '-f',
+      `title=${m.title}`,
+      '-f',
+      `description=${m.description}`,
+    ]);
+    console.log(`  + ${m.title}`);
+  }
+}
+
+console.log('3/4 issue 作成（既存タイトルはスキップ）...');
+const existing = new Set(
+  JSON.parse(gh(['issue', 'list', '--state', 'all', '--limit', '500', '--json', 'title'])).map(
+    (i) => i.title
+  )
+);
+let created = 0;
+for (const [id, title, areas, delegated, note] of TASKS) {
+  if (existing.has(title)) continue;
+  const labels = delegated ? [...areas, 'process:ai-subagent'] : areas;
+  const body = [
+    note,
+    delegated
+      ? '_Implemented by an AI subagent under a written task spec; reviewed, verified (`npm run check` / `make verify`) and committed by the maintainer._'
+      : '',
+    `_Backfilled from the in-repo task log (${id}). Full history: PROGRESS.md / CHANGELOG.md._`,
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+  const url = gh([
+    'issue',
+    'create',
+    '--title',
+    title,
+    '--body',
+    body,
+    '--milestone',
+    msOf(id),
+    ...labels.flatMap((l) => ['--label', l]),
+  ]).trim();
+  gh(['issue', 'close', url, '--reason', 'completed']);
+  created++;
+  console.log(`  ✓ ${id} ${title}`);
+}
+
+console.log('4/4 マイルストーンをクローズ...');
+const msAll = JSON.parse(gh(['api', `repos/${repo}/milestones?state=all&per_page=100`]));
+for (const m of msAll)
+  if (MILESTONES.some((x) => x.title === m.title) && m.state === 'open' && m.open_issues === 0)
+    gh(['api', '-X', 'PATCH', `repos/${repo}/milestones/${m.number}`, '-f', 'state=closed']);
+
+console.log(
+  `\n✅ 完了: issue ${created} 件を新規作成（既存 ${TASKS.length - created} 件はスキップ）。`
+);
+console.log(
+  '   以後のスプリントは docs/github-project.md の運用（起票→Closes #N）で継続してください。'
+);
