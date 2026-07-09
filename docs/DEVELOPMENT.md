@@ -31,6 +31,7 @@ social-system-debugger/
 │       └── demo.js          #   ?demo=1 のデモモード（本物のエンジンを自動操作。既定 no-op）
 │   ├── manifest.json / icon.svg / sw.js
 │   ├── classroom.html / .en.html   # 教員向け1枚ガイド（自己完結・印刷でA4）
+│   ├── classroom-slides.html / .en.html # 授業用 投影スライド（自己完結・9枚・JS無効でも縦に読める）
 │   └── privacy.html / .en.html     # プライバシーポリシー（ストア提出／フッター導線）
 ├── content/weekly/          # 週替わりシナリオJSON（*.json + latest.json）＋ weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront＋GitHub OIDCロール
@@ -65,7 +66,7 @@ social-system-debugger/
 | **週替わりシナリオ** | `scenario.js` | `SCENARIOS[]`, `getActiveScenario()`, `evalGoalConds()`, `checkScenarioGoal()`, `loadRemoteScenario()` | 宣言的 `goalConds`・fetch(latest.json)＋フォールバック・通知。全て `WEEKLY_ENABLED`(native)ガード |
 | **計測** | `ui.js`(`track`) | `track(event, props)`（共通prop `app_platform` 付与） | Plausible。イベント一覧は README「計測」節 |
 | **フィードバック** | `ui.js` | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()` | Formspree へ JSON POST |
-| **ナビ/初期化** | `ui.js` | `switchTab(n)`, `(function init(){…})()` | タブ切替＋アドレスバー同期、起動処理 |
+| **ナビ/初期化** | `ui.js` | `switchTab(n)`, `openAppPage(name)`, `(function init(){…})()` | タブ切替＋アドレスバー同期、起動処理。`openAppPage('classroom'/'privacy')` は ≡メニューから静的ページを別タブで開く（EN時は `.en.html`・`track('open_*')`） |
 | **デモモード** | `demo.js` | `?demo=1` 判定＋ゴーストカーソル | 本物のエンジンを自動操作（値の偽装なし）。プロモ録画/展示用。既定は完全 no-op |
 | **PWA** | `web/sw.js` | `CACHE`（更新の度に版を上げる）, `CORE[]` | インストール・オフライン。CORE に全js/cssを列挙 |
 

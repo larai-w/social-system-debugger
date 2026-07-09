@@ -10,6 +10,8 @@
 
 🏫 **[授業で使える1枚ガイド（公共・情報I・探究 / A4印刷→PDF）](https://larai-w.github.io/social-system-debugger/classroom.html)** ／ [English classroom guide](https://larai-w.github.io/social-system-debugger/classroom.en.html)
 
+📽 **[授業用 投影スライド（プロジェクターでそのまま提示・9枚）](https://larai-w.github.io/social-system-debugger/classroom-slides.html)** ／ [English slides](https://larai-w.github.io/social-system-debugger/classroom-slides.en.html)（JS無効でも縦に並んで読める自己完結ページ）
+
 ---
 
 ## 概要 / Overview
