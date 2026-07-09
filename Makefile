@@ -28,6 +28,9 @@ test: ## ユニットテスト（engine / goal / share）
 check: ## テスト＋週替わりJSON検証（CIと同じ）
 	npm run check
 
+verify-offline: ## PWA オフライン起動検証（SW登録→回線遮断→リロードで動くか）
+	npm run verify:offline
+
 verify: ## ブラウザ実機検証（Consoleゼロ・4タブ・Chart.js失敗時。初回: npx playwright install chromium）
 	npm run verify
 
