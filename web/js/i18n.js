@@ -252,6 +252,11 @@ const I18N = {
     // T35: アプリ内ページ導線
     menu_classroom:'🏫 Educator guide (use in class)',
     menu_privacy:'🔒 Privacy policy',
+    // T50: PWA インストール導線
+    menu_pwa:'📲 Install as an app',
+    pwa_tag:'INSTALL — use it as an app',
+    pwa_title:'One tap from your home screen',
+    pwa_body:'This site is a PWA (installable web app). Once installed it launches full-screen and works offline. No sign-up, no cost.<br><br><b>iPhone / iPad (Safari):</b> Share button (box with ↑) → "Add to Home Screen"<br><b>Android (Chrome):</b> Menu (⋮) → "Install app"<br><b>PC (Chrome / Edge):</b> the install icon at the right end of the address bar, or Menu → "Install"',
     fb_data_link:'📊 Data dictionary (export fields ↔ formulas)',
     fb_btn:'💬 Feedback',
     fb_title:'Feedback',
