@@ -18,6 +18,8 @@
 
 📽 **[授業用 投影スライド（プロジェクターでそのまま提示・9枚）](https://larai-w.github.io/social-system-debugger/classroom-slides.html)** ／ [English slides](https://larai-w.github.io/social-system-debugger/classroom-slides.en.html)（JS無効でも縦に並んで読める自己完結ページ）
 
+🛠 **[アーキテクチャ（15分の技術ツアー）](docs/ARCHITECTURE.md)** — 技術者・レビュアー向け: システム設計・配信・CI/CD・セキュリティ姿勢・コスト（[English](docs/ARCHITECTURE.en.md)）
+
 ---
 
 ## 概要 / Overview
