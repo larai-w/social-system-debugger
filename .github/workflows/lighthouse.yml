@@ -1,0 +1,27 @@
+# Lighthouse 定期監査 — PWA / 性能 / アクセシビリティ等のスコアを継続計測（助言的・非ブロッキング）
+#   本番 GitHub Pages を対象に週1で計測し、劣化に気づけるようにする。
+#   assert / budget は設定しない＝スコアで CI を落とさない（既存 verify ジョブと同じ「助言的」思想）。
+#   push / PR では走らせない（外部URL計測の不安定要因を CI に持ち込まない）。
+name: Lighthouse
+
+on:
+  workflow_dispatch: # 手動: Actions → Lighthouse → Run workflow
+  schedule:
+    - cron: '0 16 * * 0' # 毎週月曜 1:00 JST（= 日曜 16:00 UTC）
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 本番 Pages を Lighthouse で計測し、レポートを artifacts として残す（スコアでは落とさない）──
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lighthouse audit (performance / accessibility / best-practices / seo / pwa)
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            https://larai-w.github.io/social-system-debugger/
+          # レポートを Actions の artifacts と一時公開ストレージに残す（閲覧用）。
+          uploadArtifacts: true
+          temporaryPublicStorage: true

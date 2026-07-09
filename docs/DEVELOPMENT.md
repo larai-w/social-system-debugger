@@ -129,6 +129,7 @@ social-system-debugger/
 - `.github/workflows/deploy.yml`（main push）: **GitHub Pages に自動デプロイ**（`actions/deploy-pages`。公開元は `web/`）。
 - `.github/workflows/deploy-aws.yml`（main push / web・content 変更時）: **AWS OIDC でロールをAssume** → `web/`+`content/` を S3 同期 → `latest.json`+`index.html` のみ CloudFront 無効化。長期キーは保存しない。
 - `.github/workflows/weekly-rotate.yml`（毎週月曜 0:00 JST / 手動可）: その週の `content/weekly/<ISO週>.json` を `latest.json` へコピー＆コミット → Pages/AWS デプロイを `workflow_dispatch` で起動。在庫切れの週は失敗して通知（＝シナリオ追加のリマインダー）。
+- `.github/workflows/lighthouse.yml`（毎週月曜 1:00 JST / 手動可）: 本番 Pages を Lighthouse で自動計測（性能/アクセシビリティ/PWA 等・**スコアでは落とさない助言的**ジョブ。結果は Actions の artifacts）。手動は Actions → Lighthouse → Run workflow。
 - 公開URL（不変）: https://larai-w.github.io/social-system-debugger/ ／ AWS は CloudFront ドメイン（`infra` の出力）。
 - AWSインフラの定義・デプロイ手順・OIDC/最小権限の説明は [`../infra/README.md`](../infra/README.md)。
 - **Pages が「Deployment failed, try again later.」で落ちたら**、GitHub Pages バックエンドの一時障害。少し待って Actions から **Re-run failed jobs** か再 push。稼働は https://www.githubstatus.com。
