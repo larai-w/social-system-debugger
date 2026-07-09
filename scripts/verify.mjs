@@ -34,8 +34,10 @@ async function run(withChartStub) {
     if (EXPECTED.some((re) => re.test(text))) return;
     errors.push('console.error: ' + text);
   });
-  // 外部CDN（Chart.js 等）は常に遮断し、正常系はスタブで再現＝ネット環境に依らず決定的
+  // 外部CDNは常に遮断（ネット環境に依らず決定的）。T57 で Chart.js はセルフホスト化されたため、
+  // 正常系はローカル vendor/ の実 Chart.js が読み込まれ、失敗系は vendor パスを遮断して再現する。
   await page.route(/https?:\/\/(cdn|cdnjs|unpkg|jsdelivr)[^ ]*/, (r) => r.abort());
+  if (!withChartStub) await page.route(/vendor\/chart[^ ]*/, (r) => r.abort());
   if (withChartStub) await page.addInitScript(CHART_STUB);
 
   await page.goto('file://' + target);

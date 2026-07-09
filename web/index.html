@@ -28,7 +28,8 @@
      ・右中央: 斜めスタンプ風「SIMULATION ACTIVE」（#00ff88 / 二重枠 / -6°回転 / グロー）
      ・下部: 「※特定の誰かではなく、どの社会にも起こる構造の話です」（#5a6f94 / 18px） -->
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" onerror="window.__chartLoadFailed=true"></script>
+<!-- T57: Chart.js はセルフホスト（唯一の外部依存を排除。オフライン初回起動・広告ブロッカー誤爆対策）。更新時は vendor/ のファイルを差し替え -->
+<script src="vendor/chart.umd.min.js" onerror="window.__chartLoadFailed=true"></script>
 <!-- v6.345: analytics placeholder — swap src for Plausible or CF Web Analytics when ready
 <script defer data-domain="larai-w.github.io" src="https://plausible.io/js/script.js"></script>
 -->
@@ -75,14 +76,14 @@
   </div>
 </div>
 
-<div class="tab-bar">
-  <button class="tab-btn active" id="tab1Btn" onclick="switchTab(1)">▶ PAGE 1: INFORMATION SPACE</button>
-  <button class="tab-btn" id="tab2Btn" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
-  <button class="tab-btn" id="tab3Btn" onclick="switchTab(3)">▶ PAGE 3: COGNITIVE RECOVERY</button>
-  <button class="tab-btn" id="tab4Btn" onclick="switchTab(4)">▶ PAGE 4: STAKEHOLDER ASYMMETRY</button>
+<div class="tab-bar" role="tablist">
+  <button class="tab-btn active" id="tab1Btn" role="tab" aria-selected="true" aria-controls="page1" onclick="switchTab(1)">▶ PAGE 1: INFORMATION SPACE</button>
+  <button class="tab-btn" id="tab2Btn" role="tab" aria-selected="false" aria-controls="page2" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
+  <button class="tab-btn" id="tab3Btn" role="tab" aria-selected="false" aria-controls="page3" onclick="switchTab(3)">▶ PAGE 3: COGNITIVE RECOVERY</button>
+  <button class="tab-btn" id="tab4Btn" role="tab" aria-selected="false" aria-controls="page4" onclick="switchTab(4)">▶ PAGE 4: STAKEHOLDER ASYMMETRY</button>
 </div>
 
-<div id="page1" class="page active">
+<div id="page1" class="page active" role="tabpanel" aria-labelledby="tab1Btn">
 <!-- v6.35: Weekly Scenario Card -->
 <div class="card scenario-card" id="scenarioCardContainer" style="border-color:rgba(153,200,255,.3);margin-bottom:14px">
   <div class="ct" style="color:rgba(153,200,255,.8)"><span class="dot" style="background:rgba(153,200,255,.8);box-shadow:0 0 7px rgba(153,200,255,.6)"></span><span data-i18n="scenario_title">ウィークリーチャレンジ</span></div>
@@ -119,7 +120,7 @@
           <span class="pv" id="filterVal">0%</span>
         </div>
         <div class="pd" id="f1desc">エコーチェンバー度。高いほど同質情報のみ流通し、現実OSとの互換性が喪失する（過学習）。</div>
-        <input type="range" id="filterRate" min="0" max="100" value="0">
+        <input type="range" id="filterRate" aria-labelledby="f1lbl" min="0" max="100" value="0">
         <div class="rl"><span id="f1L">OPEN</span><span id="f1R">ECHO CHAMBER</span></div>
       </div>
       <hr class="div">
@@ -131,7 +132,7 @@
           <span class="pv" id="ethicsVal">100</span>
         </div>
         <div class="pd" id="f2desc">意思決定の公正性。低下するとポピュリズムが進行し報酬関数がドーパミン（即時支持率）のみに最適化される。</div>
-        <input type="range" id="ethicsScore" min="0" max="100" value="100">
+        <input type="range" id="ethicsScore" aria-labelledby="f2lbl" min="0" max="100" value="100">
         <div class="rl"><span id="f2L">POPULISM</span><span id="f2R">RULE OF LAW</span></div>
       </div>
       <hr class="div">
@@ -141,7 +142,7 @@
           <span class="pv" id="immunityVal" style="color:var(--pur)">50%</span>
         </div>
         <div class="pd" id="f4desc">法的・歴史的アーカイブへの参照能力。高いとファクトチェッカーの消滅を防ぎ、誤判定（False Positive）に抵抗できる。</div>
-        <input type="range" id="historicalImmunity" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
+        <input type="range" id="historicalImmunity" aria-labelledby="f4lbl" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
         <div class="rl"><span id="f4L">歴史の忘却</span><span id="f4R">論理と法のアーカイブ</span></div>
       </div>
       <hr class="div">
@@ -250,7 +251,7 @@
 
 </div><!-- /#page1 -->
 
-<div id="page2" class="page">
+<div id="page2" class="page" role="tabpanel" aria-labelledby="tab2Btn">
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
@@ -275,9 +276,9 @@
       <hr class="div">
       <!-- Shrink Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
+        <div class="pl2"><span class="pn" id="p2f1lbl" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
         <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
-        <input type="range" id="shrinkRate" min="0" max="100" value="10" class="ora-range">
+        <input type="range" id="shrinkRate" aria-labelledby="p2f1lbl" min="0" max="100" value="10" class="ora-range">
         <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
       </div>
       <hr class="div">
@@ -285,17 +286,17 @@
       <div class="acc" id="p2Details" style="display:none">
       <!-- DX Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
+        <div class="pl2"><span class="pn" id="p2f2lbl" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
         <div class="pd" data-i18n="p2_dx_d">スマート農業・自動化による地域ブランド産業の持続化投資。低いと高齢職人依存が継続し後継者断絶が起きる。</div>
-        <input type="range" id="dxRate" min="0" max="100" value="30">
+        <input type="range" id="dxRate" aria-labelledby="p2f2lbl" min="0" max="100" value="30">
         <div class="rl"><span data-i18n="p2_dx_l">高齢農家の職人依存</span><span data-i18n="p2_dx_r">スマート自動化</span></div>
       </div>
       <hr class="div">
       <!-- Leader Ethics P2 -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">68</span></div>
+        <div class="pl2"><span class="pn" id="p2f3lbl" data-i18n="p2_f3n">行政リーダーの倫理観 <span class="tag tg">GOVERNANCE</span></span><span class="pv" id="ethicsP2Val">68</span></div>
         <div class="pd" data-i18n="p2_ethics_d">低下するとシステム目的関数が『生活者の生存』から『自己保身』へ乗っ取られ、実務を完全放棄して他責化処理にCPUが100%占有されます。</div>
-        <input type="range" id="ethicsScoreP2" min="0" max="100" value="68">
+        <input type="range" id="ethicsScoreP2" aria-labelledby="p2f3lbl" min="0" max="100" value="68">
         <div class="rl"><span data-i18n="p2_ethics_l">他責・責任回避</span><span data-i18n="p2_ethics_r">実務・法治</span></div>
       </div>
       <hr class="div">
@@ -429,7 +430,7 @@
 
 </div><!-- /#page2 -->
 
-<div id="page3" class="page">
+<div id="page3" class="page" role="tabpanel" aria-labelledby="tab3Btn">
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
@@ -454,9 +455,9 @@
       <hr class="div">
       <!-- Search Depth -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">7</span></div>
+        <div class="pl2"><span class="pn" id="p3f1lbl" data-i18n="p3_f1n">探索深度 <span class="tag" style="background:rgba(153,69,255,.12);color:var(--pur);border:1px solid rgba(153,69,255,.3)">SEARCH DEPTH</span></span><span class="pv" id="depthVal" style="color:var(--pur)">7</span></div>
         <div class="pd" data-i18n="p3_depth_d">思考の探索段数。3以下ではバズへの脊髄反射で偽装ノードに騙される。7以上で多次元の因果関係を検証してから判断する。</div>
-        <input type="range" id="searchDepth" min="1" max="10" value="7" class="pur-range">
+        <input type="range" id="searchDepth" aria-labelledby="p3f1lbl" min="1" max="10" value="7" class="pur-range">
         <div class="rl"><span data-i18n="p3_depth_l">脊髄反射・バズ即応</span><span data-i18n="p3_depth_r">多次元因果検証</span></div>
       </div>
       <hr class="div">
@@ -464,17 +465,17 @@
       <div class="acc" id="p3Details" style="display:none">
       <!-- Grounding Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
+        <div class="pl2"><span class="pn" id="p3f2lbl" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
         <div class="pd" data-i18n="p3_ground_d">物理現実との接続率。高いほどSNS断食・実世界の一次情報により認知の過学習（ノイズ蓄積）が洗い流される。</div>
-        <input type="range" id="groundingRate" min="0" max="100" value="20">
+        <input type="range" id="groundingRate" aria-labelledby="p3f2lbl" min="0" max="100" value="20">
         <div class="rl"><span data-i18n="p3_ground_l">ネット常時接続</span><span data-i18n="p3_ground_r">物理現実回帰・SNS断食</span></div>
       </div>
       <hr class="div">
       <!-- Learning Rate -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
+        <div class="pl2"><span class="pn" id="p3f3lbl" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
         <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
-        <input type="range" id="learningRate" min="0" max="100" value="40">
+        <input type="range" id="learningRate" aria-labelledby="p3f3lbl" min="0" max="100" value="40">
         <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・アップデート拒否</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
       </div>
       </div><!-- /p3Details -->
@@ -553,7 +554,7 @@
 
 </div><!-- /#page3 -->
 
-<div id="page4" class="page">
+<div id="page4" class="page" role="tabpanel" aria-labelledby="tab4Btn">
 
 <div class="preset-bar">
   <span class="pl">SCENARIOS ▶</span>
@@ -578,17 +579,17 @@
       <hr class="div">
       <!-- External Traffic -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
+        <div class="pl2"><span class="pn" id="p4f1lbl" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
         <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
-        <input type="range" id="extTraffic" min="0" max="100" value="15" class="red-range">
+        <input type="range" id="extTraffic" aria-labelledby="p4f1lbl" min="0" max="100" value="15" class="red-range">
         <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
       </div>
       <hr class="div">
       <!-- Gamification -->
       <div style="margin-bottom:12px">
-        <div class="pl2"><span class="pn" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
+        <div class="pl2"><span class="pn" id="p4f2lbl" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
         <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
-        <input type="range" id="gamification" min="0" max="100" value="15" class="yel-range">
+        <input type="range" id="gamification" aria-labelledby="p4f2lbl" min="0" max="100" value="15" class="yel-range">
         <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
       </div>
       <hr class="div">
@@ -669,9 +670,9 @@
 <div class="foot" id="footerTxt" data-i18n="footerTxt">社会デバッガー v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
-<div class="mo" id="auditModal" onclick="closeAuditIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="auditModal" onclick="closeAuditIf(event)">
   <div class="mb" style="max-width:640px;border-color:var(--green);box-shadow:0 0 40px rgba(0,255,136,.25)">
-    <button class="mc" onclick="closeAudit()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeAudit()">✕</button>
     <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
     <div class="mti" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
     <textarea id="auditText" readonly class="audit-ta"></textarea>
@@ -683,9 +684,9 @@
   </div>
 </div>
 
-<div class="mo" id="introModal" onclick="closeIntroIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="introModal" onclick="closeIntroIf(event)">
   <div class="mb" style="max-width:620px">
-    <button class="mc" onclick="closeIntro()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
     <div class="mti" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
     <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
@@ -730,9 +731,9 @@
 </div>
 
 <!-- v6.2: 共有ポップオーバー（テンプレ選択 → OS共有 / LINE / X / コピー） -->
-<div class="mo" id="sharePopModal" onclick="closeSharePopIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="sharePopModal" onclick="closeSharePopIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" onclick="closeSharePop()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeSharePop()">✕</button>
     <div class="mtag">⇪ SHARE EXPERIMENT</div>
     <div class="mti" id="sharePopTitle">実験を共有</div>
     <div class="cs" id="sharePopHint" style="margin-bottom:8px"></div>
@@ -755,9 +756,9 @@
 
 <!-- v6.2: 共有ガイドモーダル -->
 <!-- T50: PWA インストール手順モーダル（beforeinstallprompt が使えないブラウザ向けフォールバック） -->
-<div class="mo" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
   <div class="mb" style="max-width:560px">
-    <button class="mc" onclick="closePwaInstall()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closePwaInstall()">✕</button>
     <div class="mtag" data-i18n="pwa_tag">INSTALL — アプリとして使う</div>
     <div class="mti" data-i18n="pwa_title">ホーム画面から、1タップで起動</div>
     <div class="mbd" data-i18n="pwa_body">このサイトは PWA（インストールできるWebアプリ）です。入れておくと全画面で起動し、オフラインでも動きます。登録・料金は不要です。<br><br>
@@ -767,9 +768,9 @@
   </div>
 </div>
 
-<div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="shareGuideModal" onclick="closeShareGuideIf(event)">
   <div class="mb" style="max-width:640px">
-    <button class="mc" onclick="closeShareGuide()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeShareGuide()">✕</button>
     <div class="mtag" data-i18n="sg_tag">SHARE GUIDE — 共有のつかいかた</div>
     <div class="mti" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
     <div class="mbd" style="margin-bottom:12px" data-i18n="sg_body">このアプリで共有されるのは主張ではなく、誰でも再現できる実験（パラメータ状態のURL）です。
@@ -800,9 +801,9 @@
 </div>
 
 <!-- v6.332: フィードバックモーダル -->
-<div class="mo" id="feedbackModal" onclick="closeFeedbackIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="feedbackModal" onclick="closeFeedbackIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" onclick="closeFeedback()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeFeedback()">✕</button>
     <div class="mti" data-i18n="fb_title">フィードバック</div>
     <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
       <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
@@ -837,9 +838,9 @@
 </div>
 
 <!-- v6.334: 発見ログモーダル -->
-<div class="mo" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
   <div class="mb" style="max-width:480px">
-    <button class="mc" onclick="closeDiscoveryLog()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeDiscoveryLog()">✕</button>
     <div class="mti" data-i18n="disc_title">📖 発見ログ</div>
     <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
     <div id="discList"></div>
@@ -847,9 +848,9 @@
 </div>
 
 <!-- v6.35: Weekly Scenarios Modal -->
-<div class="mo" id="scenarioModal" onclick="closeScenarioIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="scenarioModal" onclick="closeScenarioIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" onclick="closeScenarios()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeScenarios()">✕</button>
     <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
     <div class="mti" id="scenarioTitle" style="font-size:1.2em;margin-bottom:10px">Echo Chamber Trap</div>
     <div class="cs" style="margin-bottom:10px" data-i18n="scenario_intro_hint">今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。</div>
@@ -865,9 +866,9 @@
 </div>
 
 <!-- v6.345: 共有前コメントモーダル -->
-<div class="mo" id="rewindModal" onclick="closeRewindIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="rewindModal" onclick="closeRewindIf(event)">
   <div class="mb" style="max-width:460px">
-    <button class="mc" onclick="closeRewind()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeRewind()">✕</button>
     <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
     <div class="mti" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
     <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
@@ -876,9 +877,9 @@
   </div>
 </div>
 
-<div class="mo" id="shareCommentModal" onclick="closeShareCommentIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="shareCommentModal" onclick="closeShareCommentIf(event)">
   <div class="mb" style="max-width:460px">
-    <button class="mc" onclick="closeShareComment()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeShareComment()">✕</button>
     <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
     <div class="mti" data-i18n="sc_title">一言添えて送る（任意）</div>
     <textarea id="shareCommentInput" rows="2" maxlength="100"
@@ -892,9 +893,9 @@
   </div>
 </div>
 
-<div class="mo" id="modal" onclick="closeModalIf(event)">
+<div class="mo" role="dialog" aria-modal="true" id="modal" onclick="closeModalIf(event)">
   <div class="mb">
-    <button class="mc" onclick="closeModal()">✕</button>
+    <button class="mc" aria-label="Close" onclick="closeModal()">✕</button>
     <div class="mtag" id="mTag">METRIC</div>
     <div class="mti" id="mTitle"></div>
     <div class="mbd" id="mBody"></div>

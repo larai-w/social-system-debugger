@@ -816,7 +816,9 @@ function switchTab(n){
   currentTab = n;
   [1,2,3,4].forEach(i=>{
     document.getElementById('page'+i).classList.toggle('active', n===i);
-    document.getElementById('tab'+i+'Btn').classList.toggle('active', n===i);
+    const tb=document.getElementById('tab'+i+'Btn');
+    tb.classList.toggle('active', n===i);
+    tb.setAttribute('aria-selected', n===i ? 'true' : 'false'); // T55: スクリーンリーダーへ選択状態を通知
   });
   if(n===2){ updateAllP2(); startP2Tick(); } else { stopP2Tick(); } // v6.346: 後継者ストックはP2表示中のみ時間経過
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
