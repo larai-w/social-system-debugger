@@ -684,6 +684,8 @@ function track(event,props){
 // v6.343: ドキュメント導線の言語連動
 function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/blob/main/docs/'+name+(lang==='en'?'.en':'')+'.md';}
 function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
+// T35: アプリ内ページ導線（classroom/privacy。相対URL＝Pages/AWS両対応、言語連動で .en.html）
+function openAppPage(name){track('open_'+name);window.open(name+(lang==='en'?'.en':'')+'.html','_blank','noopener');}
 
 // v6.345: 街の名前 helpers
 function getTownName(){try{return localStorage.getItem('ssd_town_name')||'';}catch(e){return '';}}
