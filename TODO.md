@@ -100,6 +100,8 @@ make protect
 
 ネイティブ機能（通知・触覚・共有シート）の実挙動確認。GUI と署名が必要。
 
+> **ストア審査提出まで通す場合の詳細ランブックは `docs/store-submission.md`**（appId 確定 → cap add/sync → iOS(TestFlight)／Android(内部テスト) → 審査対策 → 提出後対応まで、上から順に実行できる1本）。
+
 ### iOS
 ```bash
 sudo gem install cocoapods      # brew が無いので gem で
