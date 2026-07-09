@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社会デバッガー — 授業用 投影スライド（公共・情報I・探究）</title>
+<meta name="description" content="社会や地域インフラが「どう壊れるか」を体験する無料の教材シミュレーター。授業でそのままプロジェクター投影できるスライド版。準備物なし・ブラウザのみ。">
+<meta property="og:title" content="社会デバッガー — 授業用 投影スライド">
+<meta property="og:description" content="公共・情報I・探究向け。授業でそのまま投影できるスライド版。準備物なし・ブラウザのみ・1テーマ約10分。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  教員向け 投影スライド版（MARKETING.md 教育チャネル）。
+  授業でそのままプロジェクター投影できる 9 枚のスライド。ダーク・ターミナル調（教室後方から読める大きさ）。
+  ← → キー / クリック・タップ / 画面端ボタンで前後移動。JS 無効でも全スライドが縦に並んで読める（プログレッシブエンハンスメント）。
+  アプリ本体の i18n/JS には依存しない自己完結ページ。
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:28px;line-height:1.6;}
+  /* JS 無効時（既定）: 全スライドを縦に並べて文書として読ませる */
+  .slide{max-width:1100px;margin:0 auto;padding:56px 48px;min-height:100vh;
+         display:flex;flex-direction:column;justify-content:center;
+         border-bottom:1px solid var(--bdr);}
+  .kicker{color:var(--muted);font-size:.62em;letter-spacing:.22em;margin:0 0 18px;text-transform:uppercase;}
+  h1{color:var(--cy);font-size:2.1em;margin:0 0 14px;letter-spacing:.04em;
+     text-shadow:0 0 24px rgba(57,213,255,.35);}
+  h2{color:var(--grn);font-size:1.35em;margin:0 0 24px;letter-spacing:.05em;}
+  .tagline{color:var(--muted);font-size:.92em;margin:0 0 26px;}
+  p{margin:0 0 16px;}
+  ol,ul{margin:6px 0 6px;padding-left:1.3em;}
+  li{margin:12px 0;}
+  b{color:var(--tx);}
+  em{color:var(--cy);font-style:normal;}
+  .q{color:var(--ora);}
+  .urlbox{display:inline-block;border:1px solid var(--cy);border-radius:8px;
+          padding:14px 20px;margin:18px 0;background:var(--bg1);
+          font-size:.86em;word-break:break-all;}
+  .urlbox a{color:var(--cy);text-decoration:none;font-weight:bold;}
+  .note{border:1px solid var(--bdr);border-left:4px solid var(--pur);border-radius:6px;
+        padding:20px 26px;margin:16px 0;color:var(--muted);font-size:.9em;line-height:1.55;}
+  .grid{display:grid;grid-template-columns:auto 1fr;gap:14px 26px;margin:10px 0;font-size:.92em;}
+  .grid .pg{color:var(--cy);white-space:nowrap;}
+  .steps{counter-reset:step;list-style:none;padding-left:0;}
+  .steps li{position:relative;padding-left:2.1em;}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:.1em;
+      color:var(--bg0);background:var(--cy);border-radius:50%;width:1.4em;height:1.4em;
+      display:inline-flex;align-items:center;justify-content:center;font-size:.72em;font-weight:bold;}
+  .small{font-size:.78em;color:var(--muted);}
+  /* JS 有効時: 1 枚ずつ表示 */
+  body.js .slide{display:none;height:100vh;min-height:0;border-bottom:none;
+                 padding:64px 72px;}
+  body.js .slide.active{display:flex;}
+  /* ナビ（JS 有効時のみ表示） */
+  .nav{display:none;}
+  body.js .nav{display:block;}
+  .navbtn{position:fixed;top:0;height:100vh;width:9%;min-width:60px;border:none;
+          background:transparent;color:var(--muted);font-size:2.4rem;cursor:pointer;
+          font-family:inherit;opacity:.35;transition:opacity .2s,background .2s;z-index:10;}
+  .navbtn:hover{opacity:1;background:rgba(57,213,255,.06);color:var(--cy);}
+  .navbtn.prev{left:0;}
+  .navbtn.next{right:0;}
+  .counter{position:fixed;right:18px;bottom:14px;font-size:.7rem;color:var(--muted);
+           border:1px solid var(--bdr);border-radius:6px;padding:5px 12px;background:var(--bg1);
+           letter-spacing:.1em;z-index:10;}
+  .hint{position:fixed;left:18px;bottom:14px;font-size:.66rem;color:var(--muted);z-index:10;}
+  .langlink{position:fixed;left:18px;top:14px;font-size:.66rem;z-index:20;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media (max-width:720px){
+    body{font-size:20px;}
+    .slide{padding:40px 24px;}
+    body.js .slide{padding:52px 26px;}
+    .navbtn{font-size:1.6rem;}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="classroom-slides.en.html">English version</a></div>
+
+<!-- スライド 1: タイトル -->
+<section class="slide" id="s1">
+  <p class="kicker">Social Debugger / 教育用シミュレーター</p>
+  <h1>社会デバッガー</h1>
+  <p class="tagline">あなたの街は、生き残れるか。</p>
+  <div class="urlbox">▶ <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+  <p class="small">公共・情報I・探究の授業で / 準備物なし・ブラウザのみ・無料・登録なし</p>
+</section>
+
+<!-- スライド 2: これは何か -->
+<section class="slide" id="s2">
+  <p class="kicker">01 — これは何か</p>
+  <h2>社会が「どう壊れるか」を、自分の手で動かして体験する</h2>
+  <p>パラメータ（スライダー）を操作すると、社会や地域インフラが崩れていく様子が目の前で動きます。</p>
+  <p>これは<b>ゲームでも予言でもありません</b>。「なぜ壊れるのか」を考えるための<em>思考の道具</em>です。</p>
+  <p class="small">正しい答えを当てる装置ではなく、条件を変えて「もし〜だったら」を試す実験台です。</p>
+</section>
+
+<!-- スライド 3: 4ページの地図 -->
+<section class="slide" id="s3">
+  <p class="kicker">02 — 4つのテーマ</p>
+  <h2>1本のアプリに、4つの「壊れ方」</h2>
+  <div class="grid">
+    <div class="pg">PAGE 1<br>情報空間</div><div>フィルターバブルと過学習。情報の偏りが多様性と信頼を静かに削る。</div>
+    <div class="pg">PAGE 2<br>地域インフラ</div><div>人口減少・効率化・後継者不足。効率を上げたのに災害に弱くなる逆説。</div>
+    <div class="pg">PAGE 3<br>認知リカバリー</div><div>怒りが止まらなくなる認知の仕組みと、そこからの回復。</div>
+    <div class="pg">PAGE 4<br>ステークホルダー<br>非対称性</div><div>当事者の声が観客の歓声にかき消されていく通信路の力学。</div>
+  </div>
+  <p class="small">授業では、この中から今日のテーマを1つ選びます。</p>
+</section>
+
+<!-- スライド 4: デモの手順 -->
+<section class="slide" id="s4">
+  <p class="kicker">03 — 3分デモ（教員が投影）</p>
+  <h2>崩壊を見せて、1つだけ変えて、救う</h2>
+  <ol class="steps">
+    <li>PAGE 1 を開き、プリセット <b>「⚡ ワイマール崩壊」</b> を1タップ。</li>
+    <li>社会が動き出し、そのまま<b>崩壊</b>していく様子を見せる。</li>
+    <li><b>巻き戻し</b>で過去に戻り、スライダーを<b>1つだけ</b>変えて、回復するか試す。</li>
+  </ol>
+  <p class="q">問いかけ:「たった1つ何を変えれば、この街は生き残ったのか?」</p>
+</section>
+
+<!-- スライド 5: 見どころ -->
+<section class="slide" id="s5">
+  <p class="kicker">04 — 見どころ</p>
+  <h2>ここに気づけたら成功</h2>
+  <ul>
+    <li>崩壊は<b>一点の原因からではなく</b>、いくつもの条件が<em>重なった</em>ときに起きる。</li>
+    <li>それでも、<b>一人の・一手の介入</b>で未来が変わりうる。手遅れになる前なら。</li>
+  </ul>
+  <p class="small">「誰が悪い」ではなく「どんな条件が揃うと危ういか」を見る目が育ちます。</p>
+</section>
+
+<!-- スライド 6: 生徒への問いかけ例 -->
+<section class="slide" id="s6">
+  <p class="kicker">05 — 生徒への問いかけ例</p>
+  <h2>そのまま板書できる問い</h2>
+  <ul>
+    <li class="q">「見たい情報だけを見ると、なぜ社会全体が壊れやすくなるのか?」（PAGE 1）</li>
+    <li class="q">「効率化はいつ正解で、いつ命取りになるか?（冗長性の価値）」（PAGE 2）</li>
+    <li class="q">「怒りが止まらないのは意志の弱さか、それとも構造か?」（PAGE 3）</li>
+    <li class="q">「崩壊した街を1つだけ過去に戻して変えられるなら、あなたは何を守るか?」（探究）</li>
+  </ul>
+</section>
+
+<!-- スライド 7: 授業の流れ -->
+<section class="slide" id="s7">
+  <p class="kicker">06 — 50分の型</p>
+  <h2>1コマの進め方</h2>
+  <div class="grid">
+    <div class="pg">10分</div><div>各自で1テーマを体験する。</div>
+    <div class="pg">10分</div><div>「生き残る設定」の仮説を立てる。</div>
+    <div class="pg">15分</div><div>パラメータを変えて実験・検証する。</div>
+    <div class="pg">15分</div><div>班で共有: どの介入が効いたか・現実では何にあたるか。</div>
+  </div>
+  <p class="small">導入だけなら10分（プリセット投影→崩壊→ペアで1問）でも成立します。</p>
+</section>
+
+<!-- スライド 8: 作法・注意 -->
+<section class="slide" id="s8">
+  <p class="kicker">07 — 扱い方の注意（大切）</p>
+  <h2>批判の道具ではなく、理解の道具</h2>
+  <div class="note">
+    このアプリは<b>架空のシミュレーション</b>です。実在の国・政党・人物には当てはめません。<br>
+    授業でも「特定の誰か・どこかの話」ではなく、<b>「どの社会にも起こる構造の話」</b>として扱ってください。<br>
+    結果を根拠に現実の特定の地域・人物・政党を評価する使い方は、このモデルの精度を超えています。
+  </div>
+</section>
+
+<!-- スライド 9: 締め -->
+<section class="slide" id="s9">
+  <p class="kicker">08 — さあ、始めましょう</p>
+  <h2>まず自分の街の設定で試してみてください</h2>
+  <div class="urlbox">▶ <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+  <p>授業の流れ・問いの例・データ書き出しの詳しい使い方は、
+     <b><a href="classroom.html" style="color:var(--cy);text-decoration:none;">教員向け1枚ガイド（classroom.html）</a></b> にまとめてあります。</p>
+  <p class="small">足りないものがあれば、アプリ内「💬 フィードバック」から。教える側の視点が一番の改善材料です。</p>
+</section>
+
+<!-- ナビ（JS 有効時のみ表示） -->
+<div class="nav">
+  <button class="navbtn prev" id="prev" aria-label="前のスライド">‹</button>
+  <button class="navbtn next" id="next" aria-label="次のスライド">›</button>
+  <div class="counter" id="counter">1 / 9</div>
+  <div class="hint">← → で移動 / 画面クリックで次へ</div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  if(!slides.length) return;
+  document.body.classList.add('js');
+  var i = 0;
+  var counter = document.getElementById('counter');
+  function show(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    for(var k=0;k<slides.length;k++){ slides[k].classList.toggle('active', k===i); }
+    if(counter) counter.textContent = (i+1) + ' / ' + slides.length;
+    if(history.replaceState) history.replaceState(null, '', '#s' + (i+1));
+  }
+  function next(){ show(i+1); }
+  function prev(){ show(i-1); }
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  // スライド本体クリックで次へ（リンク/ボタンのクリックは除外）
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.closest && (t.closest('a') || t.closest('button'))) return;
+    if(t.closest && t.closest('.slide')) next();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); next(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if(e.key === 'End'){ e.preventDefault(); show(slides.length-1); }
+  });
+  // タッチスワイプ
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if(x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+    x0 = null;
+  }, {passive:true});
+  // 起動時: URL ハッシュから復元
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1],10) - 1 : 0);
+})();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 //   - メインドキュメント と 同一オリジンのアプリコード(js/css) は network-first
 //     （新デプロイを必ず優先し、古いキャッシュに固定されない。分割変更後の stale-JS 対策）。
 //   - それ以外の静的アセット(icon 等) / CDN(Chart.js) は cache-first（オフライン動作）。
-const CACHE = 'ssd-cache-v6-360';
+const CACHE = 'ssd-cache-v6-361';
 const CORE = [
   './',
   './index.html',
