@@ -18,6 +18,8 @@ published: false
 
 方針は「**Pages 維持＋AWS 追加**」。既存URLは1文字も変えません。切り替えではなく並行運用です。
 
+執筆時点で AWS 側は**本番デプロイ済み・ライブ**です（東京リージョン・CloudFront ドメインで HTTP 200、S3 直アクセスは 403＝OAC が効いている状態）。以下は「synth が通った」話ではなく、実際にデプロイして踏んだ話です（アカウントID・バケット名・ディストリビューションIDは伏せ字で書きます）。
+
 ## 構成: S3(非公開) + CloudFront(OAC)、CDK(TypeScript)
 
 ```
@@ -52,27 +54,35 @@ repo:<owner>/<repo>:ref:refs/heads/main
 
 `cdk deploy` の権限は**意図的に含めていません**。インフラ変更は人間がローカルで、コンテンツ更新だけがCIの仕事、という分離です。ワークフローは main への push で S3 同期 →（キャッシュが長い）`index.html` と `latest.json` **だけ**を無効化します。ハッシュ付きアセット運用なら全体無効化は不要で、Invalidation のコストも抑えられます。
 
-## 個人開発ならではのハマり所 2 つ
+## 実際に踏んだハマり所 2 つ（synth では出ない・deploy で出た）
+
+この2つは `cdk synth` では一切表面化せず、**本番デプロイの当日に踏みました**。個人開発でアカウントを使い回していると、まさに刺さる類のものです。
 
 **1. GitHub OIDC プロバイダはアカウントに1つしか作れない**
 
-過去に他のプロジェクトで作った `token.actions.githubusercontent.com` のプロバイダが既にあると、CDK の新規作成が衝突します。既存 ARN をコンテキストで渡して再利用する逃げ道を用意しました:
+過去に他のプロジェクトで作った `token.actions.githubusercontent.com` のプロバイダが既にアカウントにあると、CDK の新規作成が `EntityAlreadyExists` で衝突します。CDK が「無ければ作る／有れば使う」を自動で判断してくれるわけではないので、既存 ARN をコンテキストで渡して再利用する逃げ道を用意しました（実際にこれで抜けました）:
 
 ```bash
-cdk deploy -c existingOidcProviderArn=arn:aws:iam::<account>:oidc-provider/token.actions.githubusercontent.com
+cdk deploy -c existingOidcProviderArn=arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com
 ```
+
+Makefile の既定ターゲットにはこのコンテキストが入っていないので、既存プロバイダのあるアカウントでは**手で渡すか Makefile を拡張する**必要がある、というのも実運用で分かった注意点です。
 
 **2. macOS 標準の bash 3.2 と `set -u` の組み合わせ**
 
-デプロイスクリプトで空配列を展開したら `unbound variable` で死にました。bash 3.2 では空配列の `"${ARR[@]}"` が未定義扱いになります。ガード付き展開が正解:
+デプロイスクリプト（`infra/scripts/deploy.sh`）が `set -u` 下で空配列 `"${PROFILE_ARGS[@]}"` を展開した瞬間、`unbound variable` で落ちました。macOS 同梱の bash 3.2 では**空配列の `"${ARR[@]}"` が未定義扱い**になるためです（新しめの bash では起きない）。ガード付き展開に直して解決:
 
 ```bash
 aws s3 sync ... ${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"}
 ```
 
+どちらも「クラウド側の設計」ではなく「手元の環境と履歴」に起因するバグで、synth の緑では検出できない。個人開発でインフラを自分の手で通す価値は、こういう所に出ると思います。
+
 ## 運用の自動化: 「デプロイ後の手作業」を1コマンドに
 
-CDK の出力（ロールARN・バケット名・ディストリビューションID・ドメイン）を GitHub の Secrets/Variables に手で写経するのが一番ミスる工程だったので、`make aws-wire` に固めました。中身は CDK 出力を読んで `gh` CLI で Secrets/Variables を設定し、配信元URLを `web/config.js` に書き込むシェルスクリプトです。
+CDK の出力（ロールARN・バケット名・ディストリビューションID・ドメイン）を GitHub の Secrets/Variables に手で写経するのが一番ミスる工程だったので、`make aws-wire` に固めました。中身は CDK 出力を読んで `gh` CLI で Secrets/Variables を設定し、必要なら配信元URLを `web/config.js` に書き込むシェルスクリプトです。
+
+なお今回は CloudFront が本体と週替わりJSONを**同一オリジン**で配信するので、`web/config.js` の `contentBaseUrl` は空（相対）のままで動きます。別オリジンから content を引く構成になったときだけ、ここに絶対URLが入る、という切り分けです。
 
 ```bash
 make aws-bootstrap   # 初回のみ
