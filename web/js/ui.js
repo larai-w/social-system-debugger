@@ -687,6 +687,25 @@ function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach
 // T35: アプリ内ページ導線（classroom/privacy。相対URL＝Pages/AWS両対応、言語連動で .en.html）
 function openAppPage(name){track('open_'+name);window.open(name+(lang==='en'?'.en':'')+'.html','_blank','noopener');}
 
+// T50: PWA インストール導線。対応ブラウザではネイティブのインストールプロンプトを出し、
+//   非対応（iOS Safari 等）は手順モーダルへフォールバック。native アプリ内・インストール済みでは非表示。
+let pwaDeferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();pwaDeferredPrompt=e;});
+window.addEventListener('appinstalled',()=>{track('pwa_installed');pwaDeferredPrompt=null;syncPwaInstallBtn();});
+function syncPwaInstallBtn(){
+  const b=document.getElementById('pwaInstallBtn');if(!b)return;
+  const standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+  if((window.SSD&&SSD.isNative)||standalone)b.style.display='none';
+}
+function openPwaInstall(){
+  track('pwa_install_click');
+  if(pwaDeferredPrompt){const p=pwaDeferredPrompt;pwaDeferredPrompt=null;p.prompt();return;}
+  document.getElementById('pwaInstallModal')?.classList.add('on');
+}
+function closePwaInstall(){document.getElementById('pwaInstallModal')?.classList.remove('on');}
+function closePwaInstallIf(e){if(e.target===e.currentTarget)closePwaInstall();}
+syncPwaInstallBtn();
+
 // v6.345: 街の名前 helpers
 function getTownName(){try{return localStorage.getItem('ssd_town_name')||'';}catch(e){return '';}}
 function saveTownName(name){try{if(name&&name.trim())localStorage.setItem('ssd_town_name',name.trim());else localStorage.removeItem('ssd_town_name');}catch(e){}}

@@ -67,6 +67,7 @@
         <hr class="menu-divider">
         <button class="menu-item" onclick="openAppPage('classroom');closeHeaderMenu()" data-i18n="menu_classroom">🏫 教員向けガイド（授業で使う）</button>
         <button class="menu-item" onclick="openAppPage('privacy');closeHeaderMenu()" data-i18n="menu_privacy">🔒 プライバシーポリシー</button>
+        <button class="menu-item" id="pwaInstallBtn" onclick="openPwaInstall();closeHeaderMenu()" data-i18n="menu_pwa">📲 アプリとして入れる</button>
         <hr class="menu-divider">
         <button class="menu-item" onclick="openFeedback();closeHeaderMenu()" data-i18n="fb_btn">💬 フィードバック</button>
       </div>
@@ -753,6 +754,19 @@
 <div class="disc-toast" id="discToast"></div>
 
 <!-- v6.2: 共有ガイドモーダル -->
+<!-- T50: PWA インストール手順モーダル（beforeinstallprompt が使えないブラウザ向けフォールバック） -->
+<div class="mo" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
+  <div class="mb" style="max-width:560px">
+    <button class="mc" onclick="closePwaInstall()">✕</button>
+    <div class="mtag" data-i18n="pwa_tag">INSTALL — アプリとして使う</div>
+    <div class="mti" data-i18n="pwa_title">ホーム画面から、1タップで起動</div>
+    <div class="mbd" data-i18n="pwa_body">このサイトは PWA（インストールできるWebアプリ）です。入れておくと全画面で起動し、オフラインでも動きます。登録・料金は不要です。<br><br>
+      <b>iPhone / iPad（Safari）:</b> 共有ボタン（□に↑）→「ホーム画面に追加」<br>
+      <b>Android（Chrome）:</b> メニュー（⋮）→「アプリをインストール」<br>
+      <b>PC（Chrome / Edge）:</b> アドレスバー右端のインストールアイコン、またはメニュー→「インストール」</div>
+  </div>
+</div>
+
 <div class="mo" id="shareGuideModal" onclick="closeShareGuideIf(event)">
   <div class="mb" style="max-width:640px">
     <button class="mc" onclick="closeShareGuide()">✕</button>
