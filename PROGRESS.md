@@ -62,6 +62,11 @@
 | T52 | CHANGELOG に T36〜T49 追記（**Opus委任14件目**） | 履歴の鮮度維持（ポートフォリオ整合） | ✅ |
 | T53 | `docs/store-submission.md` ストア提出ランブック（**Opus委任15件目**） | ☐4 実機ビルド〜審査提出を1本道に | ✅ |
 | T54 | Lighthouse 週次監査 `lighthouse.yml`（**Opus委任16件目**） | PWA/性能/a11y スコアの継続計測（助言的） | ✅ |
+| T55 | アクセシビリティパス（スライダー/タブ/モーダルに ARIA・直営） | 教育利用（スクリーンリーダー）＋Lighthouse a11y。見た目不変 | ✅ |
+| T56 | i18n 完全性テスト（**Opus委任17件目**） | 絶対制約「i18n を壊さない」を CI に移管（ITIL: 変更有効化） | ✅ |
+| T57 | Chart.js セルフホスト化 `web/vendor/`（直営） | 唯一の外部依存を排除＝初回訪問からオフライン完結・誤爆遮断も消滅 | ✅ |
+| T58 | ポートフォリオ鮮度（backfill T44〜T54・ARCHITECTURE/cv 追記）（**Opus委任18件目**） | ベネフィット実現の維持（PMP）・継続的改善の記録（ITIL） | ✅ |
+| T59 | `docs/ARCHITECTURE.md` 日本語版（**Opus委任19件目**） | 国内の研究者・教育関係者向け＋国内就活の保険 | ✅ |
 
 ## 実施順
 
@@ -69,6 +74,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T55〜T59（第12スプリント・品質と自立性・Opus並行委任3件＋直営2件。ITIL/PMP 視点の適用開始）**: **T55=直営** ARIA 対応＝スライダー11本 `aria-labelledby`（P2〜P4はラベルspanに id 新設・data-i18n と共存＝言語非依存）／タブ4本 role="tab"+aria-selected（switchTab で同期）＋tabpanel／モーダル11個 role="dialog" aria-modal＋閉じるボタン aria-label="Close"。CSS/文言不変（制約1遵守）。**T56=Opus委任** i18n 完全性テスト＝①index.html の全 data-i18n キーが I18N.en に存在 ②js の t('…') リテラル＋setVerdictBanner 第3引数キーが en に存在 ③ja⇔en 辞書対称。`(?<![\w$])` 後読みで getContext('2d') 等の誤検知を排除、コメント除去は URL の // を保護。現状の欠落ゼロ・allowlist 空（理由必須の枠のみ）。**T57=直営** Chart.js 4.4.0 を `web/vendor/chart.umd.min.js`（205KB・MIT）にセルフホスト＝CDN 参照を削除し**外部依存ゼロ**。sw CORE に追加（v6-363）＝初回訪問後は完全オフライン、広告ブロッカーによる Chart 遮断も構造的に消滅。verify.mjs は失敗系を vendor パス遮断で再現する方式に更新（副産物: 正常系がスタブでなく実 Chart.js で走る＝検証強化）。vendor は .prettierignore へ（第三者コード不改変）。**T58=Opus委任** backfill TASKS に T44〜T54 の11件（英語・delegated 6件）・milestone「Delegation sprints (T25–T54)」改名＋旧名残存時の対処コメント・github-project.md 件数61に更新・ARCHITECTURE.en §4 に offline検証/PWA導線/Lighthouse/gitleaks 追記・cv-highlights bullets 2本追加。**T59=Opus委任** `docs/ARCHITECTURE.md`＝en 原本の忠実和訳（6章・Mermaid2図・訳語は DEVELOPMENT.md 準拠・「原本は en」を冒頭明記）＋README 導線1行。**受け入れ（スコープ検証）**: `npm run check` 全green（**テスト27**=i18n+3）・`make verify` 両ケース green（実Chart/遮断）・`verify:offline` green・backfill 構文OK。**問題管理**: T59 が検出した vendor の prettier warn → .prettierignore で恒久対処。**ITIL/PMP 視点を CLAUDE.md「開発ツールの方針」に恒久方針として明文化**（ユーザー指示 2026-07-10）。
 
 - ✅ **T50〜T54（第11スプリント・PWA完成度・Opus並行委任3件＋直営2件）**: **T50=直営** PWA インストール導線＝≡メニュー「📲 アプリとして入れる」。`beforeinstallprompt` を捕捉して対応ブラウザ（Chrome/Edge/Android）はネイティブプロンプト、非対応（iOS Safari 等）は OS 別手順モーダルにフォールバック。native アプリ内・standalone 起動時は自動非表示。track 2種・i18n ja/en・sw v6-362。invariants テストがインライン `if(...)` を未定義関数と誤検知する既存仕様に合わせ `closePwaInstallIf(e)` ヘルパー化（shareGuide と同じ流儀）。**T51=直営** `scripts/verify-offline.mjs`＝SW は http 必須のため**依存ゼロの極小静的サーバを内蔵**し、オンライン読込→`navigator.serviceWorker.ready`→`context.setOffline(true)`→リロードで「SWキャッシュから起動・イントロ閉→タブ遷移可・Console/pageerror ゼロ」を検証。`npm run verify:offline`／`make verify-offline`。初回実行でイントロモーダルのクリック遮蔽を検出→対処済み。**T52=Opus委任** CHANGELOG「継続整備・ポートフォリオスプリント（T36〜T49）」（+37行・既存無改変・5サブセクション）。**T53=Opus委任** `docs/store-submission.md`（238行）＝前提費用→appId確定（後変更不可の警告）→gen:icons/cap add→iOS(TestFlight)→Android(内部テスト)→審査対策（App Privacy・輸出コンプライアンス・privacy URL 実体）→審査落ち定番対応。Apple/Google 側画面など検証不能箇所は「2026-07時点の一般的な手順・要公式確認」を14箇所明示。TODO ☐4 に参照1行。**T55候補だった掲載文再掲はせず store-listing.md 参照で重複回避。**T54=Opus委任** `lighthouse.yml`＝treosh/lighthouse-ci-action@v11・週1（cron 0 16 * * 0 = 月曜1:00 JST）＋workflow_dispatch・本番 Pages 対象・assert なし（助言的）・artifacts+一時公開ストレージにレポート保存。DEVELOPMENT ja/en に1行ずつ。受け入れ: `npm run check` 全green（テスト24）・`make verify` 両ケース green・`verify:offline` green を親が確認。委任3件とも直接ファイル編集（転記ゼロ）、ただし Bash は3件とも拒否＝受け入れは親が代行（プロトコル通り）。
 
