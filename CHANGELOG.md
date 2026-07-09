@@ -4,6 +4,43 @@
 
 ---
 
+## 戦略実装スプリント（T1〜T35）— 2026-07-07〜09 — 検証基盤・研究者/教育導線・AWS本番ライブ・委任プロトコル
+
+フェーズ1後の7スプリント（T1〜T35）。**アプリのUI見た目は不変・Web挙動は維持**、フッターバージョンは v6.346 据え置き（sw cache は v6-347→v6-360 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### 検証・品質基盤
+
+- **検証スクリプト `scripts/verify.mjs`**: Playwright で Chart.js 正常系／CDN遮断（失敗系）の2ケースを実行し、4タブ遷移・プリセット・スライダー操作の Console/pageerror ゼロを自動検証（`npm run verify`／`make verify`）。後に **P2ショック注入→P3/P4スライダー→エクスポート生成まで**スモーク範囲を拡張（T1/T32）。
+- **週次シナリオ到達可能性テスト**: `tests/weekly-reachability.test.mjs`＝goalConds の metric 名が判定文脈に実在するか、P1系は実エンジンのグリッド全探索で「到達可能かつ開始即クリアなし」を検証。**導入即、実バグ2件を検出**（配信JSON／バンドル版が開始パラメータでゴール達成済み＝即クリア設計）→ 劣化状態からの回復型に修正（T20）。
+- **リント/整形と CI 一致**: prettier + eslint を導入（`no-undef`/`no-unused-vars` は無効化＝明白なバグ系ルールのみ、密な手書きフロントは整形対象外）。`npm run check` = test＋週次検証＋eslint＋prettier に合流し、**CI の web ジョブを `npm ci`＋`npm run check` に統一**（lint/format 崩れが main に入らない）。ブランチ保護スクリプト `make protect`。
+- **開発フロー自動化**: セッション停止時に競合コピー/未コミット/未push を警告する Stop フック、コミット前に `npm run check` を走らせる pre-commit フック（`make hooks`）、Node20＋gh＋aws-cli の devcontainer で別マシン/Codespaces でも同一環境。`make handoff` で終了前一括検証。
+
+### 機能
+
+- **US-08 研究者向けエクスポート**: ≡メニューから全4ページのパラメータ＋P1/P2主要メトリクス＋再現用共有URL＋街名を **JSON/CSV** でダウンロード（`buildExportData()`／`exportData()`、track: `export_json`/`export_csv`）。研究者ペルソナの「教材・引用可能な再現性」に対応（T2）。
+- **共有チャネル最適化**: 固定ハッシュタグ `shareHashtag()`（ja=`#社会デバッガー` / en=`#SocialDebugger`）を X 導線に統一。PAGE 2 系文脈に「防災」語を含むテンプレ変種 `addBousai()`（LINE拡散狙い）（T3）。
+- **デモモード `?demo=1`**: ゴーストカーソルが実DOMを操作して自動再生（ワイマール→崩壊→介入→回復→ループ）。値の偽装なし＝実エンジン録画用。通常起動は完全 no-op（T21）。
+- **≡メニューに classroom/privacy 導線**: 「教員向けガイド」「プライバシーポリシー」を追加（`openAppPage()`＝相対URLで Pages/AWS 両対応・言語連動で `.en.html`・track: open_classroom/open_privacy・sw v6-360）。作りっぱなしだった教員導線とストア審査必須物をアプリ内到達可能に（T35）。
+
+### コンテンツ・発信
+
+- **週次シナリオ在庫 W31〜W46**: 在庫を W30 から W46（11/9週）まで段階延長（自動ローテの前提）。**W43〜W46 は PAGE 5 素材の小出し**＝design-note-page5.md §4 の融合戦略で、SILENT CAPTURE系（後継者の静かな枯渇・疑うのをやめた頭）と LOUD CRASH系（轟音の広場・洪水の議論場）を既存メトリクスで物語化し反応を計測。全ページカバー・実名/未実装UI名称ゼロ（T8/T15/T30/T34）。
+- **週次自動ローテ `weekly-rotate.yml`**: 毎週月曜0:00 JST に ISO週を計算して `content/weekly/<週>.json` を `latest.json` へコピーして bot コミットし、Pages/AWS デプロイを `gh workflow run` で明示起動。在庫切れ週は意図的に失敗＝補充リマインダー（T12）。
+- **教育・広報素材**: 教員向け1枚モノ `web/classroom.html`/`.en.html`（A4印刷→PDF・アプリJS非依存・ja⇔en相互リンク・OGP付き）、プライバシーポリシー `web/privacy.html`/`.en.html`（ストア審査必須物）、30秒縦型リール2本（`promo/reel-30s.html`＝効率vs冗長性／`reel-30s-history.html`＝歴史題材の安全版、両者 `?lang=en` 対応）とその自動録画 `make reels`（`scripts/record-reel.mjs`）、ストア用アイコン/スプラッシュ生成 `scripts/gen-icons.mjs`（T4/T5/T10/T13/T16/T25/T26/T27）。
+
+### インフラ
+
+- **AWS 本番デプロイ・ライブ**（ap-northeast-1）: S3(非公開/OAC)+CloudFront を実デプロイし CloudFront URL で公開（HTTP 200・S3直アクセスは403＝OAC正常）。**GitHub Pages と並行**（公開URLは常に不変）。
+- **仕組み化**: `make aws-deploy`→`make aws-wire`（CDK出力→GitHub Secrets/Variables と `web/config.js` を gh CLI で自動配線）、cdk-nag(AwsSolutions) 組込み、`deploy.sh` の macOS bash 3.2 空配列バグ修正。
+
+### ドキュメント
+
+- データ辞書 `docs/DATA-DICTIONARY.md`/`.en.md`（エクスポート全フィールドの定義と実装式の対応表）、METHODOLOGY/DEVELOPMENT（日英）の現状同期、EN ローンチキット `docs/launch-en.md`（Show HN/PH ドラフト＋フェーズ2ゲート）、ストア掲載文 `docs/store-listing.md`、KPI週次ログ `docs/kpi-log.md`、インタビュー・ガイド `docs/interview-guide.md`、X投稿テンプレ集 `docs/x-post-templates.md`、Zenn 記事ドラフト3本（`docs/articles/`）、**PAGE 5 設計凍結 `design-note-page5.md`**（実名ゼロ・構造で語る発動条件）。
+
+### プロセス
+
+- **委任プロトコル確立**: メインセッション（上位モデル）が仕様・レビュー・コミットを担い、自己完結タスクを Opus サブエージェントに委任（`docs/task-spec-template.md`・AGENTS.md）。サブエージェントは**コミット禁止**。学び2点をプロトコルに正式化: **受け入れコマンド（`npm run check`／`make verify`）は親が必ず再実行**（自己申告 green を鵜呑みにしない）／**サンドボックスで Write が拒否された場合は設計＋検証トレースを納品し親が転記**するフォールバック（T25〜T35 で実運用）。
+
 ## Phase 1 — 2026-07-06 — モバイル化・週替わりシナリオ・AWS配信基盤
 
 配信・アーキテクチャの基盤整備（アプリのUI見た目は不変・Web挙動は維持）。7タスク。
