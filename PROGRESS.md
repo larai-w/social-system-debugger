@@ -52,6 +52,11 @@
 | T42 | validate-weekly に在庫残量ガード（直営） | 残り3週未満で警告＝ローテ失敗前に補充時期が見える | ✅ |
 | T43 | README/DEVELOPMENT 鮮度＋教員打診文面テンプレ（**Opus委任10件目**） | OUTREACH.md 教育チャネルの実行キット | ✅ |
 | T44 | GitHub Issues ポートフォリオ化 `make gh-project`（直営） | NZ就活向け: 開発履歴を英語の Issues/Milestones で可視化（TODO ☐11） | ✅ |
+| T45 | README ヒーロー画像 `npm run gen:shot`＋CIバッジ（直営） | 採用担当者・来訪者の第一印象（実エンジン撮影・値の偽装なし） | ✅ |
+| T46 | `docs/ARCHITECTURE.en.md` 英語アーキテクチャ文書（**Opus委任11件目**） | ポートフォリオ本体: 設計判断の why を英語15分で読める形に | ✅ |
+| T47 | シークレットスキャン CI `secret-scan.yml`（直営） | gitleaks で全履歴を毎 push 走査＝手動監査の恒久化 | ✅ |
+| T48 | Zenn 記事1・2 の現状同期（**Opus委任12件目**） | 発信開始時に書き直しゼロで公開できる状態を維持 | ✅ |
+| T49 | `docs/cv-highlights.en.md` 英文CV素材＋STAR集（**Opus委任13件目**） | 開発実績を CV の行・面接回答に変換 | ✅ |
 
 ## 実施順
 
@@ -59,6 +64,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T45〜T49（第10スプリント・ポートフォリオ強化・Opus並行委任3件＋直営2件）**: **T45=直営** `scripts/gen-screenshot.mjs`＝Playwright でワイマール崩壊プリセットを実エンジンで走らせ崩壊バナー点灯を撮影（Console エラーがあれば失敗する自己検証つき・`npm run gen:shot`→`docs/assets/hero.png` 271KB）。README ja/en 先頭にヒーロー画像＋CI/Deploy/Weekly Rotate の3バッジ。**T46=Opus委任** `docs/ARCHITECTURE.en.md`（263行）＝System overview（Mermaid: 2配信面＋Actions＋週次5分TTL）／設計判断8点の why／Content pipeline（到達可能性CIが実バグ3件を公開前検出した実績を事実ベース記載）／Quality gates／AI-assisted delivery with human governance／Cost。README.en の目立つ位置に導線1行。**T47=直営** `secret-scan.yml`＝gitleaks-action v2・fetch-depth:0 で全履歴走査・main push と PR で実行。**T48=Opus委任** zenn-01（demo.js 含む現構成・検証基盤の現状・実機ビルド未実施を正直に）／zenn-02（synth 検証→**本番ライブの実話**に書き換え・OIDC重複と bash 3.2 のハマり所を「実際に踏んだ」として追記・実値は全て伏せ字・published:false 維持）。**T49=Opus委任** `docs/cv-highlights.en.md`（217行）＝pitch 3案・CV bullets 15本（Cloud/CI-CD/Automation/AI-assisted の4分類）・STAR 4本・想定問答5問・証跡相対リンク。**未計測の数値（ユーザー数等）は一切書かず** analytics 未有効化を明示する誠実設計。受け入れ: `npm run check` 全green（テスト24・在庫22週・prettier clean）を親が最終確認。今回から Write 許可により**委任3件とも全文をエージェント自身が書き込み**、親はレビューと受け入れ再実行のみ（転記ゼロ）。
 
 - ✅ **T39〜T44（第9スプリント・Opus並行委任3件＋直営3件）**: **T39=Opus委任** W47「外から来た担い手が、余白を戻す」(P2 hard・redundancy≥80/budget≥45・希望)／W48「誰かが、また確かめ始める」(P1 normal・legitimacy/ethicsScore・監査)／W49「裁く快感が、静まる街」(P3 normal)／W50「結果を引き受ける人を、また通す」(P4 hard)。**T40=直営** P2〜P4 到達可能性テスト＝ui.js の実関数（metricsP2/tickSkillStock/stepP3/p3Fooling）を波括弧バランスでソース抽出して headless 実行、P4 のみ式複製＋**ソース同期アサート**（式が変わるとテストが教える）。開始即クリア・放置クリア・到達不能の3類型を全在庫＋バンドル版で検証。**導入即、W49 の開始即クリアを実検出**（P3 は開始時 integrity≈95 のため integrity/dopamine だけのゴールは即成立）→ searchDepth≥8 ガード追加で修正。以後、委任シナリオの数値トレース親検証は不要（CI が担保）。**T41=Opus委任** x-post-templates に W43〜W46 月曜告知（静か系/轟音系の質感を文面に反映・goal は JSON 実文言）＋kpi-log に「崩壊モード別の反応比較」表（☐9 前でも X 側の数字だけ記録できる設計）。**T42=直営** validate-weekly に在庫残量ガード（ISO週計算で残り3週未満なら警告・現在22週）。**T43=Opus委任** README ja/en・DEVELOPMENT ja/en に classroom-slides/openAppPage を追記＋`docs/outreach-templates.md`（共通ルール6項目・教員(面識あり/なし)・研究者の3種×日英・送信前チェックリスト）。**T44=直営** `scripts/gh-project-backfill.mjs`＋`docs/github-project.md`＋`make gh-project`＋TODO ☐11＝Phase1+T1〜T43 を英語 Issues(50)/Milestones(3)/Labels(7) に冪等バックフィルし、以後は起票→`Closes #N` 運用。**運用上の学び2つ**: (1) settings.local.json に Write/Edit 許可を追加→サブエージェントが直接ファイル編集できるようになった（T41 で全工程完遂を実証）。(2) サブエージェントがセッション使用量上限で報告前に死んでも、**書き込み済み成果物は作業ツリーに残る**→親が git status から回収してレビュー・検証すれば完遂できる（T39/T43 で実証）。シークレット監査: 追跡ファイル・全 git 履歴とも秘密情報なし（.env は example のみ・認証は OIDC）。
 
