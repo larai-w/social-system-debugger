@@ -31,6 +31,7 @@ social-system-debugger/
 │       └── demo.js          #   ?demo=1 demo mode (auto-drives the real engine; no-op by default)
 │   ├── manifest.json / icon.svg / sw.js
 │   ├── classroom.html / .en.html   # one-page teacher guide (self-contained; prints to A4)
+│   ├── classroom-slides.html / .en.html # classroom projector slides (self-contained; 9 slides; still reads stacked when JS is off)
 │   └── privacy.html / .en.html     # privacy policy (store submission / footer link)
 ├── content/weekly/          # weekly scenario JSON (*.json + latest.json) + weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront + GitHub OIDC role
@@ -65,7 +66,7 @@ social-system-debugger/
 | **Weekly scenarios** | `scenario.js` | `SCENARIOS[]`, `getActiveScenario()`, `evalGoalConds()`, `checkScenarioGoal()`, `loadRemoteScenario()` | declarative `goalConds`, fetch(latest.json)+fallback, notifications; all `WEEKLY_ENABLED`(native)-gated |
 | **Analytics** | `ui.js`(`track`) | `track(event, props)` (adds common prop `app_platform`) | Plausible; event list in README "Analytics" |
 | **Feedback** | `ui.js` | `FEEDBACK_ENDPOINT`, `openFeedback()`, `submitFeedback()` | JSON POST to Formspree |
-| **Nav / init** | `ui.js` | `switchTab(n)`, `(function init(){…})()` | tab switch + address-bar sync, startup |
+| **Nav / init** | `ui.js` | `switchTab(n)`, `openAppPage(name)`, `(function init(){…})()` | tab switch + address-bar sync, startup. `openAppPage('classroom'/'privacy')` opens a static page in a new tab from the ≡ menu (`.en.html` when EN; `track('open_*')`) |
 | **Demo mode** | `demo.js` | `?demo=1` check + ghost cursor | auto-drives the real engine (no faked values); for promo recording / kiosks. Full no-op by default |
 | **PWA** | `web/sw.js` | `CACHE` (bump on every change), `CORE[]` | install, offline; CORE lists all js/css |
 

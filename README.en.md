@@ -10,6 +10,8 @@ An interactive literacy tool that treats society as one giant distributed system
 
 🏫 **[One-page classroom guide (prints to A4 PDF)](https://larai-w.github.io/social-system-debugger/classroom.en.html)**
 
+📽 **[Classroom projector slides (9 slides, present as-is)](https://larai-w.github.io/social-system-debugger/classroom-slides.en.html)** — a self-contained page that still reads as a stacked document when JS is off
+
 ---
 
 ## Overview
