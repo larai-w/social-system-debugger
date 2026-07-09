@@ -44,6 +44,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T45〜T49（ポートフォリオ強化スプリント・Opus並行委任3件＋直営2件）**: **T45（直営）** README ヒーロー画像＝`npm run gen:shot`（`scripts/gen-screenshot.mjs`: 実エンジンでワイマール崩壊まで進めて撮影・値の偽装なし・`docs/assets/hero.png`）＋CI/Deploy/Weekly バッジを README ja/en 先頭に。**T46=Opus委任** `docs/ARCHITECTURE.en.md`（263行・採用担当者向け15分ツアー: Mermaid 2図・設計判断の why・コンテンツパイプライン・品質ゲート・AI委任統制・コスト。README.en に導線）。**T47（直営）** `.github/workflows/secret-scan.yml`＝gitleaks で push/PR ごとに全履歴走査（2026-07-09 の手動監査ゼロ件を CI で恒久化）。**T48=Opus委任** Zenn 記事1・2 を T44 時点の実態に同期（AWS本番ライブ化・実際に踏んだハマり所・実値は伏せ字・published:false 維持）。**T49=Opus委任** `docs/cv-highlights.en.md`（217行: pitch 3案・CV bullets 15本・STAR 4本・想定問答5問・証跡リンク。未計測のユーザー数等は書かない事実ベース）。詳細は `PROGRESS.md`。
 - ✅ **T39〜T44（Opus並行委任3件＋直営3件）**: **T39** 週次 W47〜W50＝PAGE 5 素材第2弾（希望×2: W47 P2「外から来た担い手」redundancy/budget・W48 P1「誰かが、また確かめ始める」legitimacy／監査×2: W49 P3「裁く快感が、静まる街」・W50 P4。在庫12/7週まで）。**T40（直営）** `tests/weekly-reachability-p234.test.mjs`＝P2〜P4 の到達可能性を ui.js 実関数のソース抽出で自動検証（開始即クリア＋放置クリア＋到達不能を CI で検出。**導入即 W49 の開始即クリアを実検出→searchDepth≥8 ガードで修正**。P4 のみ式複製＋ソース同期アサート）。**T41** X告知 W43〜W46 下書き＋kpi-log に静か系vs轟音系の反応比較表。**T42（直営）** validate-weekly に在庫残量ガード（3週未満で警告）。**T43** README/DEVELOPMENT 鮮度＋`docs/outreach-templates.md`（教員/コミュニティ/研究者×ja/en）。**T44（直営）** GitHub ポートフォリオ化＝`make gh-project`（`scripts/gh-project-backfill.mjs`: Phase1+T1〜T43 を英語 Issues/Milestones/Labels に冪等バックフィル・運用は `docs/github-project.md`・人間側 TODO ☐11）。**権限改善: settings.local.json に Write/Edit 許可→サブエージェントが直接ファイル編集可能に**（T41 で実証）。※T39/T43 はセッション使用量上限で報告前に停止したが成果物は書き込み済み→親がレビュー・検証。**シークレット監査実施: 秘密情報の混入なし**（詳細は当該コミット時の報告）。
 - ✅ **T36〜T38（Opus並行委任2件＋直営1件）**: **T37** CHANGELOG.md に「戦略実装スプリント（T1〜T35）」エントリを追加（6サブセクション: 検証基盤/機能/コンテンツ/インフラ/docs/プロセス）。**T38** 教員向け投影スライド `web/classroom-slides.html`/`.en.html`（9枚・自己完結・←→/クリック/スワイプ・JS無効でも文書として成立・classroom 両ページから導線・sw v6-361）。T37/T38 とも **Write 拒否→全文納品→親転記**のフォールバックで完遂、受け入れ（check＋verify＋スライドの Playwright スモーク）は親が代行し全green。**T36** 本ファイルの進捗ログを圧縮（T1〜T24 とフェーズ1以前を CHANGELOG/PROGRESS へのポインタ2行に集約）。詳細は `PROGRESS.md`。
 - ✅ **T34/T35（Opus委任1件＋直営1件）**: **T34** 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（SILENT CAPTURE系: W43 P2「静かに痩せていく街」/W44 P3「疑うのをやめた頭」、LOUD CRASH系: W45 P1「轟音の広場を、澄ませる」/W46 P4「洪水の轟く議論場」。在庫11/9週まで・4ページ全カバー）。今回はサブエージェント環境で **Write も拒否**→エージェントは設計＋数値トレース納品、親がファイル転記＋受け入れ代行（check/verify 全green）。**T35** ≡メニューに教員向けガイド/プライバシーポリシー導線（`openAppPage()` 言語連動・track付き・sw v6-360）。詳細は `PROGRESS.md`。
@@ -58,7 +59,7 @@
 
 - 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
 - **フェーズ1は完了。T1〜T38 のスプリント履歴と詳細は `PROGRESS.md` と `CHANGELOG.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
-- **T39〜T44 完了＝コーディング側の提案タスクは全消化**。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は W50（12/7週）まで、`npm run check` が残り3週で警告する。
+- **T49 まで完了＝コーディング側の提案タスクは全消化**。ポートフォリオ資産（ARCHITECTURE.en / cv-highlights.en / hero画像 / Issues バックフィル）は整備済み。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は W50（12/7週）まで、`npm run check` が残り3週で警告する。
 - **GitHub Issues 運用（☐11 完了後）**: スプリント開始時にタスクを**英語で issue 起票**し、完了コミット末尾に `Closes #N`。委任タスクには `process:ai-subagent` ラベル。手順は `docs/github-project.md`。
 - **PAGE 5 / SWAP THE LEADER の投入判定**: design-note-page5.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
