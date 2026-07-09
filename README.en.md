@@ -1,8 +1,14 @@
 # Social OS Debugger v6.345 (社会＆地域インフラ・デバッガー)
 
+[![CI](https://github.com/larai-w/social-system-debugger/actions/workflows/ci.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/ci.yml)
+[![Deploy](https://github.com/larai-w/social-system-debugger/actions/workflows/deploy.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/deploy.yml)
+[![Weekly Rotate](https://github.com/larai-w/social-system-debugger/actions/workflows/weekly-rotate.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/weekly-rotate.yml)
+
 > 🌐 **Language / 言語:** [**日本語版はこちら →**](README.md) ・ **English**（this page）
 
 **Understand how societies collapse — in the language of code.**
+
+![Social OS Debugger — the Weimar collapse preset running on the real engine](docs/assets/hero.png)
 
 An interactive literacy tool that treats society as one giant distributed system (an "OS") and visualizes, in real time, how information contamination and governance failure trigger a **cascade collapse** through physical infrastructure, individual cognition, and stakeholder representation.
 
@@ -11,6 +17,8 @@ An interactive literacy tool that treats society as one giant distributed system
 🏫 **[One-page classroom guide (prints to A4 PDF)](https://larai-w.github.io/social-system-debugger/classroom.en.html)**
 
 📽 **[Classroom projector slides (9 slides, present as-is)](https://larai-w.github.io/social-system-debugger/classroom-slides.en.html)** — a self-contained page that still reads as a stacked document when JS is off
+
+🛠 **[Architecture (15-min technical tour)](docs/ARCHITECTURE.en.md)** — for engineers/reviewers: system design, delivery, CI/CD, security posture, and cost
 
 ---
 

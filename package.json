@@ -12,6 +12,7 @@
     "format:check": "prettier --check .",
     "check": "npm test && npm run validate:weekly && npm run lint && npm run format:check",
     "gen:og": "node scripts/gen-og-image.mjs",
+    "gen:shot": "node scripts/gen-screenshot.mjs",
     "gen:icons": "node scripts/gen-icons.mjs",
     "record:reels": "node scripts/record-reel.mjs",
     "cap:sync": "cap sync",
