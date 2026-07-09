@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Debugger — Projector slides for class (civics, CS, inquiry)</title>
+<meta name="description" content="A free educational simulator of how societies and regional infrastructure fail. A slide version you can project straight in class. No prep, browser-only.">
+<meta property="og:title" content="Social Debugger — projector slides for class">
+<meta property="og:description" content="For civics, CS and inquiry classes. A slide deck to project straight in class. No prep, browser-only, ~10 minutes per theme.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  English edition of web/classroom-slides.html (teacher projector deck, MARKETING.md education channel).
+  9 slides you can project straight in class. Dark terminal look, sized to read from the back of the room.
+  Arrow keys / click-tap / edge buttons to move. Without JS every slide stacks and reads as a document
+  (progressive enhancement). Self-contained: no dependency on the app's i18n/JS.
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  html,body{height:100%;}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:28px;line-height:1.6;}
+  /* Without JS (default): stack every slide and read it as a document */
+  .slide{max-width:1100px;margin:0 auto;padding:56px 48px;min-height:100vh;
+         display:flex;flex-direction:column;justify-content:center;
+         border-bottom:1px solid var(--bdr);}
+  .kicker{color:var(--muted);font-size:.62em;letter-spacing:.22em;margin:0 0 18px;text-transform:uppercase;}
+  h1{color:var(--cy);font-size:2.1em;margin:0 0 14px;letter-spacing:.04em;
+     text-shadow:0 0 24px rgba(57,213,255,.35);}
+  h2{color:var(--grn);font-size:1.35em;margin:0 0 24px;letter-spacing:.05em;}
+  .tagline{color:var(--muted);font-size:.92em;margin:0 0 26px;}
+  p{margin:0 0 16px;}
+  ol,ul{margin:6px 0 6px;padding-left:1.3em;}
+  li{margin:12px 0;}
+  b{color:var(--tx);}
+  em{color:var(--cy);font-style:normal;}
+  .q{color:var(--ora);}
+  .urlbox{display:inline-block;border:1px solid var(--cy);border-radius:8px;
+          padding:14px 20px;margin:18px 0;background:var(--bg1);
+          font-size:.86em;word-break:break-all;}
+  .urlbox a{color:var(--cy);text-decoration:none;font-weight:bold;}
+  .note{border:1px solid var(--bdr);border-left:4px solid var(--pur);border-radius:6px;
+        padding:20px 26px;margin:16px 0;color:var(--muted);font-size:.9em;line-height:1.55;}
+  .grid{display:grid;grid-template-columns:auto 1fr;gap:14px 26px;margin:10px 0;font-size:.92em;}
+  .grid .pg{color:var(--cy);white-space:nowrap;}
+  .steps{counter-reset:step;list-style:none;padding-left:0;}
+  .steps li{position:relative;padding-left:2.1em;}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:.1em;
+      color:var(--bg0);background:var(--cy);border-radius:50%;width:1.4em;height:1.4em;
+      display:inline-flex;align-items:center;justify-content:center;font-size:.72em;font-weight:bold;}
+  .small{font-size:.78em;color:var(--muted);}
+  /* With JS: one slide at a time */
+  body.js .slide{display:none;height:100vh;min-height:0;border-bottom:none;
+                 padding:64px 72px;}
+  body.js .slide.active{display:flex;}
+  /* Nav (JS only) */
+  .nav{display:none;}
+  body.js .nav{display:block;}
+  .navbtn{position:fixed;top:0;height:100vh;width:9%;min-width:60px;border:none;
+          background:transparent;color:var(--muted);font-size:2.4rem;cursor:pointer;
+          font-family:inherit;opacity:.35;transition:opacity .2s,background .2s;z-index:10;}
+  .navbtn:hover{opacity:1;background:rgba(57,213,255,.06);color:var(--cy);}
+  .navbtn.prev{left:0;}
+  .navbtn.next{right:0;}
+  .counter{position:fixed;right:18px;bottom:14px;font-size:.7rem;color:var(--muted);
+           border:1px solid var(--bdr);border-radius:6px;padding:5px 12px;background:var(--bg1);
+           letter-spacing:.1em;z-index:10;}
+  .hint{position:fixed;left:18px;bottom:14px;font-size:.66rem;color:var(--muted);z-index:10;}
+  .langlink{position:fixed;left:18px;top:14px;font-size:.66rem;z-index:20;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media (max-width:720px){
+    body{font-size:20px;}
+    .slide{padding:40px 24px;}
+    body.js .slide{padding:52px 26px;}
+    .navbtn{font-size:1.6rem;}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="classroom-slides.html">日本語版はこちら</a></div>
+
+<!-- Slide 1: Title -->
+<section class="slide" id="s1">
+  <p class="kicker">Social Debugger / educational simulator</p>
+  <h1>Social Debugger</h1>
+  <p class="tagline">Will your town survive?</p>
+  <div class="urlbox">▶ <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+  <p class="small">For civics, CS and inquiry classes / No prep, browser only, free, no sign-up</p>
+</section>
+
+<!-- Slide 2: What this is -->
+<section class="slide" id="s2">
+  <p class="kicker">01 — What this is</p>
+  <h2>Experience <em>how</em> a society breaks, with your own hands</h2>
+  <p>Move the parameters (sliders) and watch a society and its regional infrastructure come apart in front of you.</p>
+  <p>This is <b>not a game and not a prophecy</b>. It is a <em>tool for thinking</em> about <i>why</i> things break.</p>
+  <p class="small">Not a machine for guessing the right answer, but a bench for trying "what if..." by changing the conditions.</p>
+</section>
+
+<!-- Slide 3: Map of four pages -->
+<section class="slide" id="s3">
+  <p class="kicker">02 — The four themes</p>
+  <h2>One app, four ways to break</h2>
+  <div class="grid">
+    <div class="pg">PAGE 1<br>Information</div><div>Filter bubbles and overfitting: information bias quietly erodes diversity and trust.</div>
+    <div class="pg">PAGE 2<br>Infrastructure</div><div>Shrinking population, efficiency drives, successor shortage — efficient yet disaster-fragile.</div>
+    <div class="pg">PAGE 3<br>Cognition</div><div>The mechanics of unstoppable outrage, and the way back from it.</div>
+    <div class="pg">PAGE 4<br>Stakeholder<br>asymmetry</div><div>The channel dynamics by which affected voices are drowned out by spectators.</div>
+  </div>
+  <p class="small">In class, pick one of these as today's theme.</p>
+</section>
+
+<!-- Slide 4: Demo steps -->
+<section class="slide" id="s4">
+  <p class="kicker">03 — 3-minute demo (teacher projects)</p>
+  <h2>Show the collapse, change one thing, save it</h2>
+  <ol class="steps">
+    <li>Open PAGE 1 and tap the preset <b>"⚡ Weimar Collapse"</b>.</li>
+    <li>The society starts running — let the class watch it <b>collapse</b>.</li>
+    <li><b>Rewind</b> to the past, change <b>just one</b> slider, and see if it recovers.</li>
+  </ol>
+  <p class="q">Ask: "What single change would have let this town survive?"</p>
+</section>
+
+<!-- Slide 5: What to notice -->
+<section class="slide" id="s5">
+  <p class="kicker">04 — What to notice</p>
+  <h2>If they catch this, the lesson worked</h2>
+  <ul>
+    <li>Collapse comes <b>not from one cause</b>, but when several conditions <em>overlap</em>.</li>
+    <li>And yet <b>one person, one move</b> can change the future — if it isn't too late.</li>
+  </ul>
+  <p class="small">Students learn to ask not "who is to blame" but "which conditions, together, make things fragile".</p>
+</section>
+
+<!-- Slide 6: Discussion questions -->
+<section class="slide" id="s6">
+  <p class="kicker">05 — Discussion questions</p>
+  <h2>Questions you can put on the board as-is</h2>
+  <ul>
+    <li class="q">"When we only see what we like, why does the whole society become fragile?" (PAGE 1)</li>
+    <li class="q">"When is optimization the right answer, and when is it fatal? (the value of redundancy)" (PAGE 2)</li>
+    <li class="q">"Is runaway anger a weakness of will, or a structure?" (PAGE 3)</li>
+    <li class="q">"If you could rewind one thing in a collapsed town, what would you protect?" (inquiry)</li>
+  </ul>
+</section>
+
+<!-- Slide 7: Lesson flow -->
+<section class="slide" id="s7">
+  <p class="kicker">06 — A 50-minute format</p>
+  <h2>How to run one period</h2>
+  <div class="grid">
+    <div class="pg">10 min</div><div>Individual play on one theme.</div>
+    <div class="pg">10 min</div><div>Form a hypothesis for a "surviving configuration".</div>
+    <div class="pg">15 min</div><div>Test it by experimenting with the parameters.</div>
+    <div class="pg">15 min</div><div>Groups share: which intervention worked, and what it maps to in the real world.</div>
+  </div>
+  <p class="small">A 10-minute opener also works (project a preset → collapse → one question in pairs).</p>
+</section>
+
+<!-- Slide 8: Handling notes -->
+<section class="slide" id="s8">
+  <p class="kicker">07 — Handling notes (important)</p>
+  <h2>A tool for understanding, not for blame</h2>
+  <div class="note">
+    This app is a <b>fictional simulation</b>. Do not map it onto real countries, parties, or people.<br>
+    In class, treat it as <b>"a story about structures that can happen to any society"</b> —
+    not about anyone or anywhere in particular.<br>
+    Using its results to judge a real region, person, or party goes beyond what this model can support.
+  </div>
+</section>
+
+<!-- Slide 9: Closing -->
+<section class="slide" id="s9">
+  <p class="kicker">08 — Let's begin</p>
+  <h2>Start by trying it with your own town's settings</h2>
+  <div class="urlbox">▶ <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+  <p>Lesson flow, more questions, and how to export data are all in the
+     <b><a href="classroom.en.html" style="color:var(--cy);text-decoration:none;">one-page teacher guide (classroom.en.html)</a></b>.</p>
+  <p class="small">If something is missing, tell us via the in-app "💬 Feedback" — an educator's perspective is the best input we get.</p>
+</section>
+
+<!-- Nav (JS only) -->
+<div class="nav">
+  <button class="navbtn prev" id="prev" aria-label="Previous slide">‹</button>
+  <button class="navbtn next" id="next" aria-label="Next slide">›</button>
+  <div class="counter" id="counter">1 / 9</div>
+  <div class="hint">← → to move / click to advance</div>
+</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  if(!slides.length) return;
+  document.body.classList.add('js');
+  var i = 0;
+  var counter = document.getElementById('counter');
+  function show(n){
+    i = Math.max(0, Math.min(slides.length-1, n));
+    for(var k=0;k<slides.length;k++){ slides[k].classList.toggle('active', k===i); }
+    if(counter) counter.textContent = (i+1) + ' / ' + slides.length;
+    if(history.replaceState) history.replaceState(null, '', '#s' + (i+1));
+  }
+  function next(){ show(i+1); }
+  function prev(){ show(i-1); }
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+  // Click on the slide body advances (links/buttons excluded)
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(t.closest && (t.closest('a') || t.closest('button'))) return;
+    if(t.closest && t.closest('.slide')) next();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' '){ e.preventDefault(); next(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ e.preventDefault(); show(0); }
+    else if(e.key === 'End'){ e.preventDefault(); show(slides.length-1); }
+  });
+  // Touch swipe
+  var x0 = null;
+  document.addEventListener('touchstart', function(e){ x0 = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', function(e){
+    if(x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    if(Math.abs(dx) > 50){ dx < 0 ? next() : prev(); }
+    x0 = null;
+  }, {passive:true});
+  // Restore from URL hash on load
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1],10) - 1 : 0);
+})();
+</script>
+</body>
+</html>
