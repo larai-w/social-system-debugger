@@ -67,6 +67,13 @@ Action-verb first, one line each. Group by theme; drop the headers on a real CV.
   check (local = CI parity).
 - Configured **branch protection** (`scripts/setup-branch-protection.sh`) requiring
   PRs and passing CI, with CodeQL kept advisory.
+- Wrote an **automated offline-start verification harness** (`npm run verify:offline`)
+  that stands up a dependency-free static server, registers the service worker, cuts the
+  network, and asserts the PWA still starts from cache with zero console/pageerror —
+  turning the "works offline" claim into a test.
+- Added **continuous advisory monitoring**: a weekly **Lighthouse** audit
+  (`lighthouse.yml`, PWA/perf/a11y, non-blocking) and a **gitleaks** full-git-history
+  secret scan on every push/PR — making a one-off manual audit a permanent CI gate.
 
 ### Automation & Ops
 

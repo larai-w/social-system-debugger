@@ -55,11 +55,16 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T43)',
+    title: 'Delegation sprints (T25–T54)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks.',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes the portfolio-hardening and PWA-completion sprints (T44–T54).',
   },
 ];
+// NOTE: this milestone was previously named 'Delegation sprints (T25–T43)'. If an
+// older milestone with the previous title already exists in the repo, either rename it
+// (`gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T54)'`)
+// or close the stale one by hand — the create step below is idempotent by title, so it
+// will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
   id.startsWith('P')
     ? MILESTONES[0].title
@@ -335,6 +340,77 @@ const TASKS = [
     ['area:docs', 'area:marketing'],
     true,
     '',
+  ],
+  [
+    'T44',
+    'GitHub Issues portfolio backfill: Phase 1 + T1–T43 as English Issues/Milestones/Labels',
+    ['area:docs'],
+    false,
+    'Idempotent make gh-project; from here on, sprints are tracked by opening an issue and writing "Closes #N".',
+  ],
+  [
+    'T45',
+    'README hero image (npm run gen:shot) + CI/Deploy/Weekly badges',
+    ['area:docs', 'area:marketing'],
+    false,
+    'Playwright drives the real engine to the Weimar-collapse preset and screenshots the lit collapse banner; the shot fails if any console error occurs (self-verifying, no faked values).',
+  ],
+  [
+    'T46',
+    'ARCHITECTURE.en.md — English architecture doc (15-minute reviewer tour)',
+    ['area:docs'],
+    true,
+    'System overview, the why behind 8 design decisions, content pipeline, quality gates, AI-assisted delivery governance, cost.',
+  ],
+  [
+    'T47',
+    'Secret-scan CI (gitleaks full git-history scan on every push/PR)',
+    ['area:infra'],
+    false,
+    'Makes the one-off manual secret audit permanent; fetch-depth:0 scans the whole history.',
+  ],
+  [
+    'T48',
+    'Sync Zenn article drafts #1/#2 to the current architecture',
+    ['area:docs'],
+    true,
+    'Article #2 rewritten from synth-only to the real production-live story, real values redacted, published:false kept.',
+  ],
+  [
+    'T49',
+    'cv-highlights.en.md — English CV bullets + STAR interview stories',
+    ['area:docs'],
+    true,
+    'Fact-based: no uncounted user numbers; analytics not yet enabled is stated explicitly.',
+  ],
+  [
+    'T50',
+    'In-app PWA install path in the ≡ menu (beforeinstallprompt + iOS fallback)',
+    ['area:app'],
+    false,
+    'Native prompt on supported browsers; per-OS instructions modal otherwise; auto-hidden in native/standalone. track: pwa_install_click/pwa_installed.',
+  ],
+  [
+    'T51',
+    'Automated offline-start verification (npm run verify:offline)',
+    ['area:testing'],
+    false,
+    'A dependency-free tiny static server serves web/, registers the SW, goes offline, reloads, and asserts start-from-cache + tab navigation + zero console/pageerror — backing the PWA-offline claim with a test.',
+  ],
+  ['T52', 'CHANGELOG entry covering sprints T36–T49', ['area:docs'], true, ''],
+  [
+    'T53',
+    'store-submission.md — iOS/Android submission runbook',
+    ['area:docs'],
+    true,
+    'appId finalization → shared prep → iOS/Android → review defenses → post-submission; unverifiable steps flagged as "general procedure, confirm officially".',
+  ],
+  [
+    'T54',
+    'Weekly Lighthouse advisory audit workflow (lighthouse.yml)',
+    ['area:infra', 'area:testing'],
+    true,
+    'Runs weekly (Mon 01:00 JST) + on demand against the live Pages URL; advisory only (never fails CI), reports saved as artifacts.',
   ],
 ];
 

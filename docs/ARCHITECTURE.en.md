@@ -206,6 +206,19 @@ running the *same* command, so "green locally" and "green in CI" cannot diverge.
   `invariants.test.mjs` instead) so it only flags genuine bug-shaped rules; prettier is
   scoped to code/data/config and deliberately **excludes** the dense hand-written
   front-end to avoid noisy, regression-prone reformatting.
+- **Offline-start verification.** The PWA can be installed from the ≡ menu (a
+  `beforeinstallprompt` native prompt on supported browsers, a per-OS instructions modal
+  for iOS Safari and friends). `scripts/verify:offline` (`npm run verify:offline`) backs
+  the "works offline" claim with a test: a dependency-free tiny static server serves
+  `web/`, the service worker registers, the browser goes offline, and a reload must still
+  start from the SW cache, close the intro, navigate tabs, and log **zero console /
+  pageerror**.
+- **Advisory Lighthouse audit.** `.github/workflows/lighthouse.yml` runs weekly (and on
+  demand) against the live Pages URL to track PWA / performance / accessibility scores.
+  It is **advisory only** — it never fails CI — and stores reports as artifacts.
+- **Full-history secret scan.** `.github/workflows/secret-scan.yml` runs **gitleaks**
+  over the entire git history (`fetch-depth: 0`) on every push and PR, making the one-off
+  manual secret audit a permanent, automated gate.
 - **Pre-commit == CI.** A pre-commit hook (`make hooks`) runs `npm run check` before a
   commit lands, and the CI `web` job runs the identical `npm ci` + `npm run check`, so
   a lint/format drift cannot reach `main`.
@@ -216,7 +229,7 @@ running the *same* command, so "green locally" and "green in CI" cannot diverge.
 
 ## 5. AI-assisted delivery with human governance
 
-Much of the sprint work (T1–T43) was produced with an explicit delegation protocol,
+Much of the sprint work (T1–T54) was produced with an explicit delegation protocol,
 and it's worth being precise about the division of labor because the governance — not
 the automation — is the point.
 
@@ -259,5 +272,5 @@ the automation — is the point.
 ---
 
 *Applies to: Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD)
-complete, plus strategy/delegation sprints T1–T43. Sources: repository files only — no
+complete, plus strategy/delegation sprints T1–T54. Sources: repository files only — no
 figures invented; no real people, places, or ongoing politics named.*

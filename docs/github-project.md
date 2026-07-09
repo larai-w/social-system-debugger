@@ -9,15 +9,15 @@
 ```bash
 brew install gh
 gh auth login          # ブラウザで GitHub 認証
-make gh-project        # Phase 1 + T1〜T43 を Issues/Milestones/Labels に一括バックフィル
+make gh-project        # Phase 1 + T1〜T54 を Issues/Milestones/Labels に一括バックフィル
 ```
 
 - スクリプトは **冪等**（同名 issue はスキップ）。何度実行しても重複しない。
 - 事前確認は `node scripts/gh-project-backfill.mjs --dry-run`。
 - バックフィルされる構成:
-  - **Milestones(3)**: Phase 1 ／ Strategy sprints (T1–T24) ／ Delegation sprints (T25–T43)
+  - **Milestones(3)**: Phase 1 ／ Strategy sprints (T1–T24) ／ Delegation sprints (T25–T54)
   - **Labels**: `area:app / infra / testing / content / docs / marketing` ＋ `process:ai-subagent`
-  - **Issues(50)**: 全て英語・完了済みは closed(completed) で作成
+  - **Issues(61)**: 全て英語・完了済みは closed(completed) で作成
 
 ## 以後の運用（スプリントごと）
 
