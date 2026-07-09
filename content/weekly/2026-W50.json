@@ -1,0 +1,29 @@
+{
+  "id": "2026-W50",
+  "title": {
+    "ja": "結果を引き受ける人を、また通す",
+    "en": "Letting Those Who Bear the Cost Through Again"
+  },
+  "intro": {
+    "ja": "勝ち負けの興奮だけを消費し、結果は誰も引き受けない——そんな観客の声で議論場は埋め尽くされていた。そこへ、外の街も知る移り住みの担い手が、静かに問い直す。「この決定の結果を、実際に生きるのは誰か」。ゲーム化を鎮め、外からの洪水を堰き止め、結果を引き受ける当事者の声を、もう一度いちばんに通せるか。",
+    "en": "The debate floor was packed with spectators who consume only the thrill of winning and losing and answer for nothing. Then a carrier who has settled here after knowing other towns quietly asks again: \"Who actually lives with the consequences of this decision?\" Calm the gamification, dam the outside flood, and let the stakeholders who bear the cost be routed first once more."
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 85, "gam": 72 },
+    "hint": {
+      "ja": "ゲーム化を20あたりまで大きく下げて当事者比率を78以上へ戻し、パケットフィルタを実行して外部ノードの洪水を排出してください。洪水が引くと、パケットドロップ率は30以下まで下がります。",
+      "en": "Lower gamification to around 20 to bring the stakeholder ratio back above 78, then execute packet filtering to flush the external flood. As the flood recedes, the packet drop rate falls to 30 or below."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を78以上まで戻し、パケットドロップ率を30以下まで下げる",
+    "en": "Restore the stakeholder commit ratio to 78+ and cut the packet drop rate to 30 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 78 },
+    { "metric": "drop", "op": "<=", "value": 30 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_stakeholder_voice"
+}

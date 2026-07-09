@@ -1,0 +1,26 @@
+{
+  "id": "2026-W48",
+  "title": { "ja": "誰かが、また確かめ始める", "en": "Someone Starts Checking Again" },
+  "intro": {
+    "ja": "静かな街で、いつしか誰も確かめなくなっていた。声高な争いはない。ただ、検証する目が消えた分だけ、うわべの正しさが誰にも点検されず積み上がっていく。フィルタをゆるめ、倫理の目を取り戻し、「誰かが見ている」状態を街に戻して、正統性を立て直せるか。",
+    "en": "In a quiet town, at some point no one checked anything anymore. There is no loud quarrel — only that, as the verifying eyes vanished, a surface of rightness piled up unexamined by anyone. Loosen the filter, restore the ethical gaze, bring back the state of \"someone is watching,\" and rebuild the town's legitimacy."
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 60, "e": 45, "al": "greedy" },
+    "hint": {
+      "ja": "フィルタリングを20あたりまで下げ、倫理スコアを80近くまで引き上げてください。「見られている」状態が戻ると、正統性（Legitimacy）は70以上まで回復します。長期最適（dp）に切り替えると、より安定します。",
+      "en": "Lower filtering to around 20 and raise the ethics score to near 80. As the sense of \"being watched\" returns, legitimacy recovers above 70. Switching to the long-term algorithm (dp) makes it steadier."
+    }
+  },
+  "goal": {
+    "ja": "正統性（Legitimacy）を70以上に立て直し、倫理スコアを65以上に保つ",
+    "en": "Rebuild legitimacy to 70+ and keep the ethics score at 65 or above"
+  },
+  "goalConds": [
+    { "metric": "legitimacy", "op": ">=", "value": 70 },
+    { "metric": "ethicsScore", "op": ">=", "value": 65 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_ethics_cascade"
+}

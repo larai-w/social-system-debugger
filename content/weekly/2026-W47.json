@@ -1,0 +1,26 @@
+{
+  "id": "2026-W47",
+  "title": { "ja": "外から来た担い手が、余白を戻す", "en": "The Newcomer Who Restores the Slack" },
+  "intro": {
+    "ja": "効率だけを追い、街はすべてを一つにまとめ上げた。無駄に見えた予備も、重なりも、そぎ落とした後だ。そこへ、外の街で暮らして戻ってきた担い手が言う——「余白のない街は、一度のショックで折れる」。集約をゆるめ、財政を保ったまま、想定外に耐える余白を街へ取り戻せるか。",
+    "en": "Chasing efficiency alone, the town consolidated everything into one. The spare capacity that looked wasteful, the overlaps — all stripped away. Then a carrier who lived elsewhere and came back says: \"A town with no slack snaps at the first shock.\" Loosen the consolidation, keep the budget intact, and win back the slack that survives the unexpected."
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 70, "d": 30, "e": 80, "al": "dp", "reboot": false },
+    "hint": {
+      "ja": "集約化（Consolidation）を20あたりまで大きく下げて冗長性バッファを80以上へ戻してください。長期最適（DP）のまま進めれば、地域ブランドの税収基盤が保たれ、財政も45以上を維持できます。余白は、外の視点があるうちに戻せます。",
+      "en": "Lower consolidation to around 20 to bring the redundancy buffer back above 80. Staying on the long-term algorithm (DP) preserves the local brand's tax base, keeping the budget at 45 or higher. Slack can be restored while an outside view is still around."
+    }
+  },
+  "goal": {
+    "ja": "冗長性バッファを80以上まで戻しつつ、自治体財政を45以上に保つ",
+    "en": "Restore the redundancy buffer to 80+ while keeping the municipal budget at 45 or above"
+  },
+  "goalConds": [
+    { "metric": "redundancy", "op": ">=", "value": 80 },
+    { "metric": "budget", "op": ">=", "value": 45 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_redundancy_shock"
+}

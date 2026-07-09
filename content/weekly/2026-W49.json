@@ -1,0 +1,27 @@
+{
+  "id": "2026-W49",
+  "title": { "ja": "裁く快感が、静まる街", "en": "The Town Where the Thrill of Judging Cools" },
+  "intro": {
+    "ja": "「悪を裁いている」——その感覚が、街のいちばん強い報酬になっていた。良識のふりをしたノードに火をつけられ、事実を述べる者へ攻撃が向かう。検証する習慣を取り戻し、裁く快感が冷えていくのを見届けられるか。誰かが確かめ直せば、街の頭は正気に戻る。",
+    "en": "\"We are punishing evil\" — that feeling had become the town's strongest reward. Lit up by a node dressed as reason, the aggression turns on those who merely state facts. Can you restore the habit of verification and watch the thrill of judging cool down? Once someone checks again, the town's mind returns to its senses."
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 3, "ground": 25, "lr": 60 },
+    "hint": {
+      "ja": "探索深度を8まで上げ、現実同期レートを70近くまで引き上げてください。学習率は十分に保ったまま（凍結させないまま）でよいので、正義感カウンター（裁く快感）が30以下まで冷え、認知健全性が70以上へ戻るのを見てください。",
+      "en": "Raise search depth to 8 and grounding to near 70. Keep the learning rate high enough (do not freeze it), and watch the justice-dopamine (the thrill of judging) cool below 30 while cognitive integrity climbs back above 70."
+    }
+  },
+  "goal": {
+    "ja": "探索深度を8以上に保ったまま、認知健全性を70以上へ回復させ、正義感カウンター（ドーパミン）を30以下まで静める",
+    "en": "Keep search depth at 8+, recover cognitive integrity to 70+, and cool the justice-dopamine to 30 or below"
+  },
+  "goalConds": [
+    { "metric": "searchDepth", "op": ">=", "value": 8 },
+    { "metric": "integrity", "op": ">=", "value": 70 },
+    { "metric": "dopamine", "op": "<=", "value": 30 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_echo_trap"
+}
