@@ -129,6 +129,7 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 - `.github/workflows/deploy.yml` (main push): **auto-deploy to GitHub Pages** (`actions/deploy-pages`; serves `web/`).
 - `.github/workflows/deploy-aws.yml` (main push / when web·content change): **assume an AWS role via OIDC** → sync `web/`+`content/` to S3 → invalidate only `latest.json`+`index.html`. No long-lived keys stored.
 - `.github/workflows/weekly-rotate.yml` (every Monday 00:00 JST / manual): copies that week's `content/weekly/<ISO-week>.json` to `latest.json`, commits it, and kicks off the Pages/AWS deploys via `workflow_dispatch`. A week with no stock fails loudly (a reminder to add scenarios).
+- `.github/workflows/lighthouse.yml` (every Monday 01:00 JST / manual): audits the production Pages with Lighthouse (performance/accessibility/PWA, etc.) as an **advisory job that never fails on score**; reports land in the Actions artifacts. Manual run: Actions → Lighthouse → Run workflow.
 - Public URL (unchanged): https://larai-w.github.io/social-system-debugger/ ; AWS via the CloudFront domain (an `infra` output).
 - Infra definition, deploy steps, and the OIDC/least-privilege rationale are in [`../infra/README.md`](../infra/README.md).
 - **If Pages fails with "Deployment failed, try again later."**, that's a transient GitHub Pages backend issue. Wait, then **Re-run failed jobs**, or push again. Status: https://www.githubstatus.com.
