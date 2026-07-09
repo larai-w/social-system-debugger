@@ -41,6 +41,8 @@
 | T31 | DEVELOPMENT.md/.en 鮮度更新（**Opus委任4件目**） | コードの地図を現状に同期（demo.js・promo/・weekly-rotate・verify 等） | ✅ |
 | T32 | verify.mjs のスモーク範囲拡張 | P2ショック注入・P3/P4操作・エクスポート生成まで Console ゼロ検証 | ✅ |
 | T33 | X固定ポスト文面＋AGENTS.md に委任プロトコル | 発信初手の素材と、Codex経由サブエージェントへのルール伝播 | ✅ |
+| T34 | 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（**Opus委任5件目**） | design-note-page5.md §4 の融合戦略。SILENT CAPTURE/LOUD CRASH を既存メトリクスで物語化し反応を計測 | ✅ |
+| T35 | ≡メニューに classroom/privacy 導線（直営） | 教員導線とストア審査必須物を、作りっぱなしからアプリ内到達可能に | ✅ |
 
 ## 実施順
 
@@ -48,6 +50,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T34/T35（第7スプリント・Opus委任＋直営並行）**: **T34=Opus委任** 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（design-note-page5.md §4）。SILENT CAPTURE系×2＝W43「静かに痩せていく街」(P2 hard・skillStock/brand・後継者の静かな枯渇)／W44「疑うのをやめた頭」(P3 normal・integrity/searchDepth)、LOUD CRASH系×2＝W45「轟音の広場を、澄ませる」(P1 normal・diversity/entropy・グリッド自動検証)／W46「洪水の轟く議論場」(P4 hard・ratio/drop)。4ページ全カバー・実名/未実装UI名称ゼロ・在庫は11/9週まで。**今回はサブエージェント環境で Bash に加え Write も拒否**＝エージェントは設計＋実式からの数値トレースまで完了し、ファイル作成と受け入れ（`npm run check` 22テスト・スキーマ20件・`make verify` 両ケースConsoleゼロ）は親が代行。P2〜P4 のトレースは親が metricsP2/tickSkillStock/applyScenarioParams の実コードで裏取り（skillLost 崖→publicReboot 救済経路まで確認）。**T35=直営** ≡メニューに「🏫 教員向けガイド」「🔒 プライバシーポリシー」を追加（`openAppPage()`＝相対URLで Pages/AWS 両対応・言語連動で `.en.html`・track: open_classroom/open_privacy・en辞書キー追加・sw v6-360）。委任の学び: サンドボックス拒否は Bash だけでなく Write にも及ぶ→**「実装不能時は設計＋検証トレースを納品、親が転記」もプロトコルの正式フォールバック**とする。
 
 - ✅ **T30〜T33（第6スプリント・Opus並行委任）**: **T30=Opus委任** W39「再公営化の請求書」(P2 hard・リブートの財政コストがテーマ)／W40「学びすぎる頭」(P3・学習率の暴走)／W41「記憶する街」(P1・viability/resilience)／W42「シビルの洪水を堰き止める」(P4 hard)。エージェントのサンドボックスで Bash が拒否されたため**受け入れコマンドは親が代行実行**: prettier 差分ゼロ（手書きで正規形＝驚異的）・スキーマ16件・テスト22件 green（W41はグリッド自動検証、P2〜P4はエージェントの数値トレース表を親が妥当性確認）。**T31=Opus委任** DEVELOPMENT.md/.en を現状同期（読込順 …→demo、地図に promo/classroom/privacy/scripts5本/weekly-rotate、週次手順を「JSON追加だけ・ローテ自動」に、make verify を必須チェックの自動化版と明記）。**T32** verify.mjs を拡張＝P2ショック注入→P3/P4スライダー→buildExportData まで両ケースで Console ゼロ。**T33** X固定ポスト文面（動画注記ルール付き）＋AGENTS.md に委任プロトコル要点（Codexがサブエージェントに入る場合の commit 禁止等）。委任の学び: エージェント環境で Bash が拒否されるケースがある→**受け入れコマンドの親側代行**をプロトコルの正式手順に含める。
 
