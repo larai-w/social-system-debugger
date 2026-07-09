@@ -1,8 +1,14 @@
 # 社会＆地域インフラ・デバッガー v6.345 (Social OS Debugger)
 
+[![CI](https://github.com/larai-w/social-system-debugger/actions/workflows/ci.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/ci.yml)
+[![Deploy](https://github.com/larai-w/social-system-debugger/actions/workflows/deploy.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/deploy.yml)
+[![Weekly Rotate](https://github.com/larai-w/social-system-debugger/actions/workflows/weekly-rotate.yml/badge.svg)](https://github.com/larai-w/social-system-debugger/actions/workflows/weekly-rotate.yml)
+
 > 🌐 **Language / 言語:** **日本語**（このページ） ・ [**English version available →**](README.en.md)
 
 **社会崩壊のメカニズムを、コードの言葉で理解する。**
+
+![社会デバッガー — ワイマール崩壊プリセットの実行画面（実エンジンのスクリーンショット）](docs/assets/hero.png)
 
 社会を1つの巨大な分散システム（OS）に見立て、情報汚染やガバナンス崩壊が物理インフラ・個人の認知・当事者性に及ぼす**カスケード崩壊（連鎖破壊）**をリアルタイムに視覚化する、体験型教育リテラシー教材。
 
