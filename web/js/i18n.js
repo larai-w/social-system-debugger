@@ -249,6 +249,9 @@ const I18N = {
     // US-08: 研究者向けエクスポート
     export_json:'📊 Export data (JSON)',
     export_csv:'📊 Export data (CSV)',
+    // T35: アプリ内ページ導線
+    menu_classroom:'🏫 Educator guide (use in class)',
+    menu_privacy:'🔒 Privacy policy',
     fb_data_link:'📊 Data dictionary (export fields ↔ formulas)',
     fb_btn:'💬 Feedback',
     fb_title:'Feedback',
