@@ -46,6 +46,12 @@
 | T36 | CLAUDE.md 進捗ログの圧縮・整備（直営） | セッション毎に読むファイルを軽く保つ（詳細は CHANGELOG/PROGRESS へ集約） | ✅ |
 | T37 | CHANGELOG.md を T1〜T35 まで更新（**Opus委任6件目**） | 研究者・コントリビューター向け変更履歴の現状同期 | ✅ |
 | T38 | 教員向け投影スライド `web/classroom-slides.html`/`.en.html`（**Opus委任7件目**） | MARKETING.md 教育チャネル。授業準備コストをゼロに（印刷ガイドの投影版） | ✅ |
+| T39 | 週次シナリオ W47〜W50＝PAGE 5 素材第2弾（**Opus委任8件目**） | design-note §4。希望（半外部ノード）×2＋監査×2。在庫を12/7週まで延長 | ✅ |
+| T40 | P2〜P4 到達可能性テスト自動化 `tests/weekly-reachability-p234.test.mjs`（直営） | 週次委任の親手計算検証を CI に置換。導入即 W49 の実バグを検出 | ✅ |
+| T41 | X告知 W43〜W46＋kpi-log 崩壊モード反応比較欄（**Opus委任9件目**） | design-note §4-2 の計測を「埋めるだけ」運用に | ✅ |
+| T42 | validate-weekly に在庫残量ガード（直営） | 残り3週未満で警告＝ローテ失敗前に補充時期が見える | ✅ |
+| T43 | README/DEVELOPMENT 鮮度＋教員打診文面テンプレ（**Opus委任10件目**） | OUTREACH.md 教育チャネルの実行キット | ✅ |
+| T44 | GitHub Issues ポートフォリオ化 `make gh-project`（直営） | NZ就活向け: 開発履歴を英語の Issues/Milestones で可視化（TODO ☐11） | ✅ |
 
 ## 実施順
 
@@ -53,6 +59,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T39〜T44（第9スプリント・Opus並行委任3件＋直営3件）**: **T39=Opus委任** W47「外から来た担い手が、余白を戻す」(P2 hard・redundancy≥80/budget≥45・希望)／W48「誰かが、また確かめ始める」(P1 normal・legitimacy/ethicsScore・監査)／W49「裁く快感が、静まる街」(P3 normal)／W50「結果を引き受ける人を、また通す」(P4 hard)。**T40=直営** P2〜P4 到達可能性テスト＝ui.js の実関数（metricsP2/tickSkillStock/stepP3/p3Fooling）を波括弧バランスでソース抽出して headless 実行、P4 のみ式複製＋**ソース同期アサート**（式が変わるとテストが教える）。開始即クリア・放置クリア・到達不能の3類型を全在庫＋バンドル版で検証。**導入即、W49 の開始即クリアを実検出**（P3 は開始時 integrity≈95 のため integrity/dopamine だけのゴールは即成立）→ searchDepth≥8 ガード追加で修正。以後、委任シナリオの数値トレース親検証は不要（CI が担保）。**T41=Opus委任** x-post-templates に W43〜W46 月曜告知（静か系/轟音系の質感を文面に反映・goal は JSON 実文言）＋kpi-log に「崩壊モード別の反応比較」表（☐9 前でも X 側の数字だけ記録できる設計）。**T42=直営** validate-weekly に在庫残量ガード（ISO週計算で残り3週未満なら警告・現在22週）。**T43=Opus委任** README ja/en・DEVELOPMENT ja/en に classroom-slides/openAppPage を追記＋`docs/outreach-templates.md`（共通ルール6項目・教員(面識あり/なし)・研究者の3種×日英・送信前チェックリスト）。**T44=直営** `scripts/gh-project-backfill.mjs`＋`docs/github-project.md`＋`make gh-project`＋TODO ☐11＝Phase1+T1〜T43 を英語 Issues(50)/Milestones(3)/Labels(7) に冪等バックフィルし、以後は起票→`Closes #N` 運用。**運用上の学び2つ**: (1) settings.local.json に Write/Edit 許可を追加→サブエージェントが直接ファイル編集できるようになった（T41 で全工程完遂を実証）。(2) サブエージェントがセッション使用量上限で報告前に死んでも、**書き込み済み成果物は作業ツリーに残る**→親が git status から回収してレビュー・検証すれば完遂できる（T39/T43 で実証）。シークレット監査: 追跡ファイル・全 git 履歴とも秘密情報なし（.env は example のみ・認証は OIDC）。
 
 - ✅ **T36〜T38（第8スプリント・Opus並行委任2件＋直営1件）**: **T37=Opus委任** CHANGELOG.md に「戦略実装スプリント（T1〜T35）— 2026-07-07〜09」を追加（検証・品質基盤／機能／コンテンツ・発信／インフラ／ドキュメント／プロセスの6サブセクション。既存エントリは不変更・追記のみ。親レビューで在庫延長の日付表現を W46=11/9週 に事実修正）。**T38=Opus委任** 教員向け投影スライド `web/classroom-slides.html`/`.en.html`＝9枚構成（タイトル→これは何か→4ページ地図→3分デモ→見どころ→問いかけ例→50分の型→扱い方の注意→締め）。完全自己完結・依存ゼロ・ダーク・ターミナル調・本文28px。←→キー/クリック/スワイプ/画面端ボタンで操作、JS無効時は全スライドが縦に並ぶ文書として成立。classroom ja/en 両ページに「🖥 投影用スライド版」導線（印刷時は既存 `.langlink{display:none}` で自動非表示）。sw v6-361。**T36=直営** CLAUDE.md 進捗ログを圧縮＝T1〜T24 とフェーズ1以前の詳細エントリを CHANGELOG/PROGRESS へのポインタ2行に集約（AWS デプロイのハマり所エントリは運用情報として温存）、「次のタスク」を現状同期（在庫切れ前の W47〜 補充を推奨として明記）。**T37/T38 とも Bash に加え Write も拒否**→全文納品→親転記のフォールバックで完遂。受け入れは親が代行: `npm run check` green（テスト22・スキーマ20・eslint・prettier）／`make verify` green（両ケース Console ゼロ）／スライド2ページの Playwright スモーク（キー移動 1→3→2・クリック前進・active 1枚・Console ゼロ）。
 

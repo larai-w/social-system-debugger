@@ -44,6 +44,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T39〜T44（Opus並行委任3件＋直営3件）**: **T39** 週次 W47〜W50＝PAGE 5 素材第2弾（希望×2: W47 P2「外から来た担い手」redundancy/budget・W48 P1「誰かが、また確かめ始める」legitimacy／監査×2: W49 P3「裁く快感が、静まる街」・W50 P4。在庫12/7週まで）。**T40（直営）** `tests/weekly-reachability-p234.test.mjs`＝P2〜P4 の到達可能性を ui.js 実関数のソース抽出で自動検証（開始即クリア＋放置クリア＋到達不能を CI で検出。**導入即 W49 の開始即クリアを実検出→searchDepth≥8 ガードで修正**。P4 のみ式複製＋ソース同期アサート）。**T41** X告知 W43〜W46 下書き＋kpi-log に静か系vs轟音系の反応比較表。**T42（直営）** validate-weekly に在庫残量ガード（3週未満で警告）。**T43** README/DEVELOPMENT 鮮度＋`docs/outreach-templates.md`（教員/コミュニティ/研究者×ja/en）。**T44（直営）** GitHub ポートフォリオ化＝`make gh-project`（`scripts/gh-project-backfill.mjs`: Phase1+T1〜T43 を英語 Issues/Milestones/Labels に冪等バックフィル・運用は `docs/github-project.md`・人間側 TODO ☐11）。**権限改善: settings.local.json に Write/Edit 許可→サブエージェントが直接ファイル編集可能に**（T41 で実証）。※T39/T43 はセッション使用量上限で報告前に停止したが成果物は書き込み済み→親がレビュー・検証。**シークレット監査実施: 秘密情報の混入なし**（詳細は当該コミット時の報告）。
 - ✅ **T36〜T38（Opus並行委任2件＋直営1件）**: **T37** CHANGELOG.md に「戦略実装スプリント（T1〜T35）」エントリを追加（6サブセクション: 検証基盤/機能/コンテンツ/インフラ/docs/プロセス）。**T38** 教員向け投影スライド `web/classroom-slides.html`/`.en.html`（9枚・自己完結・←→/クリック/スワイプ・JS無効でも文書として成立・classroom 両ページから導線・sw v6-361）。T37/T38 とも **Write 拒否→全文納品→親転記**のフォールバックで完遂、受け入れ（check＋verify＋スライドの Playwright スモーク）は親が代行し全green。**T36** 本ファイルの進捗ログを圧縮（T1〜T24 とフェーズ1以前を CHANGELOG/PROGRESS へのポインタ2行に集約）。詳細は `PROGRESS.md`。
 - ✅ **T34/T35（Opus委任1件＋直営1件）**: **T34** 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（SILENT CAPTURE系: W43 P2「静かに痩せていく街」/W44 P3「疑うのをやめた頭」、LOUD CRASH系: W45 P1「轟音の広場を、澄ませる」/W46 P4「洪水の轟く議論場」。在庫11/9週まで・4ページ全カバー）。今回はサブエージェント環境で **Write も拒否**→エージェントは設計＋数値トレース納品、親がファイル転記＋受け入れ代行（check/verify 全green）。**T35** ≡メニューに教員向けガイド/プライバシーポリシー導線（`openAppPage()` 言語連動・track付き・sw v6-360）。詳細は `PROGRESS.md`。
 - ✅ **T30〜T33（Opus並行委任2件＋直営2件）**: 週次シナリオ W39〜W42（在庫10/12週まで・受け入れは親が代行実行し全green）／DEVELOPMENT.md/.en 現状同期／verify.mjs 拡張（P2ショック・P3/P4・エクスポートまでスモーク）／X固定ポスト文面＋AGENTS.md 委任ルール。プロトコル改訂: **受け入れコマンドは親が必ず再実行**。詳細は `PROGRESS.md`。
@@ -57,12 +58,8 @@
 
 - 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
 - **フェーズ1は完了。T1〜T38 のスプリント履歴と詳細は `PROGRESS.md` と `CHANGELOG.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
-- **提案済み・未着手の次スプリント（T39〜T43、2026-07-09 提案）**:
-  - **T39（おすすめ・Opus委任）**: 週次シナリオ W47〜W50 補充＝PAGE 5 素材の第2弾。今度は希望パート（半外部ノード=「外の視点を持つ参加者」が小さな社会を救う構図）と監査系を既存メトリクスで物語化。在庫が W46（11/9週）で切れるため期限付き。
-  - **T40（直営）**: P2〜P4 の到達可能性テスト自動化。ui.js の metricsP2/P3収束/P4判定を tests 側で関数抽出（weekly-reachability の new Function 流儀を拡張）し、全ページで「即クリアなし＋到達可能」を CI 検証＝週次委任時の親の手計算検証を不要に。
-  - **T41（委任）**: X投稿テンプレに W43〜W46 の月曜告知下書きを追加＋kpi-log に SILENT CAPTURE系 vs LOUD CRASH系の反応比較の記録欄（design-note-page5.md §4-2 の計測を運用に落とす）。
-  - **T42（直営・小）**: validate-weekly.mjs に在庫残量ガード（実行日から3週未満で警告表示）＝weekly-rotate が失敗する前に CI/ローカルで補充時期が見える。
-  - **T43（委任）**: ドキュメント鮮度＝README・DEVELOPMENT に classroom-slides/メニュー導線を反映＋OUTREACH.md 準拠の教員向け打診文面テンプレ（ja/en）。
+- **T39〜T44 完了＝コーディング側の提案タスクは全消化**。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は W50（12/7週）まで、`npm run check` が残り3週で警告する。
+- **GitHub Issues 運用（☐11 完了後）**: スプリント開始時にタスクを**英語で issue 起票**し、完了コミット末尾に `Closes #N`。委任タスクには `process:ai-subagent` ラベル。手順は `docs/github-project.md`。
 - **PAGE 5 / SWAP THE LEADER の投入判定**: design-note-page5.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
 ## ユーザーが手を動かす設定
