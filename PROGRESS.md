@@ -57,6 +57,11 @@
 | T47 | シークレットスキャン CI `secret-scan.yml`（直営） | gitleaks で全履歴を毎 push 走査＝手動監査の恒久化 | ✅ |
 | T48 | Zenn 記事1・2 の現状同期（**Opus委任12件目**） | 発信開始時に書き直しゼロで公開できる状態を維持 | ✅ |
 | T49 | `docs/cv-highlights.en.md` 英文CV素材＋STAR集（**Opus委任13件目**） | 開発実績を CV の行・面接回答に変換 | ✅ |
+| T50 | ≡メニューに PWA インストール導線（直営） | 今日から誰でも「アプリ」としてホーム画面に置ける | ✅ |
+| T51 | オフライン起動の自動検証 `verify:offline`（直営） | 「PWAでオフライン動作」の主張を自動テストで裏付け | ✅ |
+| T52 | CHANGELOG に T36〜T49 追記（**Opus委任14件目**） | 履歴の鮮度維持（ポートフォリオ整合） | ✅ |
+| T53 | `docs/store-submission.md` ストア提出ランブック（**Opus委任15件目**） | ☐4 実機ビルド〜審査提出を1本道に | ✅ |
+| T54 | Lighthouse 週次監査 `lighthouse.yml`（**Opus委任16件目**） | PWA/性能/a11y スコアの継続計測（助言的） | ✅ |
 
 ## 実施順
 
@@ -64,6 +69,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T50〜T54（第11スプリント・PWA完成度・Opus並行委任3件＋直営2件）**: **T50=直営** PWA インストール導線＝≡メニュー「📲 アプリとして入れる」。`beforeinstallprompt` を捕捉して対応ブラウザ（Chrome/Edge/Android）はネイティブプロンプト、非対応（iOS Safari 等）は OS 別手順モーダルにフォールバック。native アプリ内・standalone 起動時は自動非表示。track 2種・i18n ja/en・sw v6-362。invariants テストがインライン `if(...)` を未定義関数と誤検知する既存仕様に合わせ `closePwaInstallIf(e)` ヘルパー化（shareGuide と同じ流儀）。**T51=直営** `scripts/verify-offline.mjs`＝SW は http 必須のため**依存ゼロの極小静的サーバを内蔵**し、オンライン読込→`navigator.serviceWorker.ready`→`context.setOffline(true)`→リロードで「SWキャッシュから起動・イントロ閉→タブ遷移可・Console/pageerror ゼロ」を検証。`npm run verify:offline`／`make verify-offline`。初回実行でイントロモーダルのクリック遮蔽を検出→対処済み。**T52=Opus委任** CHANGELOG「継続整備・ポートフォリオスプリント（T36〜T49）」（+37行・既存無改変・5サブセクション）。**T53=Opus委任** `docs/store-submission.md`（238行）＝前提費用→appId確定（後変更不可の警告）→gen:icons/cap add→iOS(TestFlight)→Android(内部テスト)→審査対策（App Privacy・輸出コンプライアンス・privacy URL 実体）→審査落ち定番対応。Apple/Google 側画面など検証不能箇所は「2026-07時点の一般的な手順・要公式確認」を14箇所明示。TODO ☐4 に参照1行。**T55候補だった掲載文再掲はせず store-listing.md 参照で重複回避。**T54=Opus委任** `lighthouse.yml`＝treosh/lighthouse-ci-action@v11・週1（cron 0 16 * * 0 = 月曜1:00 JST）＋workflow_dispatch・本番 Pages 対象・assert なし（助言的）・artifacts+一時公開ストレージにレポート保存。DEVELOPMENT ja/en に1行ずつ。受け入れ: `npm run check` 全green（テスト24）・`make verify` 両ケース green・`verify:offline` green を親が確認。委任3件とも直接ファイル編集（転記ゼロ）、ただし Bash は3件とも拒否＝受け入れは親が代行（プロトコル通り）。
 
 - ✅ **T45〜T49（第10スプリント・ポートフォリオ強化・Opus並行委任3件＋直営2件）**: **T45=直営** `scripts/gen-screenshot.mjs`＝Playwright でワイマール崩壊プリセットを実エンジンで走らせ崩壊バナー点灯を撮影（Console エラーがあれば失敗する自己検証つき・`npm run gen:shot`→`docs/assets/hero.png` 271KB）。README ja/en 先頭にヒーロー画像＋CI/Deploy/Weekly Rotate の3バッジ。**T46=Opus委任** `docs/ARCHITECTURE.en.md`（263行）＝System overview（Mermaid: 2配信面＋Actions＋週次5分TTL）／設計判断8点の why／Content pipeline（到達可能性CIが実バグ3件を公開前検出した実績を事実ベース記載）／Quality gates／AI-assisted delivery with human governance／Cost。README.en の目立つ位置に導線1行。**T47=直営** `secret-scan.yml`＝gitleaks-action v2・fetch-depth:0 で全履歴走査・main push と PR で実行。**T48=Opus委任** zenn-01（demo.js 含む現構成・検証基盤の現状・実機ビルド未実施を正直に）／zenn-02（synth 検証→**本番ライブの実話**に書き換え・OIDC重複と bash 3.2 のハマり所を「実際に踏んだ」として追記・実値は全て伏せ字・published:false 維持）。**T49=Opus委任** `docs/cv-highlights.en.md`（217行）＝pitch 3案・CV bullets 15本（Cloud/CI-CD/Automation/AI-assisted の4分類）・STAR 4本・想定問答5問・証跡相対リンク。**未計測の数値（ユーザー数等）は一切書かず** analytics 未有効化を明示する誠実設計。受け入れ: `npm run check` 全green（テスト24・在庫22週・prettier clean）を親が最終確認。今回から Write 許可により**委任3件とも全文をエージェント自身が書き込み**、親はレビューと受け入れ再実行のみ（転記ゼロ）。
 
