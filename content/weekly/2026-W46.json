@@ -1,0 +1,26 @@
+{
+  "id": "2026-W46",
+  "title": { "ja": "洪水の轟く議論場", "en": "The Debate Floor Where the Flood Roars" },
+  "intro": {
+    "ja": "注目が金脈になる大きな議論場。勝ち負けの興奮を目当てに、当事者でない大量のノードが轟音を立てて流れ込む。生活者の静かな要求は帯域を奪われ、誰も結果を引き受けない決定だけが残っていく。ゲーム化を鎮め、洪水を堰き止め、当事者の声を通せるか。",
+    "en": "A large debate floor where attention becomes a goldmine. Chasing the thrill of winners and losers, a flood of non-stakeholder nodes pours in with a roar. Residents' quiet requests are stripped of bandwidth, and only decisions nobody answers for remain. Can you calm the gamification, dam the flood, and let the stakeholders' voices through?"
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 85, "gam": 78 },
+    "hint": {
+      "ja": "ゲーム化を35以下まで大きく下げて当事者比率を回復させ、パケットフィルタを実行して外部ノードの洪水を排出してください。轟音が引くと、静かな声のパケットが通り始めます。",
+      "en": "Lower gamification well below 35 to recover the stakeholder ratio, then execute packet filtering to flush the external flood. As the roar recedes, the quiet voices' packets start getting through."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を70以上に回復させ、パケットドロップ率を38以下まで下げる",
+    "en": "Recover the stakeholder commit ratio to 70+ and cut the packet drop rate to 38 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 70 },
+    { "metric": "drop", "op": "<=", "value": 38 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_stakeholder_voice"
+}

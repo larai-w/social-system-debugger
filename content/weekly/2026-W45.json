@@ -1,0 +1,26 @@
+{
+  "id": "2026-W45",
+  "title": { "ja": "轟音の広場を、澄ませる", "en": "Clearing the Roaring Square" },
+  "intro": {
+    "ja": "大きく、断層の走る街。強いフィルタが同じ声だけを増幅し、広場は轟音で満ちている。多様な視点は隅に追いやられ、共有できる現実がやせ細っていく。フィルタを緩め、倫理と長期の視点を取り戻して、この轟音を澄んだ議論に変えられるか。",
+    "en": "A large town with deep fault lines. Heavy filtering amplifies only the same voices, and the square fills with a roar. Diverse viewpoints are pushed to the edges, and the shared reality thins out. Can you loosen the filter, recover ethics and a long-term view, and turn this roar into clear debate?"
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 70, "e": 45, "al": "greedy" },
+    "hint": {
+      "ja": "フィルタリングを大きく下げて情報多様性を取り戻し、倫理を高く保ち、アルゴリズムを長期最適（dp）へ切り替えてください。多様性が戻ると、社会的無秩序（エントロピー）の轟音は静まっていきます。",
+      "en": "Lower filtering sharply to win diversity back, keep ethics high, and switch the algorithm to long-term (dp). As diversity returns, the roar of social disorder (entropy) subsides."
+    }
+  },
+  "goal": {
+    "ja": "情報多様性を75以上に立て直し、社会的無秩序（エントロピー）を45未満まで静める",
+    "en": "Rebuild information diversity to 75+ and calm social disorder (entropy) below 45"
+  },
+  "goalConds": [
+    { "metric": "diversity", "op": ">=", "value": 75 },
+    { "metric": "entropy", "op": "<", "value": 45 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_echo_trap"
+}

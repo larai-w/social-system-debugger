@@ -1,0 +1,26 @@
+{
+  "id": "2026-W44",
+  "title": { "ja": "疑うのをやめた頭", "en": "A Mind That Stopped Doubting" },
+  "intro": {
+    "ja": "あなたの街の頭は、いつの間にか検証をやめていた。声を荒げる者はいない。ただ静かに、確かめない習慣が根を張り、うわべの良識をまとった情報が奥まで染み込んでいく。深く探る力を取り戻し、静かな汚染を洗い流せるか。",
+    "en": "At some point, your town's mind stopped checking. No one is raising their voice. Quietly, the habit of not verifying takes root, and information dressed in reasonable tones seeps deep inside. Can you restore the power to search deeply and wash out the silent contamination?"
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 3, "ground": 15, "lr": 70 },
+    "hint": {
+      "ja": "探索深度を8まで上げて、うわべの良識を検証する力を取り戻してください。学習率は十分に保ったまま（凍結させないまま）でよいので、汚染が静かに洗い流されるのを見てください。",
+      "en": "Raise search depth to 8 to regain the power to verify a reasonable-sounding surface. Keep the learning rate high enough (do not freeze it), and watch the contamination quietly wash away."
+    }
+  },
+  "goal": {
+    "ja": "認知健全性を80以上に回復させつつ、探索深度を8以上に保つ",
+    "en": "Recover cognitive integrity to 80+ while keeping search depth at 8 or above"
+  },
+  "goalConds": [
+    { "metric": "integrity", "op": ">=", "value": 80 },
+    { "metric": "searchDepth", "op": ">=", "value": 8 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_cognitive_grounding"
+}
