@@ -4,6 +4,43 @@
 
 ---
 
+## 継続整備・ポートフォリオスプリント（T36〜T49）— 2026-07-09 — コンテンツ第2弾・到達可能性CI全ページ化・GitHub/英語ポートフォリオ
+
+T1〜T35 に続く第8〜10スプリント（T36〜T49）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-360→v6-361 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### コンテンツ
+
+- **週次シナリオ W47〜W50（PAGE 5 素材第2弾）**: design-note-page5.md §4 の融合戦略の第2弾。W47「外から来た担い手が、余白を戻す」（P2 hard・redundancy≥80/budget≥45＝**希望**＝半外部ノードの流入）、W48「誰かが、また確かめ始める」（P1 normal・legitimacy/ethicsScore＝**監査**）、W49「裁く快感が、静まる街」（P3 normal）、W50「結果を引き受ける人を、また通す」（P4 hard）。**在庫を W46 から W50（12/7週）まで延長**（T39）。
+- **X告知 W43〜W46 下書き**: `docs/x-post-templates.md` に W43〜W46 の月曜告知を追加（静か系＝SILENT CAPTURE／轟音系＝LOUD CRASH の質感を文面に反映・goal は配信JSONの実文言を転記）（T41）。
+- **kpi-log 反応比較表**: `docs/kpi-log.md` に「崩壊モード別の反応比較」表を追加（design-note §4-2 の計測を、analytics 有効化前でも X 側の数字だけ埋められる運用に）（T41）。
+
+### 品質
+
+- **P2〜P4 到達可能性テスト**: `tests/weekly-reachability-p234.test.mjs`＝ui.js の実関数（`metricsP2`/`tickSkillStock`/`stepP3`/`p3Fooling`）を波括弧バランスでソース抽出して headless 実行（P4 のみ式複製＋**ソース同期アサート**＝式が変わるとテストが教える）。開始即クリア・放置クリア・到達不能の3類型を全在庫＋バンドル版で検証。**導入即、W49 の開始即クリアを実検出**（P3 は開始時 integrity≈95 のため integrity/dopamine だけのゴールが即成立）→ searchDepth≥8 ガードで修正。以後、委任シナリオの数値トレース親検証は不要（CI が担保）（T40）。
+- **在庫残量ガード**: `scripts/validate-weekly.mjs` に ISO週計算で残り3週未満なら警告する在庫残量チェックを追加＝週次ローテ失敗前に補充時期が見える（T42）。
+- **gitleaks シークレットスキャン CI**: `.github/workflows/secret-scan.yml`＝gitleaks-action v2・`fetch-depth:0` で全 git 履歴を毎 push／PR 走査＝手動シークレット監査（当スプリントも追跡ファイル・全履歴とも秘密情報ゼロを確認）の恒久化（T47）。
+
+### アプリ
+
+- **≡メニューに classroom/privacy 導線**: 「教員向けガイド」「プライバシーポリシー」を ≡ メニューに追加（`openAppPage()`＝相対URL・言語連動で `.en.html`・track: open_classroom/open_privacy）。作りっぱなしだった教員導線とストア審査必須物をアプリ内到達可能に（T35）。
+- **教員向け投影スライド ja/en**: `web/classroom-slides.html`/`.en.html`＝9枚構成（タイトル→これは何か→4ページ地図→3分デモ→見どころ→問いかけ例→50分の型→扱い方の注意→締め）。完全自己完結・依存ゼロ・ダーク/ターミナル調・本文28px。←→キー/クリック/スワイプ/画面端ボタン操作、JS無効時は全スライドが縦に並ぶ文書として成立。classroom ja/en 両ページに投影スライド版導線（印刷時は自動非表示）（T38）。
+
+### ポートフォリオ・ドキュメント
+
+- **CHANGELOG に T1〜T35 エントリ**: 「戦略実装スプリント（T1〜T35）」を追加（検証・品質基盤／機能／コンテンツ・発信／インフラ／ドキュメント／プロセスの6サブセクション）（T37）。
+- **CLAUDE.md 進捗ログ圧縮**: T1〜T24 とフェーズ1以前の詳細エントリを CHANGELOG/PROGRESS へのポインタに集約し、セッション毎に読むファイルを軽く保つ（AWS デプロイのハマり所は運用情報として温存）（T36）。
+- **`make gh-project`（英語 Issues 50件バックフィル）**: `scripts/gh-project-backfill.mjs`＋`docs/github-project.md`＝Phase1＋T1〜T43 を英語 Issues(50)/Milestones(3)/Labels(7) に冪等バックフィルし、以後は起票→`Closes #N` 運用（採用向けに開発履歴を英語で可視化）（T44）。
+- **`docs/ARCHITECTURE.en.md`（英語アーキテクチャ文書・263行）**: System overview（Mermaid: 2配信面＋Actions＋週次5分TTL）／設計判断8点の why／Content pipeline（到達可能性CIが公開前に実バグ3件を検出した実績）／Quality gates／AI-assisted delivery with human governance／Cost。README.en に導線1行（T46）。
+- **`docs/cv-highlights.en.md`（英文CV素材・217行）**: pitch 3案・CV bullets 15本（Cloud/CI-CD/Automation/AI-assisted の4分類）・STAR 4本・想定問答5問・証跡相対リンク。**未計測の数値（ユーザー数等）は一切書かず** analytics 未有効化を明示する誠実設計（T49）。
+- **README ヒーロー画像＋バッジ**: `scripts/gen-screenshot.mjs`（`npm run gen:shot`）＝Playwright でワイマール崩壊プリセットを**実エンジンで走らせ崩壊バナー点灯を撮影**（Console エラーがあれば失敗する自己検証つき→`docs/assets/hero.png`）。README ja/en 先頭にヒーロー画像＋CI/Deploy/Weekly Rotate の3バッジ（値の偽装なし）（T45）。
+- **Zenn 記事同期**: `docs/articles/` の記事1（demo.js 含む現構成・検証基盤の現状・実機ビルド未実施を正直に）／記事2（synth 検証→**本番ライブの実話**に書き換え・OIDC重複と macOS bash 3.2 のハマり所を実体験として追記・実値は伏せ字・`published:false` 維持）（T48）。
+- **outreach テンプレ**: `docs/outreach-templates.md`（共通ルール6項目・教員(面識あり/なし)・研究者の3種×日英・送信前チェックリスト）＋ README/DEVELOPMENT（日英）に classroom-slides/openAppPage を反映（T43）。
+
+### プロセス
+
+- **サブエージェントの直接編集を解禁**: `settings.local.json` に Write/Edit 許可を追加＝サブエージェントが全文納品→親転記のフォールバックなしに**直接ファイルを書き込める**ようになった（当スプリントの委任は全文をエージェント自身が書き込み、親はレビューと受け入れ再実行のみ）。
+- **成果物は作業ツリーから回収可能という学び**: サブエージェントがセッション使用量上限で報告前に死んでも、**書き込み済み成果物は作業ツリーに残る**→親が `git status` から回収してレビュー・検証すれば完遂できる（T39/T43 で実証）。
+
 ## 戦略実装スプリント（T1〜T35）— 2026-07-07〜09 — 検証基盤・研究者/教育導線・AWS本番ライブ・委任プロトコル
 
 フェーズ1後の7スプリント（T1〜T35）。**アプリのUI見た目は不変・Web挙動は維持**、フッターバージョンは v6.346 据え置き（sw cache は v6-347→v6-360 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
