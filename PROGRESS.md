@@ -43,6 +43,9 @@
 | T33 | X固定ポスト文面＋AGENTS.md に委任プロトコル | 発信初手の素材と、Codex経由サブエージェントへのルール伝播 | ✅ |
 | T34 | 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（**Opus委任5件目**） | design-note-page5.md §4 の融合戦略。SILENT CAPTURE/LOUD CRASH を既存メトリクスで物語化し反応を計測 | ✅ |
 | T35 | ≡メニューに classroom/privacy 導線（直営） | 教員導線とストア審査必須物を、作りっぱなしからアプリ内到達可能に | ✅ |
+| T36 | CLAUDE.md 進捗ログの圧縮・整備（直営） | セッション毎に読むファイルを軽く保つ（詳細は CHANGELOG/PROGRESS へ集約） | ✅ |
+| T37 | CHANGELOG.md を T1〜T35 まで更新（**Opus委任6件目**） | 研究者・コントリビューター向け変更履歴の現状同期 | ✅ |
+| T38 | 教員向け投影スライド `web/classroom-slides.html`/`.en.html`（**Opus委任7件目**） | MARKETING.md 教育チャネル。授業準備コストをゼロに（印刷ガイドの投影版） | ✅ |
 
 ## 実施順
 
@@ -50,6 +53,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T36〜T38（第8スプリント・Opus並行委任2件＋直営1件）**: **T37=Opus委任** CHANGELOG.md に「戦略実装スプリント（T1〜T35）— 2026-07-07〜09」を追加（検証・品質基盤／機能／コンテンツ・発信／インフラ／ドキュメント／プロセスの6サブセクション。既存エントリは不変更・追記のみ。親レビューで在庫延長の日付表現を W46=11/9週 に事実修正）。**T38=Opus委任** 教員向け投影スライド `web/classroom-slides.html`/`.en.html`＝9枚構成（タイトル→これは何か→4ページ地図→3分デモ→見どころ→問いかけ例→50分の型→扱い方の注意→締め）。完全自己完結・依存ゼロ・ダーク・ターミナル調・本文28px。←→キー/クリック/スワイプ/画面端ボタンで操作、JS無効時は全スライドが縦に並ぶ文書として成立。classroom ja/en 両ページに「🖥 投影用スライド版」導線（印刷時は既存 `.langlink{display:none}` で自動非表示）。sw v6-361。**T36=直営** CLAUDE.md 進捗ログを圧縮＝T1〜T24 とフェーズ1以前の詳細エントリを CHANGELOG/PROGRESS へのポインタ2行に集約（AWS デプロイのハマり所エントリは運用情報として温存）、「次のタスク」を現状同期（在庫切れ前の W47〜 補充を推奨として明記）。**T37/T38 とも Bash に加え Write も拒否**→全文納品→親転記のフォールバックで完遂。受け入れは親が代行: `npm run check` green（テスト22・スキーマ20・eslint・prettier）／`make verify` green（両ケース Console ゼロ）／スライド2ページの Playwright スモーク（キー移動 1→3→2・クリック前進・active 1枚・Console ゼロ）。
 
 - ✅ **T34/T35（第7スプリント・Opus委任＋直営並行）**: **T34=Opus委任** 週次シナリオ W43〜W46＝PAGE 5 素材の小出し（design-note-page5.md §4）。SILENT CAPTURE系×2＝W43「静かに痩せていく街」(P2 hard・skillStock/brand・後継者の静かな枯渇)／W44「疑うのをやめた頭」(P3 normal・integrity/searchDepth)、LOUD CRASH系×2＝W45「轟音の広場を、澄ませる」(P1 normal・diversity/entropy・グリッド自動検証)／W46「洪水の轟く議論場」(P4 hard・ratio/drop)。4ページ全カバー・実名/未実装UI名称ゼロ・在庫は11/9週まで。**今回はサブエージェント環境で Bash に加え Write も拒否**＝エージェントは設計＋実式からの数値トレースまで完了し、ファイル作成と受け入れ（`npm run check` 22テスト・スキーマ20件・`make verify` 両ケースConsoleゼロ）は親が代行。P2〜P4 のトレースは親が metricsP2/tickSkillStock/applyScenarioParams の実コードで裏取り（skillLost 崖→publicReboot 救済経路まで確認）。**T35=直営** ≡メニューに「🏫 教員向けガイド」「🔒 プライバシーポリシー」を追加（`openAppPage()`＝相対URLで Pages/AWS 両対応・言語連動で `.en.html`・track: open_classroom/open_privacy・en辞書キー追加・sw v6-360）。委任の学び: サンドボックス拒否は Bash だけでなく Write にも及ぶ→**「実装不能時は設計＋検証トレースを納品、親が転記」もプロトコルの正式フォールバック**とする。
 
