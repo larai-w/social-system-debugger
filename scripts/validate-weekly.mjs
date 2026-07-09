@@ -88,3 +88,37 @@ if (errors > 0) {
   process.exit(1);
 }
 console.log(`✅ ${files.length} 件の週替わりシナリオJSONを検証しました（スキーマOK・ja/en完備）`);
+
+// T42: 在庫残量ガード — 最新在庫週が今日のISO週から3週未満なら警告する（weekly-rotate が
+// 在庫切れで失敗する前に、CI/ローカルで補充時期が見えるようにする。検証の成否には影響しない）。
+function isoWeekMonday(year, week) {
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const mondayW1 = new Date(jan4);
+  mondayW1.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay() + 6) % 7));
+  const m = new Date(mondayW1);
+  m.setUTCDate(mondayW1.getUTCDate() + (week - 1) * 7);
+  return m;
+}
+function currentIsoWeekMonday(now) {
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
+  return d;
+}
+const weekIds = files
+  .map((f) => f.match(/^(\d{4})-W(\d{2})\.json$/))
+  .filter(Boolean)
+  .map((m) => ({ id: `${m[1]}-W${m[2]}`, monday: isoWeekMonday(Number(m[1]), Number(m[2])) }))
+  .sort((a, b) => a.monday - b.monday);
+if (weekIds.length > 0) {
+  const latest = weekIds[weekIds.length - 1];
+  const weeksLeft = Math.round(
+    (latest.monday - currentIsoWeekMonday(new Date())) / (7 * 24 * 3600 * 1000)
+  );
+  if (weeksLeft < 3) {
+    console.warn(
+      `⚠ 週次シナリオの在庫が残り${Math.max(0, weeksLeft)}週です（最新: ${latest.id}）。次週分以降の補充を計画してください。`
+    );
+  } else {
+    console.log(`📦 在庫: 残り${weeksLeft}週（最新: ${latest.id}）`);
+  }
+}
