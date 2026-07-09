@@ -1,0 +1,26 @@
+{
+  "id": "2026-W43",
+  "title": { "ja": "静かに痩せていく街", "en": "The Town That Quietly Thins" },
+  "intro": {
+    "ja": "小さく、信頼の厚い街。誰もが「うちは大丈夫」と信じている。だからこそ誰も点検していない場所で、技を継ぐ人がひとり、またひとりと去っていく——警報も、炎上もないまま。この静かな枯渇に気づき、後継の芽を植え直せるか。",
+    "en": "A small town, rich in trust. Everyone believes \"we'll be fine\" — which is exactly why no one is watching the corner where, one by one, the people who carry the craft quietly retire. No alarm, no uproar. Can you notice this silent depletion and replant the seeds of succession?"
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 35, "d": 15, "e": 70, "al": "greedy", "reboot": false },
+    "hint": {
+      "ja": "DX投資を大きく上げて暗黙知を形式知化（シリアライズ）し、後継者ストックを回復させてください。長期最適（DP）に切り替えると、地域ブランドの税収基盤も立て直せます。静かな枯渇は、気づけば止められます。",
+      "en": "Raise DX investment sharply to serialize tacit knowledge and rebuild the successor stock. Switch to the long-term algorithm (DP) to restore the tax base of the local brand. A silent depletion can be stopped once you notice it."
+    }
+  },
+  "goal": {
+    "ja": "後継者ストックを45以上まで回復させ、地域ブランド産業を55以上に立て直す",
+    "en": "Recover the successor stock to 45+ and rebuild the local brand industry to 55+"
+  },
+  "goalConds": [
+    { "metric": "skillStock", "op": ">=", "value": 45 },
+    { "metric": "brand", "op": ">=", "value": 55 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_successor_crisis"
+}
