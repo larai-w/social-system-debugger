@@ -78,6 +78,45 @@ async function run(withChartStub) {
     'typeof buildExportData==="function" && JSON.stringify(buildExportData()).length > 0'
   );
   await page.waitForTimeout(200);
+  // ≡メニュー: 開閉トグル（#headerMenu の .open 付与→解除）
+  const menuStates = await page.evaluate(`(function(){
+    const m = document.getElementById('headerMenu');
+    if (typeof toggleHeaderMenu !== 'function' || !m) return null;
+    toggleHeaderMenu(); const opened = m.classList.contains('open');
+    toggleHeaderMenu(); const closed = !m.classList.contains('open');
+    return { opened, closed };
+  })()`);
+  if (!menuStates || !menuStates.opened || !menuStates.closed)
+    errors.push('verify: toggleHeaderMenu open/close failed ' + JSON.stringify(menuStates));
+  await page.waitForTimeout(200);
+  // PWA インストールモーダル: openPwaInstall→.on 付与→closePwaInstall→.on 解除
+  const pwaStates = await page.evaluate(`(function(){
+    const mo = document.getElementById('pwaInstallModal');
+    if (typeof openPwaInstall !== 'function' || typeof closePwaInstall !== 'function' || !mo) return null;
+    openPwaInstall(); const opened = mo.classList.contains('on');
+    closePwaInstall(); const closed = !mo.classList.contains('on');
+    return { opened, closed };
+  })()`);
+  if (!pwaStates || !pwaStates.opened || !pwaStates.closed)
+    errors.push('verify: openPwaInstall/closePwaInstall failed ' + JSON.stringify(pwaStates));
+  await page.waitForTimeout(200);
+  // classroom/privacy 導線: window.open をスタブして openAppPage が正しい URL を渡すか確認（実タブは開かない）
+  const openedUrls = await page.evaluate(`(function(){
+    if (typeof openAppPage !== 'function') return null;
+    const orig = window.open; const urls = [];
+    window.open = function(u){ urls.push(u); return null; };
+    try { openAppPage('classroom'); openAppPage('privacy'); }
+    finally { window.open = orig; }
+    return urls;
+  })()`);
+  if (
+    !Array.isArray(openedUrls) ||
+    openedUrls.length !== 2 ||
+    !/^classroom(\.en)?\.html$/.test(openedUrls[0] || '') ||
+    !/^privacy(\.en)?\.html$/.test(openedUrls[1] || '')
+  )
+    errors.push('verify: openAppPage classroom/privacy URLs wrong ' + JSON.stringify(openedUrls));
+  await page.waitForTimeout(200);
   await browser.close();
   return errors;
 }
