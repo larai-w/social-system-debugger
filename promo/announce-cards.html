@@ -8,12 +8,16 @@
 <!--
   X 告知用 画像カード（4枚・各 1200×675）。scripts/gen-announce-cards.mjs で #card1〜#card4 を PNG 撮影する。
   用途: 「ホーム画面に置ける無料の社会シミュレーター（PWA インストール可能）」を X で告知する。
+  英語カード版: URL に ?lang=en を付ける（Show HN / 海外向け撮影用）。reel-30s.html の流儀に合わせる。
   忠実性: card2/card3 のインストール手順は web/index.html の pwaInstallModal（pwa_body, ja/en）の実文言と一致させている。
     - iPhone/iPad（Safari）: 共有ボタン（□に↑）→「ホーム画面に追加」
     - Android（Chrome）: メニュー（⋮）→「アプリをインストール」
     - PC（Chrome / Edge）: アドレスバー右端のインストールアイコン、またはメニュー→「インストール」
-  card4 は content/weekly/2026-W51.json の実タイトルを例示。
+  card4 は content/weekly/2026-W51.json の実タイトル（ja/en とも実物を転記）を例示。
+  en の免責1行は reel-30s.html / classroom.en.html の既存文言を流用（新造しない）。
   依存ゼロ（外部フォント/画像なし・絵文字と CSS 図形のみ）。promo/ 配下＝本番配信(web/)対象外。
+  実装: 既定は ja（クエリなしで完全不変）。?lang=en のとき、data-en 属性を持つ要素の
+  innerHTML を末尾のスクリプトが差し替える（ja のマークアップには一切触れない）。
 -->
 <style>
   :root{
@@ -117,18 +121,18 @@
 
 <!-- ══════════ CARD 1 — メイン告知 ══════════ -->
 <section class="card" id="card1">
-  <div class="kicker"><span class="dot"></span>Social Debugger / 無料・登録なし</div>
+  <div class="kicker"><span class="dot"></span><span data-en="Social Debugger / free · no sign-up">Social Debugger / 無料・登録なし</span></div>
   <div style="height:26px"></div>
-  <div class="brand">社会デバッガー</div>
+  <div class="brand" data-en="SOCIAL DEBUGGER">社会デバッガー</div>
   <div style="height:22px"></div>
-  <h1>ホーム画面に置ける、<br>無料の社会シミュレーター</h1>
+  <h1 data-en="A free society simulator<br>that lives on your home screen">ホーム画面に置ける、<br>無料の社会シミュレーター</h1>
   <div style="height:24px"></div>
-  <p class="tagline">あなたの街は、生き残れるか。</p>
+  <p class="tagline" data-en="Will your town survive?">あなたの街は、生き残れるか。</p>
   <div class="spacer"></div>
   <div class="chips">
-    <span class="chip on">登録なし</span>
-    <span class="chip on">オフラインでも動く</span>
-    <span class="chip">ブラウザで60秒</span>
+    <span class="chip on" data-en="No sign-up">登録なし</span>
+    <span class="chip on" data-en="Works offline">オフラインでも動く</span>
+    <span class="chip" data-en="60 seconds in your browser">ブラウザで60秒</span>
   </div>
   <div style="height:26px"></div>
   <div class="urlbox"><span class="run">▶</span> larai-w.github.io/social-system-debugger</div>
@@ -136,57 +140,57 @@
 
 <!-- ══════════ CARD 2 — iPhone / iPad 手順 ══════════ -->
 <section class="card" id="card2">
-  <div class="kicker"><span class="dot"></span>iPhone / iPad（Safari）で入れる</div>
+  <div class="kicker"><span class="dot"></span><span data-en="iPhone / iPad (Safari)">iPhone / iPad（Safari）で入れる</span></div>
   <div style="height:18px"></div>
-  <h1 style="font-size:46px">ホーム画面に、3タップで</h1>
+  <h1 style="font-size:46px" data-en="Home screen, in 3 taps">ホーム画面に、3タップで</h1>
   <div style="height:34px"></div>
   <div class="steps">
     <div class="step">
       <div class="num">1</div>
       <div class="iconrow"><span class="glyph">🧭</span></div>
-      <div class="st"><b>Safari</b> で開く</div>
-      <div class="sub">上のURLを Safari のアドレスバーに入力</div>
+      <div class="st" data-en="Open in <b>Safari</b>"><b>Safari</b> で開く</div>
+      <div class="sub" data-en="Enter the URL above in Safari's address bar">上のURLを Safari のアドレスバーに入力</div>
     </div>
     <div class="arrow">→</div>
     <div class="step">
       <div class="num">2</div>
       <div class="ios-share"><span class="box"></span><span class="arw"></span></div>
-      <div class="st"><b>共有ボタン</b>を押す</div>
-      <div class="sub">□に↑ のアイコン（画面下または上）</div>
+      <div class="st" data-en="Tap the <b>Share</b> button"><b>共有ボタン</b>を押す</div>
+      <div class="sub" data-en="The box-with-↑ icon (bottom or top of screen)">□に↑ のアイコン（画面下または上）</div>
     </div>
     <div class="arrow">→</div>
     <div class="step">
       <div class="num">3</div>
       <div class="iconrow"><span class="glyph">➕</span></div>
-      <div class="st">「<b>ホーム画面に追加</b>」を選ぶ</div>
-      <div class="sub">全画面で起動・オフラインでも動く</div>
+      <div class="st" data-en="Choose &quot;<b>Add to Home Screen</b>&quot;">「<b>ホーム画面に追加</b>」を選ぶ</div>
+      <div class="sub" data-en="Launches full-screen · works offline">全画面で起動・オフラインでも動く</div>
     </div>
   </div>
   <div class="spacer"></div>
-  <div class="footer">登録・料金は不要。ホーム画面のアイコンから、アプリのように起動します。</div>
+  <div class="footer" data-en="No sign-up, no cost. Launch it like an app from the home screen icon.">登録・料金は不要。ホーム画面のアイコンから、アプリのように起動します。</div>
 </section>
 
 <!-- ══════════ CARD 3 — Android / PC 手順 ══════════ -->
 <section class="card" id="card3">
-  <div class="kicker"><span class="dot"></span>Android / PC で入れる</div>
+  <div class="kicker"><span class="dot"></span><span data-en="Install on Android / PC">Android / PC で入れる</span></div>
   <div style="height:18px"></div>
-  <h1 style="font-size:46px">スマホでも、パソコンでも</h1>
+  <h1 style="font-size:46px" data-en="On your phone, on your PC">スマホでも、パソコンでも</h1>
   <div style="height:34px"></div>
   <div class="rows">
     <div class="rowline">
       <div class="tag">Android</div>
-      <div class="body">Chrome のメニュー（<em>⋮</em>）→「<b>アプリをインストール</b>」</div>
+      <div class="body" data-en="Chrome Menu (<em>⋮</em>) → &quot;<b>Install app</b>&quot;">Chrome のメニュー（<em>⋮</em>）→「<b>アプリをインストール</b>」</div>
     </div>
     <div class="rowline">
       <div class="tag">PC</div>
-      <div class="body">Chrome / Edge のアドレスバー右端の<b>インストールアイコン</b>（<em>⊕</em>）、またはメニュー→「<b>インストール</b>」</div>
+      <div class="body" data-en="The <b>install icon</b> (<em>⊕</em>) at the right end of the Chrome / Edge address bar, or Menu → &quot;<b>Install</b>&quot;">Chrome / Edge のアドレスバー右端の<b>インストールアイコン</b>（<em>⊕</em>）、またはメニュー→「<b>インストール</b>」</div>
     </div>
   </div>
   <div style="height:30px"></div>
   <div class="chips">
-    <span class="chip on">登録なし</span>
-    <span class="chip on">オフラインでも動く</span>
-    <span class="chip">全画面で起動</span>
+    <span class="chip on" data-en="No sign-up">登録なし</span>
+    <span class="chip on" data-en="Works offline">オフラインでも動く</span>
+    <span class="chip" data-en="Launches full-screen">全画面で起動</span>
   </div>
   <div class="spacer"></div>
   <div class="urlbox"><span class="run">▶</span> larai-w.github.io/social-system-debugger</div>
@@ -194,23 +198,33 @@
 
 <!-- ══════════ CARD 4 — 週次シナリオ ══════════ -->
 <section class="card" id="card4">
-  <div class="kicker"><span class="dot"></span>毎週更新</div>
+  <div class="kicker"><span class="dot"></span><span data-en="Updated weekly">毎週更新</span></div>
   <div style="height:18px"></div>
-  <h1 style="font-size:52px">毎週月曜、<br>新しい崩壊が届く</h1>
+  <h1 style="font-size:52px" data-en="Every Monday,<br>a new collapse arrives">毎週月曜、<br>新しい崩壊が届く</h1>
   <div style="height:28px"></div>
   <div class="weekband">
-    <div class="wk">今週のシナリオ（例）</div>
-    <div class="wt">同じ火は、条件が揃った街だけを焼く</div>
+    <div class="wk" data-en="This week's scenario (example)">今週のシナリオ（例）</div>
+    <div class="wt" data-en="The Same Spark Only Burns the Town That Was Ready to Burn">同じ火は、条件が揃った街だけを焼く</div>
   </div>
   <div style="height:24px"></div>
   <div class="reward">
     <span class="medal">🛡</span>
-    <div>クリアすると、発見ログに<span class="disc">「今週の守り人」</span></div>
+    <div data-en="Clear it, and your discovery log records <span class=&quot;disc&quot;>&quot;This Week's Guardian&quot;</span>">クリアすると、発見ログに<span class="disc">「今週の守り人」</span></div>
   </div>
   <div class="spacer"></div>
-  <div class="footer">Webでもアプリでも、同じ週次シナリオが遊べます。<br>
+  <div class="footer" data-en="The same weekly scenario plays on the web and in the app.<br>*Not about anyone specific — structures any society can fall into (fictional simulation).">Webでもアプリでも、同じ週次シナリオが遊べます。<br>
     ※特定の誰かではなく、どの社会にも起こる構造の話です。</div>
 </section>
 
+<script>
+  // ?lang=en のときだけ、data-en を持つ要素の innerHTML を英語に差し替える。
+  // クエリなし（ja 既定）では何もしない＝既存 ja 表示は完全不変。
+  if (new URLSearchParams(location.search).get('lang') === 'en') {
+    document.documentElement.lang = 'en';
+    for (const el of document.querySelectorAll('[data-en]')) {
+      el.innerHTML = el.getAttribute('data-en');
+    }
+  }
+</script>
 </body>
 </html>
