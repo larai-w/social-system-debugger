@@ -55,14 +55,15 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T54)',
+    title: 'Delegation sprints (T25–T66)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes the portfolio-hardening and PWA-completion sprints (T44–T54).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), and the first Sonnet-delegated task (T66).',
   },
 ];
-// NOTE: this milestone was previously named 'Delegation sprints (T25–T43)'. If an
-// older milestone with the previous title already exists in the repo, either rename it
-// (`gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T54)'`)
+// NOTE: this milestone was previously named 'Delegation sprints (T25–T43)' and then
+// 'Delegation sprints (T25–T54)'. If an older milestone with either previous title already
+// exists in the repo, either rename it via:
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T66)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -411,6 +412,90 @@ const TASKS = [
     ['area:infra', 'area:testing'],
     true,
     'Runs weekly (Mon 01:00 JST) + on demand against the live Pages URL; advisory only (never fails CI), reports saved as artifacts.',
+  ],
+  [
+    'T55',
+    'Accessibility pass: ARIA labels on all sliders, tabs, and modals (WAI-ARIA)',
+    ['area:app'],
+    false,
+    'aria-labelledby on 11 sliders, role="tab"+aria-selected on 4 tabs, role="dialog" aria-modal on 11 modals. Visual appearance unchanged.',
+  ],
+  [
+    'T56',
+    'i18n completeness test: CI checks that every data-i18n / t() key exists in both dictionaries',
+    ['area:testing'],
+    true,
+    'Covers data-i18n attributes, t("…") literals, and setVerdictBanner key args. Lookbehind regex prevents false positives on getContext("2d") etc. Zero missing keys on first run.',
+  ],
+  [
+    'T57',
+    'Self-host Chart.js 4.4.0 under web/vendor/ to eliminate the last external dependency',
+    ['area:app'],
+    false,
+    'CDN reference removed; vendor file added to SW CORE cache (v6-363). Offline-complete from first visit. verify.mjs failure-case updated to block vendor path instead of CDN, incidentally making the success-case run against real Chart.js.',
+  ],
+  [
+    'T58',
+    'Portfolio freshness: backfill T44–T54, update ARCHITECTURE.en & cv-highlights',
+    ['area:docs'],
+    true,
+    'Added 11 issues to backfill TASKS; milestone renamed to T25–T54; ARCHITECTURE.en §4 expanded with offline verification, PWA install path, Lighthouse, and gitleaks; 2 new CV bullets.',
+  ],
+  [
+    'T59',
+    'ARCHITECTURE.md — Japanese translation of the English architecture doc',
+    ['area:docs'],
+    true,
+    'Faithful translation of ARCHITECTURE.en.md; terminology follows DEVELOPMENT.md conventions; README updated with a link.',
+  ],
+  [
+    'T60',
+    'Add Content Security Policy <meta> tag (script-src self+inline, object-src none)',
+    ['area:app', 'area:infra'],
+    false,
+    'Converts the zero-external-dependency posture (T57) into a structural defence. connect-src: self+formspree+plausible. Verified compatible with file:// verify runs and all offline checks.',
+  ],
+  [
+    'T61',
+    'Operations runbook: 7-chapter incident response guide (operations-runbook.md)',
+    ['area:docs'],
+    true,
+    'Chapters: weekly-rotate failure, Pages down, AWS down, SW cache incident + user message template, console errors (verify triage), git revert rollback (force-push forbidden), delegated agent recovery. P1–P3 priority matrix.',
+  ],
+  [
+    'T62',
+    'Add verify:offline step to CI advisory verify job',
+    ['area:infra', 'area:testing'],
+    false,
+    'Elevates the offline-start guarantee to a change-validation gate; job remains advisory.',
+  ],
+  [
+    'T63',
+    'Automate teacher-guide PDF generation: make classroom-pdf (scripts/gen-classroom-pdf.mjs)',
+    ['area:docs'],
+    true,
+    'Puppeteer + print CSS; generates dist/classroom.pdf and dist/classroom.en.pdf. Page count verified programmatically. Removes human TODO ☐6.',
+  ],
+  [
+    'T64',
+    'Zenn article #4 draft: AI delegation governance — 22 delegations, real numbers',
+    ['area:docs'],
+    true,
+    'Documents the delegation protocol with real statistics (22 delegations, 27 tests). Three true stories: Write-denied fallback, session-limit recovery, W49 bug caught by CI. published:false.',
+  ],
+  [
+    'T65',
+    'Weekly scenarios W51–2027-W01: contrast pair "same fire, different outcome" (stock through Jan 2027)',
+    ['area:content'],
+    true,
+    'ISO 53-week year handled autonomously by the subagent (2026-W53 → 2027-W01). Reachability CI green before delivery; full delegation cycle (delegate → CI → parent commit) first end-to-end success.',
+  ],
+  [
+    'T66',
+    'CHANGELOG entry covering sprints T50–T64',
+    ['area:docs'],
+    true,
+    'First Sonnet-delegated task (all prior subagent work used Opus). Mechanical append-only task confirmed Sonnet is sufficient for CHANGELOG maintenance.',
   ],
 ];
 
