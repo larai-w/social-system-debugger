@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社会デバッガー — X 告知用画像カード（PWA インストール告知）</title>
+<meta name="description" content="ホーム画面に置ける無料の社会シミュレーターであることを X で告知するための画像カード素材。ダーク・ターミナル調・自己完結。">
+<!--
+  X 告知用 画像カード（4枚・各 1200×675）。scripts/gen-announce-cards.mjs で #card1〜#card4 を PNG 撮影する。
+  用途: 「ホーム画面に置ける無料の社会シミュレーター（PWA インストール可能）」を X で告知する。
+  忠実性: card2/card3 のインストール手順は web/index.html の pwaInstallModal（pwa_body, ja/en）の実文言と一致させている。
+    - iPhone/iPad（Safari）: 共有ボタン（□に↑）→「ホーム画面に追加」
+    - Android（Chrome）: メニュー（⋮）→「アプリをインストール」
+    - PC（Chrome / Edge）: アドレスバー右端のインストールアイコン、またはメニュー→「インストール」
+  card4 は content/weekly/2026-W51.json の実タイトルを例示。
+  依存ゼロ（外部フォント/画像なし・絵文字と CSS 図形のみ）。promo/ 配下＝本番配信(web/)対象外。
+-->
+<style>
+  :root{
+    --bg0:#070b14; --bg1:#0b1220; --bg2:#0e1626;
+    --cy:#39d5ff; --grn:#3ef58c; --ora:#ffb74d; --pur:#c792ea; --red:#ff5470;
+    --tx:#cfe3ee; --muted:#7b93a4; --bdr:#1d3345;
+    --W:1200px; --H:675px;
+    --mono:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#000;font-family:var(--mono);color:var(--tx);
+    -webkit-font-smoothing:antialiased;}
+  /* 各カードは正確に 1200×675。撮影は elementHandle.screenshot() で1枚ずつ */
+  .card{
+    width:var(--W); height:var(--H);
+    background:
+      radial-gradient(120% 90% at 12% 0%, rgba(57,213,255,.10), transparent 55%),
+      radial-gradient(120% 100% at 100% 100%, rgba(199,146,234,.09), transparent 55%),
+      linear-gradient(180deg, var(--bg1), var(--bg0));
+    border:1px solid var(--bdr);
+    position:relative; overflow:hidden;
+    margin:0 auto 40px;
+    display:flex; flex-direction:column;
+    padding:56px 64px;
+  }
+  /* 上端の走査線 */
+  .card::before{
+    content:""; position:absolute; left:0; right:0; top:0; height:3px;
+    background:linear-gradient(90deg,var(--cy),transparent 60%);
+    opacity:.7;
+  }
+  .kicker{color:var(--muted); font-size:22px; letter-spacing:.28em;
+    text-transform:uppercase; display:flex; align-items:center; gap:14px;}
+  .kicker .dot{width:11px;height:11px;border-radius:50%;background:var(--grn);
+    box-shadow:0 0 14px var(--grn);}
+  .brand{color:var(--cy); font-size:24px; letter-spacing:.16em; font-weight:bold;
+    text-shadow:0 0 22px rgba(57,213,255,.4);}
+  h1{color:var(--cy); font-size:60px; line-height:1.12; letter-spacing:.02em;
+    text-shadow:0 0 30px rgba(57,213,255,.35); font-weight:800;}
+  .tagline{color:var(--tx); font-size:34px; letter-spacing:.05em;}
+  .lead{font-size:34px; line-height:1.32;}
+  b{color:var(--tx);}
+  em{color:var(--cy); font-style:normal;}
+  .spacer{flex:1 1 auto;}
+  .chips{display:flex; gap:16px; flex-wrap:wrap;}
+  .chip{border:1px solid var(--bdr); border-radius:999px; padding:12px 24px;
+    font-size:28px; color:var(--tx); background:var(--bg2); letter-spacing:.02em;}
+  .chip.on{border-color:var(--grn); color:var(--grn); box-shadow:0 0 16px rgba(62,245,140,.18);}
+  .urlbox{display:inline-flex; align-items:center; gap:14px;
+    border:1px solid var(--cy); border-radius:12px; padding:16px 26px;
+    background:rgba(57,213,255,.06); font-size:30px; color:var(--cy);
+    letter-spacing:.01em; align-self:flex-start;}
+  .urlbox .run{color:var(--grn);}
+  .footer{color:var(--muted); font-size:24px; letter-spacing:.02em;}
+
+  /* ── ステップ図解（card2 / card3） ───────────────── */
+  .steps{display:flex; align-items:stretch; gap:20px;}
+  .step{flex:1 1 0; background:var(--bg2); border:1px solid var(--bdr);
+    border-radius:14px; padding:30px 26px; display:flex; flex-direction:column; gap:16px;
+    position:relative;}
+  .step .num{width:56px;height:56px;border-radius:50%;background:var(--cy);color:var(--bg0);
+    font-size:34px; font-weight:800; display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 20px rgba(57,213,255,.4);}
+  .step .st{font-size:30px; color:var(--tx); line-height:1.3;}
+  .step .sub{font-size:24px; color:var(--muted); line-height:1.35;}
+  .arrow{align-self:center; color:var(--cy); font-size:52px; line-height:1; flex:0 0 auto;
+    text-shadow:0 0 14px rgba(57,213,255,.4);}
+  /* iOS 共有アイコン（□に↑）を CSS で描く */
+  .ios-share{width:52px;height:58px;position:relative;display:inline-block;flex:0 0 auto;}
+  .ios-share .box{position:absolute;left:6px;bottom:0;width:40px;height:36px;
+    border:3px solid var(--cy);border-top:none;border-radius:5px;}
+  .ios-share .arw{position:absolute;left:50%;top:0;transform:translateX(-50%);
+    width:0;height:0;}
+  .ios-share .arw::before{content:"";position:absolute;left:-3px;top:8px;width:3px;height:26px;
+    background:var(--cy);border-radius:2px;}
+  .ios-share .arw::after{content:"";position:absolute;left:-11px;top:8px;width:22px;height:22px;
+    border-left:3px solid var(--cy);border-top:3px solid var(--cy);
+    transform:rotate(45deg);transform-origin:left top;}
+  .iconrow{display:flex;align-items:center;gap:14px;}
+  .glyph{font-size:40px;color:var(--cy);line-height:1;}
+
+  /* 上下2段（card3） */
+  .rows{display:flex;flex-direction:column;gap:22px;}
+  .rowline{display:flex;align-items:center;gap:22px;background:var(--bg2);
+    border:1px solid var(--bdr);border-radius:14px;padding:24px 28px;}
+  .rowline .tag{flex:0 0 190px;font-size:30px;color:var(--grn);letter-spacing:.06em;font-weight:bold;}
+  .rowline .body{font-size:30px;color:var(--tx);line-height:1.32;}
+  .rowline .body em{color:var(--cy);}
+
+  /* 週次カード（card4） */
+  .weekband{border:1px solid var(--bdr);border-left:5px solid var(--pur);border-radius:12px;
+    background:var(--bg2);padding:26px 30px;display:flex;flex-direction:column;gap:12px;}
+  .weekband .wk{color:var(--pur);font-size:24px;letter-spacing:.14em;}
+  .weekband .wt{color:var(--tx);font-size:38px;line-height:1.24;font-weight:700;}
+  .reward{display:flex;align-items:center;gap:16px;font-size:30px;color:var(--tx);}
+  .reward .medal{font-size:38px;}
+  .disc{color:var(--grn);}
+</style>
+</head>
+<body>
+
+<!-- ══════════ CARD 1 — メイン告知 ══════════ -->
+<section class="card" id="card1">
+  <div class="kicker"><span class="dot"></span>Social Debugger / 無料・登録なし</div>
+  <div style="height:26px"></div>
+  <div class="brand">社会デバッガー</div>
+  <div style="height:22px"></div>
+  <h1>ホーム画面に置ける、<br>無料の社会シミュレーター</h1>
+  <div style="height:24px"></div>
+  <p class="tagline">あなたの街は、生き残れるか。</p>
+  <div class="spacer"></div>
+  <div class="chips">
+    <span class="chip on">登録なし</span>
+    <span class="chip on">オフラインでも動く</span>
+    <span class="chip">ブラウザで60秒</span>
+  </div>
+  <div style="height:26px"></div>
+  <div class="urlbox"><span class="run">▶</span> larai-w.github.io/social-system-debugger</div>
+</section>
+
+<!-- ══════════ CARD 2 — iPhone / iPad 手順 ══════════ -->
+<section class="card" id="card2">
+  <div class="kicker"><span class="dot"></span>iPhone / iPad（Safari）で入れる</div>
+  <div style="height:18px"></div>
+  <h1 style="font-size:46px">ホーム画面に、3タップで</h1>
+  <div style="height:34px"></div>
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <div class="iconrow"><span class="glyph">🧭</span></div>
+      <div class="st"><b>Safari</b> で開く</div>
+      <div class="sub">上のURLを Safari のアドレスバーに入力</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <div class="num">2</div>
+      <div class="ios-share"><span class="box"></span><span class="arw"></span></div>
+      <div class="st"><b>共有ボタン</b>を押す</div>
+      <div class="sub">□に↑ のアイコン（画面下または上）</div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="step">
+      <div class="num">3</div>
+      <div class="iconrow"><span class="glyph">➕</span></div>
+      <div class="st">「<b>ホーム画面に追加</b>」を選ぶ</div>
+      <div class="sub">全画面で起動・オフラインでも動く</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="footer">登録・料金は不要。ホーム画面のアイコンから、アプリのように起動します。</div>
+</section>
+
+<!-- ══════════ CARD 3 — Android / PC 手順 ══════════ -->
+<section class="card" id="card3">
+  <div class="kicker"><span class="dot"></span>Android / PC で入れる</div>
+  <div style="height:18px"></div>
+  <h1 style="font-size:46px">スマホでも、パソコンでも</h1>
+  <div style="height:34px"></div>
+  <div class="rows">
+    <div class="rowline">
+      <div class="tag">Android</div>
+      <div class="body">Chrome のメニュー（<em>⋮</em>）→「<b>アプリをインストール</b>」</div>
+    </div>
+    <div class="rowline">
+      <div class="tag">PC</div>
+      <div class="body">Chrome / Edge のアドレスバー右端の<b>インストールアイコン</b>（<em>⊕</em>）、またはメニュー→「<b>インストール</b>」</div>
+    </div>
+  </div>
+  <div style="height:30px"></div>
+  <div class="chips">
+    <span class="chip on">登録なし</span>
+    <span class="chip on">オフラインでも動く</span>
+    <span class="chip">全画面で起動</span>
+  </div>
+  <div class="spacer"></div>
+  <div class="urlbox"><span class="run">▶</span> larai-w.github.io/social-system-debugger</div>
+</section>
+
+<!-- ══════════ CARD 4 — 週次シナリオ ══════════ -->
+<section class="card" id="card4">
+  <div class="kicker"><span class="dot"></span>毎週更新</div>
+  <div style="height:18px"></div>
+  <h1 style="font-size:52px">毎週月曜、<br>新しい崩壊が届く</h1>
+  <div style="height:28px"></div>
+  <div class="weekband">
+    <div class="wk">今週のシナリオ（例）</div>
+    <div class="wt">同じ火は、条件が揃った街だけを焼く</div>
+  </div>
+  <div style="height:24px"></div>
+  <div class="reward">
+    <span class="medal">🛡</span>
+    <div>クリアすると、発見ログに<span class="disc">「今週の守り人」</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="footer">Webでもアプリでも、同じ週次シナリオが遊べます。<br>
+    ※特定の誰かではなく、どの社会にも起こる構造の話です。</div>
+</section>
+
+</body>
+</html>
