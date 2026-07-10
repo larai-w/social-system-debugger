@@ -67,6 +67,11 @@
 | T57 | Chart.js セルフホスト化 `web/vendor/`（直営） | 唯一の外部依存を排除＝初回訪問からオフライン完結・誤爆遮断も消滅 | ✅ |
 | T58 | ポートフォリオ鮮度（backfill T44〜T54・ARCHITECTURE/cv 追記）（**Opus委任18件目**） | ベネフィット実現の維持（PMP）・継続的改善の記録（ITIL） | ✅ |
 | T59 | `docs/ARCHITECTURE.md` 日本語版（**Opus委任19件目**） | 国内の研究者・教育関係者向け＋国内就活の保険 | ✅ |
+| T60 | CSP メタ導入（直営） | 外部依存ゼロ化（T57）を防御に転化＝第三者スクリプト注入の構造的遮断 | ✅ |
+| T61 | 運用ランブック `docs/operations-runbook.md`（**Opus委任20件目**） | ITIL インシデント管理の実装（症状→切り分け→対処→根拠） | ✅ |
+| T62 | CI に verify:offline 追加（直営・助言的） | PWA オフライン保証を変更有効化ゲートに昇格 | ✅ |
+| T63 | 教員ガイド PDF 自動生成 `make classroom-pdf`（**Opus委任21件目**） | 人間 TODO ☐6 を恒久自動化（サービス要求の自動化） | ✅ |
+| T64 | Zenn 記事4「AI委任統制」ドラフト（**Opus委任22件目**） | 19件の委任実績を発信素材化（published:false 待機） | ✅ |
 
 ## 実施順
 
@@ -74,6 +79,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T60〜T64（第13スプリント・セキュリティと運用・Opus並行委任3件＋直営2件）**: **T60=直営** CSP メタ＝`default-src 'self'`／script は self＋inline（onclick主体の構成のため）＋plausible（将来の計測）／connect は self+formspree+plausible／`object-src 'none'`・`base-uri 'self'`・worker/manifest self。**リスク対応**: file:// の verify との相性懸念→実測で verify 両ケース・verify:offline・gen:shot・gen:classroom-pdf 全green を確認してから確定。sw v6-364。ARCHITECTURE ja/en の品質ゲート節に追記。**T61=Opus委任** 運用ランブック＝§0 まず見る3点＋P1〜P3 優先度マトリクス＋7章（週次ローテ失敗の在庫切れ/その他切り分け・Pages・AWS 手動復旧・SWキャッシュ事故と案内文テンプレ・Console エラー時の verify 3種の使い分け・git revert ロールバック（force-push 禁止明記）・委任エージェント停止→作業ツリー回収）。全手順に根拠ファイル・検証不能な外部障害は「一般的な対応」と明示。**T62=直営** ci.yml verify ジョブに offline 検証ステップ追加（ジョブは助言的のまま）。**T63=Opus委任** `scripts/gen-classroom-pdf.mjs`＝print メディア＋preferCSSPageSize で classroom ja/en → dist/*.pdf。Console 自己検証＋サイズ＋ページ数の機械確認（実測: ja 7.1MB/1p〔CJKフォント埋込〕・en 237KB/1p）。TODO ☐6 を「自動化済み」に書き換え＝人間TODOが1件減。**T64=Opus委任** `docs/articles/zenn-04-ai-delegation.md`＝委任の定義→仕様書の型（実物引用）→統制3原則→実話3つ（Write拒否フォールバック・上限停止からの回収・W49 を CI が検出）→実数値（委任19件・テスト27件）→向く/向かない→まとめ。全数値に根拠箇所を報告で明示・published:false。**バックグラウンド常設化（第一歩）**: 毎朝8:47 の読み取り専用ヘルスチェック cron（git 競合コピー/未push/check/在庫→問題のみ ITIL の型で報告）。制約=セッション限り・最長7日（恒久化は新セッションでの再セット運用。将来はクラウド routine も選択肢）。**受け入れ**: `npm run check` 全green（テスト27）・verify 両ケース・verify:offline・PDF 2枚生成・ヒーロー再生成まで親が実行確認。
 
 - ✅ **T55〜T59（第12スプリント・品質と自立性・Opus並行委任3件＋直営2件。ITIL/PMP 視点の適用開始）**: **T55=直営** ARIA 対応＝スライダー11本 `aria-labelledby`（P2〜P4はラベルspanに id 新設・data-i18n と共存＝言語非依存）／タブ4本 role="tab"+aria-selected（switchTab で同期）＋tabpanel／モーダル11個 role="dialog" aria-modal＋閉じるボタン aria-label="Close"。CSS/文言不変（制約1遵守）。**T56=Opus委任** i18n 完全性テスト＝①index.html の全 data-i18n キーが I18N.en に存在 ②js の t('…') リテラル＋setVerdictBanner 第3引数キーが en に存在 ③ja⇔en 辞書対称。`(?<![\w$])` 後読みで getContext('2d') 等の誤検知を排除、コメント除去は URL の // を保護。現状の欠落ゼロ・allowlist 空（理由必須の枠のみ）。**T57=直営** Chart.js 4.4.0 を `web/vendor/chart.umd.min.js`（205KB・MIT）にセルフホスト＝CDN 参照を削除し**外部依存ゼロ**。sw CORE に追加（v6-363）＝初回訪問後は完全オフライン、広告ブロッカーによる Chart 遮断も構造的に消滅。verify.mjs は失敗系を vendor パス遮断で再現する方式に更新（副産物: 正常系がスタブでなく実 Chart.js で走る＝検証強化）。vendor は .prettierignore へ（第三者コード不改変）。**T58=Opus委任** backfill TASKS に T44〜T54 の11件（英語・delegated 6件）・milestone「Delegation sprints (T25–T54)」改名＋旧名残存時の対処コメント・github-project.md 件数61に更新・ARCHITECTURE.en §4 に offline検証/PWA導線/Lighthouse/gitleaks 追記・cv-highlights bullets 2本追加。**T59=Opus委任** `docs/ARCHITECTURE.md`＝en 原本の忠実和訳（6章・Mermaid2図・訳語は DEVELOPMENT.md 準拠・「原本は en」を冒頭明記）＋README 導線1行。**受け入れ（スコープ検証）**: `npm run check` 全green（**テスト27**=i18n+3）・`make verify` 両ケース green（実Chart/遮断）・`verify:offline` green・backfill 構文OK。**問題管理**: T59 が検出した vendor の prettier warn → .prettierignore で恒久対処。**ITIL/PMP 視点を CLAUDE.md「開発ツールの方針」に恒久方針として明文化**（ユーザー指示 2026-07-10）。
 
