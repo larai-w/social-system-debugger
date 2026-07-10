@@ -30,6 +30,18 @@ Tune the parameters to bring all four layers into a healthy range and you earn *
 
 ---
 
+## Install as an app (PWA)
+
+This site is a PWA (installable web app). Once installed it launches full-screen and works offline. No sign-up, no cost.
+
+- **iPhone / iPad (Safari):** Share button (box with ↑) → "Add to Home Screen"
+- **Android (Chrome):** Menu (⋮) → "Install app"
+- **PC (Chrome / Edge):** the install icon at the right end of the address bar, or Menu → "Install"
+
+The same guide is available in the app from the ≡ menu under "📲 Install as an app".
+
+---
+
 ## The 4-Layer Architecture
 
 | Layer | Page | What you debug |
