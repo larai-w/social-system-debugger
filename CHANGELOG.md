@@ -4,6 +4,41 @@
 
 ---
 
+## PWA完成・品質と運用スプリント（T50〜T64）— 2026-07-09〜10 — アプリとして配れる品質・外部依存ゼロ・運用ランブック
+
+T36〜T49 に続く第11〜13スプリント（T50〜T64）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-362→v6-364 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### アプリ
+
+- **PWA インストール導線（T50）**: ≡メニューに「📲 アプリとして入れる」を追加。`beforeinstallprompt` を捕捉して対応ブラウザ（Chrome/Edge/Android）はネイティブプロンプト、iOS Safari 等は OS 別手順モーダルにフォールバック。native アプリ内・standalone 起動時は自動非表示。track 2種・i18n ja/en。`closePwaInstallIf(e)` ヘルパー方式（closeShareGuideIf と同じ流儀で invariants 誤検知を回避）。sw v6-362。
+- **ARIA アクセシビリティ（T55）**: スライダー11本に `aria-labelledby`（ラベル span に id 付与＝言語非依存）、タブ4本に WAI-ARIA tabs（role/aria-selected を switchTab で同期）、モーダル11個に `role="dialog" aria-modal`、閉じるボタンに `aria-label="Close"`。CSS/文言は一切不変（制約1遵守）。Lighthouse a11y 向上の前提整備。
+- **Chart.js セルフホスト化（T57）**: Chart.js 4.4.0（205KB・MIT）を `web/vendor/chart.umd.min.js` としてリポジトリに同梱。CDN 参照を削除し**外部依存ゼロ**を達成。sw CORE に追加（v6-363）＝初回訪問後は完全オフライン。広告ブロッカーによる Chart 遮断も構造的に消滅。verify.mjs の失敗系を vendor パス遮断で再現する方式に更新（副産物: 正常系が実 Chart.js で走るため検証が強化）。
+- **CSP メタ（T60）**: `<meta http-equiv="Content-Security-Policy">` を導入（`default-src 'self'`・script は self＋inline＋plausible・connect は self＋formspree＋plausible・`object-src 'none'`・`base-uri 'self'`）。T57 の外部依存ゼロ化を防御に転化し、第三者スクリプト注入を構造的に遮断。file:// 検証との相性を実測確認（verify 両ケース・verify:offline・gen:shot・gen:classroom-pdf 全 green）。sw v6-364。ARCHITECTURE ja/en に追記。
+
+### 品質・CI
+
+- **オフライン起動検証 `verify:offline`（T51/T62）**: 依存ゼロの極小静的サーバを内蔵した `scripts/verify-offline.mjs` を新規追加。オンライン読込→SW 登録→回線遮断→リロードで「SW キャッシュから起動・イントロ閉→タブ遷移可・Console/pageerror ゼロ」を自動検証（`npm run verify:offline`／`make verify-offline`）。PWA 主張の自動裏付け。初回実行でイントロモーダルのクリック遮蔽を検出→対処済み（T51）。T62 で CI の verify ジョブに offline 検証ステップを追加（助言的のまま）。
+- **i18n 完全性テスト（T56）**: `tests/i18n-completeness.test.mjs` を新規追加。① index.html の全 `data-i18n` キーが `I18N.en` に存在、② js の `t('…')` リテラル＋`setVerdictBanner` 第3引数キーが en に存在、③ ja⇔en 辞書対称性を CI 化。後読み正規表現（`(?<![\w$])`）で `getContext('2d')` 等の誤検知を排除。現状の欠落ゼロ確認済み。**テスト合計27件**に到達。
+- **Lighthouse 週次監査（T54）**: `.github/workflows/lighthouse.yml` を追加。毎週月曜1:00 JST＋手動実行で本番 Pages を Lighthouse 計測（PWA/性能/a11y）。assert なし（助言的）・artifacts 保存。DEVELOPMENT ja/en に1行ずつ反映。
+
+### 運用・ドキュメント
+
+- **運用ランブック（T61）**: `docs/operations-runbook.md`（§0 まず見る3点＋P1〜P3 優先度マトリクス＋7章構成）。週次ローテ失敗（在庫切れ/その他）・Pages/AWS 手動復旧・SW キャッシュ事故と案内文テンプレ・Console エラー時の verify 3種の使い分け・git revert ロールバック（force-push 禁止明記）・委任エージェント停止→作業ツリー回収。全手順に根拠ファイル記載、検証不能な外部障害は「一般的な対応」と明示。ITIL インシデント管理の実装。
+- **ストア提出ランブック（T53）**: `docs/store-submission.md`（238行）＝前提費用・appId 確定（後変更不可の警告）・gen:icons/cap add → iOS（TestFlight）→ Android（内部テスト）→ 審査対策（App Privacy・輸出コンプライアンス・privacy URL 実体）→ 審査落ち定番対応。Apple/Google 側画面など検証不能箇所は「2026-07時点の一般的な手順・要公式確認」を14箇所に明示。TODO ☐4 から参照。
+- **教員ガイド PDF 自動生成 `make classroom-pdf`（T63）**: `scripts/gen-classroom-pdf.mjs` を新規追加。print メディア＋preferCSSPageSize で classroom ja/en を A4 PDF に自動生成（実測: ja 7.1MB/1p・en 237KB/1p）。Console 自己検証＋サイズ＋ページ数の機械確認つき。**人間 TODO ☐6 を自動化で削除**（ITIL: サービス要求の自動化）。
+- **CHANGELOG T36〜T49 追記（T52）**: 「継続整備・ポートフォリオスプリント（T36〜T49）」エントリを追加（+37行・既存無改変）。
+
+### ポートフォリオ・発信
+
+- **ARCHITECTURE 日本語版（T59）**: `docs/ARCHITECTURE.md` を新規追加（en 原本の忠実和訳・6章・Mermaid 2図・訳語は DEVELOPMENT.md 準拠・「原本は en」を冒頭明記）。README に導線1行。国内研究者・教育関係者向け＋国内就活の保険。
+- **Issues バックフィル61件化・cv-highlights 追記（T58）**: `gh-project-backfill.mjs` に T44〜T54 の11件（英語・委任6件）を追加して合計61件に。milestone「Delegation sprints (T25–T54)」に改名。ARCHITECTURE.en §4 にオフライン検証・PWA導線・Lighthouse・gitleaks を追記。cv-highlights bullets を2本追加。
+- **Zenn 記事4「AI委任統制の記録」ドラフト（T64）**: `docs/articles/zenn-04-ai-delegation.md` を追加。委任の定義→仕様書の型（実物引用）→統制3原則→実話3つ（Write拒否フォールバック・上限停止からの回収・W49 を CI が検出）→実数値（委任19件・テスト27件）→向く/向かない→まとめ。全数値に根拠箇所を明示。`published: false` で待機。
+
+### プロセス
+
+- **ITIL/PMP 視点の恒久方針化**: CLAUDE.md「開発ツールの方針」に PMP の型（目的＝ビジネス価値／スコープ／受け入れ基準／リスクと対応）と ITIL の型（変更有効化＝CI ゲート通過のみ main へ・リリース管理＝sw キャッシュ版数・問題管理＝インシデント→根本原因→恒久対策の記録・継続的改善＝学びのプロトコル昇格）をスプリント提案・報告の標準様式として明文化（ユーザー指示 2026-07-10）。1人プロジェクトのため過剰な官僚化はせず、用語より「何を防ぐ仕組みか」を成果物に落とす。
+- **バックグラウンド・ヘルスチェック（第一歩）**: 毎朝8:47 の読み取り専用 cron（git 競合コピー/未 push/check/在庫残量を検査し、問題のみ ITIL の型で報告）をセッション内に設定。制約＝セッション限り・最長7日（恒久化は新セッションで再セット、将来はクラウド routine も選択肢）。
+
 ## 継続整備・ポートフォリオスプリント（T36〜T49）— 2026-07-09 — コンテンツ第2弾・到達可能性CI全ページ化・GitHub/英語ポートフォリオ
 
 T1〜T35 に続く第8〜10スプリント（T36〜T49）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-360→v6-361 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
