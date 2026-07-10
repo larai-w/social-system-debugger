@@ -17,7 +17,24 @@ Web（GitHub Pages / AWS CloudFront）＋ネイティブ（Capacitor iOS/Android
 - `.github/workflows/` … `ci.yml`(PR) / `deploy.yml`(Pages) / `deploy-aws.yml`(OIDC)。
 
 ## 委任プロトコル（サブエージェントとして呼ばれた場合）
-CLAUDE.md「開発ツールの方針 > 委任プロトコル」が一次ソース。要点: 仕様書（`docs/task-spec-template.md` 形式）の範囲外に触れない／**git commit・push は禁止**（親セッションがレビュー後に行う）／受け入れ条件は最低 `npm run check` green、web/ に触れたら `npm run verify` も green／完了報告には検証コマンドの実行結果と判断に迷った点を含める。
+CLAUDE.md「開発ツールの方針 > 委任プロトコル」が一次ソース。要点:
+
+- 仕様書（`docs/task-spec-template.md` 形式）の範囲外に触れない。
+- **git commit・push は禁止**（親セッションがレビュー後に行う）。
+- 受け入れ条件は最低 `npm run check` green、web/ に触れたら `npm run verify` も green。
+- 完了報告には検証コマンドの実行結果と判断に迷った点を含める。
+
+### 実行環境の制約（現行）
+- **Write/Edit は許可済み**（`settings.local.json` で許可）。ファイルの読み書きは通常どおり実行できる。
+- **Bash はしばしば拒否される**。そのため `npm run check` 等の受け入れコマンドは**親セッションが必ず再実行**する（サブエージェントの自己申告 green を鵜呑みにしない）。Bash が通らなかった場合はその旨を報告して終了すること。
+
+### モデル使い分け（現行）
+- **Opus**: 創作（週次シナリオ文面・記事ドラフト）、コード改修、設計判断が絡む作業。
+- **Sonnet**: 機械的な要約・追記・既存ファイルの同期（DEVELOPMENT.md 更新等）。
+- **Haiku は使わない**（この規模・複雑さには力不足で退行バグの原因になる）。
+
+### 完全委任タスクの例
+**週次シナリオ補充**（`content/weekly/*.json` の追加）は完全委任タスク。スキーマ・日英完備は `npm run validate:weekly` が、**クリア到達可能性（開始即クリア/放置クリア/到達不能）は `npm test` の到達可能性スイート**（`tests/weekly-reachability*.test.mjs`）が自動判定するため、サブエージェントは仕様どおりに JSON を作成し `npm run check` を green にするだけでよい。コミットは親が行う。
 
 ## よく使うコマンド
 `make help` で全コマンドを一覧できる（操作の単一入口）。主なもの:
