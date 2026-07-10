@@ -1,0 +1,30 @@
+{
+  "id": "2026-W53",
+  "title": {
+    "ja": "確かめる習慣を、失くした街",
+    "en": "The Town That Lost the Habit of Checking"
+  },
+  "intro": {
+    "ja": "同じ良識ふうの声が、隣の街と同じように届いていた。違いは、届いた声ではなく、受け取る側の条件にある。確かめ直す習慣が消えた街では、うわべの正しさが奥まで染み込み、「悪を裁いている」という快感だけが膨らんでいく。深く探る力と現実に照らす目を取り戻せば、快感は冷え、認知は正気に戻る。壊すのは声ではなく、確かめない条件のほうだ。",
+    "en": "The same reasonable-sounding voice arrived here just as it did in the town next door. The difference is not in the voice that arrived, but in the conditions of those receiving it. In a town where the habit of re-checking has vanished, a surface of rightness seeps deep, and only the thrill of \"punishing evil\" swells. Restore the power to search deeply and the eyes that check against reality, and the thrill cools, the mind returns to its senses. What breaks it is not the voice, but the condition of not verifying."
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 3, "ground": 30, "lr": 65 },
+    "hint": {
+      "ja": "探索深度を8まで上げ、現実同期レート（グラウンディング）を70近くまで引き上げてください。学習率は十分に保ったまま（凍結させないまま）でよいので、認知健全性が75以上へ戻り、裁く快感（ドーパミン）が25以下まで冷えるのを見てください。確かめる条件が戻れば、街の頭は正気に戻ります。",
+      "en": "Raise search depth to 8 and grounding to near 70. Keep the learning rate high enough (do not freeze it), and watch cognitive integrity climb back above 75 while the thrill of judging (dopamine) cools to 25 or below. Once the condition of checking returns, the town's mind comes back to its senses."
+    }
+  },
+  "goal": {
+    "ja": "現実同期レート（グラウンディング）を60以上に保ったまま、認知健全性を75以上へ回復させ、裁く快感（ドーパミン）を25以下まで冷やす",
+    "en": "Keeping grounding at 60+, recover cognitive integrity to 75+ and cool the thrill of judging (dopamine) to 25 or below"
+  },
+  "goalConds": [
+    { "metric": "groundingRate", "op": ">=", "value": 60 },
+    { "metric": "integrity", "op": ">=", "value": 75 },
+    { "metric": "dopamine", "op": "<=", "value": 25 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_cognitive_grounding"
+}

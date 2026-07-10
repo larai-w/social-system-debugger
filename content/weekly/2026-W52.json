@@ -1,0 +1,29 @@
+{
+  "id": "2026-W52",
+  "title": {
+    "ja": "去っていく担い手が、崩れる条件を残す",
+    "en": "The Carriers Who Leave Behind the Conditions for Collapse"
+  },
+  "intro": {
+    "ja": "この街を折るのは、大きな一撃ではない。技を継ぐ人がひとり、またひとりと静かに去り、いつか支える手が足りなくなる——そのとき初めて、次の小さなショックが致命傷になる。崩壊はある日突然やって来るように見えて、崩れる条件はずっと前から積み上がっていた。暗黙知を形式知に移し、後継の芽を植え直して、崩れない条件へ組み替えられるか。",
+    "en": "What breaks this town is not one great blow. The people who carry the craft leave, one by one, until the hands that hold it up run short — and only then does the next small shock become fatal. Collapse looks like it arrives one sudden day, but the conditions for it had been piling up all along. Move tacit knowledge into explicit form, replant the seeds of succession, and rearrange the town into conditions that do not break."
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 45, "d": 15, "e": 75, "al": "dp", "reboot": false },
+    "hint": {
+      "ja": "DX投資を大きく上げて暗黙知を形式知化（シリアライズ）し、後継者ストックを50以上へ回復させてください。長期最適（DP）のまま進めれば、地域ブランドの税収基盤が支えられ、自治体財政も50以上を保てます。崩れる条件は、気づいたうちに組み替えられます。",
+      "en": "Raise DX investment sharply to serialize tacit knowledge and recover the successor stock above 50. Staying on the long-term algorithm (DP) supports the local brand's tax base, keeping the municipal budget at 50 or above. The conditions for collapse can be rearranged while you still notice them."
+    }
+  },
+  "goal": {
+    "ja": "後継者ストックを50以上まで回復させ、自治体財政を50以上に保つ",
+    "en": "Recover the successor stock to 50+ and keep the municipal budget at 50 or above"
+  },
+  "goalConds": [
+    { "metric": "skillStock", "op": ">=", "value": 50 },
+    { "metric": "budget", "op": ">=", "value": 50 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_successor_crisis"
+}

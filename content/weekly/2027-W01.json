@@ -1,0 +1,29 @@
+{
+  "id": "2027-W01",
+  "title": {
+    "ja": "備えた街には、火が入らない",
+    "en": "The Town That Prepared Never Catches"
+  },
+  "intro": {
+    "ja": "先週の街と、来た火は同じだった。対立をあおる同じ種類の火種。けれどこの街では、疑心の煙が広がらない。違いは持ち込まれた火ではなく、あらかじめ整えられていた条件のほうにある。フィルタを弱く保ち、確かめる目を残しておけば、疑心暗鬼（パラノイア）は燃え広がらず、街の心の余裕は保たれる。「何が揃っていたか」で、結果は決まる。",
+    "en": "Last week's town and the spark that came were the same. The same kind of tinder meant to inflame division. Yet in this town, the smoke of suspicion does not spread. The difference lies not in the spark that was brought, but in the conditions that were arranged in advance. Keep filtering weak and the checking eyes in place, and paranoia never catches — the town's peace of mind holds. What was already in place decides the outcome."
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 70, "e": 35, "al": "greedy" },
+    "hint": {
+      "ja": "フィルタリングを15あたりまで下げ、倫理スコアを80近くまで引き上げてください。アルゴリズムを長期最適（dp）に切り替えると、疑心暗鬼（パラノイア）が30以下まで静まり、心の余裕（メンタルウェルビーイング）が70以上まで戻ります。",
+      "en": "Lower filtering to around 15 and raise the ethics score to near 80. Switching the algorithm to long-term (dp) calms paranoia to 30 or below and restores mental well-being above 70."
+    }
+  },
+  "goal": {
+    "ja": "疑心暗鬼（パラノイア）を30以下まで静め、心の余裕（メンタルウェルビーイング）を70以上に保つ",
+    "en": "Calm paranoia to 30 or below and keep mental well-being at 70 or above"
+  },
+  "goalConds": [
+    { "metric": "paranoia", "op": "<=", "value": 30 },
+    { "metric": "mentalWB", "op": ">=", "value": 70 }
+  ],
+  "difficulty": "normal",
+  "discoveryId": "sce_ethics_cascade"
+}

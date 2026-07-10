@@ -1,0 +1,29 @@
+{
+  "id": "2026-W51",
+  "title": {
+    "ja": "同じ火は、条件が揃った街だけを焼く",
+    "en": "The Same Spark Only Burns the Town That Was Ready to Burn"
+  },
+  "intro": {
+    "ja": "強いフィルタが同じ声だけを増幅し、多様な視点はとうに隅へ追いやられていた。そこへ対立をあおる火種が投げ込まれる——けれど問いは「誰が火をつけたか」ではない。「なぜこの街だけが燃えたのか」だ。燃えたのは、燃える条件が先に揃っていたから。フィルタを緩めて視点の幅を取り戻し、同じ火が来ても耐えられる街に整え直せるか。",
+    "en": "Heavy filtering amplified only the same voices, and diverse viewpoints had long been pushed to the edges. Then a spark meant to inflame division is thrown in — but the question is not \"who lit it.\" It is \"why did only this town catch fire.\" It burned because the conditions to burn were already in place. Loosen the filter, win back the breadth of viewpoints, and rebuild a town that holds even when the same spark arrives."
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 68, "e": 42, "al": "greedy" },
+    "hint": {
+      "ja": "フィルタリングを25あたりまで大きく下げて情報多様性を75以上へ戻し、倫理スコアを60前後まで引き上げてください。アルゴリズムを長期最適（dp）に切り替えると、社会的回復力（レジリエンス）が55以上まで戻ります。同じ火が来ても、幅のある街は焼け落ちません。",
+      "en": "Lower filtering sharply to around 25 to bring information diversity back above 75, and raise the ethics score to about 60. Switching the algorithm to long-term (dp) restores social resilience above 55. When the breadth returns, the same spark no longer burns the town down."
+    }
+  },
+  "goal": {
+    "ja": "情報多様性を75以上に立て直し、社会的回復力（レジリエンス）を55以上まで戻す",
+    "en": "Rebuild information diversity to 75+ and restore social resilience to 55 or above"
+  },
+  "goalConds": [
+    { "metric": "diversity", "op": ">=", "value": 75 },
+    { "metric": "resilience", "op": ">=", "value": 55 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_echo_trap"
+}
