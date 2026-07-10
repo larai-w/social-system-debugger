@@ -15,7 +15,7 @@
 | ☐3 | main ブランチ保護 | 5分 | ☐2で `gh` 済みなら5分 | かんたん |
 | ☐4 | Capacitor 実機（任意） | 30〜60分 | iOS +15分（cocoapods）/ Android +30〜60分（Studio+JDK17）| やや重い |
 | ☐5 | 30秒リールを録画して X 固定ポストに | 15分 | 15分 | かんたん |
-| ☐6 | 教員向け1枚ガイドを PDF 化 | 5分 | 5分 | かんたん |
+| ☐6 | 教員向け1枚ガイドを PDF 化（**自動化済み** `make classroom-pdf`） | 0分 | 0分 | 自動 |
 | ☐7 | リポジトリの iCloud 外移設（推奨） | 15分 | 15分 | 普通 |
 
 **おすすめの進め方（急ぎでなければ）:**
@@ -149,11 +149,15 @@ git push
      ワイマール崩壊→介入→回復を自動再生（ループ）。これを画面録画すれば「実物と完全一致」の映像になる
      （この場合「演出用デモ」の注記は不要）。
 
-## ☐ 6. 教員向け1枚ガイドを PDF 化 — 5分
+## ☐ 6. 教員向け1枚ガイドを PDF 化 — **自動化済み（手動印刷は不要）**
 
-ブラウザで `web/classroom.html`（公開後は `https://larai-w.github.io/social-system-debugger/classroom.html`）を開き、
-**Ctrl/Cmd + P → PDFとして保存**（自動で白地・A4・1枚になる）。
-OUTREACH.md の教員向け雛形で打診するとき、URLと一緒にこのPDFを添付する。
+```bash
+make classroom-pdf     # dist/classroom.pdf と dist/classroom.en.pdf を生成（A4・白地・print メディア）
+```
+
+教員打診のたびに上記1コマンドで最新の PDF（日/英）が `dist/` に得られる。
+OUTREACH.md の教員向け雛形で打診するとき、URLと一緒にこの PDF を添付する。
+（従来の手動手順＝ブラウザで `web/classroom.html` を開いて Ctrl/Cmd + P → PDF保存、も引き続き可能。）
 
 ## ☐ 7.（推奨）リポジトリを iCloud 外へ移設 — 15分
 

@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 GITHUB_REPO ?= larai-w/social-system-debugger
 
-.PHONY: help setup hooks serve test check verify lint format gen-og gen-icons reels synth handoff protect \
+.PHONY: help setup hooks serve test check verify lint format gen-og gen-icons classroom-pdf reels synth handoff protect \
         aws-bootstrap aws-deploy aws-wire ios android
 
 help: ## このヘルプを表示
@@ -45,6 +45,9 @@ gen-og: ## og-image.png を再生成
 
 gen-icons: ## ストア用アイコン/スプラッシュを resources/ に生成
 	npm run gen:icons
+
+classroom-pdf: ## 教員向け1枚ガイドを dist/classroom.pdf / .en.pdf に自動生成（A4・白地）
+	npm run gen:classroom-pdf
 
 reels: ## リール5本を自動録画（dist/reels/ へ webm、ffmpegがあればmp4も）
 	npm run record:reels
