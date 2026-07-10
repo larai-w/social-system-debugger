@@ -219,6 +219,10 @@ running the *same* command, so "green locally" and "green in CI" cannot diverge.
 - **Full-history secret scan.** `.github/workflows/secret-scan.yml` runs **gitleaks**
   over the entire git history (`fetch-depth: 0`) on every push and PR, making the one-off
   manual secret audit a permanent, automated gate.
+- **Content-Security-Policy.** With Chart.js self-hosted there are zero external script
+  origins, so the page ships a CSP meta (`script-src 'self'` plus inline handlers) that
+  structurally blocks third-party script injection; the offline and browser verifications
+  run against the policy on every change.
 - **Pre-commit == CI.** A pre-commit hook (`make hooks`) runs `npm run check` before a
   commit lands, and the CI `web` job runs the identical `npm ci` + `npm run check`, so
   a lint/format drift cannot reach `main`.
