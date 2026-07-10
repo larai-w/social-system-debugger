@@ -79,6 +79,14 @@
 | T68 | Issues バックフィル T55〜T66 追記＝計73件（**Sonnet委任2件目**） | ポートフォリオ鮮度の定期運用 | ✅ |
 | T69 | ストア用スクショ自動撮影 `make store-shots`（**Opus委任25件目**） | ☐4 提出物の自動化（実エンジン撮影・6枚） | ✅ |
 | T70 | X 告知画像カード4枚＋投稿文 `make announce-cards`（**Opus委任26件目**） | PWA インストールの直感図解＋週次予告（card4 は Web 有効化までゲート） | ✅ |
+| T71 | 告知カード英語版 `?lang=en`＝計8枚＋announce-post.en（**Opus委任27件目**） | Show HN・海外打診の画像素材 | ✅ |
+| T72 | エクスポート⇔辞書 整合テスト（**Opus委任28件目**） | US-08 の約束を docs-as-tested に（38フィールド・欠落ゼロ） | ✅ |
+| T73 | verify スモーク拡張＝メニュー/PWAモーダル/導線（**Opus委任29件目**） | 直近スプリントの新UIを Console ゼロゲートの傘に | ✅ |
+| T74 | Zenn 記事1・2 再同期（**Sonnet委任3件目**） | PWA/CSP/Node20実話を反映・発信即応を維持 | ✅ |
+| T75 | launch-en / store-listing 鮮度（**Sonnet委任4件目**） | Show HN 素材とスクショ手順の現行化 | ✅ |
+| T76 | dependabot 網羅確認＋AGENTS.md 現行化（**Sonnet委任5件目**） | root npm は監視済みと確認。委任ルールの文書を実運用に一致 | ✅ |
+| T77 | ポートフォリオ鮮度バッチ＝77 issues 化ほか（**Sonnet委任6件目**） | 鮮度維持サイクル3周目 | ✅ |
+| T78 | README ja/en に PWA インストール節（**Opus委任30件目**） | 告知と README の導線整合 | ✅ |
 
 ## 実施順
 
