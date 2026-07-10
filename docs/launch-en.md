@@ -47,10 +47,23 @@ Tech notes, in case they're interesting:
   scripts with no bundler — concatenating the files reproduces the original
   byte-for-byte — so the deployed behavior never changed during the refactor.
 - The simulation core is DOM-free and unit-tested with node:test.
+- **Installable PWA (offline-capable).** Once installed it launches
+  full-screen and works without a network. Chart.js is self-hosted — there are
+  zero external JS dependencies at runtime — so the app and its service worker
+  have no third-party origin to worry about. If the CDN were somehow blocked,
+  graceful degradation (sliders, tabs, sharing keep working) is asserted in CI,
+  not just hoped for. Install instructions: README §"Install as an app (PWA)"
+  or ≡ menu → "📲 Install as an app" inside the app.
 - Native builds (iOS/Android) are the same code via Capacitor behind a
   no-op-on-web facade.
 - Static hosting on S3+CloudFront via CDK; GitHub Actions deploys with OIDC
   (no long-lived keys). No Docker — there is no resident process to contain.
+  For the full technical story see [`docs/ARCHITECTURE.en.md`](ARCHITECTURE.en.md).
+- **Reachability CI caught 3 real bugs before shipping.** A grid-search test
+  runs against the real engine to confirm every weekly scenario is (a) beatable
+  and (b) not already satisfied at the starting parameters ("instant-clear" bug).
+  Two such bugs were found at T20 and one more at T40; all were fixed before the
+  scenario reached users.
 - Privacy: no accounts, no cookies, anonymous aggregate analytics only.
 
 Important framing: it deliberately names no real places, people, or current
@@ -81,6 +94,12 @@ Q: Data / research use?
 A: Menu -> Export gives JSON/CSV of all parameters and metrics plus a URL
    that reproduces the exact run. There's also a printable one-page
    classroom guide (EN): https://larai-w.github.io/social-system-debugger/classroom.en.html
+
+Q: Where's the full technical write-up?
+A: docs/ARCHITECTURE.en.md in the repo covers the module split, DOM-free
+   engine, dual delivery (Pages + CloudFront OAC), keyless OIDC deploy,
+   the Playwright Console-zero harness, and the reachability CI in depth.
+   It's written with a cloud/infrastructure reviewer in mind.
 ```
 
 ---
@@ -129,6 +148,7 @@ printable one-page classroom guide in the app's README.
 - [ ] 批判コメントへの姿勢を事前に決めておく: モデルの粗の指摘は**歓迎して Issue 化**（OUTREACH の精神と同じ）
 - [ ] 「政治的では？」への定型回答を用意: 実名ゼロ・構造の話・両陣営に同じ力学が働くことをアプリ内で明示している
 - [ ] Show HN と Product Hunt は**同日にしない**（それぞれのトラフィックを観測可能に保つ）
+- [ ] announce cards (en) ready — `docs/announce-post.en.md` を素材に X/各チャネル向けカードを最終確認
 
 ## 4. 投稿後の観測（MARKETING.md KPI と接続）
 
