@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- T60: CSP（T57 の外部依存ゼロ化を防御に転化）。inline handler/style 主体の構成のため unsafe-inline は許容し、
+     外部オリジンからのスクリプト注入を遮断する。plausible/formspree は将来の計測・現行フィードバック送信用 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://formspree.io https://plausible.io; object-src 'none'; base-uri 'self'; worker-src 'self'; manifest-src 'self'">
 <title>社会デバッガー</title>
 <!-- v6.2: OGP / SNSカード -->
 <meta property="og:title" content="社会デバッガー">
