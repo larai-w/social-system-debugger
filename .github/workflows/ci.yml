@@ -42,6 +42,9 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser verification (scripts/verify.mjs)
         run: npm run verify
+      # T62: PWA オフライン起動もPRごとに検証（SW登録→回線遮断→リロード。ジョブ自体が助言的なのは従来どおり）
+      - name: Offline-start verification (scripts/verify-offline.mjs)
+        run: npm run verify:offline
 
   # ── インフラ: cdk synth が通ることの確認 ──
   infra:
