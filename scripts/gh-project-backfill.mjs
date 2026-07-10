@@ -55,15 +55,15 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T66)',
+    title: 'Delegation sprints (T25–T70)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), and the first Sonnet-delegated task (T66).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), and the release-prep sprint (T67–T70).',
   },
 ];
-// NOTE: this milestone was previously named 'Delegation sprints (T25–T43)' and then
-// 'Delegation sprints (T25–T54)'. If an older milestone with either previous title already
-// exists in the repo, either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T66)'
+// NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
+// 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)'. If an older milestone
+// with any of those prior titles already exists in the repo, either rename it via:
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T70)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -496,6 +496,34 @@ const TASKS = [
     ['area:docs'],
     true,
     'First Sonnet-delegated task (all prior subagent work used Opus). Mechanical append-only task confirmed Sonnet is sufficient for CHANGELOG maintenance.',
+  ],
+  [
+    'T67',
+    'X post drafts for W47–2027-W01 (8 weeks) + KPI log hope-vs-audit comparison table',
+    ['area:marketing'],
+    true,
+    'Announces the contrast-pair weekly scenarios in matching tone (quiet / loud). CI fix landed alongside: Node 22 upgrade + shell-glob expansion for node:test eliminates a latent Node-version incompatibility that Dependabot PRs exposed.',
+  ],
+  [
+    'T68',
+    'GitHub Issues portfolio backfill T55–T66 (total 73 issues, milestone renamed to T25–T66)',
+    ['area:docs'],
+    true,
+    'Idempotent append to gh-project-backfill.mjs; milestone description updated; github-project.md count updated to 73.',
+  ],
+  [
+    'T69',
+    'Automated store-screenshot pipeline: make store-shots (6 screenshots, real engine)',
+    ['area:marketing'],
+    true,
+    'Playwright drives the real engine through shock-survival, panic, etc.; each screenshot fails if any console error occurs (self-verifying, no faked values). Weekly-card shot replaced with P4 because the weekly feature is web-gated.',
+  ],
+  [
+    'T70',
+    'Announce-card pipeline: make announce-cards (4 images + post copy)',
+    ['area:marketing'],
+    true,
+    'Cards: main announcement / iPhone 3-tap PWA install / Android+PC install / weekly teaser (card 4 gated until weekly feature is web-enabled). Post copy in docs/announce-post.md.',
   ],
 ];
 

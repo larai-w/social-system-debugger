@@ -74,6 +74,11 @@ Action-verb first, one line each. Group by theme; drop the headers on a real CV.
 - Added **continuous advisory monitoring**: a weekly **Lighthouse** audit
   (`lighthouse.yml`, PWA/perf/a11y, non-blocking) and a **gitleaks** full-git-history
   secret scan on every push/PR — making a one-off manual audit a permanent CI gate.
+- Root-caused a **latent Node-version CI incompatibility** (glob expansion in `node
+  --test` changed between Node 20 and 22; branch protection had not yet been enabled, so
+  the bug was invisible until Dependabot opened 8 PRs simultaneously): diagnosed via
+  GitHub Actions public API logs, resolved by pinning Node 22 and switching to explicit
+  shell glob expansion (`$(ls tests/*.test.mjs)`).
 
 ### Automation & Ops
 
@@ -97,6 +102,10 @@ Action-verb first, one line each. Group by theme; drop the headers on a real CV.
   (`npm run check`, `make verify`) on the reviewer side** rather than trusting a
   subagent's self-reported green, and defined a **fallback** for when the sandbox
   blocks writes (deliver design + verification trace; reviewer transcribes).
+- Built a **self-verifying promo asset pipeline** (`make store-shots`, `make
+  announce-cards`) in which Playwright drives the real engine and aborts on any console
+  error — making it structurally impossible to produce store screenshots or announcement
+  images with faked values.
 
 ---
 
