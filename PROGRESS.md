@@ -72,6 +72,8 @@
 | T62 | CI に verify:offline 追加（直営・助言的） | PWA オフライン保証を変更有効化ゲートに昇格 | ✅ |
 | T63 | 教員ガイド PDF 自動生成 `make classroom-pdf`（**Opus委任21件目**） | 人間 TODO ☐6 を恒久自動化（サービス要求の自動化） | ✅ |
 | T64 | Zenn 記事4「AI委任統制」ドラフト（**Opus委任22件目**） | 19件の委任実績を発信素材化（published:false 待機） | ✅ |
+| T65 | 週次 W51〜2027-W01＝対比「トリガーか条件か」（**Opus委任23件目**） | 在庫を2027/1/4週まで＝年末年始の無人運転。ISO 53週年またぎ処理 | ✅ |
+| T66 | CHANGELOG に T50〜T64 追記（**Sonnet委任1件目**） | 履歴鮮度。機械的タスクは Sonnet で足りる使い分けの確立 | ✅ |
 
 ## 実施順
 
@@ -79,6 +81,8 @@ T1 →（T1で検証しながら）T2 → T3 → T4 → T5。
 T2/T3 はアプリ本体（web/js）に触れるため、完了ごとに verify（Console ゼロ・Chart.js 失敗時含む）を実施する。
 
 ## 完了ログ（新しいものを上に追記）
+
+- ✅ **T65/T66（第14スプリント・制限下の完全委任運用）**: **T65=Opus** 週次補充4本＝「同じ火は、条件が揃った街だけを焼く」対比2組（W51 P1 hard「同じ火は、条件が揃った街だけを焼く」／2027-W01 P1 normal「備えた街には、火が入らない」＝対の回答編／W52 P2「担い手が静かに去る」／W53 P3 hard・groundingRate 条件で pre-clear を構造的に防止）。**ISO 年またぎを自力処理**（2026=53週年→ W53 の次は 2027-W01）。エージェント自身が `npm run check` green まで自己修正＝**到達可能性CI＋Write許可で「委任→CI→親コミット」の完全委任サイクルが初めて全工程で成立**。**T66=Sonnet（初のSonnet委任）** CHANGELOG T50〜T64 エントリ（+35行・無改変追記・自己検証green）。親（Fable）の作業はレビューとコミットのみ＝制限下の運用モデルとして確立。在庫: **2027/1/4週まで・残り26週**。
 
 - ✅ **T60〜T64（第13スプリント・セキュリティと運用・Opus並行委任3件＋直営2件）**: **T60=直営** CSP メタ＝`default-src 'self'`／script は self＋inline（onclick主体の構成のため）＋plausible（将来の計測）／connect は self+formspree+plausible／`object-src 'none'`・`base-uri 'self'`・worker/manifest self。**リスク対応**: file:// の verify との相性懸念→実測で verify 両ケース・verify:offline・gen:shot・gen:classroom-pdf 全green を確認してから確定。sw v6-364。ARCHITECTURE ja/en の品質ゲート節に追記。**T61=Opus委任** 運用ランブック＝§0 まず見る3点＋P1〜P3 優先度マトリクス＋7章（週次ローテ失敗の在庫切れ/その他切り分け・Pages・AWS 手動復旧・SWキャッシュ事故と案内文テンプレ・Console エラー時の verify 3種の使い分け・git revert ロールバック（force-push 禁止明記）・委任エージェント停止→作業ツリー回収）。全手順に根拠ファイル・検証不能な外部障害は「一般的な対応」と明示。**T62=直営** ci.yml verify ジョブに offline 検証ステップ追加（ジョブは助言的のまま）。**T63=Opus委任** `scripts/gen-classroom-pdf.mjs`＝print メディア＋preferCSSPageSize で classroom ja/en → dist/*.pdf。Console 自己検証＋サイズ＋ページ数の機械確認（実測: ja 7.1MB/1p〔CJKフォント埋込〕・en 237KB/1p）。TODO ☐6 を「自動化済み」に書き換え＝人間TODOが1件減。**T64=Opus委任** `docs/articles/zenn-04-ai-delegation.md`＝委任の定義→仕様書の型（実物引用）→統制3原則→実話3つ（Write拒否フォールバック・上限停止からの回収・W49 を CI が検出）→実数値（委任19件・テスト27件）→向く/向かない→まとめ。全数値に根拠箇所を報告で明示・published:false。**バックグラウンド常設化（第一歩）**: 毎朝8:47 の読み取り専用ヘルスチェック cron（git 競合コピー/未push/check/在庫→問題のみ ITIL の型で報告）。制約=セッション限り・最長7日（恒久化は新セッションでの再セット運用。将来はクラウド routine も選択肢）。**受け入れ**: `npm run check` 全green（テスト27）・verify 両ケース・verify:offline・PDF 2枚生成・ヒーロー再生成まで親が実行確認。
 
