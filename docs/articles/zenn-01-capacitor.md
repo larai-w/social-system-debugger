@@ -100,10 +100,35 @@ if (window.SSD && SSD.isNative) SSD.haptic('MEDIUM');
 
 この反省から、**Console エラーゼロ確認を Playwright で自動化**しました（`make verify`）。Chart.js が正常な場合と CDN がブロックされた場合の両方で、全タブ遷移・プリセット・スライダー操作（さらに P2 ショック注入・エクスポート生成まで）を行い、`pageerror`/`console.error` がゼロであることを検証します。「インラインの `onclick` が全部実在の関数に解決すること」も静的テストにしました（地雷2の再発防止）。ローカルの `npm run check`（ユニット/ガードレールテスト＋週次JSON検証＋eslint＋prettier）を CI の web ジョブがそのまま実行するので、ローカルで通ればCIでも通る、という一致を保っています。
 
+## 手順3: PWA インストール導線と外部依存ゼロ化
+
+Capacitor によるネイティブ化と並行して、Web 版にも「インストール可能なアプリ」としての仕上げを施しました。
+
+**PWA インストール導線（≡メニュー）**: `beforeinstallprompt` を捕捉し、Chrome/Edge/Android では OS ネイティブのインストールプロンプトを呼び出します。iOS Safari など `beforeinstallprompt` が発火しない環境では、OS 別の手動手順をモーダルで案内するフォールバックに切り替えます。Capacitor アプリ内・standalone 起動時（すでにインストール済み）は自動で非表示にします。ネイティブアプリとのコード共存のため、導線の表示/非表示は `SSD.isNative` と `window.matchMedia('(display-mode: standalone)')` を組み合わせた条件分岐で制御します。
+
+**Chart.js セルフホスト化で外部依存ゼロ**: 当初は Chart.js を CDN から読み込んでいましたが、広告ブロッカーや CDN 障害で描画が消えるリスクが残っていました。Chart.js 4.4.0（MIT）を `web/vendor/chart.umd.min.js` としてリポジトリに同梱し、Service Worker のキャッシュに追加しました（初回訪問後は完全オフライン）。外部依存ゼロになったことで、後述の CSP 設定（`script-src 'self'`）も実現できました。セルフホスト後は `verify.mjs` の「Chart.js ブロック」再現方法を CDN 遮断から vendor パス遮断に切り替え、正常系が実ファイルで走るため検証が以前より強化されました。
+
+### Web は PWA・ネイティブは Capacitor の二段構え
+
+この時点でのアーキテクチャは「**Web = PWA（インストール可・オフライン対応・外部依存ゼロ）、ネイティブ = Capacitor（触覚・週替わり通知・Preferences 耐久ストレージ）**」という二段構えになっています。同じコードベースで両面をカバーし、`SSD.isNative` ガード1本で挙動を切り替えます。Web と Capacitor を別プロジェクトに分けず、**ガードで共存させる**選択が、「1バイトも壊さない」制約の具体的な実装です。
+
+## 手順4: PWA の主張を自動検証する（verify:offline）
+
+「オフラインで動く」は主張するだけでは不十分で、デプロイのたびに壊れていないか確認する必要があります。そこで `scripts/verify-offline.mjs` を追加しました。
+
+フローは次のとおりです:
+1. 依存ゼロの極小静的サーバを内蔵して `web/` を配信
+2. Playwright でページを開き、Service Worker を登録させる
+3. ブラウザの回線を完全遮断してリロード
+4. SW キャッシュから起動できること、イントロを閉じてタブ遷移できること、`pageerror` / `console.error` がゼロであることを検証
+
+`npm run verify:offline`（`make verify-offline`）で手元から実行でき、CI の verify ジョブにも助言的ステップとして組み込んであります。導入時にイントロモーダルがクリックを遮蔽するバグを検出して修正できたのは、この自動検証があったからです。
+
 ## 結果
 
 - Web版: URL・挙動とも従来どおり（Pages でそのまま配信継続。この記事執筆時点でもライブ）
 - アプリ版: 同じコードベースから iOS/Android が出る**構成**が用意できた。週替わりシナリオ・ローカル通知・触覚・共有シートだけがネイティブで追加される設計
+- PWA版: `beforeinstallprompt` + iOS フォールバック導線・Chart.js セルフホスト（外部依存ゼロ）・`verify:offline` による自動検証が揃い、**Web としても「インストール可能なアプリ」として完成**した状態
 - バンドラ・トランスパイラ・フレームワーク: **導入ゼロ**。ビルドは `npx cap sync` だけ
 
 正直に書くと、**実機（Xcode / Android Studio）でのビルド・審査提出はこの記事執筆時点では未実施**で、`ios/`・`android/` は `.gitignore`（`npx cap add` で再生成）に置いたまま、Preferences 耐久ミラーや `isNative` ガードといった「ネイティブ側の設計と Web 無影響」の担保を先に固めた段階です。実機・ストア審査の話は次の記事に回します。

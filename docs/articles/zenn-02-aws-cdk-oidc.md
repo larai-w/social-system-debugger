@@ -90,6 +90,43 @@ make aws-deploy      # スタック作成 + S3同期
 make aws-wire        # CDK出力 → GitHub Secrets/Variables + config.js
 ```
 
+## セキュリティ追加: CSP メタと gitleaks
+
+### CSP メタ — 外部依存ゼロ化を防御に転化
+
+Chart.js をセルフホスト化して外部依存をゼロにしたタイミングで、Content Security Policy を `<meta http-equiv="Content-Security-Policy">` として HTML に埋め込みました（CloudFront のレスポンスヘッダーポリシーではなく、HTML 側で宣言することで Pages/AWS どちらでも同じ保護が効きます）。
+
+ポリシーの骨格は次のとおりです:
+
+```
+default-src 'self';
+script-src 'self' 'unsafe-inline' https://plausible.io;
+connect-src 'self' https://formspree.io https://plausible.io;
+object-src 'none';
+base-uri 'self';
+```
+
+`script-src` に `'unsafe-inline'` が残っているのは、HTML 内のインラインスクリプトを全部外出しにするリファクタリングコストが高すぎるためです（33万文字の既存コードに手を入れない、という制約と同じ理由）。ただし `object-src 'none'` で Flash/object 系は完全遮断し、`connect-src` で通信先をホワイトリスト化しています。「外部依存ゼロ化」は当初パフォーマンスと可用性のために行いましたが、CSP を有効にしてみると**防御の副産物**でもあったことが分かりました。外部スクリプトが1本もなければ、`script-src` を `'self'` に近い形に保てます。
+
+### gitleaks によるシークレットスキャン
+
+OIDC でアクセスキーをゼロにしたとしても、過去のコミット履歴にうっかり秘密情報が混入するリスクは別の話です。そこで `.github/workflows/secret-scan.yml` に gitleaks-action v2 を追加し、毎 push および PR で `fetch-depth: 0`（全 git 履歴）を走査するようにしました。
+
+「長期キーを発行しない設計」と「シークレットが漏れていないことを継続的に確認する CI」は、セキュリティの別々のレイヤーをカバーします。OIDC で入り口を塞いでも、コードに書かれた秘密情報の流出は防げないため、両方が必要です。
+
+## CI バグの実体験: Node のバージョン変更が依存 PR で露呈した話
+
+Dependabot が送ってくる依存更新 PR が、ある時期から一斉に CI red になりました。最初は `actions/checkout` などの Actions バージョン更新が原因だと思い込みましたが、調べると真因は別の場所にありました。
+
+CI のテストは `node --test` のグロブ展開（`tests/*.test.mjs` のような指定）に依存していました。このグロブ展開は **Node 21 以降の機能**で、Node 20 ではシェルが展開しない限り動きません。プロジェクトの CI は Node 20 で固定されていたため、PR ワークフローが初めて走るまで（= ブランチ保護がかかってテストが実行されるまで）この非互換が表面化していませんでした。
+
+対処は2ステップです:
+
+1. CI の Node バージョンを 22 に変更（LTS として安定）
+2. `package.json` のテストコマンドを `node --test tests/*.test.mjs` ではなく、シェルがグロブを展開する形式に修正（`node --test $(ls tests/*.test.mjs)` など）
+
+教訓は「**依存更新 PR が一斉に red になったとき、原因は依存そのものではなく CI 環境の前提が変わった可能性がある**」です。Dependabot PR はタイミングを揃えて来る傾向があるため、実は以前から潜んでいたバグが複数 PR の初実行で一気に露呈することがあります。
+
 ## コスト
 
 このワークロード（静的配信・個人開発規模）は AWS 無料枠にほぼ収まります。常駐リソースがないので、「使われなければ請求もほぼゼロ」。教育用・非営利のプロジェクトを続ける上で、この性質は構成そのものより大事かもしれません。
