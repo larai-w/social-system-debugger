@@ -57,8 +57,9 @@ flowchart LR
     CF -. "other assets: long TTL" .-> S3
 ```
 
-The only runtime external dependency is **Chart.js v4** from a CDN; agent
-visualizations are drawn on raw Canvas. If Chart.js is blocked, the app degrades
+There are **no runtime external dependencies**: Chart.js v4 is self-hosted under
+`web/vendor/` (it used to be the single CDN dependency), and agent visualizations are
+drawn on raw Canvas. Even if the charting library fails to load, the app degrades
 gracefully (sliders, tabs, sharing keep working) — a property that is asserted in CI,
 not just hoped for (see §4).
 
@@ -228,6 +229,11 @@ running the *same* command, so "green locally" and "green in CI" cannot diverge.
   a lint/format drift cannot reach `main`.
 - **Branch protection.** `make protect` requires PRs with the web/infra CI checks
   passing before merge (CodeQL is advisory, not required).
+- **Self-verifying promo asset generators.** `npm run gen:shot` (README hero),
+  `make store-shots` (6 App Store / Play Store screenshots), and `make announce-cards`
+  (4 X announcement images) all drive the *real engine* via Playwright and abort on
+  any console error — so the images produced are literally impossible to fake without
+  breaking the test.
 
 ---
 
