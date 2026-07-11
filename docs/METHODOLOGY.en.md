@@ -2,7 +2,7 @@
 
 > **[日本語](METHODOLOGY.md) | [English](METHODOLOGY.en.md)** (this page)
 >
-> A technical reference gathering **every formula, threshold, and assumption** used in the "Social System Debugger". It mirrors the source (`index.html`) in a readable form.
+> A technical reference gathering **every formula, threshold, and assumption** used in the "Social System Debugger". It mirrors the source (`web/js/engine.js` / `web/js/ui.js`) in a readable form.
 
 ---
 
@@ -30,7 +30,7 @@ Society is treated as **one distributed system (an "OS")** composed of four laye
 | **L3** | Individual Cognition | poisoning attack, halted belief updates | search depth, learning rate (gradient) |
 | **L4** | Stakeholder Asymmetry | genuine voices drowned by outsider noise | sybil attack, objective hijack |
 
-> **What is "SECTOR-T"?** It is the **fictional, anonymous codename for the depopulating regional city simulated on Page 2 (L2)** — deliberately generic (not a real place), consistent with the app's "not about anyone specific" stance.
+> **What is "SECTOR-T"?** It is the **fictional, anonymous codename for the depopulating regional city simulated on Page 2 (L2)** — deliberately generic (not a real place), consistent with the app's "not about anyone specific" stance. (The residents' cluster in L4 stands for a population of 5.3M.)
 
 `clamp(x, 0, 100)` means "clamp to 0–100" (used throughout).
 
@@ -208,4 +208,4 @@ Earned when each layer's snapshot (diversity, infrastructure, cognitive integrit
 
 ---
 
-*Applies to: v6.346 · Source: `index.html` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
+*Applies to: v6.346 · Source: `web/js/engine.js` / `web/js/ui.js` (`metrics` / `metricsP2` / `updateP3Monitor` / `updateP4Monitor`, etc.)*
