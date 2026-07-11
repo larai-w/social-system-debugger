@@ -12,7 +12,7 @@
 - **読み込み順（重要）**: `i18n → engine → native → share → scenario → ui → demo`。この順で、後のファイルが前のファイルの関数/定数を実行時に参照できる。
 - `engine.js` は **DOM/window 非依存の純粋計算層**（`metrics` 等）。将来のサーバー側検証やユニットテストに再利用するため、`document`/`window` に触れない。
 - ネイティブ機能（Capacitor）は `native.js` の `window.SSD` ファサードに集約し、すべて `SSD.isNative` でガード → **Web は完全 no-op**。
-- 外部依存（実行時）は **Chart.js v4（CDN）** のみ。エージェント表現は素の Canvas。
+- 外部依存（実行時）は **Chart.js v4（セルフホスト）** のみ。`web/vendor/chart.umd.min.js` に同梱済み（更新時はファイル差し替えのみ）。エージェント表現は素の Canvas。`web/index.html` の `<meta http-equiv="Content-Security-Policy">` で外部オリジンからのスクリプト注入を遮断。
 - **PWA**: `web/manifest.json` / `web/icon.svg` / `web/sw.js`。
 - **配信**: GitHub Pages（`web/` を公開・現行URL維持）＋ AWS S3/CloudFront（`/infra` の CDK、本命）。
 
@@ -30,14 +30,16 @@ social-system-debugger/
 │       ├── ui.js            #   DOM・チャート・P1〜P4・発見・init（最大）
 │       └── demo.js          #   ?demo=1 のデモモード（本物のエンジンを自動操作。既定 no-op）
 │   ├── manifest.json / icon.svg / sw.js
+│   ├── vendor/chart.umd.min.js     # Chart.js セルフホスト（唯一の外部実行時依存）
 │   ├── classroom.html / .en.html   # 教員向け1枚ガイド（自己完結・印刷でA4）
 │   ├── classroom-slides.html / .en.html # 授業用 投影スライド（自己完結・9枚・JS無効でも縦に読める）
 │   └── privacy.html / .en.html     # プライバシーポリシー（ストア提出／フッター導線）
 ├── content/weekly/          # 週替わりシナリオJSON（*.json + latest.json）＋ weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront＋GitHub OIDCロール
 ├── promo/                   # プロモリールHTML（?lang=en 対応。make reels で自動録画）
-├── tests/                   # ユニット/ガードレール（engine / goal / share / invariants / weekly-reachability）
-├── scripts/                 # validate-weekly / verify / record-reel / gen-icons / gen-og-image 等
+├── tests/                   # ユニット/ガードレール（engine / goal / share / invariants / weekly-reachability / i18n-completeness / export-dictionary）8ファイル
+├── scripts/                 # validate-weekly / verify / verify-offline / record-reel / gen-icons / gen-og-image /
+│                            #   gen-classroom-pdf / gen-store-shots / gen-announce-cards / gh-project-backfill 等
 ├── capacitor.config.json    # appId / webDir=web / プラグイン設定
 ├── package.json             # Capacitor 依存 ＋ ルートスクリプト（test / check / verify / reels / gen:icons …）
 ├── Makefile                 # 全操作の単一入口（make help で一覧）
@@ -53,8 +55,8 @@ social-system-debugger/
 
 | 領域 | ファイル | 主な関数・変数 | 役割 |
 |---|---|---|---|
-| **多言語 (i18n)** | `i18n.js`(辞書) / `engine.js`(`t`,`tt`) / `ui.js`(`applyI18n`) | `I18N={ja,en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()`は手動キー、`tt()`はJSインライン、`data-i18n`属性は `applyI18nAuto()` |
-| **純粋計算** | `engine.js` | `metrics(fr,es,al)`, `simTimeline()`, `clamp/lerp/seedRng/genScatter`, `HIST_REF/PRESETS/MDATA` | **DOM/window非依存**。テスト対象（`tests/engine.test.mjs`） |
+| **多言語 (i18n)** | `i18n.js`(辞書) / `engine.js`(`t`,`tt`) / `ui.js`(`applyI18n`) | `I18N={ja,en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()`は手動キー、`tt()`はJSインライン、`data-i18n`属性は `applyI18nAuto()`。網羅性は `tests/i18n-completeness.test.mjs` で検証 |
+| **純粋計算** | `engine.js` | `metrics(fr,es,al)`, `simTimeline()`, `clamp/lerp/seedRng/genScatter`, `HIST_REF/PRESETS/MDATA` | **DOM/window非依存**。テスト対象（`tests/engine.test.mjs` / `tests/invariants.test.mjs`） |
 | **L1 情報空間** | `ui.js` | `updateAll()`, `startAgents()`, `startScatter()`, `getModeCollapseLog()` | 過学習・モード崩壊ログ・アニメ |
 | **L2 物理インフラ** | `ui.js` | `metricsP2()`, `calcRedundancyBuffer()`, `updateAllP2()`, `injectSystemShock()` | 冗長性・デッドロック・ショック |
 | **L3 個人の認知** | `ui.js` | `stepP3()/drawP3()/updateP3Monitor()`, `executeDropout()/executeEarlyStopping()` | ノードシム・毒入れ・回復 |
@@ -98,11 +100,11 @@ social-system-debugger/
 3. カウンタ（`(x/N)`）は `DISCOVERIES.length` から自動計算。**禁止**: ストリーク・通知・時間制限・不安を煽る文言（アプリの批判テーマと矛盾するため）。
 - 注: `sce_` 始まりの発見は週替わり用で、`WEEKLY_ENABLED`（native）でのみ到達・カウント対象。
 
-### 週替わりシナリオを追加する（人間の作業は「JSONを1枚書く」だけ）
+### 週替わりシナリオを追加する（人間の作業は「JSONを1枚書く」だけ・CI が到達可能性まで全自動判定）
 1. `content/weekly/2026-Wxx.json` を作成。スキーマは `content/weekly.schema.json`（必須: `id/title/intro/page/params/goal/goalConds/difficulty/discoveryId`、`title/intro/goal` は ja/en 両方）。
 2. **ゴールは宣言的**に：`goalConds: [{ "metric": "diversity", "op": ">=", "value": 80 }, …]`（AND結合）。`metric` は `metrics*` の返り値キー（`diversity/entropy/legitimacy/brand/redundancy/infra/integrity/ratio/drop` など）＋パラメータ（`ethicsScore/skillStock/searchDepth` 等）。判定は `scenario.js` の `evalGoalConds()` が評価。
 3. **`latest.json` の差し替えは自動**：`weekly-rotate.yml` が毎週月曜 0:00 JST にその週の `2026-Wxx.json` を `latest.json` へコピー＆コミットし、Pages/AWS デプロイまで起動する。**人間の作業は「その週のJSONを1枚追加して PR する」だけ**（アプリは起動時に `latest.json` を fetch。`scenario.js` の `CONTENT_BASE_URL` が配信元）。在庫が無い週はローテが失敗して「書き足して」というリマインダーになる。
-4. ローカル検証: `npm run validate:weekly`（ja/en 欠けやopの不正を弾く）＋ `npm test`（`weekly-reachability.test.mjs` が **goalConds の metric 名の実在＝クリア可能性**を自動検証。タイポで誰もクリアできないシナリオを CI で弾く）。
+4. ローカル検証: `npm run validate:weekly`（ja/en 欠けやopの不正を弾く）＋ `npm test`（`tests/weekly-reachability.test.mjs` と `tests/weekly-reachability-p234.test.mjs` が **goalConds の metric 名の実在・開始即クリア・放置クリア・到達不能を自動判定**。タイポで誰もクリアできないシナリオは CI で弾かれる）。**サブエージェントへの完全委任が可能**: JSON を作成して `npm run check` が green になれば完了（到達可能性の判断はCIに任せる。コミットは親が行う）。
 5. PR → main マージで `deploy-aws.yml` が S3 反映＋`latest.json` 無効化まで自動。
 - **禁止**: 実在の特定の国・自治体・人物の名指し（エチケット方針）。既存プリセットの変奏で抽象的に。
 
@@ -156,11 +158,16 @@ npm run serve              # → http://localhost:8000 （http で開く。file:
 - 構文チェック: `node --check web/js/xxx.js`。
 - **操作は `make help` に一覧**（人間 / Claude Code / Codex 共通の単一入口）。主なもの:
   ```bash
-  make check       # CIと同じ（テスト＋週次JSON検証＋eslint＋prettier）＝ npm run check
-  make verify      # ★完了ごとの必須チェックの自動化（下記）
-  make reels       # プロモリールを自動録画（dist/reels/ へ webm、ffmpegがあれば mp4 も）
-  make gen-icons   # ストア用アイコン/スプラッシュを resources/ に生成
-  make synth       # cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
+  make check          # CIと同じ（テスト＋週次JSON検証＋eslint＋prettier）＝ npm run check
+  make verify         # ★完了ごとの必須チェックの自動化（下記）
+  make verify-offline # PWAオフライン起動検証（SW登録→回線遮断→リロードで動くか）
+  make reels          # プロモリールを自動録画（dist/reels/ へ webm、ffmpegがあれば mp4 も）
+  make gen-icons      # ストア用アイコン/スプラッシュを resources/ に生成
+  make classroom-pdf  # 教員向け1枚ガイドを dist/classroom.pdf / .en.pdf に生成
+  make store-shots    # ストア提出用スクショ6枚を dist/store-shots/ に撮影
+  make announce-cards # X告知用画像カード4枚を dist/announce/ に生成
+  make gh-project     # 開発履歴を GitHub Issues/Milestones へバックフィル（要 gh）
+  make synth          # cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
   ```
 - **★「完了ごとの必須チェック」の自動化 = `make verify`**（`scripts/verify.mjs`。Playwright）: CLAUDE.md の手動チェック（Console エラーゼロ・4タブ遷移・プリセット・スライダー・Chart.js 失敗時のグレースフルデグラデーション）を **Chart.js 正常時／CDN遮断時の2ケース**で自動再生し、Console/pageerror がゼロであることを検証する。手で毎回ブラウザを触る代わりにこれを回す（初回のみ `npx playwright install chromium`）。
 - **PWA/SW のキャッシュで古いJSが出たら**（デプロイ直後や分割変更後に起きやすい）: DevTools → Application → Service Workers → **Bypass for network** にチェック（開発中はこれが楽）／または Unregister → ハード再読み込み／シークレットウィンドウ。`sw.js` は cache-first なので、CORE を変えたら `CACHE` の版番号（`ssd-cache-v6-xxx`）を必ず上げること。
@@ -171,4 +178,4 @@ npm run serve              # → http://localhost:8000 （http で開く。file:
 
 ---
 
-*対応バージョン: v6.346 / フェーズ1（モジュール分割・Capacitor・週替わり・AWS配信・CI-CD）完了*
+*対応バージョン: v6.346（アプリ表記）・sw cache v6-364 時点 / フェーズ1（モジュール分割・Capacitor・週替わり・AWS配信・CI-CD）完了。Node.js 22 以上推奨（CI と devcontainer は Node 22 固定）。*
