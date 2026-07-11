@@ -4,6 +4,40 @@
 
 ---
 
+## 発信準備・完全委任運用スプリント（T65〜T78）— 2026-07-10〜11 — 在庫2027年へ・告知素材 ja/en・品質ゲート追加
+
+T50〜T64 に続く第14〜16スプリント（T65〜T78）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-364 から変更なし）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### コンテンツ
+
+- **週次 W51〜2027-W01（年またぎ・4本）（T65）**: 「同じ火は、条件が揃った街だけを焼く」対比2組（W51 P1 hard「同じ火は…」／2027-W01 P1 normal「備えた街には、火が入らない」という希望の対、W52 P2「担い手が静かに去る」、W53 P3 hard）。**2026年が ISO 53週の年**であることを自力処理し、`2026-W51/W52/W53 + 2027-W01` を正しく採番。**在庫は 2027/1/4週まで（残り26週）**。到達可能性 CI が受け入れを自動判定（エージェント自身が `npm run check` green まで自己修正。委任→CI green→親コミットのみ、という完全委任サイクルが初めて全工程で成立）（T65=Opus委任）。
+- **X 月曜告知 8週分（W47〜2027-W01）（T67）**: `docs/x-post-templates.md` に W47〜W54・W51〜2027-W01 の月曜告知を追加。希望系（外から来た担い手・備えた街）と監査系（裁く快感・結果を引き受ける人）を交互に組み合わせ、対比ペアとしての文脈を告知文でも活用。`docs/kpi-log.md` に「希望系 vs 監査系」×「週次 vs 通常投稿」の反応比較表を追加（T67=Opus委任）。
+
+### 品質・CI
+
+- **Node 22 化＋test グロブのシェル展開化（直営・恒久修正）**: Dependabot PR 8本の CI red を調査した結果、原因は `node --test 'tests/*.mjs'` のグロブが Node 21+ 固定の機能であり、CI が Node 20 を使っていたことが判明（branch protection 未設定のため PR 初実行まで露呈しなかった潜在バグ）。Node 22 化＋グロブを `tests/*.mjs` からシェル展開（`$(ls tests/*.mjs)`）に変更し恒久対処。
+- **エクスポート⇔辞書 整合テスト（T72）**: `tests/export-dictionary-consistency.test.mjs` を新規追加。`buildExportData()` が出力する38フィールド全てが `docs/DATA-DICTIONARY.md`/`.en.md` に定義されていることを CI 化（欠落ゼロ・**テスト30件体制**に到達）（T72=Opus委任28件目）。
+- **verify スモーク拡張＝メニュー/PWAモーダル/導線（T73）**: `scripts/verify.mjs` に≡メニュー開閉・「アプリとして入れる」モーダル表示・classroom/privacy 導線の `window.open` スタブ検証を追加。直近スプリントで追加した UI を Console ゼロゲートの傘に組み込み（T73=Opus委任29件目）。
+
+### 発信素材
+
+- **X 告知画像・英語版（告知カード計8枚）（T71）**: `scripts/gen-announce-cards.mjs` で `?lang=en` を付与した英語版カード4枚を追加生成。メイン告知（card1）・iPhone 3タップ図解（card2）・Android/PC 手順（card3）・週次予告（card4）の en 版。card4 は Web WEEKLY_ENABLED 有効化まで投稿禁止のゲートを英語版にも継承。投稿文 `docs/announce-post.en.md` を追加（Show HN・海外打診向け）（T71=Opus委任27件目）。
+- **ストア用スクショ自動撮影 `make store-shots`（T69）**: `scripts/gen-store-shots.mjs` を新規追加。Playwright で実エンジンを操作し、430×932@3x のストア規格スクリーンショット6枚を自動生成（ショック生存の緑バナー等。週次カードは Web 到達不能のため P4 に正しく代替）（T69=Opus委任25件目）。
+- **README ja/en に「アプリとして入れる（PWA）」節（T78）**: ≡メニューの PWA インストール導線と README の告知が整合した。iOS Safari / Chrome / Edge の手順を簡潔に記載し、告知素材 card2 と参照を統一（T78=Opus委任30件目）。
+
+### ドキュメント
+
+- **Zenn 記事1・2 再同期（T74）**: `docs/articles/zenn-01-capacitor.md`・`zenn-02-aws-cdk-oidc.md` に PWA 完成・CSP 導入・Node 20 潜在バグの実話を追記。いずれも `published: false` 待機（T74=Sonnet委任3件目）。
+- **launch-en / store-listing 鮮度（T75）**: `docs/launch-en.md` に PWA/ARCHITECTURE.en/実バグ3件検出ストーリーを追記。`docs/store-listing.md` のスクショ節を `make store-shots` の手順に更新（T75=Sonnet委任4件目）。
+- **AGENTS.md 現行化（T76）**: 委任モデルの使い分け（Opus=創造的タスク・Sonnet=機械的タスク）、Write 可/Bash 拒否のサンドボックス実態、完全委任サイクルの確立を反映（T76=Sonnet委任5件目）。
+- **Issues バックフィル77件化（T77）**: `scripts/gh-project-backfill.mjs` に T67〜T70 を追記（計77 issues・milestone を T25–T70 に更新）。`docs/ARCHITECTURE.en.md`・`docs/cv-highlights.en.md` に自己検証パイプライン（告知画像・スクショ・エクスポートの実エンジン撮影）を追記（T77=Sonnet委任6件目）。**親レビューでの修正2件（問題管理）**: ①ARCHITECTURE §1「唯一の外部依存=CDN Chart.js」が T57 以降陳腐化→「外部依存ゼロ（vendor同梱）」に ja/en 修正 ②AGENTS.md の「validate:weekly が到達可能性判定」誤記→到達可能性はテストスイート側と訂正。
+- **CHANGELOG T50〜T64 追記（T66）**: 「PWA完成・品質と運用スプリント（T50〜T64）」エントリを追加（+35行・既存無改変）（T66=Sonnet委任1件目）。
+
+### プロセス
+
+- **Sonnet 委任の確立＝モデル使い分けの型（T66・T74〜T77）**: 機械的タスク（CHANGELOG 追記・鮮度更新・バックフィル）は Sonnet で足りると実証。Opus は設計・新規実装・数値トレースが必要な創造的タスクに集中させることで、委任サイクルの効率と品質が両立。
+- **完全委任サイクルの確立（T65）**: 到達可能性 CI と Write 許可の組み合わせにより、週次シナリオ補充は「委任→CI green→親コミット」だけで完結する運用が成立。親の手計算・転記・受け入れコマンド代行がゼロになった。
+
 ## PWA完成・品質と運用スプリント（T50〜T64）— 2026-07-09〜10 — アプリとして配れる品質・外部依存ゼロ・運用ランブック
 
 T36〜T49 に続く第11〜13スプリント（T50〜T64）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-362→v6-364 に前進）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
