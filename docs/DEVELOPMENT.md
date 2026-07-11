@@ -178,4 +178,4 @@ npm run serve              # → http://localhost:8000 （http で開く。file:
 
 ---
 
-*対応バージョン: v6.346（アプリ表記）・sw cache v6-365 時点 / フェーズ1（モジュール分割・Capacitor・週替わり・AWS配信・CI-CD）完了。Node.js 22 以上推奨（CI と devcontainer は Node 22 固定）。*
+*対応バージョン: v6.346（アプリ表記）・sw cache v6-366 時点 / フェーズ1（モジュール分割・Capacitor・週替わり・AWS配信・CI-CD）完了。Node.js 22 以上推奨（CI と devcontainer は Node 22 固定）。*

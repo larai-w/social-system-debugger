@@ -252,6 +252,7 @@ const I18N = {
     // T35: アプリ内ページ導線
     menu_classroom:'🏫 Educator guide (use in class)',
     menu_privacy:'🔒 Privacy policy',
+    menu_faq:'❓ FAQ (web vs installed app)',
     // T50: PWA インストール導線
     menu_pwa:'📲 Install as an app',
     pwa_tag:'INSTALL — use it as an app',
