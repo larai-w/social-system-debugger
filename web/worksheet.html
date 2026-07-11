@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社会デバッガー — 探究ワークシート（生徒配布用A4）</title>
+<meta name="description" content="社会デバッガーを使った実験を「予想→実験→観察→考察」の探究の型で記録する生徒配布用ワークシート。準備物なし・ブラウザのみ。印刷してそのまま配れるA4・1枚。">
+<meta property="og:title" content="社会デバッガー — 探究ワークシート（生徒配布用）">
+<meta property="og:description" content="予想→実験→観察→考察の型で実験を記録するA4・1枚のプリント。印刷して配ればそのまま使える。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  生徒配布用ワークシート（教育3点セットの最後のピース。classroom.html / classroom-slides.html の姉妹版）。
+  画面ではアプリと同じダーク・ターミナル調、印刷（Ctrl/Cmd+P → PDF保存）では白地A4・書き込み欄付き。
+  アプリ本体の i18n/JS には依存しない自己完結ページ。
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;--line:#2a4356;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.6;}
+  .sheet{max-width:800px;margin:0 auto;padding:26px 26px;}
+  h1{font-size:1.2rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 10px;font-size:.78rem;}
+  h2{font-size:.9rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:14px 0 6px;letter-spacing:.05em;}
+  h2 .n{color:var(--ora);}
+  .urlbox{border:1px solid var(--cy);border-radius:6px;padding:6px 12px;margin:8px 0;
+          background:var(--bg1);font-size:.85rem;word-break:break-all;}
+  .urlbox a{color:var(--cy);text-decoration:none;font-weight:bold;}
+  .hint{color:var(--muted);font-size:.74rem;margin:2px 0 4px;}
+  /* 記名欄 */
+  .id{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:8px 0;font-size:.8rem;}
+  .id .fill{border-bottom:1px solid var(--line);min-width:120px;display:inline-block;height:1.1em;}
+  .pages{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;padding:0;list-style:none;font-size:.76rem;}
+  .pages li{border:1px solid var(--bdr);border-radius:20px;padding:2px 12px;color:var(--muted);}
+  /* 手書き記入欄（罫線） */
+  .write{border:1px solid var(--bdr);border-radius:4px;background:var(--bg1);
+         padding:6px 8px 2px;margin:4px 0 8px;}
+  .rule{border-bottom:1px solid var(--line);height:1.5em;margin:0;}
+  .rule.sm{height:1.35em;}
+  table{border-collapse:collapse;width:100%;margin:6px 0;font-size:.8rem;}
+  th,td{border:1px solid var(--bdr);padding:4px 8px;text-align:left;vertical-align:top;}
+  th{color:var(--cy);white-space:nowrap;font-weight:bold;}
+  td.blank{height:1.7em;}
+  .q{color:var(--ora);font-size:.82rem;margin:2px 0;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:6px 12px;margin:8px 0;font-size:.74rem;color:var(--muted);}
+  footer{margin-top:12px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.7rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:10mm;}
+    :root{--bg0:#fff;--bg1:#fff;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;--line:#777;}
+    body{font-size:9.6px;line-height:1.4;-webkit-print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h1{font-size:1.05rem;}
+    h2{margin:8px 0 4px;}
+    .rule{height:1.7em;}
+    .rule.sm{height:1.5em;}
+    td.blank{height:1.9em;}
+    footer{margin-top:8px;}
+    a{color:var(--cy);}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="worksheet.en.html">English version</a></div>
+<div class="langlink" style="top:52px;"><a href="classroom.html">📄 教員ガイドへ</a></div>
+<button class="printbtn" onclick="window.print()">🖨 印刷 / PDF保存</button>
+<div class="sheet">
+
+<h1>社会デバッガー — 探究ワークシート</h1>
+<p class="tagline">あなたの街は、生き残れるか。 — スライダーを動かして、社会が「どう壊れるか」を実験しよう</p>
+
+<div class="urlbox">▶ アプリを開く: <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+
+<div class="id">
+  <span>名前: <span class="fill" style="min-width:180px;"></span></span>
+  <span>日付: <span class="fill" style="min-width:110px;"></span></span>
+</div>
+<p class="hint">今日のページ（動かすテーマ）を1つ丸で囲もう:</p>
+<ul class="pages">
+  <li>PAGE 1 情報空間</li><li>PAGE 2 地域インフラ</li><li>PAGE 3 認知リカバリー</li><li>PAGE 4 ステークホルダー</li>
+</ul>
+
+<h2><span class="n">①</span> 予想（仮説）</h2>
+<p class="hint">どのパラメータ（スライダー）を動かすと、街はどうなると思う? 動かす前に自分の言葉で書こう。</p>
+<div class="write">
+  <div class="rule"></div><div class="rule"></div><div class="rule"></div>
+</div>
+
+<h2><span class="n">②</span> 実験（動かした記録）</h2>
+<p class="hint">動かしたパラメータと、その値を「前 → 後」でメモしよう。</p>
+<table>
+  <tr><th>動かしたパラメータ</th><th>前の値</th><th>後の値</th></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+</table>
+
+<h2><span class="n">③</span> 観察（何が起きた?）</h2>
+<p class="hint">バナー（警告メッセージ）・数値・グラフはどう変わった? 見たままを書こう。</p>
+<div class="write">
+  <div class="rule"></div><div class="rule"></div><div class="rule"></div>
+</div>
+
+<h2><span class="n">④</span> 考察（意味を考える）</h2>
+<p class="q">現実の社会で言うと、これは何にあたる?</p>
+<div class="write">
+  <div class="rule sm"></div><div class="rule sm"></div>
+</div>
+<p class="q">1つだけ巻き戻せるなら、何を変える? そしてなぜ?</p>
+<div class="write">
+  <div class="rule sm"></div><div class="rule sm"></div>
+</div>
+
+<div class="note">
+  このアプリは<b>架空のシミュレーション</b>です。実在の地名・人名・進行中の政治的話題は出てきません。
+  「特定の誰か・どこかの話」ではなく、<b>「どの社会にも起こりうる構造の話」</b>として考えよう。
+</div>
+
+<footer>
+  結果を人に見せるときは、<b>実験の記録として</b>共有しよう（特定の人・地域・政党を名指しして評価する使い方はしない）。<br>
+  ※このワークシートはブラウザの印刷（Ctrl/Cmd + P）でA4のPDFとして保存・配布できます。 — 社会デバッガー（無料・非営利・オープンソース）
+</footer>
+
+</div>
+</body>
+</html>
