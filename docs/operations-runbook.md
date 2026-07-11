@@ -113,6 +113,10 @@ npm run validate:weekly   # 末尾に「在庫: 残りN週（最新: 2026-Wxx）
 
 - Pages はサーバー障害以外ではコード側が原因になりにくい（`web/` をそのまま公開するだけ）。稼働状況は事業者の status ページに依存する（＝一般的な対応）。根拠: [`../.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) の単純構成。
 
+**404 ページの挙動**:
+
+- 存在しないパスへのアクセスは [`../web/404.html`](../web/404.html) が返る（GitHub Pages がルートの `404.html` を自動採用）。SW 制御下のクライアントはオフライン時に navigate フェッチを `index.html` へフォールバックするため、この 404 が表示されるのはオンライン直アクセス時に限られる。根拠: [`../web/sw.js`](../web/sw.js) `fetch` ハンドラ（navigate/document の `.catch(() => caches.match('./index.html'))`）。
+
 ---
 
 ## 3. AWS(CloudFront) 側だけ古い・落ちている
