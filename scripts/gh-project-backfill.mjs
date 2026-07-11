@@ -55,15 +55,16 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T70)',
+    title: 'Delegation sprints (T25–T84)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), and the release-prep sprint (T67–T70).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), and the methodology-audit / self-improvement sprint (T79–T84).',
   },
 ];
 // NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
-// 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)'. If an older milestone
-// with any of those prior titles already exists in the repo, either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T70)'
+// 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)', then
+// 'Delegation sprints (T25–T70)'. If an older milestone with any of those prior titles
+// already exists in the repo, either rename it via:
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T84)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -524,6 +525,104 @@ const TASKS = [
     ['area:marketing'],
     true,
     'Cards: main announcement / iPhone 3-tap PWA install / Android+PC install / weekly teaser (card 4 gated until weekly feature is web-enabled). Post copy in docs/announce-post.md.',
+  ],
+  [
+    'T71',
+    'English announce-card variants (?lang=en, 8 cards total) + announce-post.en.md',
+    ['area:marketing'],
+    true,
+    'All 4 cards regenerated with ?lang=en suffix; announce-post.en.md added for Show HN / international outreach.',
+  ],
+  [
+    'T72',
+    'Export-dictionary consistency test: CI checks all 38 buildExportData() fields against DATA-DICTIONARY',
+    ['area:testing'],
+    true,
+    '38 fields verified present in docs/DATA-DICTIONARY.md and .en.md on every CI run. Zero missing fields on first run. Test count reached 30.',
+  ],
+  [
+    'T73',
+    'Extend verify smoke: ≡ menu open/close, PWA install modal, classroom/privacy nav links',
+    ['area:testing'],
+    true,
+    'Recently added UI elements brought under the console-zero gate; window.open stubbed for link assertions.',
+  ],
+  [
+    'T74',
+    'Re-sync Zenn articles #1 and #2 (PWA completion, CSP, Node 20 latent bug story)',
+    ['area:docs'],
+    true,
+    'Article #2 updated with three real incidents (vendor, CSP file:// check, Dependabot Node-version bug). published:false kept.',
+  ],
+  [
+    'T75',
+    'Freshen launch-en.md and store-listing.md (PWA/ARCHITECTURE.en/real bugs)',
+    ['area:docs'],
+    true,
+    'launch-en.md expanded with PWA/CSP/Node-20 real stories; store-listing.md screenshot section updated to make store-shots.',
+  ],
+  [
+    'T76',
+    'AGENTS.md update: Opus vs Sonnet model split, sandbox realities, full-delegation cycle',
+    ['area:docs'],
+    true,
+    'Clarifies which tasks go to Opus (creative) vs Sonnet (mechanical); documents Write-denied sandbox behaviour and the complete delegation cycle.',
+  ],
+  [
+    'T77',
+    'Portfolio freshness: GitHub Issues backfill to 77 (T67–T70), ARCHITECTURE.en + cv-highlights updates',
+    ['area:docs'],
+    true,
+    'Added 4 issues to backfill TASKS; milestone description updated to T25–T70; github-project.md count updated to 77. Parent corrected 2 stale claims in ARCHITECTURE.en and AGENTS.md.',
+  ],
+  [
+    'T78',
+    'README ja/en: "Install as app (PWA)" section aligned with ≡ menu and announce cards',
+    ['area:docs'],
+    true,
+    'iOS Safari / Chrome / Edge install steps added; references card2 from the announce-card pipeline.',
+  ],
+  [
+    'T79',
+    'METHODOLOGY audit: zero formula drift confirmed, 3 minor notation fixes',
+    ['area:docs'],
+    true,
+    'Every formula, parameter definition, and goal condition in docs/METHODOLOGY.md cross-checked against engine.js and ui.js. Zero judgment-required items found.',
+  ],
+  [
+    'T80',
+    'DEVELOPMENT.md / .en.md brought up to date (vendor, CSP, 5 scripts, Node 22, auto-rotate)',
+    ['area:docs'],
+    true,
+    'Parent review caught 1 version-number typo that the subagent missed.',
+  ],
+  [
+    'T81',
+    'CHANGELOG entry for T65–T78 + SECURITY.md vulnerability reporting policy',
+    ['area:docs'],
+    true,
+    'SECURITY.md: responsible disclosure window, scope definition, response commitment. OSS hygiene for a public repo.',
+  ],
+  [
+    'T82',
+    'Auto-create ITIL work-order issue on weekly-rotate failure (idempotent, permanent)',
+    ['area:infra'],
+    true,
+    'Appended failure hook to weekly-rotate.yml; gh issue create with symptom/triage/action/paste-prompt template. Deduplicated per week to avoid duplicates on repeated failures.',
+  ],
+  [
+    'T83',
+    'Freshness-watch test suite (tests/freshness.test.mjs) + make vendor-check',
+    ['area:testing'],
+    true,
+    '4 fail assertions (sw/app version drift in DEVELOPMENT ja+en) and 2 warn checks (CHANGELOG/backfill T-number lag). Test count reached 36. First run caught Chart.js 4.5.1 upstream and 2 real backlog items.',
+  ],
+  [
+    'T84',
+    'Learnings ledger docs/learnings.md (IN-01–IN-09) + ratchet policy in CLAUDE.md',
+    ['area:docs'],
+    true,
+    'Nine past incidents recorded in incident→root-cause→permanent-guard format. Ratchet policy: every bug earns one permanent guard. Ledger by Sonnet; policy line added by the parent session.',
   ],
 ];
 
