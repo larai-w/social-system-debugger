@@ -144,7 +144,7 @@
 ## 動作環境 / Requirements
 
 - **スタンドアロン型SPA** — バンドル不要。フロント資産は `web/` 配下（Capacitor の `webDir` 兼 配信元）
-- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/)（CDN読み込み）
+- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/)（web/vendor/ にセルフホスト＝外部依存なし。読み込み失敗時もグレースフルに動作）
 - 推奨ブラウザ: Chrome / Edge / Safari / Firefox 最新版（スマートフォン対応）
 
 ```bash

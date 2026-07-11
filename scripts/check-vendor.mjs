@@ -17,9 +17,10 @@ import { fileURLToPath } from 'node:url';
 const vendorPath = fileURLToPath(new URL('../web/vendor/chart.umd.min.js', import.meta.url));
 
 // ── ローカル版数の抽出 ─────────────────────────────────────────────────────
-// バナー例: * Original file: /npm/chart.js@4.4.0/dist/chart.umd.js
+// バナー例1（標準）: * Chart.js v4.5.1 ／ 例2（jsdelivrラッパー）: /npm/chart.js@4.4.0/dist/...
 const vendorSrc = readFileSync(vendorPath, 'utf8').slice(0, 500); // バナーは先頭部のみ見る
-const localMatch = vendorSrc.match(/chart\.js@(\d+\.\d+\.\d+)/);
+const localMatch =
+  vendorSrc.match(/Chart\.js v(\d+\.\d+\.\d+)/i) || vendorSrc.match(/chart\.js@(\d+\.\d+\.\d+)/);
 if (!localMatch) {
   console.error(
     '❌ web/vendor/chart.umd.min.js のバナーから版数を抽出できませんでした。\n' +

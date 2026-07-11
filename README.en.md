@@ -144,7 +144,7 @@ Sharing here is designed as an **experiment link for observing structure togethe
 ## Requirements
 
 - **No build step** — classic scripts under `web/`; serve locally and open
-- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/) (loaded from CDN, with graceful degradation when blocked)
+- HTML5 / Canvas API / [Chart.js v4](https://www.chartjs.org/) (self-hosted under web/vendor/ — no external dependency; degrades gracefully if it fails to load)
 - Recommended browsers: latest Chrome / Edge / Safari / Firefox (mobile supported)
 
 ```bash
