@@ -24,7 +24,8 @@
     "cap:add:android": "cap add android",
     "cap:open:ios": "cap open ios",
     "cap:open:android": "cap open android",
-    "serve": "python3 -m http.server 8000 --directory web"
+    "serve": "python3 -m http.server 8000 --directory web",
+    "check:vendor": "node scripts/check-vendor.mjs"
   },
   "repository": {
     "type": "git",

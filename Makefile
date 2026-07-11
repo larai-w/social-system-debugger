@@ -4,7 +4,7 @@
 GITHUB_REPO ?= larai-w/social-system-debugger
 
 .PHONY: help setup hooks serve test check verify lint format gen-og gen-icons classroom-pdf store-shots announce-cards reels synth handoff protect \
-        aws-bootstrap aws-deploy aws-wire ios android
+        aws-bootstrap aws-deploy aws-wire ios android vendor-check
 
 help: ## このヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -70,6 +70,9 @@ protect: ## main をブランチ保護（PR＋CI必須。要 gh admin）
 
 gh-project: ## 開発履歴を GitHub Issues/Milestones へバックフィル（英語・要 gh。手順: docs/github-project.md）
 	node scripts/gh-project-backfill.mjs
+
+vendor-check: ## Chart.js の新版有無を確認（手動・要ネットワーク）
+	npm run check:vendor
 
 ## ── AWS（要 AWS 認証情報 / gh CLI）────────────────
 aws-bootstrap: ## 初回のみ: CDK ブートストラップ
