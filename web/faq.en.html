@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Debugger — Frequently Asked Questions (FAQ)</title>
+<meta name="description" content="Social Debugger FAQ. The difference between using it in the browser, adding it to your home screen (PWA), and the store app; where data is stored; offline support; cost; and use in class and research.">
+<!--
+  Frequently Asked Questions (FAQ). Explains the difference between browser / PWA / store app for users.
+  Dark terminal look on screen, white A4 on print (Ctrl/Cmd+P → save as PDF).
+  Self-contained page that does not depend on the app's i18n/JS (same style family as privacy.en.html).
+  Facts are based on the implementation (no exaggeration, no future promises). The store app is not yet
+  distributed, so it is shown only as "coming soon" with no feature comparison. Weekly scenarios /
+  notifications are gated / native-only and are intentionally not mentioned here.
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--bg2:#0e1626;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.65;}
+  .sheet{max-width:860px;margin:0 auto;padding:28px 26px;}
+  h1{font-size:1.25rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 14px;font-size:.8rem;}
+  h2{font-size:.92rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:20px 0 8px;letter-spacing:.06em;}
+  ol,ul{margin:6px 0;padding-left:1.4em;}
+  li{margin:3px 0;}
+  p{margin:6px 0;}
+  b{color:var(--tx);}
+  a{color:var(--cy);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:8px 12px;margin:10px 0;font-size:.78rem;color:var(--muted);}
+  /* ── 3-form comparison table ─────────────────── */
+  .cmp-wrap{overflow-x:auto;margin:10px 0 4px;}
+  table.cmp{border-collapse:collapse;width:100%;font-size:.8rem;min-width:560px;}
+  table.cmp th,table.cmp td{border:1px solid var(--bdr);padding:8px 10px;text-align:left;
+        vertical-align:top;}
+  table.cmp thead th{background:var(--bg2);color:var(--cy);letter-spacing:.03em;}
+  table.cmp thead th:first-child{color:var(--muted);}
+  table.cmp tbody th{background:var(--bg1);color:var(--tx);font-weight:normal;white-space:nowrap;}
+  .yes{color:var(--grn);}
+  .soon{color:var(--ora);}
+  .cell-muted{color:var(--muted);}
+  footer{margin-top:20px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.72rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:11mm;}
+    :root{--bg0:#fff;--bg1:#fff;--bg2:#f2f2f2;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;}
+    body{font-size:10.2px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h2{margin:10px 0 5px;}
+    a{color:var(--cy);}
+    table.cmp{font-size:9px;}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="faq.html">日本語版</a></div>
+<button class="printbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+<div class="sheet">
+
+<h1>Social Debugger — Frequently Asked Questions (FAQ)</h1>
+<p class="tagline">In short: free, no sign-up. Use it straight in your browser. Add it to your home screen and it launches full-screen and works offline.</p>
+
+<h2>1. What is the difference between "browser", "PWA", and "store app"?</h2>
+<p>It is the same simulator inside. Only <em>how you launch it</em> differs. Today you can pick between <b>use it in the browser</b> and <b>add it to your home screen (PWA)</b>. The store app is <b>coming soon</b>.</p>
+<div class="cmp-wrap">
+<table class="cmp">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Use in the browser</th>
+      <th>Add to home screen (PWA)</th>
+      <th>Store app</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Install</th>
+      <td>Not needed</td>
+      <td>"Add to Home Screen" / "Install" from your browser</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>How to launch</th>
+      <td>Open the URL</td>
+      <td>From the home-screen icon, like an app</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>Offline</th>
+      <td class="yes">Yes (after you open it once)</td>
+      <td class="yes">Yes (after you open it once)</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>Full screen</th>
+      <td>Inside a browser tab</td>
+      <td class="yes">Yes, launches full-screen</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>Cost</th>
+      <td class="yes">Free</td>
+      <td class="yes">Free</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>Availability</th>
+      <td class="yes">Available now</td>
+      <td class="yes">Available now</td>
+      <td class="soon">Coming soon</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>How to add it to your home screen (PWA):</p>
+<ul>
+  <li><b>iPhone / iPad (Safari):</b> Share button (box with ↑) → "Add to Home Screen"</li>
+  <li><b>Android (Chrome):</b> Menu (⋮) → "Install app"</li>
+  <li><b>PC (Chrome / Edge):</b> the install icon at the right end of the address bar, or Menu → "Install"</li>
+</ul>
+
+<h2>2. Where is my data stored?</h2>
+<p>Settings, your town's name, and your records are stored in your browser's localStorage, <b>on your device only</b>. Nothing is sent to our servers.</p>
+<ul>
+  <li>From the ≡ menu's "Export", you can take out parameters and metrics as JSON / CSV.</li>
+  <li>Clearing your browser's site data removes these records.</li>
+  <li>For details, see the <a href="privacy.en.html">Privacy Policy</a>.</li>
+</ul>
+
+<h2>3. Does it work offline?</h2>
+<p>Yes. <b>Once you open it online</b>, a Service Worker caches the page and scripts, so it works offline afterward. Adding it to your home screen (PWA) makes launching more reliable.</p>
+<ul>
+  <li>The charting library (Chart.js) loads from an external CDN. Even where it cannot load, the main features — sliders, tabs, sharing — still work (only the charts are omitted).</li>
+</ul>
+
+<h2>4. Is it free? Do I need to register?</h2>
+<ul>
+  <li>It is <b>free</b>. There is no cost at all.</li>
+  <li>No <b>sign-up or account</b> is needed. You do not enter an email address or anything.</li>
+  <li>There are <b>no ads</b>.</li>
+  <li>It is <b>open source</b> (<a href="https://github.com/larai-w/social-system-debugger">larai-w/social-system-debugger</a>).</li>
+</ul>
+
+<h2>5. Can I use it in class or research?</h2>
+<p>Yes. Non-commercial, educational use is welcome. The following materials are available.</p>
+<ul>
+  <li><a href="classroom.en.html">One-page classroom guide (prints to A4 PDF)</a></li>
+  <li>Methodology: <a href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.en.md">METHODOLOGY.en.md</a></li>
+  <li>Export field reference: <a href="https://github.com/larai-w/social-system-debugger/blob/main/docs/DATA-DICTIONARY.en.md">DATA-DICTIONARY.en.md</a></li>
+</ul>
+
+<div class="note">
+  This app is a free, non-profit, open-source project. It is not about any real place or person or any
+  specific political situation — its purpose is to let you experience "structures any society can fall into".
+</div>
+
+<footer>
+  * The above is based on the current implementation. The store app is coming soon; we cannot promise a release date.<br>
+  * You can save this page as an A4 PDF via your browser's print (Ctrl/Cmd + P).
+</footer>
+
+</div>
+</body>
+</html>

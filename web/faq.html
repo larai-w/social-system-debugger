@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>社会デバッガー — よくある質問（FAQ）</title>
+<meta name="description" content="社会デバッガーのよくある質問。ブラウザでそのまま／ホーム画面に入れる（PWA）／ストアアプリの違い、データの保存先、オフライン動作、無料か、授業・研究での利用について。">
+<!--
+  よくある質問（FAQ）ページ。ブラウザ／PWA／ストア版の違いを利用者向けに説明する。
+  画面ではアプリと同じダーク・ターミナル調、印刷（Ctrl/Cmd+P → PDF保存）では白地A4。
+  アプリ本体の i18n/JS には依存しない自己完結ページ（privacy.html と同系）。
+  事実は実装に基づく（誇張・未来の約束なし）。ストア版は未配布のため「準備中」表示のみで機能差は書かない。
+  週次シナリオ・通知はゲート中/ネイティブ限定のため、本ページでは一切触れない。
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--bg2:#0e1626;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.65;}
+  .sheet{max-width:860px;margin:0 auto;padding:28px 26px;}
+  h1{font-size:1.25rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 14px;font-size:.8rem;}
+  h2{font-size:.92rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:20px 0 8px;letter-spacing:.06em;}
+  ol,ul{margin:6px 0;padding-left:1.4em;}
+  li{margin:3px 0;}
+  p{margin:6px 0;}
+  b{color:var(--tx);}
+  a{color:var(--cy);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:8px 12px;margin:10px 0;font-size:.78rem;color:var(--muted);}
+  /* ── 3形態の比較表 ─────────────────────────── */
+  .cmp-wrap{overflow-x:auto;margin:10px 0 4px;}
+  table.cmp{border-collapse:collapse;width:100%;font-size:.8rem;min-width:560px;}
+  table.cmp th,table.cmp td{border:1px solid var(--bdr);padding:8px 10px;text-align:left;
+        vertical-align:top;}
+  table.cmp thead th{background:var(--bg2);color:var(--cy);letter-spacing:.03em;}
+  table.cmp thead th:first-child{color:var(--muted);}
+  table.cmp tbody th{background:var(--bg1);color:var(--tx);font-weight:normal;white-space:nowrap;}
+  .yes{color:var(--grn);}
+  .soon{color:var(--ora);}
+  .cell-muted{color:var(--muted);}
+  footer{margin-top:20px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.72rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:11mm;}
+    :root{--bg0:#fff;--bg1:#fff;--bg2:#f2f2f2;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;}
+    body{font-size:10.2px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h2{margin:10px 0 5px;}
+    a{color:var(--cy);}
+    table.cmp{font-size:9px;}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="faq.en.html">English version</a></div>
+<button class="printbtn" onclick="window.print()">🖨 印刷 / PDF保存</button>
+<div class="sheet">
+
+<h1>社会デバッガー — よくある質問（FAQ）</h1>
+<p class="tagline">短くまとめると: 無料・登録なし。ブラウザでそのまま使えます。ホーム画面に入れれば全画面＆オフラインでも動きます。</p>
+
+<h2>1. 「ブラウザ版」「PWA版」「ストア版」は何が違う?</h2>
+<p>中身は同じシミュレーターです。「どうやって起動するか」だけが違います。今日すぐ選べるのは <b>ブラウザでそのまま</b> と <b>ホーム画面に入れる（PWA）</b> の2形態。ストアアプリ版は<b>準備中</b>です。</p>
+<div class="cmp-wrap">
+<table class="cmp">
+  <thead>
+    <tr>
+      <th></th>
+      <th>ブラウザでそのまま</th>
+      <th>ホーム画面に入れる（PWA）</th>
+      <th>ストアアプリ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>インストール</th>
+      <td>不要</td>
+      <td>ブラウザから「ホーム画面に追加」/「インストール」</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>起動方法</th>
+      <td>URL を開く</td>
+      <td>ホーム画面のアイコンから、アプリのように</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>オフライン</th>
+      <td class="yes">◯（一度開けば動く）</td>
+      <td class="yes">◯（一度開けば動く）</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>全画面</th>
+      <td>ブラウザのタブ内</td>
+      <td class="yes">◯ 全画面で起動</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>費用</th>
+      <td class="yes">無料</td>
+      <td class="yes">無料</td>
+      <td class="cell-muted">—</td>
+    </tr>
+    <tr>
+      <th>提供状況</th>
+      <td class="yes">今すぐ使える</td>
+      <td class="yes">今すぐ使える</td>
+      <td class="soon">準備中</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>ホーム画面への入れ方（PWA）:</p>
+<ul>
+  <li><b>iPhone / iPad（Safari）:</b> 共有ボタン（□に↑）→「ホーム画面に追加」</li>
+  <li><b>Android（Chrome）:</b> メニュー（⋮）→「アプリをインストール」</li>
+  <li><b>PC（Chrome / Edge）:</b> アドレスバー右端のインストールアイコン、またはメニュー→「インストール」</li>
+</ul>
+
+<h2>2. データはどこに保存されますか?</h2>
+<p>設定・街の名前・記録などは、ブラウザの localStorage に、<b>あなたの端末内にのみ</b>保存されます。こちらのサーバーには送信されません。</p>
+<ul>
+  <li>≡メニューの「エクスポート」から、パラメータや指標を JSON / CSV で持ち出せます。</li>
+  <li>ブラウザのサイトデータを削除すると、これらの記録は消えます。</li>
+  <li>詳しくは <a href="privacy.html">プライバシーポリシー</a> をご覧ください。</li>
+</ul>
+
+<h2>3. オフラインで動きますか?</h2>
+<p>はい。<b>一度オンラインで開けば</b>、Service Worker がページとスクリプトをキャッシュするので、その後はオフラインでも動きます。ホーム画面に入れておく（PWA）と、より安定して起動できます。</p>
+<ul>
+  <li>グラフ描画ライブラリ（Chart.js）は外部 CDN から読み込みます。読み込めない環境でも、スライダー・タブ・共有などの主要機能は動きます（グラフだけが省略されます）。</li>
+</ul>
+
+<h2>4. 無料ですか? 登録は必要ですか?</h2>
+<ul>
+  <li><b>無料</b>です。料金は一切かかりません。</li>
+  <li><b>登録・アカウントは不要</b>です。メールアドレスなどの入力もいりません。</li>
+  <li><b>広告はありません</b>。</li>
+  <li><b>オープンソース</b>です（<a href="https://github.com/larai-w/social-system-debugger">larai-w/social-system-debugger</a>）。</li>
+</ul>
+
+<h2>5. 授業や研究で使えますか?</h2>
+<p>はい。非営利・教育目的での利用を歓迎します。次の資料があります。</p>
+<ul>
+  <li><a href="classroom.html">授業で使える1枚ガイド（A4印刷 → PDF）</a></li>
+  <li>方法論の説明: <a href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md">METHODOLOGY.md</a></li>
+  <li>エクスポート項目の対応表: <a href="https://github.com/larai-w/social-system-debugger/blob/main/docs/DATA-DICTIONARY.md">DATA-DICTIONARY.md</a></li>
+</ul>
+
+<div class="note">
+  このアプリは無料・非営利のオープンソースです。実在の地名・人名や特定の政局を扱うものではなく、
+  「どの社会にも起こる構造」を体験してもらうことが目的です。
+</div>
+
+<footer>
+  ※ 記載内容は現在の実装に基づきます。ストアアプリ版は準備中で、配布時期はお約束できません。<br>
+  ※ このページはブラウザの印刷（Ctrl/Cmd + P）でA4のPDFとして保存できます。
+</footer>
+
+</div>
+</body>
+</html>

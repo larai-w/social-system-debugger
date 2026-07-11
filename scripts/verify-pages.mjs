@@ -53,10 +53,10 @@ async function checkSlides(page) {
   return errs;
 }
 
-// announce-cards: #card1〜#card4 が存在（クエリ有無は呼び出し側で ?lang=en も検証）
+// announce-cards: #card1〜#card5 が存在（クエリ有無は呼び出し側で ?lang=en も検証）
 async function checkAnnounceCards(page) {
   const errs = [];
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 5; i++) {
     const found = await page.$(`#card${i}`);
     if (!found) errs.push(`#card${i} が存在しない`);
   }
@@ -92,6 +92,19 @@ const targets = [
   },
   { name: 'privacy.html', url: fileUrl(web('privacy.html')), check: checkNoop },
   { name: 'privacy.en.html', url: fileUrl(web('privacy.en.html')), check: checkNoop },
+  // faq: Console ゼロ ＋ langlink の相互リンク先が実在（checkClassroom を流用）
+  {
+    name: 'faq.html',
+    url: fileUrl(web('faq.html')),
+    check: (p) => checkClassroom(p, web('faq.html')),
+  },
+  {
+    name: 'faq.en.html',
+    url: fileUrl(web('faq.en.html')),
+    check: (p) => checkClassroom(p, web('faq.en.html')),
+  },
+  // 404.html: Console ゼロのみ
+  { name: '404.html', url: fileUrl(web('404.html')), check: checkNoop },
   {
     name: 'announce-cards.html',
     url: fileUrl(promo('announce-cards.html')),
