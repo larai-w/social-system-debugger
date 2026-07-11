@@ -95,6 +95,9 @@
 | T84 | 学びの台帳 `docs/learnings.md`＋ラチェット方針（**Sonnet委任10件目**＋直営） | インシデント9件を制度化（バグ1件=恒久ガード1件） | ✅ |
 | T85 | Chart.js 4.4.0→4.5.1 更新（直営） | vendor-check の初検出に対応。check-vendor の regex を標準バナー対応に（検出→修正の実例=IN候補） | ✅ |
 | T86 | 鮮度warn解消＝CHANGELOG T79〜T84＋バックフィル T71〜T84=91件（**Sonnet委任11件目**） | **鮮度見張りの warn を起点にした初の自動駆動スプリント** | ✅ |
+| T87 | 生徒用ワークシート ja/en＋PDF 4枚体制（**Opus委任33件目**） | 教育3点セット完成。親レビューで ja ガイドのA4溢れを検出→langlink 導線に切替 | ✅ |
+| T88 | 静的ページ検証 `verify:pages`（**Opus委任34件目**） | 最後の未検証面（classroom/slides/privacy/cards/worksheet）を CI 化 | ✅ |
+| T89 | `web/404.html`＋runbook 追記（**Sonnet委任12件目**） | 公開サイトの仕上げ（Pages 自動採用・SW との関係も文書化） | ✅ |
 
 ## 実施順
 
