@@ -87,6 +87,9 @@
 | T76 | dependabot 網羅確認＋AGENTS.md 現行化（**Sonnet委任5件目**） | root npm は監視済みと確認。委任ルールの文書を実運用に一致 | ✅ |
 | T77 | ポートフォリオ鮮度バッチ＝77 issues 化ほか（**Sonnet委任6件目**） | 鮮度維持サイクル3周目 | ✅ |
 | T78 | README ja/en に PWA インストール節（**Opus委任30件目**） | 告知と README の導線整合 | ✅ |
+| T79 | METHODOLOGY 監査＝全式照合・**ドリフトゼロ確認**（**Opus委任31件目**） | 研究者向け「検証可能」の約束の裏付け。軽微修正3点・要判断0件 | ✅ |
+| T80 | DEVELOPMENT ja/en 現行化（**Sonnet委任7件目**） | 開発ガイドの鮮度（vendor/CSP/スクリプト5本/Node22） | ✅ |
+| T81 | CHANGELOG T65〜T78＋SECURITY.md（**Sonnet委任8件目**） | 履歴鮮度＋公開リポジトリの OSS 衛生（脆弱性窓口の明示） | ✅ |
 
 ## 実施順
 
