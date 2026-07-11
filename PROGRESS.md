@@ -98,6 +98,9 @@
 | T87 | 生徒用ワークシート ja/en＋PDF 4枚体制（**Opus委任33件目**） | 教育3点セット完成。親レビューで ja ガイドのA4溢れを検出→langlink 導線に切替 | ✅ |
 | T88 | 静的ページ検証 `verify:pages`（**Opus委任34件目**） | 最後の未検証面（classroom/slides/privacy/cards/worksheet）を CI 化 | ✅ |
 | T89 | `web/404.html`＋runbook 追記（**Sonnet委任12件目**） | 公開サイトの仕上げ（Pages 自動採用・SW との関係も文書化） | ✅ |
+| T90 | FAQ ページ ja/en＋比較カード card5＝計10枚（**Opus委任35件目**＋直営メニュー導線） | 「Web版とアプリ版の違い」の空白を解消（週次ゲート遵守の正直な3形態比較） | ✅ |
+| T91 | 帳簿バッチ＝CHANGELOG T85〜T89・96 issues・IN-10/11（**Sonnet委任13件目**） | 見張り指示の履行＋ラチェット台帳の追記義務 | ✅ |
+| T92 | verify.mjs モバイルパス＝4パス体制（**Opus委任36件目**） | 主要ユーザー=スマホの検証穴を CI 化 | ✅ |
 
 ## 実施順
 
