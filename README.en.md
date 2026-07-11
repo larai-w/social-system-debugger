@@ -40,6 +40,8 @@ This site is a PWA (installable web app). Once installed it launches full-screen
 
 The same guide is available in the app from the ≡ menu under "📲 Install as an app".
 
+❓ **[FAQ (browser vs PWA vs store app, where data is stored, is it free)](https://larai-w.github.io/social-system-debugger/faq.en.html)** — [日本語版 FAQ](https://larai-w.github.io/social-system-debugger/faq.html)
+
 ---
 
 ## The 4-Layer Architecture

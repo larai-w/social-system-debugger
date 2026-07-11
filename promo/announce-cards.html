@@ -6,7 +6,7 @@
 <title>社会デバッガー — X 告知用画像カード（PWA インストール告知）</title>
 <meta name="description" content="ホーム画面に置ける無料の社会シミュレーターであることを X で告知するための画像カード素材。ダーク・ターミナル調・自己完結。">
 <!--
-  X 告知用 画像カード（4枚・各 1200×675）。scripts/gen-announce-cards.mjs で #card1〜#card4 を PNG 撮影する。
+  X 告知用 画像カード（5枚・各 1200×675）。scripts/gen-announce-cards.mjs で #card1〜#card5 を PNG 撮影する。
   用途: 「ホーム画面に置ける無料の社会シミュレーター（PWA インストール可能）」を X で告知する。
   英語カード版: URL に ?lang=en を付ける（Show HN / 海外向け撮影用）。reel-30s.html の流儀に合わせる。
   忠実性: card2/card3 のインストール手順は web/index.html の pwaInstallModal（pwa_body, ja/en）の実文言と一致させている。
@@ -14,6 +14,7 @@
     - Android（Chrome）: メニュー（⋮）→「アプリをインストール」
     - PC（Chrome / Edge）: アドレスバー右端のインストールアイコン、またはメニュー→「インストール」
   card4 は content/weekly/2026-W51.json の実タイトル（ja/en とも実物を転記）を例示。
+  card5 は「ブラウザ／PWA／ストア」の3形態の違い（ストアは準備中＝機能差は書かない）。faq.html と整合。
   en の免責1行は reel-30s.html / classroom.en.html の既存文言を流用（新造しない）。
   依存ゼロ（外部フォント/画像なし・絵文字と CSS 図形のみ）。promo/ 配下＝本番配信(web/)対象外。
   実装: 既定は ja（クエリなしで完全不変）。?lang=en のとき、data-en 属性を持つ要素の
@@ -115,6 +116,23 @@
   .reward{display:flex;align-items:center;gap:16px;font-size:30px;color:var(--tx);}
   .reward .medal{font-size:38px;}
   .disc{color:var(--grn);}
+
+  /* 3形態の比較（card5） */
+  .cols{display:flex;gap:20px;align-items:stretch;}
+  .col{flex:1 1 0;background:var(--bg2);border:1px solid var(--bdr);border-radius:14px;
+    padding:26px 24px;display:flex;flex-direction:column;gap:14px;}
+  .col.on{border-color:var(--grn);box-shadow:0 0 16px rgba(62,245,140,.14);}
+  .col.soon{border-color:var(--bdr);opacity:.9;}
+  .col .ctitle{font-size:30px;color:var(--tx);line-height:1.24;font-weight:700;min-height:74px;}
+  .col.on .ctitle{color:var(--cy);}
+  .col .cnote{font-size:24px;color:var(--muted);line-height:1.35;}
+  .col .spacer2{flex:1 1 auto;}
+  .col .badge{align-self:flex-start;border-radius:999px;padding:10px 20px;font-size:26px;
+    letter-spacing:.04em;}
+  .col.on .badge{border:1px solid var(--grn);color:var(--grn);background:rgba(62,245,140,.08);}
+  .col.soon .badge{border:1px solid var(--ora);color:var(--ora);background:rgba(255,183,77,.08);}
+  .col .check{font-size:34px;color:var(--grn);line-height:1;}
+  .col.soon .check{color:var(--ora);}
 </style>
 </head>
 <body>
@@ -214,6 +232,39 @@
   <div class="spacer"></div>
   <div class="footer" data-en="The same weekly scenario plays on the web and in the app.<br>*Not about anyone specific — structures any society can fall into (fictional simulation).">Webでもアプリでも、同じ週次シナリオが遊べます。<br>
     ※特定の誰かではなく、どの社会にも起こる構造の話です。</div>
+</section>
+
+<!-- ══════════ CARD 5 — 3形態の違い ══════════ -->
+<section class="card" id="card5">
+  <div class="kicker"><span class="dot"></span><span data-en="Three ways to use it">3つの使い方</span></div>
+  <div style="height:16px"></div>
+  <h1 style="font-size:46px" data-en="Same simulator,<br>your choice of launch">中身は同じ、<br>起動のしかたを選ぶだけ</h1>
+  <div style="height:30px"></div>
+  <div class="cols">
+    <div class="col on">
+      <div class="check">✓</div>
+      <div class="ctitle" data-en="Use in the browser">ブラウザでそのまま</div>
+      <div class="cnote" data-en="Just open the URL. Nothing to install.">URLを開くだけ。<br>インストール不要。</div>
+      <div class="spacer2"></div>
+      <div class="badge" data-en="Available now">今すぐ使える</div>
+    </div>
+    <div class="col on">
+      <div class="check">✓</div>
+      <div class="ctitle" data-en="Add to home screen (PWA)">ホーム画面に入れる（PWA）</div>
+      <div class="cnote" data-en="Full-screen · works offline · free">全画面・オフライン可・<br>無料。</div>
+      <div class="spacer2"></div>
+      <div class="badge" data-en="Available now">今すぐ使える</div>
+    </div>
+    <div class="col soon">
+      <div class="check">⌛</div>
+      <div class="ctitle" data-en="Store app">ストアアプリ</div>
+      <div class="cnote" data-en="For iOS / Android.">iOS / Android 向け。</div>
+      <div class="spacer2"></div>
+      <div class="badge" data-en="Coming soon">準備中</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="footer" data-en="Both web forms are free with no sign-up. See the FAQ for details.">どちらも無料・登録なし。詳しくは FAQ をご覧ください。</div>
 </section>
 
 <script>

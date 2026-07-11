@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // X 告知用 画像カードの生成（PWA インストール告知素材）。
-//   promo/announce-cards.html の #card1〜#card4 を 1200×675 PNG で dist/announce/ へ撮影する。
-//   ja（クエリなし）と en（?lang=en）の両方を撮影＝計 8 枚。
+//   promo/announce-cards.html の #card1〜#card5 を 1200×675 PNG で dist/announce/ へ撮影する。
+//   ja（クエリなし）と en（?lang=en）の両方を撮影＝計 10 枚。
 //   使い方: npm run gen:announce
-//     出力: dist/announce/announce-card{1..4}.png（ja） / announce-card{1..4}.en.png（en）
+//     出力: dist/announce/announce-card{1..5}.png（ja） / announce-card{1..5}.en.png（en）
 //   gen-screenshot.mjs と同じ file:// 読み込み。外部依存ゼロ（Playwright のみ）。
 //   自己検証: Console エラーで非0終了・各PNGが 30KB 超であることを確認。
 import { chromium } from 'playwright';
@@ -14,7 +14,7 @@ const target = fileURLToPath(new URL('../promo/announce-cards.html', import.meta
 const outDir = fileURLToPath(new URL('../dist/announce/', import.meta.url));
 mkdirSync(outDir, { recursive: true });
 
-const CARDS = ['card1', 'card2', 'card3', 'card4'];
+const CARDS = ['card1', 'card2', 'card3', 'card4', 'card5'];
 const MIN_BYTES = 30 * 1024;
 // ja=クエリなし（既定・不変） / en=?lang=en。suffix は en のとき '.en' を付ける。
 const LANGS = [

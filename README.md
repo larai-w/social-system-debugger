@@ -40,6 +40,8 @@
 
 アプリ内 ≡メニューの「📲 アプリとして入れる」からも同じ案内が出ます。
 
+❓ **[よくある質問（ブラウザ／PWA／ストア版の違い・保存先・無料か）](https://larai-w.github.io/social-system-debugger/faq.html)** ／ [English FAQ](https://larai-w.github.io/social-system-debugger/faq.en.html)
+
 ---
 
 ## 4つのレイヤー / The 4-Layer Architecture
