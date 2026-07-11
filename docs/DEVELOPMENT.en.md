@@ -12,7 +12,7 @@ Practical notes for anyone who touches the "Social System Debugger" (future me, 
 - **Load order (important)**: `i18n → engine → native → share → scenario → ui → demo`. Later files reference earlier files' functions/constants at runtime.
 - `engine.js` is the **DOM/window-free pure-logic layer** (`metrics`, etc.) — no `document`/`window`, so it can be reused for server-side validation and unit tests.
 - Native features (Capacitor) live behind the `window.SSD` facade in `native.js`, all gated by `SSD.isNative` → **web is a full no-op**.
-- The only runtime external dependency is **Chart.js v4 (CDN)**. Agents are drawn on raw Canvas.
+- The only runtime external dependency is **Chart.js v4 (self-hosted)**. Bundled at `web/vendor/chart.umd.min.js` (to update, just replace the file). Agents are drawn on raw Canvas. The `<meta http-equiv="Content-Security-Policy">` in `web/index.html` blocks script injection from external origins.
 - **PWA**: `web/manifest.json` / `web/icon.svg` / `web/sw.js`.
 - **Delivery**: GitHub Pages (serves `web/`, URL unchanged) + AWS S3/CloudFront (CDK in `/infra`).
 
@@ -30,14 +30,16 @@ social-system-debugger/
 │       ├── ui.js            #   DOM, charts, P1–P4, discovery, init (largest)
 │       └── demo.js          #   ?demo=1 demo mode (auto-drives the real engine; no-op by default)
 │   ├── manifest.json / icon.svg / sw.js
+│   ├── vendor/chart.umd.min.js     # self-hosted Chart.js (the only runtime external dependency)
 │   ├── classroom.html / .en.html   # one-page teacher guide (self-contained; prints to A4)
 │   ├── classroom-slides.html / .en.html # classroom projector slides (self-contained; 9 slides; still reads stacked when JS is off)
 │   └── privacy.html / .en.html     # privacy policy (store submission / footer link)
 ├── content/weekly/          # weekly scenario JSON (*.json + latest.json) + weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront + GitHub OIDC role
 ├── promo/                   # promo reel HTML (?lang=en supported; auto-recorded by make reels)
-├── tests/                   # unit / guardrail tests (engine / goal / share / invariants / weekly-reachability)
-├── scripts/                 # validate-weekly / verify / record-reel / gen-icons / gen-og-image, etc.
+├── tests/                   # unit / guardrail tests (engine / goal / share / invariants / weekly-reachability / i18n-completeness / export-dictionary) — 8 files
+├── scripts/                 # validate-weekly / verify / verify-offline / record-reel / gen-icons / gen-og-image /
+│                            #   gen-classroom-pdf / gen-store-shots / gen-announce-cards / gh-project-backfill, etc.
 ├── capacitor.config.json    # appId / webDir=web / plugin config
 ├── package.json             # Capacitor deps + root scripts (test / check / verify / reels / gen:icons …)
 ├── Makefile                 # single entry point for all ops (make help)
@@ -53,8 +55,8 @@ social-system-debugger/
 
 | Area | File | Key functions / variables | Role |
 |---|---|---|---|
-| **i18n** | `i18n.js`(dict) / `engine.js`(`t`,`tt`) / `ui.js`(`applyI18n`) | `I18N={ja,en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()` manual keys, `tt()` JS inline, `data-i18n` via `applyI18nAuto()` |
-| **Pure calc** | `engine.js` | `metrics(fr,es,al)`, `simTimeline()`, `clamp/lerp/seedRng/genScatter`, `HIST_REF/PRESETS/MDATA` | **DOM/window-free**. Tested by `tests/engine.test.mjs` |
+| **i18n** | `i18n.js`(dict) / `engine.js`(`t`,`tt`) / `ui.js`(`applyI18n`) | `I18N={ja,en}`, `t(id)`, `tt(ja,en)`, `applyI18n()`, `applyI18nAuto()` | `t()` manual keys, `tt()` JS inline, `data-i18n` via `applyI18nAuto()`. Coverage enforced by `tests/i18n-completeness.test.mjs` |
+| **Pure calc** | `engine.js` | `metrics(fr,es,al)`, `simTimeline()`, `clamp/lerp/seedRng/genScatter`, `HIST_REF/PRESETS/MDATA` | **DOM/window-free**. Tested by `tests/engine.test.mjs` and `tests/invariants.test.mjs` |
 | **L1 Information Space** | `ui.js` | `updateAll()`, `startAgents()`, `startScatter()`, `getModeCollapseLog()` | overfitting, mode-collapse log, animation |
 | **L2 Regional Infrastructure** | `ui.js` | `metricsP2()`, `calcRedundancyBuffer()`, `updateAllP2()`, `injectSystemShock()` | redundancy, deadlock, shock |
 | **L3 Individual Cognition** | `ui.js` | `stepP3()/drawP3()/updateP3Monitor()`, `executeDropout()/executeEarlyStopping()` | node sim, poisoning, recovery |
@@ -98,11 +100,11 @@ Every layer follows the same shape: **user input → compute in `metrics*` → u
 3. The counter (`(x/N)`) is derived automatically from `DISCOVERIES.length`. **Forbidden**: streaks, notifications, time limits, anxiety-inducing copy (they contradict the app's own critique).
 - Note: `sce_`-prefixed discoveries are for weekly scenarios and are only reachable/counted when `WEEKLY_ENABLED` (native).
 
-### Add a weekly scenario (the human step is just "write one JSON file")
+### Add a weekly scenario (the human step is just "write one JSON file" — CI auto-validates reachability)
 1. Create `content/weekly/2026-Wxx.json`. Schema is `content/weekly.schema.json` (required: `id/title/intro/page/params/goal/goalConds/difficulty/discoveryId`; `title/intro/goal` need both ja/en).
 2. **Goals are declarative**: `goalConds: [{ "metric": "diversity", "op": ">=", "value": 80 }, …]` (AND-combined). `metric` is any key returned by `metrics*` (`diversity/entropy/legitimacy/brand/redundancy/infra/integrity/ratio/drop`…) plus params (`ethicsScore/skillStock/searchDepth`…). Evaluated by `evalGoalConds()` in `scenario.js`.
 3. **Swapping `latest.json` is automated**: `weekly-rotate.yml` runs every Monday 00:00 JST, copies that week's `2026-Wxx.json` to `latest.json`, commits it, and triggers the Pages/AWS deploys. **The human step is only "add one JSON for the week and open a PR."** (The app fetches `latest.json` at startup; `CONTENT_BASE_URL` in `scenario.js` is the origin.) A week with no stock makes the rotation fail — a built-in "write more scenarios" reminder.
-4. Validate locally: `npm run validate:weekly` (rejects missing ja/en or bad ops) + `npm test` (`weekly-reachability.test.mjs` checks that every `goalConds` metric name **actually exists = the scenario is clearable**, so a typo that makes it unbeatable is caught in CI).
+4. Validate locally: `npm run validate:weekly` (rejects missing ja/en or bad ops) + `npm test` (`tests/weekly-reachability.test.mjs` and `tests/weekly-reachability-p234.test.mjs` check that every `goalConds` metric name **exists, and the scenario is neither instantly clearable nor permanently unreachable**; caught in CI). **Full delegation to a subagent is safe**: create the JSON and make `npm run check` green — CI handles reachability; commit is done by the parent session.
 5. PR → merge to main → `deploy-aws.yml` syncs to S3 and invalidates `latest.json` automatically.
 - **Forbidden**: naming real countries/municipalities/people (etiquette policy). Keep it abstract, a variation of existing presets.
 
@@ -156,11 +158,16 @@ npm run serve              # → http://localhost:8000 (open over http; file:// 
 - Syntax check: `node --check web/js/xxx.js`.
 - **All ops are listed in `make help`** (a single entry point shared by humans / Claude Code / Codex). The main ones:
   ```bash
-  make check       # same as CI (tests + weekly JSON validation + eslint + prettier) = npm run check
-  make verify      # ★ automated "checks before reporting done" (see below)
-  make reels       # auto-record promo reels (webm to dist/reels/, mp4 too if ffmpeg is present)
-  make gen-icons   # generate store icons/splash into resources/
-  make synth       # cdk synth (with cdk-nag security checks; no AWS needed)
+  make check          # same as CI (tests + weekly JSON validation + eslint + prettier) = npm run check
+  make verify         # ★ automated "checks before reporting done" (see below)
+  make verify-offline # PWA offline boot check (SW register → offline emulation → reload)
+  make reels          # auto-record promo reels (webm to dist/reels/, mp4 too if ffmpeg is present)
+  make gen-icons      # generate store icons/splash into resources/
+  make classroom-pdf  # generate teacher guide as dist/classroom.pdf / .en.pdf (A4)
+  make store-shots    # capture 6 store screenshots into dist/store-shots/
+  make announce-cards # generate 4 X announcement cards into dist/announce/
+  make gh-project     # backfill dev history to GitHub Issues/Milestones (requires gh)
+  make synth          # cdk synth (with cdk-nag security checks; no AWS needed)
   ```
 - **★ Automated "checks before reporting done" = `make verify`** (`scripts/verify.mjs`, Playwright): replays CLAUDE.md's manual checklist (zero Console errors, all 4 tabs, a preset, slider input, and graceful degradation when Chart.js fails) across **two cases — Chart.js OK and CDN blocked** — and asserts zero Console/pageerror. Run this instead of poking the browser by hand every time (first run: `npx playwright install chromium`).
 - **If the SW serves stale JS** (common right after a deploy or a module change): DevTools → Application → Service Workers → check **Bypass for network** (easiest during dev) / or Unregister → hard reload / incognito. `sw.js` is cache-first, so whenever you change CORE, bump the `CACHE` version (`ssd-cache-v6-xxx`).
@@ -171,4 +178,4 @@ npm run serve              # → http://localhost:8000 (open over http; file:// 
 
 ---
 
-*Applies to: v6.346 / Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD) complete*
+*Applies to: v6.346 (app version) at sw cache v6-364 / Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD) complete. Node.js 22+ recommended (CI and devcontainer pin Node 22).*
