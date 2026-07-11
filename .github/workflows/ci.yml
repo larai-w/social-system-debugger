@@ -45,6 +45,9 @@ jobs:
       # T62: PWA オフライン起動もPRごとに検証（SW登録→回線遮断→リロード。ジョブ自体が助言的なのは従来どおり）
       - name: Offline-start verification (scripts/verify-offline.mjs)
         run: npm run verify:offline
+      # 静的ページ群（classroom/slides/privacy/announce-cards）の Console ゼロ＋構造を検証（助言的）
+      - name: Static-pages verification (scripts/verify-pages.mjs)
+        run: npm run verify:pages
 
   # ── インフラ: cdk synth が通ることの確認 ──
   infra:
