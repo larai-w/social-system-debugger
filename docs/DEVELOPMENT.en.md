@@ -178,4 +178,4 @@ npm run serve              # → http://localhost:8000 (open over http; file:// 
 
 ---
 
-*Applies to: v6.346 (app version) at sw cache v6-365 / Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD) complete. Node.js 22+ recommended (CI and devcontainer pin Node 22).*
+*Applies to: v6.346 (app version) at sw cache v6-366 / Phase 1 (module split, Capacitor, weekly scenarios, AWS delivery, CI/CD) complete. Node.js 22+ recommended (CI and devcontainer pin Node 22).*
