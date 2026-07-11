@@ -4,6 +4,23 @@
 
 ---
 
+## 見張り駆動・教育キット完成スプリント（T85〜T89）— 2026-07-11 — Chart.js 4.5.1・ワークシート・静的ページ検証・404
+
+T79〜T84 に続く第19〜20スプリント（T85〜T89）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-365）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### 見張り駆動（機械が指示した初の自動駆動スプリント）
+
+- **Chart.js 4.4.0→4.5.1 更新（T85・直営）**: `make vendor-check`（T83）が初回実行で upstream 4.5.1 の存在を検出したことを受け、`web/vendor/chart.umd.min.js` を更新（sw v6-365）。すべてのテストハーネス green・README ja/en の「CDN読み込み」残骸表記も同時修正。**副検出**: `scripts/check-vendor.sh` の版数抽出 regex が jsdelivr ラッパー形式にしか対応しておらず、標準バナー形式のファイルで fail していた。「黙って通さない」設計がバグを表面化させ、両形式対応 regex に修正（T85=直営）。
+- **鮮度warn解消バッチ＝CHANGELOG T79〜T84 追記＋バックフィル T71〜T84（T86・Sonnet委任）**: `tests/freshness.test.mjs` の warn 2件（CHANGELOG/backfill の T番号乖離）を解消。**91 issues**・milestone「Delegation sprints (T25–T84)」に更新。warn 解消を受け入れ条件として確認（T86=Sonnet委任11件目）。
+
+### 教育・公開面
+
+- **生徒用ワークシート `web/worksheet.html`/`.en.html`（T87・Opus委任）**: 探究の型（予想→実験→観察→考察）を構造化した書き込み式ワークシート。A4 白地・書き込み罫線・PDF 目視品質確認済み。`make classroom-pdf` が4枚体制（ガイド ja/en＋ワークシート ja/en）になり**教育3点セット（ガイド/スライド/ワークシート）が完成**。**親レビューで退行検出（問題管理）**: 追記文で ja ガイドが A4 1枚→2枚に溢れたことから、ja 版が元々 A4 1枚ちょうどの満杯設計であると判明。ja への本文追記は原則不可・導線は langlink で解決（軽微な ja/en 非対称は意図的と記録）（T87=Opus委任33件目）。
+- **静的ページ群の Console ゼロ検証 `verify:pages`（T88・Opus委任）**: classroom/slides/privacy/announce-cards/worksheet の ja/en 全ページを対象に Console ゼロ＋構造（title/charset/viewport）を検証する `scripts/verify-pages.mjs` を追加し CI の advisory verify ジョブに組み込み。**最後の未検証面が消滅**（T88=Opus委任34件目）。
+- **`web/404.html`（T89・Sonnet委任）**: ダーク・ターミナル調・日英併記・相対リンクで GitHub Pages が自動採用する 404 ページを追加。`docs/operations-runbook.md` に SW との関係（SW 登録前は 404.html が表示・登録後は SW が SPA フォールバック）を注記（T89=Sonnet委任12件目）。
+
+---
+
 ## 文書の正しさ・自己改善の仕組み化スプリント（T79〜T84）— 2026-07-11 — METHODOLOGY監査ドリフトゼロ・障害の自動作業指示化・学びの台帳
 
 T65〜T78 に続く第17〜18スプリント（T79〜T84）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-364 から変更なし）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
