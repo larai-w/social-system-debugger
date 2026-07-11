@@ -13,6 +13,7 @@ on:
 permissions:
   contents: write
   actions: write # 後続デプロイの workflow_dispatch 起動に必要
+  issues: write # 失敗時に「作業指示書つき Issue」を自動起票するために必要
 
 concurrency:
   group: weekly-rotate
@@ -55,3 +56,89 @@ jobs:
           gh workflow run deploy.yml --ref main -R "$GITHUB_REPOSITORY"
           # AWS 側は Secrets 未設定なら deploy-aws.yml 内の if でスキップされる（安全）
           gh workflow run deploy-aws.yml --ref main -R "$GITHUB_REPOSITORY"
+
+      # 失敗時（多くは在庫切れ = 意図的な exit 1）に、直し方を書いた Issue を自動起票する。
+      # ITIL: インシデント（赤い Actions）を、そのまま実行できるサービス要求（作業指示書）へ変換する。
+      # 冪等: restock ラベルの open Issue が既にあれば新規起票せずコメント追記のみ（毎週の重複起票を防ぐ）。
+      - name: Open a "restock" issue with a ready-to-paste prompt
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'restock';
+            // 今週の ISO 週（JST）— 症状メッセージに使う
+            const weekId = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo' })
+              .format(new Date()); // フォールバック用の日付表示（週番号は本文で run ログ参照に委ねる）
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // restock ラベルが無ければ作る（失敗しても続行 — 起票は色なしでも成立させる）
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: label,
+                color: 'd93f0b',
+                description: '週替わりシナリオの在庫補充・週次ローテ失敗のトリアージ',
+              });
+            } catch (e) {
+              // 既存（HTTP 422）や権限で失敗しても無視して続行
+              core.info(`ラベル作成はスキップ（既存 or 失敗）: ${e.message}`);
+            }
+
+            // 本文（日本語）— そのまま Claude Code に貼れるプロンプトを同梱する
+            const body = [
+              '## 症状',
+              `週次ローテ（\`Weekly scenario rotation\`）が失敗しました（実行日 JST: ${weekId}）。`,
+              `今週分の \`content/weekly/<ISO週>.json\` を \`latest.json\` へ切り替える処理が完了していません。`,
+              '',
+              `- 実行ログ: ${runUrl}`,
+              '',
+              '## 切り分け',
+              '在庫切れ（意図的な失敗）か、それ以外（push/ディスパッチ等）かを判定してください。',
+              '手順は運用ランブック §1 を参照:',
+              '[docs/operations-runbook.md#1-週次ローテが失敗した](../blob/main/docs/operations-runbook.md#1-週次ローテが失敗した)',
+              '',
+              '- **在庫切れ**の場合 → 下記プロンプトで次の週分を補充する（完全委任タスク）。',
+              '- **それ以外**（在庫はある）→ ランブック §1 の (B) に従う（push 競合の再実行・`actions: write` 権限・後続ワークフロー名）。',
+              '',
+              '## そのまま Claude Code に貼れるプロンプト（在庫切れ時）',
+              '```',
+              '次の4週分の週次シナリオ（content/weekly/<ISO週>.json）を作って。',
+              '既存の週次 JSON と同じスキーマ・日英完備で、実名ゼロ・構造で語ること。',
+              '受け入れは `npm run check`（週次JSONスキーマ検証＋クリア到達可能性CIを含む）を green にすること。',
+              '完全委任フローと受け入れ基準は AGENTS.md「完全委任タスクの例」を参照。コミットは親が行う。',
+              '```',
+              '',
+              '_この Issue は週次ローテ失敗時に自動起票されました。復旧後はクローズしてください。_',
+            ].join('\n');
+
+            // 冪等チェック: restock ラベルの open Issue を探す
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: label,
+              per_page: 1,
+            });
+
+            if (existing.data.length > 0) {
+              // 既にある → 重複起票せずコメントで追記のみ
+              const issueNumber = existing.data[0].number;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: `週次ローテが再度失敗しました（実行日 JST: ${weekId}）。\n\n- 実行ログ: ${runUrl}`,
+              });
+              core.info(`既存 Issue #${issueNumber} にコメント追記しました。`);
+            } else {
+              // 無い → 新規起票
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '[auto] Weekly rotation failed — restock or triage needed',
+                body,
+                labels: [label],
+              });
+              core.info(`新規 Issue #${created.data.number} を起票しました。`);
+            }
