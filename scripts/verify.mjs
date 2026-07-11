@@ -3,6 +3,8 @@
 //   ケース1: Chart.js 正常時（スタブ注入）／ケース2: Chart.js 失敗時（CDN遮断）
 //   両ケースで 4タブ遷移・プリセット・スライダー操作に加え、P2ショック注入・
 //   P3/P4 スライダー・エクスポート生成までをスモークし、Console/pageerror ゼロを確認する。
+//   さらに主要流入がスマホ（X/LINE）のため、デスクトップ(1400×1000)とモバイル(390×844)の
+//   2ビューポートで同一スモークを実行し、モバイル限定のレイアウト起因退行も検出する（計4パス）。
 // 使い方: npm run verify   （または node scripts/verify.mjs [path/to/index.html]）
 import { chromium } from 'playwright';
 import path from 'node:path';
@@ -20,10 +22,20 @@ window.Chart = class Chart {
 };
 `;
 
-async function run(withChartStub) {
+// ビューポート定義。モバイルは isMobile/hasTouch も付与し、スマホ縦の実挙動に近づける。
+const VIEWPORTS = [
+  { name: 'desktop', opts: { viewport: { width: 1400, height: 1000 } } },
+  {
+    name: 'mobile',
+    opts: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
+  },
+];
+
+// browser を使い回し、パスごとに context を分ける（起動コスト削減・状態は context 単位で分離）。
+async function run(browser, withChartStub, viewport) {
   const errors = [];
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
+  const context = await browser.newContext(viewport.opts);
+  const page = await context.newPage();
   // 想定内メッセージ: 検証側が意図的に CDN を遮断するためのリソース失敗と、
   // それを受けたアプリ自身のグレースフル・デグラデーション通知ログのみ許可
   const EXPECTED = [/Failed to load resource/, /Chart\.js CDN 読み込み失敗/];
@@ -36,9 +48,9 @@ async function run(withChartStub) {
   });
   // 外部CDNは常に遮断（ネット環境に依らず決定的）。T57 で Chart.js はセルフホスト化されたため、
   // 正常系はローカル vendor/ の実 Chart.js が読み込まれ、失敗系は vendor パスを遮断して再現する。
-  await page.route(/https?:\/\/(cdn|cdnjs|unpkg|jsdelivr)[^ ]*/, (r) => r.abort());
-  if (!withChartStub) await page.route(/vendor\/chart[^ ]*/, (r) => r.abort());
-  if (withChartStub) await page.addInitScript(CHART_STUB);
+  await context.route(/https?:\/\/(cdn|cdnjs|unpkg|jsdelivr)[^ ]*/, (r) => r.abort());
+  if (!withChartStub) await context.route(/vendor\/chart[^ ]*/, (r) => r.abort());
+  if (withChartStub) await context.addInitScript(CHART_STUB);
 
   await page.goto('file://' + target);
   await page.waitForTimeout(1500);
@@ -117,12 +129,24 @@ async function run(withChartStub) {
   )
     errors.push('verify: openAppPage classroom/privacy URLs wrong ' + JSON.stringify(openedUrls));
   await page.waitForTimeout(200);
-  await browser.close();
+  await context.close();
   return errors;
 }
 
-const e1 = await run(true); // Chart.js 正常時
-const e2 = await run(false); // Chart.js 失敗時（グレースフル・デグラデーション）
-console.log('Chart正常時 errors:', e1.length ? e1 : 'なし ✓');
-console.log('Chart失敗時 errors:', e2.length ? e2 : 'なし ✓');
-process.exit(e1.length || e2.length ? 1 : 0);
+const browser = await chromium.launch();
+let total = 0;
+try {
+  for (const [label, withChartStub] of [
+    ['Chart正常時', true],
+    ['Chart失敗時', false],
+  ]) {
+    for (const vp of VIEWPORTS) {
+      const errs = await run(browser, withChartStub, vp);
+      console.log(`${label}(${vp.name}) errors:`, errs.length ? errs : 'なし ✓');
+      total += errs.length;
+    }
+  }
+} finally {
+  await browser.close();
+}
+process.exit(total ? 1 : 0);
