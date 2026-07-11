@@ -14,6 +14,8 @@ mkdirSync(outDir, { recursive: true });
 const jobs = [
   { src: '../web/classroom.html', out: 'classroom.pdf' },
   { src: '../web/classroom.en.html', out: 'classroom.en.pdf' },
+  { src: '../web/worksheet.html', out: 'worksheet.pdf' },
+  { src: '../web/worksheet.en.html', out: 'worksheet.en.pdf' },
 ];
 
 // PDF のページ数を簡易カウント（生バイト列の /Type /Page 出現数）。
@@ -56,4 +58,6 @@ if (errors.length) {
   console.error('❌ 失敗:', errors);
   process.exit(1);
 }
-console.log('✅ dist/classroom.pdf, dist/classroom.en.pdf を生成しました（print/A4・白地）');
+console.log(
+  '✅ dist/classroom.pdf, dist/classroom.en.pdf, dist/worksheet.pdf, dist/worksheet.en.pdf を生成しました（print/A4・白地）'
+);

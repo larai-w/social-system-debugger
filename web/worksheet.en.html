@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Debugger — Inquiry worksheet (student handout, A4)</title>
+<meta name="description" content="A student handout for recording experiments in Social Debugger with the inquiry cycle: predict, experiment, observe, reflect. No prep, browser-only. Prints to one A4 page ready to hand out.">
+<meta property="og:title" content="Social Debugger — inquiry worksheet (student handout)">
+<meta property="og:description" content="An A4 handout to record experiments using the predict / experiment / observe / reflect cycle. Print it and hand it out.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<!--
+  English edition of web/worksheet.html (student handout, the third piece of the teaching set alongside
+  classroom.en.html / classroom-slides.en.html).
+  Dark terminal look on screen, white A4 with write-in lines in print (Ctrl/Cmd+P -> save as PDF).
+  Self-contained: no dependency on the app's i18n/JS.
+-->
+<style>
+  :root{--bg0:#070b14;--bg1:#0b1220;--cy:#39d5ff;--grn:#3ef58c;--ora:#ffb74d;--pur:#c792ea;
+        --tx:#cfe3ee;--muted:#7b93a4;--bdr:#1d3345;--line:#2a4356;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg0);color:var(--tx);
+       font-family:"SFMono-Regular",Consolas,"Courier New",Menlo,monospace;
+       font-size:13px;line-height:1.6;}
+  .sheet{max-width:800px;margin:0 auto;padding:26px 26px;}
+  h1{font-size:1.2rem;color:var(--cy);margin:0 0 2px;letter-spacing:.04em;}
+  .tagline{color:var(--muted);margin:0 0 10px;font-size:.78rem;}
+  h2{font-size:.9rem;color:var(--grn);border-bottom:1px solid var(--bdr);
+     padding-bottom:3px;margin:14px 0 6px;letter-spacing:.05em;}
+  h2 .n{color:var(--ora);}
+  .urlbox{border:1px solid var(--cy);border-radius:6px;padding:6px 12px;margin:8px 0;
+          background:var(--bg1);font-size:.85rem;word-break:break-all;}
+  .urlbox a{color:var(--cy);text-decoration:none;font-weight:bold;}
+  .hint{color:var(--muted);font-size:.74rem;margin:2px 0 4px;}
+  /* name row */
+  .id{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin:8px 0;font-size:.8rem;}
+  .id .fill{border-bottom:1px solid var(--line);min-width:120px;display:inline-block;height:1.1em;}
+  .pages{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;padding:0;list-style:none;font-size:.76rem;}
+  .pages li{border:1px solid var(--bdr);border-radius:20px;padding:2px 12px;color:var(--muted);}
+  /* write-in lines */
+  .write{border:1px solid var(--bdr);border-radius:4px;background:var(--bg1);
+         padding:6px 8px 2px;margin:4px 0 8px;}
+  .rule{border-bottom:1px solid var(--line);height:1.5em;margin:0;}
+  .rule.sm{height:1.35em;}
+  table{border-collapse:collapse;width:100%;margin:6px 0;font-size:.8rem;}
+  th,td{border:1px solid var(--bdr);padding:4px 8px;text-align:left;vertical-align:top;}
+  th{color:var(--cy);white-space:nowrap;font-weight:bold;}
+  td.blank{height:1.7em;}
+  .q{color:var(--ora);font-size:.82rem;margin:2px 0;}
+  .note{border:1px solid var(--bdr);border-left:3px solid var(--pur);border-radius:4px;
+        padding:6px 12px;margin:8px 0;font-size:.74rem;color:var(--muted);}
+  footer{margin-top:12px;padding-top:8px;border-top:1px solid var(--bdr);
+         font-size:.7rem;color:var(--muted);}
+  .printbtn{position:fixed;right:16px;top:14px;background:var(--bg1);color:var(--cy);
+            border:1px solid var(--cy);border-radius:6px;padding:7px 14px;cursor:pointer;
+            font-family:inherit;font-size:.8rem;}
+  .printbtn:hover{background:var(--cy);color:var(--bg0);}
+  .langlink{position:fixed;left:16px;top:14px;font-size:.75rem;}
+  .langlink a{color:var(--muted);text-decoration:none;border:1px solid var(--bdr);
+              border-radius:6px;padding:6px 10px;background:var(--bg1);}
+  @media print{
+    @page{size:A4;margin:10mm;}
+    :root{--bg0:#fff;--bg1:#fff;--cy:#00546e;--grn:#0a6b3c;--ora:#a35a00;--pur:#5a3a86;
+          --tx:#111;--muted:#444;--bdr:#999;--line:#777;}
+    body{font-size:9.6px;line-height:1.4;-webkit-print-color-adjust:exact;}
+    .sheet{max-width:none;padding:0;}
+    .printbtn,.langlink{display:none;}
+    h1{font-size:1.05rem;}
+    h2{margin:8px 0 4px;}
+    .rule{height:1.7em;}
+    .rule.sm{height:1.5em;}
+    td.blank{height:1.9em;}
+    footer{margin-top:8px;}
+    a{color:var(--cy);}
+  }
+</style>
+</head>
+<body>
+<div class="langlink"><a href="worksheet.html">日本語版はこちら</a></div>
+<div class="langlink" style="top:52px;"><a href="classroom.en.html">📄 Teacher guide</a></div>
+<button class="printbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+<div class="sheet">
+
+<h1>Social Debugger — Inquiry Worksheet</h1>
+<p class="tagline">Will your town survive? — Move the sliders and experiment with <em>how</em> a society breaks down</p>
+
+<div class="urlbox">▶ Open the app: <a href="https://larai-w.github.io/social-system-debugger/">https://larai-w.github.io/social-system-debugger/</a></div>
+
+<div class="id">
+  <span>Name: <span class="fill" style="min-width:180px;"></span></span>
+  <span>Date: <span class="fill" style="min-width:110px;"></span></span>
+</div>
+<p class="hint">Circle today's page (the theme you'll work on):</p>
+<ul class="pages">
+  <li>PAGE 1 Information</li><li>PAGE 2 Infrastructure</li><li>PAGE 3 Cognition</li><li>PAGE 4 Stakeholders</li>
+</ul>
+
+<h2><span class="n">①</span> Predict (hypothesis)</h2>
+<p class="hint">Which parameter (slider) will you move, and what do you think will happen to the town? Write it in your own words before you touch anything.</p>
+<div class="write">
+  <div class="rule"></div><div class="rule"></div><div class="rule"></div>
+</div>
+
+<h2><span class="n">②</span> Experiment (what you changed)</h2>
+<p class="hint">Record each parameter you moved and its value, "before → after".</p>
+<table>
+  <tr><th>Parameter you moved</th><th>Before</th><th>After</th></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+  <tr><td class="blank"></td><td class="blank"></td><td class="blank"></td></tr>
+</table>
+
+<h2><span class="n">③</span> Observe (what happened?)</h2>
+<p class="hint">How did the banners (warning messages), numbers, and graphs change? Write what you actually saw.</p>
+<div class="write">
+  <div class="rule"></div><div class="rule"></div><div class="rule"></div>
+</div>
+
+<h2><span class="n">④</span> Reflect (make meaning)</h2>
+<p class="q">In the real world, what does this correspond to?</p>
+<div class="write">
+  <div class="rule sm"></div><div class="rule sm"></div>
+</div>
+<p class="q">If you could rewind just one thing, what would you change — and why?</p>
+<div class="write">
+  <div class="rule sm"></div><div class="rule sm"></div>
+</div>
+
+<div class="note">
+  This app is a <b>fictional simulation</b>. No real place names, people, or ongoing political topics appear in it.
+  Think of it as <b>"a story about structures that can happen to any society"</b> — not about anyone or anywhere in particular.
+</div>
+
+<footer>
+  When you show your results to others, share them <b>as an experiment</b> (don't name and judge specific people, regions, or parties).<br>
+  * This worksheet prints to an A4 PDF via your browser (Ctrl/Cmd + P). — Social Debugger (free, non-commercial, open source)
+</footer>
+
+</div>
+</body>
+</html>
