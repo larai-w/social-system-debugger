@@ -8,6 +8,7 @@
     "validate:weekly": "node scripts/validate-weekly.mjs",
     "verify": "node scripts/verify.mjs",
     "verify:offline": "node scripts/verify-offline.mjs",
+    "verify:pages": "node scripts/verify-pages.mjs",
     "lint": "eslint web/js scripts tests web/config.js",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
