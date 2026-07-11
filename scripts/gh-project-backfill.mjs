@@ -55,16 +55,17 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T84)',
+    title: 'Delegation sprints (T25–T89)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), and the methodology-audit / self-improvement sprint (T79–T84).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), and the sentinel-driven / education-kit sprint (T85–T89).',
   },
 ];
 // NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
 // 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)', then
-// 'Delegation sprints (T25–T70)'. If an older milestone with any of those prior titles
-// already exists in the repo, either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T84)'
+// 'Delegation sprints (T25–T70)', then 'Delegation sprints (T25–T84)'.
+// If an older milestone with any of those prior titles already exists in the repo,
+// either rename it via:
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T89)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -623,6 +624,41 @@ const TASKS = [
     ['area:docs'],
     true,
     'Nine past incidents recorded in incident→root-cause→permanent-guard format. Ratchet policy: every bug earns one permanent guard. Ledger by Sonnet; policy line added by the parent session.',
+  ],
+  [
+    'T85',
+    'Upgrade Chart.js vendor from 4.4.0 to 4.5.1 + fix check-vendor regex for standard banner format',
+    ['area:app'],
+    false,
+    'make vendor-check (T83) detected Chart.js 4.5.1 on its first run. Side discovery: check-vendor.sh regex only matched the jsdelivr wrapper form and silently failed on the standard banner — fixed to support both forms. "Fail loudly rather than silently pass" design caught the bug.',
+  ],
+  [
+    'T86',
+    'Freshness-warn resolution batch: CHANGELOG T79–T84 entry + backfill T71–T84 (91 issues total)',
+    ['area:docs'],
+    true,
+    'First sprint driven by machine-generated warnings (freshness.test.mjs warn × 2). Milestone renamed to T25–T84. Acceptance gated on warn count reaching zero.',
+  ],
+  [
+    'T87',
+    'Student worksheet web/worksheet.html + .en.html — education kit now complete (guide / slides / worksheet)',
+    ['area:marketing'],
+    true,
+    'Exploration template (predict→experiment→observe→reflect). A4 white layout with write-in lines; PDF verified by page-count assertion. Parent review detected ja guide overflow from 1 page to 2 — root cause: ja was already a perfectly full single page, so no body-text additions are possible; langlink used for cross-references instead.',
+  ],
+  [
+    'T88',
+    'verify:pages CI check: console-zero + structure validation for all static pages',
+    ['area:testing'],
+    true,
+    'scripts/verify-pages.mjs covers classroom/slides/privacy/announce-cards/worksheet in both ja and en. Added to the CI advisory verify job. Eliminates the last unverified surface.',
+  ],
+  [
+    'T89',
+    'web/404.html — dark-terminal 404 page auto-adopted by GitHub Pages',
+    ['area:app'],
+    true,
+    'Bilingual (ja/en), relative links, dark-terminal style consistent with the app. Runbook updated with a note on the SW relationship (404.html shows before SW registration; after registration the SW handles SPA fallback).',
   ],
 ];
 
