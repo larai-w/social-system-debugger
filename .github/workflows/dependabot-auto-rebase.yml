@@ -1,0 +1,21 @@
+name: Dependabot auto-rebase
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  rebase:
+    # Dependabot PR のみ実行
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Dependabot rebase
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "@dependabot rebase"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
