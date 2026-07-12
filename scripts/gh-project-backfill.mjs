@@ -55,7 +55,7 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T92)',
+    title: 'Delegation sprints (T25–T93)',
     description:
       'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), and the usage-modes / mobile-verification sprint (T90–T92).',
   },
@@ -681,6 +681,13 @@ const TASKS = [
     ['area:testing'],
     true,
     'Adds a mobile viewport (390×844, isMobile/hasTouch) so the primary phone form factor is verified. Single browser launch, context-per-pass isolation, identical smoke across all four passes — no branching. Closes the last untested surface for mobile users.',
+  ],
+  [
+    'T93',
+    'Restock weekly scenarios 2027-W02 to 2027-W05',
+    ['area:content'],
+    true,
+    'Adds 4 weekly scenarios extending inventory from 2027-W01 to 2027-W05 (30 weeks). PAGE 5 teaser vol.4 — unified audit-type theme "the same shock only breaks the town whose conditions were already open", one scenario per PAGE 1-4. Reachability CI green; parent reviewed ethics/i18n. Same commit also added dependabot-auto-rebase.yml (permanent automation of the manual rebase chore).',
   ],
 ];
 
