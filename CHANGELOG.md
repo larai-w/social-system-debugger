@@ -4,6 +4,26 @@
 
 ---
 
+## 利用形態の説明・モバイル検証スプリント（T90〜T92）— 2026-07-12 — Web/PWA/ストア版の正直な比較・4パス検証
+
+T85〜T89 に続く第21スプリント（T90〜T92）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-365→v6-366）。実名・実在地名・進行中政局への言及なし（integrity準拠）。**保留中の週次シナリオ Web 有効化には一切触れない**（見えない機能を宣伝しない方針）。
+
+### 利用形態の説明（Web版とアプリ版の違い）
+
+- **FAQ ページ ja/en＋比較カード（T90・Opus委任35件目＋直営）**: `web/faq.html`/`.en.html` が「①ブラウザでそのまま（今すぐ）／②ホーム画面に入れる PWA（今すぐ）／③ストアアプリ（準備中）」の**正直な3形態比較**を提供（データ保存先・オフライン・費用・研究/授業利用まで／**週次シナリオには触れないゲート遵守**）。告知カード **card5**「中身は同じ、起動のしかたを選ぶだけ」（ja/en）を追加し告知画像は計10枚体制に。`scripts/verify-pages.mjs` を faq（Console ゼロ＋`@media print`＋langlink 相互リンク）と 404 まで拡張。**直営（親）**: ≡メニューに「❓ よくある質問」項目（`openAppPage('faq')`）・sw cache v6-366・DEVELOPMENT ja/en フッター同期。
+
+### モバイル検証
+
+- **verify.mjs にモバイルパス追加＝4パス体制（T92・Opus委任36件目）**: `scripts/verify.mjs` に 390×844（`isMobile`/`hasTouch`）のモバイルビューポートを追加。**Chart-ok/fail × desktop/mobile の4パス**を、ブラウザ1回起動・パスごとに context 分離・分岐なしの同一スモークで実施。**主要ユーザー（スマホ）の検証穴が消滅**。
+
+### 帳簿（自己改善ループの継続）
+
+- **CHANGELOG T85〜T89 追記＋バックフィル 96 issues＋learnings IN-10/11（T91・Sonnet委任13件目）**: `tests/freshness.test.mjs` の warn を解消する帳簿バッチ。milestone を「Delegation sprints (T25–T89)」に更新。`docs/learnings.md` に IN-10（ja classroom.html の A4 溢れ）・IN-11（check-vendor の版数抽出 regex）を追加。
+
+> 備考: 本スプリントとは別に、本 CHANGELOG 追記時点で人間側 TODO の ☐2（AWS自動デプロイ配線）・☐3（mainブランチ保護）・☐11（Issuesポートフォリオ96件）が完了。その過程で `scripts/aws-wire.sh` の bash 3.2 空配列 unbound バグを検出・恒久修正し **IN-12** として台帳化（`deploy.sh` 同型の横展開漏れ）。
+
+---
+
 ## 見張り駆動・教育キット完成スプリント（T85〜T89）— 2026-07-11 — Chart.js 4.5.1・ワークシート・静的ページ検証・404
 
 T79〜T84 に続く第19〜20スプリント（T85〜T89）。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-365）。実名・実在地名・進行中政局への言及なし（integrity準拠）。

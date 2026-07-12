@@ -55,17 +55,18 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T89)',
+    title: 'Delegation sprints (T25–T92)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), and the sentinel-driven / education-kit sprint (T85–T89).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), and the usage-modes / mobile-verification sprint (T90–T92).',
   },
 ];
 // NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
 // 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)', then
-// 'Delegation sprints (T25–T70)', then 'Delegation sprints (T25–T84)'.
+// 'Delegation sprints (T25–T70)', then 'Delegation sprints (T25–T84)', then
+// 'Delegation sprints (T25–T89)'.
 // If an older milestone with any of those prior titles already exists in the repo,
 // either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T89)'
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T92)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -659,6 +660,27 @@ const TASKS = [
     ['area:app'],
     true,
     'Bilingual (ja/en), relative links, dark-terminal style consistent with the app. Runbook updated with a note on the SW relationship (404.html shows before SW registration; after registration the SW handles SPA fallback).',
+  ],
+  [
+    'T90',
+    'FAQ page ja/en (browser / PWA / store-app) + web-vs-app comparison card',
+    ['area:docs'],
+    true,
+    'web/faq.html + .en.html give an honest 3-mode comparison (browser now / installable PWA now / native store app "coming soon") covering data storage, offline, cost and research use — with zero mention of the still-gated weekly scenarios. Announce card5 "same core, just pick how you launch it" (ja/en) brings the announce set to 10 images. verify-pages.mjs extended to cover faq (console-zero + @media print + langlink) and 404. Direct work by parent: FAQ header-menu entry (openAppPage), sw cache v6-366, DEVELOPMENT footer sync.',
+  ],
+  [
+    'T91',
+    'Ledger batch: CHANGELOG T85–T89 entry + backfill to 96 issues + learnings IN-10/11',
+    ['area:docs'],
+    true,
+    'Freshness-warn resolution batch. Milestone renamed to T25–T89. learnings.md gained IN-10 (ja classroom.html A4 overflow) and IN-11 (check-vendor version regex only matched the jsdelivr wrapper form). Acceptance gated on warn count reaching zero.',
+  ],
+  [
+    'T92',
+    'verify.mjs mobile pass (390×844) — 4-pass smoke (Chart-ok/fail × desktop/mobile)',
+    ['area:testing'],
+    true,
+    'Adds a mobile viewport (390×844, isMobile/hasTouch) so the primary phone form factor is verified. Single browser launch, context-per-pass isolation, identical smoke across all four passes — no branching. Closes the last untested surface for mobile users.',
   ],
 ];
 
