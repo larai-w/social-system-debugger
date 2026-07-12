@@ -31,7 +31,7 @@ jobs:
     # S3_BUCKET の Variable を設定した時点で自動的に有効化される。
     if: ${{ vars.S3_BUCKET != '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Configure AWS credentials (OIDC — no long-lived keys)
         uses: aws-actions/configure-aws-credentials@v4

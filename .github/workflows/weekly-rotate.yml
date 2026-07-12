@@ -23,7 +23,7 @@ jobs:
   rotate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Rotate latest.json to this week's scenario (JST)
         id: rotate
