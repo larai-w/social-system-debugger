@@ -1,0 +1,29 @@
+{
+  "id": "2027-W02",
+  "title": {
+    "ja": "断層の走る街に、対立フレームが刺さる",
+    "en": "A Town on a Fault Line, Pierced by a Frame of Conflict"
+  },
+  "intro": {
+    "ja": "この街には、もとから見えない断層が走っていた。強いフィルタが対立の側だけを増幅し、倫理の重しは軽くなっていた。そこへ「敵と味方」を切り分けるフレームが刺さる——問いは「誰が刺したか」ではない。「なぜこの街の断層だけが開いたのか」だ。開いたのは、断層を放置し、確かめる重しを外していたから。フィルタを緩め、倫理の重しを戻し、共有できる現実の土台を敷き直せるか。分断は刺す言葉ではなく、開いていた条件のほうから起きる。",
+    "en": "An invisible fault line had always run through this town. Heavy filtering amplified only the side of conflict, and the weight of ethics had grown light. Then a frame that splits the world into friend and foe pierces in — the question is not \"who pierced it.\" It is \"why did only this town's fault line open.\" It opened because the fault had been left alone and the checking weight removed. Loosen the filter, restore the weight of ethics, and re-lay a shared foundation of reality. Division comes not from the piercing words, but from the conditions that were already open."
+  },
+  "page": 1,
+  "params": {
+    "p1": { "f": 66, "e": 38, "al": "greedy" },
+    "hint": {
+      "ja": "フィルタリングを20あたりまで下げ、倫理スコアを80近くまで引き上げてください。アルゴリズムを長期最適（dp）に切り替えると、社会関係資本（ソーシャルキャピタル）が65以上まで戻り、社会的信頼が78以上まで回復します。断層の開いた条件を組み替えれば、同じフレームは刺さらなくなります。",
+      "en": "Lower filtering to around 20 and raise the ethics score to near 80. Switching the algorithm to long-term (dp) restores social capital above 65 and recovers social trust to 78 or above. Rearrange the conditions that opened the fault, and the same frame no longer pierces."
+    }
+  },
+  "goal": {
+    "ja": "社会関係資本（ソーシャルキャピタル）を65以上に立て直し、社会的信頼を78以上まで回復させる",
+    "en": "Rebuild social capital to 65+ and recover social trust to 78 or above"
+  },
+  "goalConds": [
+    { "metric": "socialCap", "op": ">=", "value": 65 },
+    { "metric": "trust", "op": ">=", "value": 78 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_ethics_cascade"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "2027-W03",
+  "title": {
+    "ja": "予備を削った街が、次の一撃で折れる",
+    "en": "The Town That Cut Its Reserves Breaks at the Next Blow"
+  },
+  "intro": {
+    "ja": "平時には、余っている手ほど無駄に見える。だからこの街は、担い手の余力と予備の系統を少しずつ削ってきた。効率だけを追う運用のもとで、支える厚みは薄くなっていた。そこへ次の一撃が来る——折れるかどうかは、来た一撃の大きさではなく、あらかじめ残していた予備の厚さで決まる。長期最適に切り替え、公的リブートで予備の系統を立て直し、折れない厚みを取り戻せるか。崩壊は一撃ではなく、削っていた条件のほうから始まる。",
+    "en": "In calm times, spare hands look like waste. So this town trimmed the slack of its carriers and its backup lines, little by little. Under an operation that chased only efficiency, the thickness that holds things up wore thin. Then the next blow comes — whether it breaks depends not on the size of the blow, but on the thickness of reserve kept in advance. Switch to the long-term algorithm, rebuild the backup lines with a public reboot, and win back the thickness that does not break. Collapse begins not from the blow, but from the conditions that were trimmed away."
+  },
+  "page": 2,
+  "params": {
+    "p2": { "s": 76, "d": 30, "e": 40, "al": "greedy", "reboot": false },
+    "hint": {
+      "ja": "スリム化を30あたりまで大きく下げ、公的リブートを実行して予備の系統を立て直してください。長期最適（dp）に切り替えて倫理スコアを70以上に保つと、冗長性バッファ（レジリエンス予備）が60以上へ戻り、自治体財政も55以上を保てます。削った予備は、気づいたうちに積み直せます。",
+      "en": "Lower the slimming sharply to around 30 and execute a public reboot to rebuild the backup lines. Switch to the long-term algorithm (dp) and keep the ethics score at 70+, and the redundancy buffer recovers above 60 while the municipal budget holds at 55 or above. The reserves you cut can be restacked while you still notice."
+    }
+  },
+  "goal": {
+    "ja": "冗長性バッファ（レジリエンス予備）を60以上まで立て直し、自治体財政を55以上に保つ",
+    "en": "Rebuild the redundancy buffer to 60+ and keep the municipal budget at 55 or above"
+  },
+  "goalConds": [
+    { "metric": "redundancy", "op": ">=", "value": 60 },
+    { "metric": "budget", "op": ">=", "value": 55 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_redundancy_shock"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "2027-W05",
+  "title": {
+    "ja": "門を開けた議論場に、外の洪水が入る",
+    "en": "The Debate Floor Left Open Lets the Outside Flood In"
+  },
+  "intro": {
+    "ja": "同じ外部の洪水が、隣の議論場にも押し寄せていた。違いは洪水の量ではなく、門をどう構えていたかにある。勝ち負けの興奮だけを煽り、当事者かどうかの門を開け放していた議論場では、結果を引き受けない声が奥まで流れ込み、実際に生きる人の声はかき消される。ゲーム化を鎮め、パケットフィルタで門を締め直せば、洪水は引き、当事者の声がまた一番に通る。議論を溺れさせるのは洪水ではなく、開けていた門のほうだ。",
+    "en": "The same outside flood surged against the debate floor next door too. The difference is not in the volume of the flood, but in how the gate was set. On a floor that stoked only the thrill of winning and losing and left the gate of stakeholder-standing wide open, voices that answer for nothing flow deep, and the voices of those who actually live it are drowned out. Calm the gamification, re-close the gate with packet filtering, and the flood recedes — the stakeholders' voices are routed first again. What drowns the debate is not the flood, but the gate left open."
+  },
+  "page": 4,
+  "params": {
+    "p4": { "ext": 82, "gam": 76 },
+    "hint": {
+      "ja": "ゲーム化を15あたりまで大きく下げて当事者比率を80以上へ戻し、パケットフィルタを実行して外部ノードの洪水を排出してください。洪水が引くと、パケットドロップ率は25以下まで下がります。締め直した門は、当事者の声をまた一番に通します。",
+      "en": "Lower gamification to around 15 to bring the stakeholder ratio back above 80, then execute packet filtering to flush the external flood. As the flood recedes, the packet drop rate falls to 25 or below. The re-closed gate routes the stakeholders' voices first again."
+    }
+  },
+  "goal": {
+    "ja": "当事者コミット比率を80以上まで戻し、パケットドロップ率を25以下まで下げる",
+    "en": "Restore the stakeholder commit ratio to 80+ and cut the packet drop rate to 25 or below"
+  },
+  "goalConds": [
+    { "metric": "ratio", "op": ">=", "value": 80 },
+    { "metric": "drop", "op": "<=", "value": 25 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_stakeholder_voice"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "2027-W04",
+  "title": {
+    "ja": "浅く読む癖が、街の頭を毒に開く",
+    "en": "The Habit of Reading Shallow Opens the Town's Mind to Poison"
+  },
+  "intro": {
+    "ja": "隣の街と同じ「正しさ」の毒が、この街にも投げ込まれていた。違いは毒の中身ではなく、受け取る頭の癖にある。浅くしか読まず、現実に照らし直さない癖がついた街では、うわべの正義が奥まで回り、「裁いている」という快感だけが速く回る。深く探る力を戻し、現実同期の目を開けば、毒は薄まり、認知は澄む。街の頭を開くのは毒ではなく、浅く読む条件のほうだ。",
+    "en": "The same poison of \"righteousness\" that struck the town next door was thrown in here too. The difference is not in the poison, but in the habit of the minds receiving it. In a town grown used to reading shallow and never checking against reality, a surface of justice circulates deep, and only the thrill of \"judging\" spins fast. Restore the power to search deeply and open the eyes of reality-syncing, and the poison thins, the mind clears. What opens the town's mind is not the poison, but the condition of reading shallow."
+  },
+  "page": 3,
+  "params": {
+    "p3": { "depth": 3, "ground": 30, "lr": 60 },
+    "hint": {
+      "ja": "探索深度を8まで上げ、現実同期レート（グラウンディング）を70近くまで引き上げてください。学習率は十分に保ったまま（凍結させないまま）でよいので、認知健全性が80以上まで澄み、裁く快感（ドーパミン）が20以下まで冷えるのを見てください。深く読む条件が戻れば、毒は回りません。",
+      "en": "Raise search depth to 8 and grounding to near 70. Keep the learning rate high enough (do not freeze it), and watch cognitive integrity clear to 80 or above while the thrill of judging (dopamine) cools to 20 or below. Once the condition of deep reading returns, the poison stops circulating."
+    }
+  },
+  "goal": {
+    "ja": "現実同期レート（グラウンディング）を60以上に保ったまま、認知健全性を80以上へ澄ませ、裁く快感（ドーパミン）を20以下まで冷やす",
+    "en": "Keeping grounding at 60+, clear cognitive integrity to 80+ and cool the thrill of judging (dopamine) to 20 or below"
+  },
+  "goalConds": [
+    { "metric": "groundingRate", "op": ">=", "value": 60 },
+    { "metric": "integrity", "op": ">=", "value": 80 },
+    { "metric": "dopamine", "op": "<=", "value": 20 }
+  ],
+  "difficulty": "hard",
+  "discoveryId": "sce_cognitive_grounding"
+}
