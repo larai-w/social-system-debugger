@@ -27,7 +27,7 @@ command -v aws >/dev/null || { echo "❌ aws CLI が必要です" >&2; exit 1; }
 command -v gh  >/dev/null || { echo "❌ gh CLI が必要です（gh auth login）" >&2; exit 1; }
 
 get_output() {
-  aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$AWS_REGION" "${PROFILE_ARGS[@]}" \
+  aws cloudformation describe-stacks --stack-name "$STACK_NAME" --region "$AWS_REGION" ${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"} \
     --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue" --output text
 }
 

@@ -276,6 +276,34 @@ PROGRESS.md T85 完了ログ（「副検出: check-vendor の regex が…」）
 
 ---
 
+### IN-12: aws-wire.sh が空配列展開で unbound variable（☐2 実行時に発覚・即修正）
+
+**何が起きたか**
+人間側 TODO ☐2（AWS 自動デプロイ配線）を `make aws-wire` で実行した際、
+`scripts/aws-wire.sh:30` の `"${PROFILE_ARGS[@]}"` が
+`PROFILE_ARGS[@]: unbound variable` で落ちた。
+`AWS_PROFILE` 未設定時に `PROFILE_ARGS` が空配列のまま素で展開されたため。
+
+**根本原因**
+macOS 既定の bash 3.2 では `set -u` 下で空配列の `"${arr[@]}"` 展開が
+unbound variable エラーになる（bash 4.4+ では空文字に展開され問題ない）。
+**IN と同型の事故が `infra/scripts/deploy.sh` でも過去に起きて修正済みだったが、
+その教訓が `aws-wire.sh` に横展開されていなかった**（同じ罠を別ファイルで再度踏んだ）。
+
+**追加した恒久ガード**
+- `aws-wire.sh:30` を `${PROFILE_ARGS[@]+"${PROFILE_ARGS[@]}"}` ガード付き展開に修正
+  （deploy.sh と同じ定石。空配列でも安全に展開される）。
+- **横展開スキャンを実施**: `set -u` を持つ全 `.sh` を対象に
+  ガード無し `"${arr[@]}"` を grep で総点検 → 他に実バグは無し
+  （`handoff-hook.sh:24` は `if [ "${#msgs[@]}" -gt 0 ]` の内側で安全・deploy.sh はコメント）。
+- 今後 bash 配列を `set -u` 下で展開する箇所は必ず `${arr[@]+"${arr[@]}"}` を使う
+  （macOS bash 3.2 が現役である限り恒久ルール）。
+
+**根拠**: 本セッションの ☐2 実行ログ（`make aws-wire` → 修正 → Secrets/Variables 設定成功）。
+CLAUDE.md ライブ環境ログの deploy.sh 同型バグ記述。
+
+---
+
 ## 今後の追記ルール
 
 スプリント完了時、以下のいずれかに該当する事象があれば本ファイルの末尾に追記する:
