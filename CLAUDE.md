@@ -47,6 +47,7 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T93（週次補充・Opus委任1件）**: 週次シナリオ **2027-W02〜W05** の4週分補充＝PAGE 5 素材第4弾「同じ火/毒/洪水も、あらかじめ開いていた条件のある街だけを壊す」（監査系・W02=P1 断層×対立フレーム／W03=P2 予備削減／W04=P3 浅読み癖／W05=P4 開けた門）。在庫は **2027-W05 まで（30週）**。確立済みの完全委任運用（委任→到達可能性CI green→親レビュー→コミット）どおり。あわせて Dependabot PR の自動 rebase ワークフロー追加（`dependabot-auto-rebase.yml`・☐12 の恒久自動化）。Issues #118。
 - ✅ **T90〜T92（利用形態の説明・モバイル検証スプリント・Opus2件＋Sonnet1件＋直営）**: **T90=Opus** `web/faq.html`/`.en.html`＝「ブラウザ/PWA/ストア版（準備中）」の**正直な3形態比較**が核（週次・通知に触れないゲート遵守）＋データ保存/オフライン/研究利用。比較カード **card5**（「中身は同じ、起動のしかたを選ぶだけ」）で告知画像は計10枚。verify-pages に faq/404 追加・README 導線。**直営**: ≡メニューに「❓ よくある質問」（openAppPage('faq')・sw v6-366・DEVELOPMENT footer同期）。**T91=Sonnet** 帳簿＝CHANGELOG T85〜T89・バックフィル96 issues・learnings に IN-10/11。**T92=Opus** verify.mjs にモバイル 390×844 パス＝**4パス体制**（ブラウザ1回起動に最適化・分岐なし同一スモーク）。ユーザー側も ☐0/☐1/☐12 完了（Dependabot rebase 済み）。受け入れ: check 36 green・warn ゼロ→（本エントリ追記で T92 分の warn が再点灯=設計どおり）・4パス green・ページ検証 green・カード10枚生成・card5/FAQ 目視。
 - ✅ **T87〜T89（教育キット完成・検証面の完結スプリント・Opus2件＋Sonnet1件）**: **T87=Opus** 生徒用ワークシート `web/worksheet.html`/`.en.html`（探究の型: 予想→実験→観察→考察・A4白地・書き込み罫線・PDF目視で品質確認）＋`make classroom-pdf` が4枚体制に＝**教育3点セット完成**（ガイド/スライド/ワークシート）。**親レビューで退行検出（問題管理）**: 追記文で ja ガイドが A4 1枚→2枚に溢れ→切り分けの結果 **ja 版は元々1枚ちょうどの満杯**と判明→ja は画面専用 langlink を導線に（本文追記なし）・en は短文が収まるため維持（軽微な非対称は意図的と記録）。**T88=Opus** `verify:pages`＝静的ページ群（classroom/slides/privacy/announce-cards/worksheet×両言語）の Console ゼロ＋構造検証を CI に追加＝**最後の未検証面が消滅**。**T89=Sonnet** `web/404.html`（ダーク調・日英併記・相対リンク・Pages 自動採用）＋runbook に SW との関係注記。鮮度warn は T86超過分が新たに蓄積中（設計どおり=次回バッチの指示）。受け入れ: check 36 green・verify:pages green・PDF 4枚生成。
 - ✅ **T85/T86（見張り駆動スプリント＝自己改善ループの初回転）**: **T85（直営）** Chart.js 4.4.0→4.5.1（vendor-check の初検出に対応・全ハーネス green・README ja/en の「CDN読み込み」残骸も修正）。副検出: check-vendor の regex が jsdelivr ラッパー形式にしか対応しておらず標準バナーで fail →「黙って通さない」設計が機能し regex を両形式対応に修正。sw v6-365（鮮度テストの強制で DEVELOPMENT 両footerと同時更新）。**T86=Sonnet** CHANGELOG に T79〜T84 エントリ＋バックフィル T71〜T84 追記（**91 issues**・milestone T25–T84）＝**鮮度見張りの warn 2件を起点に発生した初の「機械が指示した」スプリント**。warn 解消を受け入れ条件として確認済み。
@@ -73,7 +74,7 @@
 
 - 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
 - **フェーズ1は完了。T1〜T38 のスプリント履歴と詳細は `PROGRESS.md` と `CHANGELOG.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
-- **T54 まで完了＝コーディング側の提案タスクは全消化**。アプリの入手経路: 今すぐ=ブラウザURL＋PWAインストール（≡メニュー「📲 アプリとして入れる」）／将来=ネイティブ（`docs/store-submission.md` のランブック、人間側 ☐4）。ポートフォリオ資産（ARCHITECTURE.en / cv-highlights.en / hero画像 / Issues バックフィル）は整備済み。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は W50（12/7週）まで、`npm run check` が残り3週で警告する。
+- **T54 まで完了＝コーディング側の提案タスクは全消化**。アプリの入手経路: 今すぐ=ブラウザURL＋PWAインストール（≡メニュー「📲 アプリとして入れる」）／将来=ネイティブ（`docs/store-submission.md` のランブック、人間側 ☐4）。ポートフォリオ資産（ARCHITECTURE.en / cv-highlights.en / hero画像 / Issues バックフィル）は整備済み。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は 2027-W05（2027/2/1週）まで、`npm run check` が残り3週で警告する。
 - **GitHub Issues 運用（☐11 完了後）**: スプリント開始時にタスクを**英語で issue 起票**し、完了コミット末尾に `Closes #N`。委任タスクには `process:ai-subagent` ラベル。手順は `docs/github-project.md`。
 - **PAGE 5 / SWAP THE LEADER の投入判定**: design-note-page5.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
