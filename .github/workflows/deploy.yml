@@ -28,7 +28,7 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           # Phase 1: front-end assets now live under web/ (Capacitor webDir).
           # Publishing web/ keeps the existing GitHub Pages URL working unchanged.
