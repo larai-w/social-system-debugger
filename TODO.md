@@ -11,8 +11,8 @@
 |---|---|---|---|---|
 | ~~☐0~~ | ~~**`git push`（未pushコミットあり）**~~ | ~~1分~~ | ~~1分~~ | ✅ 完了 |
 | ~~☐1~~ | ~~本番サイト目視確認~~ | ~~5分~~ | ~~5分（不要）~~ | ✅ 完了 |
-| ☐2 | Actions 自動デプロイ有効化 | 10分 | +15分（`gh` 導入・認証）→ 計25分 / Web UI手動なら10分 | 普通 |
-| ☐3 | main ブランチ保護 | 5分 | ☐2で `gh` 済みなら5分 | かんたん |
+| ~~☐2~~ | ~~Actions 自動デプロイ有効化~~ | ~~10分~~ | ~~計25分~~ | ✅ 完了（2026-07-12・`make aws-wire` で Secrets/Variables 設定済） |
+| ~~☐3~~ | ~~main ブランチ保護~~ | ~~5分~~ | ~~5分~~ | ✅ 完了（2026-07-12・`make protect`・CI必須 web/infra） |
 | ☐4 | Capacitor 実機（任意） | 30〜60分 | iOS +15分（cocoapods）/ Android +30〜60分（Studio+JDK17）| やや重い |
 | ☐5 | 30秒リールを録画して X 固定ポストに | 15分 | 15分 | かんたん |
 | ☐6 | 教員向け1枚ガイドを PDF 化（**自動化済み** `make classroom-pdf`） | 0分 | 0分 | 自動 |
@@ -214,19 +214,14 @@ Dependabot PR は**古い main から分岐しているため、rebase するま
 
 > ☐11 で gh 導入済みなら `gh pr comment 18 --body "@dependabot rebase"` の形で一括も可。
 
-## ☐ 11.（就活準備・おすすめ）GitHub Issues をポートフォリオ化 — 10分
+## ✅ ~~☐ 11.（就活準備・おすすめ）GitHub Issues をポートフォリオ化 — 10分~~
 
-開発履歴（Phase 1 + T1〜T43）を英語の Issues/Milestones として GitHub に一括バックフィルする。
-NZ 就活でリポジトリを見せる時に「計画 → 実行 → 完了」が採用担当者に読める形になる。
+**完了（2026-07-12）**: `make gh-project` で開発履歴を英語 Issues **96件**＋マイルストーン4件
+（Delegation sprints T25–T89 ほか）として一括バックフィル済み。
+以後の運用（新タスクは英語で起票 → 完了コミット末尾に `Closes #N`）は `docs/github-project.md`。
 
-```bash
-brew install gh
-gh auth login          # ブラウザで認証
-make gh-project        # 冪等・50 issue を英語で作成（closed 済み）
-```
-
-詳細と以後の運用（起票 → コミットに `Closes #N`）は `docs/github-project.md`。
-ボード表示にしたい場合は同ドキュメントの「Projects ボード」節を参照。
+> `gh` CLI は Homebrew 無しで `~/.local/bin/gh`（v2.96.0）に導入済み・PATH 済み・認証済み（larai-w）。
+> 以後 `make protect` / `make aws-wire` / `gh pr` 等がそのまま使える。
 
 ## 週替わりシナリオの在庫メモ（自動運用の前提）
 
