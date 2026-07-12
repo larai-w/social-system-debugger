@@ -171,11 +171,20 @@ test('sanity: buildExportData yielded a non-trivial key set', () => {
   const coveredAliases = new Set();
   for (const k of exportKeys) for (const a of keyAliases(k)) coveredAliases.add(a);
   const isIdentifierLike = (t) => /^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*$/.test(t);
+  // 数式説明に登場する補助関数名（例: `p2SkillFactor`）は export フィールドではないが
+  // ui.js/engine.js に実在する現行シンボル ⇒ 陳腐化ではない。「辞書が参照するシンボルが
+  // もう存在しない」ものだけを陳腐化とするため、定義済み関数名を除外する。
+  const definedFns = new Set(
+    [...`${uiSrc}\n${engineSrc}`.matchAll(/function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)].map(
+      (m) => m[1]
+    )
+  );
   const stale = (tokens, file) => {
     const out = [];
     for (const t of tokens) {
       if (!isIdentifierLike(t)) continue; // 式・URL・記号を含むコード表記は対象外
       if (coveredAliases.has(t)) continue;
+      if (definedFns.has(t)) continue; // 実在する補助関数名（式説明に登場）は陳腐化ではない
       out.push(t);
     }
     if (out.length) {
