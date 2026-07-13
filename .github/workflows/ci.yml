@@ -3,6 +3,9 @@ name: CI
 on:
   pull_request:
     branches: [main]
+  # weekly-rotate が作る PR は GITHUB_TOKEN 起点のため pull_request イベントで CI が
+  # 発火しない（GitHub の再帰防止）。ローテ側から明示ディスパッチして required checks を満たす。
+  workflow_dispatch:
 
 jobs:
   # ── フロント: engine.js のユニットテスト + 週替わりJSONスキーマ検証 ──
