@@ -1,41 +1,26 @@
 {
-  "id": "2026-W28",
-  "title": {
-    "ja": "エコーチェンバーの罠",
-    "en": "Echo Chamber Trap"
-  },
+  "id": "2026-W29",
+  "title": { "ja": "後継者ストック危機", "en": "Successor Stock Crisis" },
   "intro": {
-    "ja": "ある街の情報空間で、心地よい同質な声だけが少しずつ増えていく。最初は快適だが、やがて外の現実と噛み合わなくなる。多様性を手放さずに、この静かな濁りを止められるか。",
-    "en": "In one town's information space, comfortable, like-minded voices slowly crowd out the rest. It feels pleasant at first — until it no longer fits outside reality. Can you hold onto diversity and stop the quiet clouding?"
+    "ja": "人口が細るある地域で、名産を支えてきた職人たちが静かに引退していく。しばらくは何も起きない——ストックが尽きるその日までは。技術を次世代へ渡す投資で、崖の手前で踏みとどまれるか。",
+    "en": "In a thinning region, the artisans who sustained a local specialty quietly retire. For a while, nothing happens — until the reserve runs out. Can investment in handing skills to the next generation stop the fall just before the cliff?"
   },
-  "page": 1,
+  "page": 2,
   "params": {
-    "p1": {
-      "f": 55,
-      "e": 75,
-      "al": "greedy"
-    },
+    "p2": { "s": 30, "d": 10, "e": 80, "al": "dp", "reboot": false },
     "hint": {
-      "ja": "フィルタリングを下げて多様性を取り戻し、エントロピーが70を超える前に情報空間を澄ませてください。",
-      "en": "Lower the filtering to win diversity back, and clear the information space before entropy crosses 70."
+      "ja": "DX投資を素早く上げ、後継者ストック（スキルゲージ）の回復を見てください。平穏→崖落ちの瞬間を体験できます。",
+      "en": "Raise DX investment quickly and watch the successor stock (skill gauge) recover. Feel the calm-to-cliff moment."
     }
   },
   "goal": {
-    "ja": "エントロピーを70以上に上げずに、多様性を80以上に保つ",
-    "en": "Keep diversity above 80 while preventing entropy from rising above 70"
+    "ja": "後継者ストックを50以上に回復させ、ブランド産業の崩壊を止める",
+    "en": "Recover successor stock above 50 and prevent the brand industry from collapsing"
   },
   "goalConds": [
-    {
-      "metric": "diversity",
-      "op": ">=",
-      "value": 80
-    },
-    {
-      "metric": "entropy",
-      "op": "<",
-      "value": 70
-    }
+    { "metric": "skillStock", "op": ">=", "value": 50 },
+    { "metric": "brand", "op": ">=", "value": 40 }
   ],
   "difficulty": "normal",
-  "discoveryId": "sce_echo_trap"
+  "discoveryId": "sce_successor_crisis"
 }
