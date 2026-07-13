@@ -17,6 +17,8 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v7
+
       - name: Lighthouse audit (performance / accessibility / best-practices / seo / pwa)
         uses: treosh/lighthouse-ci-action@v11
         with:
