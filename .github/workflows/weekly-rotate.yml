@@ -60,13 +60,16 @@ jobs:
           # -f で万一の残骸も上書き（run_id 入りで衝突はまず無いが冪等に）。
           git push -f origin "$BRANCH"
           # PR 作成 → squash で auto-merge 予約（linear history 必須のため squash）。
-          # required checks の web/infra は PR で自動実行され、green になり次第マージされる。
           gh pr create \
             --base main \
             --head "$BRANCH" \
             --title "content: rotate latest.json to ${WEEK_ID}" \
             --body "Automated weekly rotation to ${WEEK_ID}. Auto-merges once required checks pass."
           gh pr merge "$BRANCH" --auto --squash
+          # GITHUB_TOKEN が作った PR は pull_request イベントの CI を発火させない
+          # （GitHub の再帰防止）。required checks（web/infra）を満たすため、
+          # CI をこのブランチ上で明示ディスパッチする（デプロイ起動と同じ手法）。
+          gh workflow run ci.yml --ref "$BRANCH"
           echo "rotated=true" >> "$GITHUB_OUTPUT"
           echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
 
