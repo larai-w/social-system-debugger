@@ -73,7 +73,7 @@ jobs:
       # 冪等: restock ラベルの open Issue が既にあれば新規起票せずコメント追記のみ（毎週の重複起票を防ぐ）。
       - name: Open a "restock" issue with a ready-to-paste prompt
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const label = 'restock';
