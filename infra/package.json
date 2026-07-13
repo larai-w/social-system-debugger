@@ -15,7 +15,7 @@
     "deploy": "bash scripts/deploy.sh"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^26",
     "aws-cdk": "2.1129.0",
     "cdk-nag": "^2.38.2",
     "ts-node": "^10.9.2",
