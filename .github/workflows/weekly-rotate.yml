@@ -1,9 +1,11 @@
 name: Weekly scenario rotation
 
 # 毎週月曜 0:00 JST（日曜 15:00 UTC）に、その週の content/weekly/<ISO週>.json を
-# latest.json へコピーして自動コミットする。
-# 注意: GITHUB_TOKEN による push は他ワークフローを発火させない（GitHub の再帰防止）ため、
-# ローテ後に Pages / AWS のデプロイを workflow_dispatch で明示的に起動する。
+# latest.json へコピーして main へ反映する。
+# 反映手段: main は branch protection 下（直接 push 不可）なので、一意ブランチに push →
+# PR 作成 → squash auto-merge を予約する。required checks が green になり次第マージされる。
+# 注意: GITHUB_TOKEN によるマージの push は他ワークフローを発火させない（GitHub の再帰防止）ため、
+# マージ完了を待ってから Pages / AWS のデプロイを workflow_dispatch で明示的に起動する。
 # 在庫が無い週は失敗させて通知する（＝「シナリオを書き足す」リマインダーを兼ねる）。
 on:
   schedule:
@@ -12,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write # main は branch protection 下 — 直接 push 不可なので PR 経由で反映する
   actions: write # 後続デプロイの workflow_dispatch 起動に必要
   issues: write # 失敗時に「作業指示書つき Issue」を自動起票するために必要
 
@@ -27,6 +30,12 @@ jobs:
 
       - name: Rotate latest.json to this week's scenario (JST)
         id: rotate
+        # main は branch protection（required checks: web/infra・linear history）下にあり
+        # GITHUB_TOKEN の直接 push は GH006 で拒否される。よって一意ブランチに commit & push し、
+        # PR を作成して squash auto-merge を予約する（required checks が green になり次第マージ）。
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           WEEK_ID=$(TZ=Asia/Tokyo date +%G-W%V)
           SRC="content/weekly/${WEEK_ID}.json"
@@ -41,21 +50,58 @@ jobs:
             exit 0
           fi
           cp "$SRC" content/weekly/latest.json
+          # run_id 入りの一意ブランチ名で冪等性を確保（同名ブランチ残骸で落ちない）。
+          BRANCH="weekly-rotate/${WEEK_ID}-${GITHUB_RUN_ID}"
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -b "$BRANCH"
           git add content/weekly/latest.json
           git commit -m "content: rotate latest.json to ${WEEK_ID}"
-          git push
+          # -f で万一の残骸も上書き（run_id 入りで衝突はまず無いが冪等に）。
+          git push -f origin "$BRANCH"
+          # PR 作成 → squash で auto-merge 予約（linear history 必須のため squash）。
+          # required checks の web/infra は PR で自動実行され、green になり次第マージされる。
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "content: rotate latest.json to ${WEEK_ID}" \
+            --body "Automated weekly rotation to ${WEEK_ID}. Auto-merges once required checks pass."
+          gh pr merge "$BRANCH" --auto --squash
           echo "rotated=true" >> "$GITHUB_OUTPUT"
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
 
       - name: Trigger deploys (Pages + AWS)
         if: steps.rotate.outputs.rotated == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BRANCH: ${{ steps.rotate.outputs.branch }}
         run: |
-          gh workflow run deploy.yml --ref main -R "$GITHUB_REPOSITORY"
+          # auto-merge は非同期（required checks 通過を待つ）。GITHUB_TOKEN による
+          # マージの push は deploy.yml/deploy-aws.yml を発火させない（再帰防止）ため、
+          # PR が main にマージされたのを待ってから明示的にデプロイをディスパッチする。
+          echo "PR (${BRANCH}) のマージ完了を待機します（最大 ~20 分）…"
+          MERGED=""
+          for i in $(seq 1 40); do
+            STATE=$(gh pr view "$BRANCH" --json state -q .state 2>/dev/null || echo "")
+            if [ "$STATE" = "MERGED" ]; then
+              MERGED="yes"
+              echo "PR がマージされました。"
+              break
+            fi
+            if [ "$STATE" = "CLOSED" ]; then
+              echo "::error::PR が（マージされずに）クローズされました。デプロイを中止します。"
+              exit 1
+            fi
+            sleep 30
+          done
+          if [ -z "$MERGED" ]; then
+            echo "::error::タイムアウト内に PR がマージされませんでした（checks 未通過の可能性）。デプロイを中止します。"
+            exit 1
+          fi
+          gh workflow run deploy.yml --ref main -R "$GH_REPO"
           # AWS 側は Secrets 未設定なら deploy-aws.yml 内の if でスキップされる（安全）
-          gh workflow run deploy-aws.yml --ref main -R "$GITHUB_REPOSITORY"
+          gh workflow run deploy-aws.yml --ref main -R "$GH_REPO"
 
       # 失敗時（多くは在庫切れ = 意図的な exit 1）に、直し方を書いた Issue を自動起票する。
       # ITIL: インシデント（赤い Actions）を、そのまま実行できるサービス要求（作業指示書）へ変換する。
