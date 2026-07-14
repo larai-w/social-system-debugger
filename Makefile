@@ -68,7 +68,7 @@ synth: ## cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
 handoff: ## セッション終了前チェック（クリーン・未push・テスト）
 	bash scripts/handoff-check.sh
 
-protect: ## main をブランチ保護（PR＋CI必須。要 gh admin）
+protect: ## [実行禁止] classic保護はruleset(id 18896897)に移行済み。再設定しないこと(docs/operations-runbook.md §8参照)
 	bash scripts/setup-branch-protection.sh
 
 gh-project: ## 開発履歴を GitHub Issues/Milestones へバックフィル（英語・要 gh。手順: docs/github-project.md）

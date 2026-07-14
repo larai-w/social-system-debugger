@@ -55,18 +55,18 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T93)',
+    title: 'Delegation sprints (T25–T96)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), and the usage-modes / mobile-verification sprint (T90–T92).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), the usage-modes / mobile-verification sprint (T90–T92), and the 5-incident chain / ruleset migration sprint (T94–T96).',
   },
 ];
 // NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
 // 'Delegation sprints (T25–T54)', then 'Delegation sprints (T25–T66)', then
 // 'Delegation sprints (T25–T70)', then 'Delegation sprints (T25–T84)', then
-// 'Delegation sprints (T25–T89)'.
+// 'Delegation sprints (T25–T89)', then 'Delegation sprints (T25–T93)'.
 // If an older milestone with any of those prior titles already exists in the repo,
 // either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T92)'
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T96)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -688,6 +688,27 @@ const TASKS = [
     ['area:content'],
     true,
     'Adds 4 weekly scenarios extending inventory from 2027-W01 to 2027-W05 (30 weeks). PAGE 5 teaser vol.4 — unified audit-type theme "the same shock only breaks the town whose conditions were already open", one scenario per PAGE 1-4. Reachability CI green; parent reviewed ethics/i18n. Same commit also added dependabot-auto-rebase.yml (permanent automation of the manual rebase chore).',
+  ],
+  [
+    'T94',
+    'Fix weekly-rotate (PR+auto-merge), lighthouse checkout, dependabot-auto-rebase repo context',
+    ['area:infra'],
+    false,
+    'Five-incident chain (IN-14 to IN-18): classic branch protection broke the GITHUB_TOKEN direct push in weekly-rotate (GH006). IN-15: lighthouse.yml missing checkout caused git rev-parse failure on first scheduled run. IN-16: dependabot-auto-rebase.yml missing GH_REPO env caused gh pr comment to fail. IN-17: PR+auto-merge approach proved impossible — GITHUB_TOKEN PRs do not trigger CI (GitHub re-entry guard) and the approve API is fork-only (HTTP 403). IN-18: can_approve_pull_request_reviews reverted to false after investigation. Final solution: removed classic protection, migrated to ruleset id 18896897 (DeployKey bypass); weekly-rotate now pushes via a write deploy key (secret WEEKLY_ROTATE_DEPLOY_KEY). Verified: run 29290558734 green, latest.json rotated to 2026-W29, AWS deploy succeeded, auto-filed issue #119 closed. Related: commits 8ae56a9, 8b7fc06 (rejected), a7ec3ce.',
+  ],
+  [
+    'T95',
+    'Incident ledger IN-13..17 + runbook chapter for bot-vs-protection ops',
+    ['area:docs'],
+    true,
+    'Adds IN-14–IN-18 to docs/learnings.md in the standard three-point format (what happened → root cause → permanent guard). Adds §8 to docs/operations-runbook.md covering: GH006 triage for the weekly-rotate deploy-key setup, deploy-key rotation procedure (ssh-keygen → gh api keys → gh secret set), explicit statement that bot PR auto-merge is impossible in this repo configuration, and a reminder that make protect must not be re-run. Also converts scripts/setup-branch-protection.sh to a no-op guard with the original code commented out. CHANGELOG T94–T96 entry added; PROGRESS.md rows added; gh-project-backfill.mjs TASKS extended to T96; TODO.md ☐3 completion note updated.',
+  ],
+  [
+    'T96',
+    'X Monday announce drafts 2027-W02..W05 + kpi layer-comparison table',
+    ['area:marketing'],
+    true,
+    'Adds four Monday post drafts for 2027-W02 through W05 to docs/x-post-templates.md (audit-type themes, no mention of gated weekly feature). Adds a reach-layer comparison table (educators / researchers / general public) to docs/kpi-log.md for tracking differentiated response patterns.',
   ],
 ];
 

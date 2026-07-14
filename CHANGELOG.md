@@ -4,6 +4,35 @@
 
 ---
 
+## インシデント対応・発信準備スプリント（T94〜T96）— 2026-07-13/14 — 5連鎖インシデントの恒久修正・ruleset移行・告知下書き
+
+T93 に続く第23スプリント。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-366 から変更なし）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
+
+### インシデント対応と恒久修正
+
+- **5連鎖インシデントの恒久修正・ruleset移行（T94・直営）**: 月曜定期実行で weekly-rotate / lighthouse / dependabot-auto-rebase の3ワークフローが連鎖失敗。根本原因を5点特定・順次修正した。
+  - **IN-14**: classic branch protection 有効化で weekly-rotate の GITHUB_TOKEN による直 push が GH006 で拒否。
+  - **IN-15**: lighthouse.yml に checkout なしで `git rev-parse HEAD` が失敗（初回スケジュール実行で露呈）。恒久修正: `actions/checkout@v7` 追加（コミット 8ae56a9）。
+  - **IN-16**: dependabot-auto-rebase.yml に checkout なしで `gh pr comment` が失敗。恒久修正: `env: GH_REPO: ${{ github.repository }}` 追加（コミット 8ae56a9）。
+  - **IN-17**: 修正第1案（PR + auto-merge 方式）は GitHub の再帰防止（GITHUB_TOKEN 作成 PR は CI を発火させない）と承認 API の fork 専用制限（非 fork PR は HTTP 403）により完全自動化不可と実証（コミット 8b7fc06・棄却）。
+  - **IN-18**: 調査中に変更した `can_approve_pull_request_reviews` を最終解確定後に `false` へ戻す（後始末）。
+  - **最終解**: classic protection を撤去し ruleset（id 18896897・DeployKey バイパス）に移行。`WEEKLY_ROTATE_DEPLOY_KEY`（デプロイキー id 157203959）で checkout し `git push origin HEAD:main` する方式を採用（コミット a7ec3ce）。検証: run 29290558734 green・latest.json が 2026-W29 に回転（コミット 58cb4c2）・AWS デプロイ成功・自動起票 issue #119 クローズ済み。関連 issue #130（T94）。
+- **帳簿・台帳バッチ（T95・Sonnet委任14件目・本エントリ）**:
+  - `docs/learnings.md` に IN-14〜IN-18 を追記（確定事実ベース・「何が起きた→根本原因→恒久ガード」の3点セット）。
+  - `docs/operations-runbook.md` に §8「ブランチ保護と bot 運用（ruleset・デプロイキー）」を追加（GH006 切り分け・デプロイキーローテ手順・bot PR 自動マージ禁止の明文化・`make protect` 実行禁止の理由）。
+  - `Makefile` の `protect` ターゲットのコメントを「実行禁止」表示に更新。
+  - `scripts/setup-branch-protection.sh` を再実行禁止の安全な形に変更（既存コードはコメントアウトで温存）。
+  - `CHANGELOG.md` に本エントリ追加（T94〜T96）。
+  - `PROGRESS.md` にタスク行 T94/T95/T96 を追記。
+  - `scripts/gh-project-backfill.mjs` の TASKS 配列末尾に T94/T95/T96 を追加・milestone を T25–T96 に更新。
+  - `TODO.md` ☐3 の完了注記に ruleset 移行の1行を追記。
+
+### コンテンツ・発信
+
+- **X 月曜告知 2027-W02〜W05 下書き＋kpi-log レイヤー別比較表（T96・Opus委任39件目）**: `docs/x-post-templates.md` に W02〜W05 の月曜告知文（在庫ある監査系テーマで統一・ゲート付きコンテンツ非掲載）を追加。`docs/kpi-log.md` にリーチ層別（教育者/研究者/一般）の反応比較表を追加（関連 issue #131）。
+
+---
+
 ## 週次補充・Dependabot自動化スプリント（T93）— 2026-07-12 — 在庫30週・PR後始末の恒久自動化
 
 T90〜T92 に続く第22スプリント。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-366 から変更なし）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
