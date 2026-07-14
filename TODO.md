@@ -12,7 +12,7 @@
 | ~~☐0~~ | ~~**`git push`（未pushコミットあり）**~~ | ~~1分~~ | ~~1分~~ | ✅ 完了 |
 | ~~☐1~~ | ~~本番サイト目視確認~~ | ~~5分~~ | ~~5分（不要）~~ | ✅ 完了 |
 | ~~☐2~~ | ~~Actions 自動デプロイ有効化~~ | ~~10分~~ | ~~計25分~~ | ✅ 完了（2026-07-12・`make aws-wire` で Secrets/Variables 設定済） |
-| ~~☐3~~ | ~~main ブランチ保護~~ | ~~5分~~ | ~~5分~~ | ✅ 完了（2026-07-12・`make protect`・CI必須 web/infra） |
+| ~~☐3~~ | ~~main ブランチ保護~~ | ~~5分~~ | ~~5分~~ | ✅ 完了（2026-07-12・`make protect`・CI必須 web/infra）。2026-07-14 に classic → ruleset（id 18896897・DeployKey バイパス）へ移行。`make protect` は再実行禁止（docs/operations-runbook.md §8 参照）。 |
 | ☐4 | Capacitor 実機（任意） | 30〜60分 | iOS +15分（cocoapods）/ Android +30〜60分（Studio+JDK17）| やや重い |
 | ☐5 | 30秒リールを録画して X 固定ポストに | 15分 | 15分 | かんたん |
 | ☐6 | 教員向け1枚ガイドを PDF 化（**自動化済み** `make classroom-pdf`） | 0分 | 0分 | 自動 |

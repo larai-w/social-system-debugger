@@ -259,6 +259,119 @@ npm run validate:weekly   # 末尾に「在庫: 残りN週（最新: 2026-Wxx）
 
 ---
 
+## 8. ブランチ保護と bot 運用（ruleset・デプロイキー）
+
+**背景**: 2026-07-12 に classic branch protection を有効化した翌朝、`weekly-rotate.yml` の
+`GITHUB_TOKEN` による `main` への直 push が `GH006` で拒否され、週次ローテが失敗した（IN-14）。
+調査・試行錯誤の末、**ruleset + デプロイキー直接 push** が最終解として確立・実装済み（コミット a7ec3ce）。
+
+---
+
+### 8-1. ローテが GH006 で失敗した（切り分け）
+
+**症状**: `weekly-rotate.yml` のログに `GH006 Protected branch update failed` が出る。
+
+**切り分け**:
+
+1. **classic protection が有効になっていないか確認**:
+   ```bash
+   gh api repos/larai-w/social-system-debugger/branches/main/protection 2>&1
+   ```
+   `404` なら classic protection なし（正常）。値が返ってきたら classic protection が有効 → 後述の対処。
+
+2. **ruleset の状態を確認**:
+   ```bash
+   gh api repos/larai-w/social-system-debugger/rulesets/18896897
+   ```
+   `bypass_actors` に `repository_roles` の `"name": "deploy_key"` が含まれているかを確認する。
+   含まれていない場合、デプロイキーのバイパスが効いておらず、直 push が拒否される原因になる。
+
+3. **`WEEKLY_ROTATE_DEPLOY_KEY` シークレットが正しく設定されているか確認**:
+   - GitHub → Settings → Secrets → Actions で `WEEKLY_ROTATE_DEPLOY_KEY` の有無を確認。
+   - シークレットは存在しても値の妥当性は確認できないため、もし疑わしければ後述のデプロイキーローテ手順で再生成する。
+
+**根拠**: `weekly-rotate.yml`（`ssh-key: ${{ secrets.WEEKLY_ROTATE_DEPLOY_KEY }}` で checkout し
+`git push origin HEAD:main`）。ruleset id 18896897（名称 "main protection (CI gate, deploy-key bypass)"）。
+
+---
+
+### 8-2. デプロイキーのローテ手順
+
+既存のデプロイキーが失効・漏洩した場合、または定期ローテ時の手順。
+
+```bash
+# 1. 新しい SSH キーペアを生成（パスフレーズなし・ファイルは作業後に削除）
+ssh-keygen -t ed25519 -C "weekly-rotate deploy key" -f /tmp/weekly_rotate_key -N ""
+
+# 2. GitHub リポジトリに公開鍵を登録（title は任意）
+#    deploy key id 157203959 が既存キー — 削除してから新規登録する
+gh api -X DELETE repos/larai-w/social-system-debugger/keys/157203959
+gh api -X POST repos/larai-w/social-system-debugger/keys \
+  -f title="weekly-rotate deploy key $(date +%Y%m%d)" \
+  -f key="$(cat /tmp/weekly_rotate_key.pub)" \
+  -F read_only=false
+
+# 3. 秘密鍵を Actions シークレットに登録
+gh secret set WEEKLY_ROTATE_DEPLOY_KEY --repo larai-w/social-system-debugger \
+  < /tmp/weekly_rotate_key
+
+# 4. 作業ファイルを削除
+rm /tmp/weekly_rotate_key /tmp/weekly_rotate_key.pub
+```
+
+新しいデプロイキーの id を記録しておくこと（`gh api repos/larai-w/social-system-debugger/keys` で確認可）。
+
+**根拠**: `weekly-rotate.yml`（`actions/checkout` の `ssh-key` 入力でデプロイキー checkout）。
+
+---
+
+### 8-3. 絶対にやらないこと（bot による PR 自動マージ）
+
+> **「GITHUB_TOKEN で PR を作り、CI 通過後に自動マージする」方式は、このリポジトリ構成では完全自動化不可能と実証済みである（IN-17）。再挑戦しないこと。**
+
+理由（2点）:
+
+1. **CI が発火しない**: `GITHUB_TOKEN` が作成した PR は、GitHub の再帰防止ポリシーにより
+   `pull_request` イベントの CI ジョブが発火しない。`workflow_dispatch` で CI を明示起動しても、
+   後から到着する「承認待ち（action_required）の pull_request 実行」が競合して PR は BLOCKED のまま。
+
+2. **承認 API は fork PR 専用**: 非 fork PR に対する `/approve` API は HTTP 403 で拒否される。
+   承認要件を 0 にしても、CI が通過しない限り BLOCKED は解消しない。
+
+代替案は存在しない（これは GitHub のプラットフォーム設計上の制約）。
+週次ローテのような自動コミットは「デプロイキーで直接 push」一択。
+
+---
+
+### 8-4. classic protection と ruleset の二重設定に注意
+
+> `make protect`（`scripts/setup-branch-protection.sh`）は **実行禁止**。
+
+`make protect` は classic branch protection を設定するスクリプトであり、
+現在は ruleset（id 18896897）に移行済み。両方を有効にすると以下の問題が発生する:
+
+- classic protection はデプロイキーのバイパスを認識しない → 週次ローテが再び GH006 で失敗する（IN-14 の再発）。
+- `make protect` の実行は設定の二重化であり、解決よりも問題を増やす。
+
+`make protect` を実行したくなった場合は、まずこの節を読んで ruleset の状態を確認すること。
+ruleset の設定確認・変更は GitHub Web UI（Settings → Rules → Rulesets → id 18896897）か
+`gh api` で行う。
+
+現在の ruleset 設定概要:
+
+| 項目 | 値 |
+|---|---|
+| ruleset id | 18896897 |
+| 名称 | "main protection (CI gate, deploy-key bypass)" |
+| 必須チェック | `web`, `infra` |
+| linear history | 必須 |
+| force push/削除 | 禁止 |
+| バイパス | DeployKey, Repository admin |
+
+**根拠**: `scripts/setup-branch-protection.sh`（現在は実行禁止の表示のみ）・`TODO.md` ☐3 の完了注記。
+
+---
+
 ## 付録: この文書のメンテナンス
 
 - 手順が実装とずれたら、**先に実装（ワークフロー / `sw.js` / スクリプト）を正**として本書を直す。各手順の根拠パスを頼りに追随する。

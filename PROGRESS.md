@@ -102,6 +102,9 @@
 | T91 | 帳簿バッチ＝CHANGELOG T85〜T89・96 issues・IN-10/11（**Sonnet委任13件目**） | 見張り指示の履行＋ラチェット台帳の追記義務 | ✅ |
 | T92 | verify.mjs モバイルパス＝4パス体制（**Opus委任36件目**） | 主要ユーザー=スマホの検証穴を CI 化 | ✅ |
 | T93 | 週次シナリオ 2027-W02〜W05 補充＋Dependabot自動rebase（**Opus委任37件目＋直営**） | 在庫を2027年2月頭（30週）まで延長・☐12の恒久自動化 | ✅ |
+| T94 | 5連鎖インシデント恒久修正＋ruleset移行（直営＋Opus委任38件目） | IN-14〜18: classic保護→ruleset+デプロイキー方式・bot PR自動マージ不可を実証・lighthouse/dependabot-auto-rebase のcheckout修正 | ✅ |
+| T95 | 帳簿・台帳バッチ=learnings IN-14〜18・runbook §8・CHANGELOG T94〜T96・PROGRESS/backfill 追記（**Sonnet委任14件目**） | ガードレール・ラチェット方針の履行＋make protect 実行禁止化 | ✅ |
+| T96 | X 月曜告知 2027-W02〜W05 下書き＋kpi-log レイヤー別比較表（**Opus委任39件目**） | 発信素材の継続補充（在庫あるコンテンツの範囲内・ゲート遵守） | ✅ |
 
 ## 実施順
 
