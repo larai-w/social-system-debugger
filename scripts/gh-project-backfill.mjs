@@ -698,7 +698,7 @@ const TASKS = [
   ],
   [
     'T95',
-    'Incident ledger IN-13..17 + runbook chapter for bot-vs-protection ops',
+    'Incident ledger IN-14..18 + runbook chapter for bot-vs-protection ops',
     ['area:docs'],
     true,
     'Adds IN-14–IN-18 to docs/learnings.md in the standard three-point format (what happened → root cause → permanent guard). Adds §8 to docs/operations-runbook.md covering: GH006 triage for the weekly-rotate deploy-key setup, deploy-key rotation procedure (ssh-keygen → gh api keys → gh secret set), explicit statement that bot PR auto-merge is impossible in this repo configuration, and a reminder that make protect must not be re-run. Also converts scripts/setup-branch-protection.sh to a no-op guard with the original code commented out. CHANGELOG T94–T96 entry added; PROGRESS.md rows added; gh-project-backfill.mjs TASKS extended to T96; TODO.md ☐3 completion note updated.',
