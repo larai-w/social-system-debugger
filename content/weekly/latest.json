@@ -1,26 +1,26 @@
 {
-  "id": "2026-W29",
-  "title": { "ja": "後継者ストック危機", "en": "Successor Stock Crisis" },
+  "id": "2026-W30",
+  "title": { "ja": "認知のグラウンディング", "en": "Cognitive Grounding" },
   "intro": {
-    "ja": "人口が細るある地域で、名産を支えてきた職人たちが静かに引退していく。しばらくは何も起きない——ストックが尽きるその日までは。技術を次世代へ渡す投資で、崖の手前で踏みとどまれるか。",
-    "en": "In a thinning region, the artisans who sustained a local specialty quietly retire. For a while, nothing happens — until the reserve runs out. Can investment in handing skills to the next generation stop the fall just before the cliff?"
+    "ja": "浅い反射だけで判断する頭に、偽装された声が「正義」を注ぎ込む。事実を述べる者が、集団で赤く攻撃されはじめる。深い探索と現実への同期で、汚染された認知を洗い流せるか。",
+    "en": "A mind that judges by shallow reflex gets fed 'justice' by a disguised voice. Those who state facts start getting mobbed in red. Can deeper reasoning and reality-sync wash the contaminated cognition clean?"
   },
-  "page": 2,
+  "page": 3,
   "params": {
-    "p2": { "s": 30, "d": 10, "e": 80, "al": "dp", "reboot": false },
+    "p3": { "depth": 3, "ground": 20, "lr": 20 },
     "hint": {
-      "ja": "DX投資を素早く上げ、後継者ストック（スキルゲージ）の回復を見てください。平穏→崖落ちの瞬間を体験できます。",
-      "en": "Raise DX investment quickly and watch the successor stock (skill gauge) recover. Feel the calm-to-cliff moment."
+      "ja": "パラメータを調整し、赤い『毒入れ攻撃』が消えて認知健全性が上がるかを観察してください。",
+      "en": "Adjust the parameters and watch the red 'poisoning attack' fade as cognitive integrity climbs."
     }
   },
   "goal": {
-    "ja": "後継者ストックを50以上に回復させ、ブランド産業の崩壊を止める",
-    "en": "Recover successor stock above 50 and prevent the brand industry from collapsing"
+    "ja": "認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする",
+    "en": "Raise cognitive integrity above 80 and reach search depth 7+"
   },
   "goalConds": [
-    { "metric": "skillStock", "op": ">=", "value": 50 },
-    { "metric": "brand", "op": ">=", "value": 40 }
+    { "metric": "integrity", "op": ">=", "value": 80 },
+    { "metric": "searchDepth", "op": ">=", "value": 7 }
   ],
-  "difficulty": "normal",
-  "discoveryId": "sce_successor_crisis"
+  "difficulty": "hard",
+  "discoveryId": "sce_cognitive_grounding"
 }
