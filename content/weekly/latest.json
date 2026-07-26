@@ -1,26 +1,26 @@
 {
-  "id": "2026-W30",
-  "title": { "ja": "認知のグラウンディング", "en": "Cognitive Grounding" },
+  "id": "2026-W31",
+  "title": { "ja": "冗長性ショック対抗", "en": "Redundancy Shock Resilience" },
   "intro": {
-    "ja": "浅い反射だけで判断する頭に、偽装された声が「正義」を注ぎ込む。事実を述べる者が、集団で赤く攻撃されはじめる。深い探索と現実への同期で、汚染された認知を洗い流せるか。",
-    "en": "A mind that judges by shallow reflex gets fed 'justice' by a disguised voice. Those who state facts start getting mobbed in red. Can deeper reasoning and reality-sync wash the contaminated cognition clean?"
+    "ja": "効率化の名の下に、あなたの街のインフラは1か所に集約されていく。数字の上では順調だ——未知の衝撃が来るまでは。ムダに見える余白を、間に合ううちに取り戻せるか。",
+    "en": "In the name of efficiency, your town's infrastructure keeps consolidating into one place. The numbers look great — until an unknown shock arrives. Can you win back the slack that looks like waste, while there is still time?"
   },
-  "page": 3,
+  "page": 2,
   "params": {
-    "p3": { "depth": 3, "ground": 20, "lr": 20 },
+    "p2": { "s": 50, "d": 30, "e": 80, "al": "dp", "reboot": false },
     "hint": {
-      "ja": "パラメータを調整し、赤い『毒入れ攻撃』が消えて認知健全性が上がるかを観察してください。",
-      "en": "Adjust the parameters and watch the red 'poisoning attack' fade as cognitive integrity climbs."
+      "ja": "集約化を下げて冗長性バッファを積み上げ、そのあと ⚡ショック注入 で生存の分岐点を確かめてください。",
+      "en": "Lower consolidation to build up the redundancy buffer, then inject ⚡ shock and see the survival branching point."
     }
   },
   "goal": {
-    "ja": "認知健全性（Integrity）を80以上に上げ、探索深度を7以上にする",
-    "en": "Raise cognitive integrity above 80 and reach search depth 7+"
+    "ja": "冗長性バッファを75以上に上げ、ショック注入後もインフラを維持して生き残る",
+    "en": "Raise the redundancy buffer above 75 and keep infrastructure alive through the shock"
   },
   "goalConds": [
-    { "metric": "integrity", "op": ">=", "value": 80 },
-    { "metric": "searchDepth", "op": ">=", "value": 7 }
+    { "metric": "redundancy", "op": ">=", "value": 75 },
+    { "metric": "infra", "op": ">=", "value": 20 }
   ],
   "difficulty": "hard",
-  "discoveryId": "sce_cognitive_grounding"
+  "discoveryId": "sce_redundancy_shock"
 }
