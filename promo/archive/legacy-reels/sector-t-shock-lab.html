@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECTOR-T 実験 — 効率都市 vs 冗長都市</title>
+<style>
+:root{
+  --bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;
+  --cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--pur:#9945ff;--yel:#ffcc00;
+  --txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 16px 26px;position:relative;z-index:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--bdr);gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:1.0rem;color:var(--cyan);text-shadow:0 0 22px rgba(0,212,255,.45);letter-spacing:.13em}
+.hdr .sub{color:var(--muted);font-size:.6rem;margin-top:3px;letter-spacing:.06em}
+.rec{display:inline-flex;align-items:center;gap:6px;font-size:.6rem;letter-spacing:.18em;color:var(--red)}
+.rec .d{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.stage{position:relative;margin-top:14px;border:1px solid var(--bdr);border-radius:3px;background:var(--bg1);overflow:hidden}
+#cv{width:100%;height:470px;display:block}
+.banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 24px;border-radius:3px;font-size:.72rem;font-weight:bold;letter-spacing:.16em;white-space:nowrap;transition:opacity .6s;text-align:center}
+.b-calm{background:rgba(0,212,255,.1);border:1px solid var(--cyan);color:var(--cyan)}
+.b-shock{background:rgba(255,204,0,.12);border:1px solid var(--yel);color:var(--yel);text-shadow:0 0 14px rgba(255,204,0,.7);animation:ap .8s infinite}
+.b-res{background:rgba(0,255,136,.1);border:1px solid var(--green);color:var(--green)}
+@keyframes ap{0%,100%{box-shadow:0 0 16px rgba(255,204,0,.5)}50%{box-shadow:none}}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:rgba(7,11,20,.85);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity 1.6s;text-align:center;padding:20px}
+.endcard.on{opacity:1;pointer-events:auto}
+.endcard .big{font-size:1.05rem;color:var(--green);letter-spacing:.15em;text-shadow:0 0 24px rgba(0,255,136,.6)}
+.endcard .msg{font-size:.7rem;color:var(--txt);line-height:2.1;max-width:600px}
+.endcard .msg em{color:var(--cyan);font-style:normal}
+.endcard .msg b{color:var(--red)}
+.ctrl{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 18px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;cursor:pointer;transition:all .2s;letter-spacing:.12em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.2)}
+.pi{padding:4px 11px;font-size:.55rem;letter-spacing:.1em;border:1px solid var(--bdr);border-radius:2px;color:var(--muted);transition:all .4s}
+.pi.on1{border-color:var(--cyan);color:var(--cyan)}
+.pi.on2{border-color:var(--yel);color:var(--yel)}
+.pi.on3{border-color:var(--green);color:var(--green)}
+.phase-ind{display:flex;gap:6px;margin-left:auto}
+.tbar{height:3px;background:var(--bdr);margin-top:10px;border-radius:2px;overflow:hidden}
+.tfill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--yel),var(--green))}
+.foot{text-align:center;padding-top:14px;font-size:.54rem;color:var(--muted);letter-spacing:.1em;margin-top:14px;border-top:1px solid var(--bdr)}
+@media(prefers-reduced-motion:reduce){.rec .d,.b-shock{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <h1>▶ SECTOR-T LAB — 効率都市 vs 冗長都市 ショック注入実験</h1>
+      <div class="sub">PAGE 2「地方インフラ・シミュレーター」核心デモ — 平時に勝つ都市と、最悪の日に生き残る都市は違う</div>
+    </div>
+    <div class="rec"><span class="d"></span>REC — EXPERIMENT 02</div>
+  </div>
+
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="banner" id="banner" style="opacity:0"></div>
+    <div class="endcard" id="endcard">
+      <div class="big">EXPERIMENT COMPLETE — 生存者: CITY-B</div>
+      <div class="msg">
+        平時のスコアは <b>効率都市 CITY-A の圧勝</b>だった。<br>
+        しかしブラックスワンは、スコアボードを見ない。<br>
+        単一ハブのCITY-Aは一撃で連鎖崩壊、<em>冗長性バッファ</em>を持つCITY-Bは吸収して復旧。<br>
+        <em>効率は「平時の速さ」、冗長性は「最悪の日の命」。</em>
+      </div>
+      <button class="btn" onclick="restart()">↺ REPLAY EXPERIMENT</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+    <div class="phase-ind">
+      <span class="pi" id="pi0">01 平時比較</span>
+      <span class="pi" id="pi1">02 ⚡ショック注入</span>
+      <span class="pi" id="pi2">03 判定</span>
+    </div>
+  </div>
+  <div class="tbar"><div class="tfill" id="tfill"></div></div>
+
+  <div class="foot">SECTOR-T LAB — 集約×Greedy戦略の隠れコストを可視化 / 画面録画で動画化できます</div>
+</div>
+
+<script>
+// timeline: 0-5 boot / 5-20 平時(Aが勝ってるように見える) / 20-24 shock countdown / 24-40 cascade vs absorb / 40-52 判定→end
+const DUR=52, T_CALM=5, T_SHOCK=20, T_HIT=24, T_JUDGE=40;
+let t=0, playing=true, last=performance.now(), ended=false;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=470*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+addEventListener('resize',fit);fit();
+const W=()=>cv.getBoundingClientRect().width, H=470;
+
+// ---------- city model ----------
+// each city: buildings[], hubs[], links hub->building. power: building lit if any connected hub alive.
+function makeCity(cx0,w,mode){
+  const c={x0:cx0,w,mode,buildings:[],hubs:[],score:0,alive:1};
+  const cols=6,rows=3;
+  for(let r=0;r<rows;r++)for(let k=0;k<cols;k++){
+    c.buildings.push({x:cx0+30+k*((w-60)/(cols-1)),y:170+r*80+((k%2)*14),lit:1,flick:0,h:26+((k*7+r*13)%22)});
+  }
+  if(mode==='A'){ // single mega hub
+    c.hubs.push({x:cx0+w/2,y:300,r:16,alive:true,load:0,mega:true});
+  }else{ // three small hubs, ring
+    c.hubs.push({x:cx0+w*.25,y:250,r:9,alive:true,load:0});
+    c.hubs.push({x:cx0+w*.72,y:220,r:9,alive:true,load:0});
+    c.hubs.push({x:cx0+w*.55,y:340,r:9,alive:true,load:0});
+  }
+  return c;
+}
+let A,B;
+function build(){const w=W();A=makeCity(0,w/2,'A');B=makeCity(w/2,w/2,'B');}
+build();addEventListener('resize',build);
+
+// packets flowing hub->buildings (visual life)
+const packets=[];
+function spawnPacket(city){
+  const hubs=city.hubs.filter(h=>h.alive);if(!hubs.length)return;
+  const h=hubs[Math.floor(Math.random()*hubs.length)];
+  const b=city.buildings[Math.floor(Math.random()*city.buildings.length)];
+  if(!b.lit)return;
+  packets.push({x:h.x,y:h.y,tx:b.x,ty:b.y,p:0,col:city.mode==='A'?'#00d4ff':'#00ff88'});
+}
+
+// gauges
+let effA=95,effB=72,bufA=12,bufB=58,svcA=98,svcB=90;
+const heli={A:true,B:true};
+
+// helper: nearest alive hub for building
+function powered(city,b){
+  return city.hubs.some(h=>h.alive&&((h.x-b.x)**2+(h.y-b.y)**2)<(city.mode==='A'?1e9:210*210));
+}
+
+let shockFlash=0, quake=0;
+function step(dt){
+  t+=dt;
+  if(t>=DUR){t=DUR;if(!ended){ended=true;document.getElementById('endcard').classList.add('on');}}
+  // packets
+  if(Math.random()<dt*10)spawnPacket(A);
+  if(Math.random()<dt*10)spawnPacket(B);
+  packets.forEach(p=>p.p+=dt*1.6);
+  for(let i=packets.length-1;i>=0;i--)if(packets[i].p>=1)packets.splice(i,1);
+
+  // SHOCK HIT
+  if(t>=T_HIT&&A.hubs[0].alive){
+    A.hubs[0].alive=false;            // mega hub destroyed
+    B.hubs[1].alive=false;            // one of three destroyed — same magnitude
+    shockFlash=1;quake=1;heli.A=false;heli.B=false;
+  }
+  shockFlash=Math.max(0,shockFlash-dt*.7);
+  quake=Math.max(0,quake-dt*.35);
+
+  // cascade / absorb
+  if(t>=T_HIT){
+    const p=Math.min(1,(t-T_HIT)/10);
+    // City A: all dark, cascading with delay per building
+    A.buildings.forEach((b,i)=>{
+      const delay=(i%6)*.5+Math.floor(i/6)*.8;
+      if(t>T_HIT+delay)b.lit=Math.max(0,b.lit-dt*1.5);
+    });
+    svcA=Math.max(4,svcA-dt*14);effA=Math.max(0,effA-dt*16);
+    // City B: brief flicker then re-route to surviving hubs
+    B.buildings.forEach(b=>{
+      if(powered(B,b)){b.flick=Math.max(0,b.flick-dt);b.lit=Math.min(1,b.lit+dt*(t>T_HIT+3?.7:.1));}
+      else b.lit=Math.max(.25,b.lit-dt*.6);
+    });
+    if(t<T_HIT+3){svcB=Math.max(58,svcB-dt*12);}
+    else{svcB=Math.min(84,svcB+dt*5);heli.B=t>T_HIT+5;}
+    bufB=Math.max(24,58-(t-T_HIT)*4.5);
+    bufA=Math.max(0,12-(t-T_HIT)*4);
+  }
+}
+
+// ---------- drawing ----------
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-4);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,6);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,6);
+  cx.fillStyle=col;cx.fillText(Math.round(val),x+w+6,y+6);
+}
+function heliIcon(x,y,on){
+  cx.strokeStyle=on?'#00ff88':'#ff2244';cx.fillStyle=on?'#00ff88':'#ff2244';cx.lineWidth=1.5;
+  cx.beginPath();cx.ellipse(x,y+3,8,4,0,0,7);cx.stroke();
+  const a=on?(performance.now()/40)%7:0.6;
+  cx.beginPath();cx.moveTo(x-11*Math.cos(a),y-4);cx.lineTo(x+11*Math.cos(a),y-4);cx.stroke();
+  cx.font='8px Courier New';cx.fillText(on?'HELI: OPERATIONAL':'HELI: OFFLINE',x+14,y+4);
+}
+function drawCity(c,title,accent){
+  const {x0,w}=c;
+  // panel divider handled globally
+  cx.fillStyle=accent;cx.font='bold 12px Courier New';
+  cx.fillText(title,x0+18,60);
+  // links hub->buildings
+  c.buildings.forEach(b=>{
+    c.hubs.forEach(h=>{
+      const near=c.mode==='A'||((h.x-b.x)**2+(h.y-b.y)**2)<210*210;
+      if(!near)return;
+      cx.strokeStyle=h.alive?(c.mode==='A'?'rgba(0,212,255,.18)':'rgba(0,255,136,.18)'):'rgba(255,34,68,.12)';
+      cx.setLineDash(h.alive?[]:[3,5]);cx.lineWidth=1;
+      cx.beginPath();cx.moveTo(h.x,h.y);cx.lineTo(b.x,b.y);cx.stroke();cx.setLineDash([]);
+    });
+  });
+  // ring between B hubs
+  if(c.mode==='B'){cx.strokeStyle='rgba(0,255,136,.3)';cx.lineWidth=1.4;
+    cx.beginPath();cx.moveTo(c.hubs[0].x,c.hubs[0].y);cx.lineTo(c.hubs[1].x,c.hubs[1].y);cx.lineTo(c.hubs[2].x,c.hubs[2].y);cx.closePath();cx.stroke();}
+  // buildings
+  c.buildings.forEach(b=>{
+    const lit=b.lit;
+    const qx=quake*(Math.random()-.5)*4,qy=quake*(Math.random()-.5)*3;
+    cx.fillStyle=`rgba(15,24,41,1)`;cx.strokeStyle='rgba(23,35,64,1)';
+    cx.fillRect(b.x-9+qx,b.y-b.h+qy,18,b.h);cx.strokeRect(b.x-9+qx,b.y-b.h+qy,18,b.h);
+    const wc=lit>0.5?(c.mode==='A'?`rgba(0,212,255,${.5*lit})`:`rgba(0,255,136,${.5*lit})`):`rgba(255,34,68,${.25*(1-lit)})`;
+    cx.fillStyle=wc;
+    for(let wy=0;wy<Math.floor(b.h/10);wy++)cx.fillRect(b.x-5+qx,b.y-b.h+4+wy*10+qy,4,5),cx.fillRect(b.x+2+qx,b.y-b.h+4+wy*10+qy,4,5);
+  });
+  // hubs
+  c.hubs.forEach(h=>{
+    const qx=quake*(Math.random()-.5)*5;
+    if(h.alive){
+      const col=c.mode==='A'?'#00d4ff':'#00ff88';
+      cx.shadowBlur=14;cx.shadowColor=col;cx.fillStyle=col;
+      cx.beginPath();cx.arc(h.x+qx,h.y,h.r+Math.sin(t*3)*1.5,0,7);cx.fill();cx.shadowBlur=0;
+      cx.fillStyle='#070b14';cx.font='bold 8px Courier New';cx.textAlign='center';
+      cx.fillText(h.mega?'MEGA HUB':'HUB',h.x+qx,h.y+3);cx.textAlign='left';
+    }else{
+      cx.strokeStyle='#ff2244';cx.lineWidth=2;
+      cx.beginPath();cx.arc(h.x,h.y,h.r,0,7);cx.stroke();
+      cx.beginPath();cx.moveTo(h.x-7,h.y-7);cx.lineTo(h.x+7,h.y+7);cx.moveTo(h.x+7,h.y-7);cx.lineTo(h.x-7,h.y+7);cx.stroke();
+      if(shockFlash>0){cx.fillStyle=`rgba(255,204,0,${shockFlash})`;
+        cx.beginPath();cx.arc(h.x,h.y,h.r+30*(1-shockFlash),0,7);cx.fill();}
+      cx.fillStyle='#ff2244';cx.font='8px Courier New';cx.fillText('DESTROYED',h.x-24,h.y+h.r+14);
+    }
+  });
+}
+
+function render(){
+  const w=W();cx.clearRect(0,0,w,H);
+  // divider
+  cx.strokeStyle='#172340';cx.lineWidth=1;cx.beginPath();cx.moveTo(w/2,40);cx.lineTo(w/2,H-10);cx.stroke();
+  cx.fillStyle='rgba(90,111,148,.6)';cx.font='9px Courier New';cx.textAlign='center';
+  cx.fillText('SAME SHOCK — 同時・同規模のブラックスワンを両都市に注入',w/2,34);cx.textAlign='left';
+
+  drawCity(A,'CITY-A ▸ 効率至上都市（集約×Greedy）','#00d4ff');
+  drawCity(B,'CITY-B ▸ 冗長都市（分散×DP）','#00ff88');
+
+  // packets
+  packets.forEach(p=>{
+    const x=p.x+(p.tx-p.x)*p.p,y=p.y+(p.ty-p.y)*p.p;
+    cx.fillStyle=p.col;cx.shadowBlur=5;cx.shadowColor=p.col;
+    cx.beginPath();cx.arc(x,y,1.8,0,7);cx.fill();cx.shadowBlur=0;
+  });
+
+  // gauges per city
+  gauge(20,H-58,120,'平時コスト効率',effA,'#00d4ff');
+  gauge(20,H-34,120,'冗長性バッファ',bufA,bufA<30?'#ff2244':'#ffcc00');
+  gauge(180,H-58,120,'市民サービス稼働',svcA,svcA<30?'#ff2244':'#00d4ff');
+  heliIcon(200,H-28,heli.A&&t<T_HIT);
+  gauge(w/2+20,H-58,120,'平時コスト効率',effB,'#00d4ff');
+  gauge(w/2+20,H-34,120,'冗長性バッファ',bufB,bufB<30?'#ff2244':'#00ff88');
+  gauge(w/2+180,H-58,120,'市民サービス稼働',svcB,svcB<30?'#ff2244':'#00ff88');
+  heliIcon(w/2+200,H-28,heli.B||t<T_HIT);
+
+  // phase overlays
+  if(t>=T_CALM&&t<T_SHOCK){
+    // scoreboard: A winning
+    const bx=w/2-130,by=70;
+    cx.fillStyle='rgba(7,11,20,.9)';cx.strokeStyle='#172340';rrect(bx,by,260,44,4);cx.fill();cx.stroke();
+    cx.fillStyle='#00d4ff';cx.font='bold 11px Courier New';cx.textAlign='center';
+    cx.fillText('平時スコア: CITY-A 95 vs CITY-B 72',w/2,by+18);
+    cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+    cx.fillText('「無駄の多いBは負け…？」— 市場はAを称賛',w/2,by+34);cx.textAlign='left';
+  }
+  if(t>=T_SHOCK&&t<T_HIT){
+    const c=Math.ceil(T_HIT-t);
+    cx.fillStyle=`rgba(255,204,0,${.08+.06*Math.sin(t*10)})`;cx.fillRect(0,0,w,H);
+    cx.fillStyle='#ffcc00';cx.font='bold 30px Courier New';cx.textAlign='center';
+    cx.fillText('⚡ BLACK SWAN INBOUND — '+c,w/2,H/2-40);
+    cx.font='10px Courier New';cx.fillText('50年に一度の複合災害（地震＋豪雪）を両都市に同時注入',w/2,H/2-16);
+    cx.textAlign='left';
+  }
+  if(shockFlash>0){cx.fillStyle=`rgba(255,255,255,${shockFlash*.5})`;cx.fillRect(0,0,w,H);}
+  // verdicts
+  if(t>=T_JUDGE){
+    cx.textAlign='center';
+    cx.fillStyle='rgba(255,34,68,.14)';cx.fillRect(0,40,w/2,H-50);
+    cx.fillStyle='#ff2244';cx.font='bold 26px Courier New';
+    cx.fillText('✗ CRASHED',w/4,H/2);
+    cx.font='10px Courier New';cx.fillText('単一障害点 → 連鎖崩壊 / 復旧手段なし',w/4,H/2+22);
+    cx.fillStyle='rgba(0,255,136,.10)';cx.fillRect(w/2,40,w/2,H-50);
+    cx.fillStyle='#00ff88';cx.font='bold 26px Courier New';
+    cx.fillText('✓ SURVIVED',w*3/4,H/2);
+    cx.font='10px Courier New';cx.fillText('バッファが衝撃を吸収 → 再ルーティング成功',w*3/4,H/2+22);
+    cx.textAlign='left';
+  }
+  // boot
+  if(t<3.4){cx.globalAlpha=Math.min(1,t)*(t>2.4?(3.4-t):1);
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.textAlign='center';
+    cx.fillText('EXPERIMENT 02 — どちらの都市が「最悪の日」を生き残るか',w/2,H/2-6);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('CITY-A: 効率95点の集約都市 / CITY-B: 効率72点の冗長都市',w/2,H/2+16);
+    cx.textAlign='left';cx.globalAlpha=1;}
+}
+
+const banner=document.getElementById('banner');
+function ui(){
+  banner.style.opacity=t<1.4?0:1;
+  if(t<T_SHOCK){banner.className='banner b-calm';banner.textContent='PHASE 01 — 平時運用: 効率都市CITY-Aが高スコアで圧勝中';}
+  else if(t<T_JUDGE){banner.className='banner b-shock';banner.textContent='⚡ PHASE 02 — SHOCK INJECTION: ブラックスワンはスコアを見ない';}
+  else{banner.className='banner b-res';banner.textContent='PHASE 03 — 判定: 冗長性バッファ ＝ 最悪の日の命綱';}
+  document.getElementById('pi0').className='pi'+(t<T_SHOCK?' on1':'');
+  document.getElementById('pi1').className='pi'+(t>=T_SHOCK&&t<T_JUDGE?' on2':'');
+  document.getElementById('pi2').className='pi'+(t>=T_JUDGE?' on3':'');
+  document.getElementById('tfill').style.width=(t/DUR*100)+'%';
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();ui();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;packets.length=0;
+  effA=95;effB=72;bufA=12;bufB=58;svcA=98;svcB=90;heli.A=true;heli.B=true;shockFlash=0;quake=0;
+  build();document.getElementById('endcard').classList.remove('on');
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

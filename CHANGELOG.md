@@ -4,6 +4,54 @@
 
 ---
 
+## PAGE 5ビジュアル・ストーリーボード（T102）— 2026-07-14
+
+- 完成ストーリー全8シーンの画面構成を `docs/story/page5-storyboard.html` に可視化した。タイムライン、左右キー、URLクエリで任意シーンを確認できる。
+- 既存のダーク・ターミナル調で、平時比較、LOUD CRASH／SILENT CAPTURE、人物交換、構造診断、介入、再実験、共有カードまでの情報階層と演出指示を固定した。
+- デスクトップと390px幅をChromiumで目視確認。アプリ本体への接続、Service Worker、PAGE 5公開ゲートには変更なし。
+
+---
+
+## PAGE 5完成ストーリー設計（T101）— 2026-07-14
+
+- 「同じ引き金、違う傷跡」を仮題に、平時比較から人物交換、攻撃面診断、構造介入、再実験までの全8シーンを `docs/story/page5-complete-story.md` に確定した。
+- トリガー側の責任を消さず、「交換後も傷跡が交換されない」という観測から構造条件を診断する表現へ精密化。ja/en主要文言、分岐、共有カード、倫理境界、実装受け入れ条件を含む。
+- Claude Code向けの過去プロンプトはGit未追跡を確認し、ignore対象の `.local/` へ移した。リールのHTMLと投稿文は再生成可能な制作ソースとしてGit管理対象、動画・画像生成物は `dist/` のまま対象外とする。
+
+---
+
+## ストーリー／プロモ素材の整理（T100）— 2026-07-14
+
+- PAGE 5の物語候補と既存週次シナリオの対応を `docs/story/` に集約し、過去の実装依頼書をGit管理外のローカル資料へ分離した。
+- 完成済み30秒リール10本を `promo/campaigns/<企画名>/` に再編し、各映像原稿とX投稿文を `reel.html` / `post.md` の組として同居させた。
+- 長尺版・旧生成器・重複コピーを `promo/archive/` に移し、録画スクリプトと文書参照を新パスへ同期。組の欠落を検出する自動テストを追加した。
+
+---
+
+## X投稿直前キット（T99）— 2026-07-14
+
+- 生成キービジュアルを利用した第5カードを追加し、プロモ画像を5枚体制にした。
+- `make x-launch-kit` で固定ポスト動画・画像5枚・投稿本文ガイドを番号順に一括整理する。
+- `docs/x-launch-kit.md` に投稿間隔、コピー用本文、週次機能の告知禁止を含む最終チェックを収録した。
+
+---
+
+## プロモーションビジュアル（T98）— 2026-07-14
+
+- X向け1200×675キービジュアル・図解4枚を追加。メイン告知、4ページ構造図、PAGE 4の意思決定図、PAGE 2のショック比較図を用途別に用意した。
+- `make promo-visuals` で高精細PNGを自動生成し、Console/pageerror・寸法・ファイルサイズを検査する。
+- 実在人物・地域・政治記号を使わず、固定の免責表示を付けた。アプリ本体・Service Worker・既存カードには変更なし。
+
+---
+
+## Xリール書き出し自動化（T97）— 2026-07-14
+
+- 完成済みX向け30秒リール10本を `make social-reels` で `dist/social-reels/` へ一括録画できるようにした。
+- 手動録画用の余白・ボタンを除外し、420×740の映像面のみを書き出す。Console/pageerror・寸法・長さを生成時に検査する。
+- `--only` による個別再録画と、ffmpeg検出時のMP4自動変換に対応。アプリ本体・Service Worker・見た目には変更なし。
+
+---
+
 ## インシデント対応・発信準備スプリント（T94〜T96）— 2026-07-13/14 — 5連鎖インシデントの恒久修正・ruleset移行・告知下書き
 
 T93 に続く第23スプリント。**アプリのUI見た目は不変・Web挙動は維持**（sw cache は v6-366 から変更なし）。実名・実在地名・進行中政局への言及なし（integrity準拠）。
@@ -172,7 +220,7 @@ T1〜T35 に続く第8〜10スプリント（T36〜T49）。**アプリのUI見�
 
 ### コンテンツ
 
-- **週次シナリオ W47〜W50（PAGE 5 素材第2弾）**: design-note-page5.md §4 の融合戦略の第2弾。W47「外から来た担い手が、余白を戻す」（P2 hard・redundancy≥80/budget≥45＝**希望**＝半外部ノードの流入）、W48「誰かが、また確かめ始める」（P1 normal・legitimacy/ethicsScore＝**監査**）、W49「裁く快感が、静まる街」（P3 normal）、W50「結果を引き受ける人を、また通す」（P4 hard）。**在庫を W46 から W50（12/7週）まで延長**（T39）。
+- **週次シナリオ W47〜W50（PAGE 5 素材第2弾）**: docs/story/page5-design-note.md §4 の融合戦略の第2弾。W47「外から来た担い手が、余白を戻す」（P2 hard・redundancy≥80/budget≥45＝**希望**＝半外部ノードの流入）、W48「誰かが、また確かめ始める」（P1 normal・legitimacy/ethicsScore＝**監査**）、W49「裁く快感が、静まる街」（P3 normal）、W50「結果を引き受ける人を、また通す」（P4 hard）。**在庫を W46 から W50（12/7週）まで延長**（T39）。
 - **X告知 W43〜W46 下書き**: `docs/x-post-templates.md` に W43〜W46 の月曜告知を追加（静か系＝SILENT CAPTURE／轟音系＝LOUD CRASH の質感を文面に反映・goal は配信JSONの実文言を転記）（T41）。
 - **kpi-log 反応比較表**: `docs/kpi-log.md` に「崩壊モード別の反応比較」表を追加（design-note §4-2 の計測を、analytics 有効化前でも X 側の数字だけ埋められる運用に）（T41）。
 
@@ -223,7 +271,7 @@ T1〜T35 に続く第8〜10スプリント（T36〜T49）。**アプリのUI見�
 
 ### コンテンツ・発信
 
-- **週次シナリオ在庫 W31〜W46**: 在庫を W30 から W46（11/9週）まで段階延長（自動ローテの前提）。**W43〜W46 は PAGE 5 素材の小出し**＝design-note-page5.md §4 の融合戦略で、SILENT CAPTURE系（後継者の静かな枯渇・疑うのをやめた頭）と LOUD CRASH系（轟音の広場・洪水の議論場）を既存メトリクスで物語化し反応を計測。全ページカバー・実名/未実装UI名称ゼロ（T8/T15/T30/T34）。
+- **週次シナリオ在庫 W31〜W46**: 在庫を W30 から W46（11/9週）まで段階延長（自動ローテの前提）。**W43〜W46 は PAGE 5 素材の小出し**＝docs/story/page5-design-note.md §4 の融合戦略で、SILENT CAPTURE系（後継者の静かな枯渇・疑うのをやめた頭）と LOUD CRASH系（轟音の広場・洪水の議論場）を既存メトリクスで物語化し反応を計測。全ページカバー・実名/未実装UI名称ゼロ（T8/T15/T30/T34）。
 - **週次自動ローテ `weekly-rotate.yml`**: 毎週月曜0:00 JST に ISO週を計算して `content/weekly/<週>.json` を `latest.json` へコピーして bot コミットし、Pages/AWS デプロイを `gh workflow run` で明示起動。在庫切れ週は意図的に失敗＝補充リマインダー（T12）。
 - **教育・広報素材**: 教員向け1枚モノ `web/classroom.html`/`.en.html`（A4印刷→PDF・アプリJS非依存・ja⇔en相互リンク・OGP付き）、プライバシーポリシー `web/privacy.html`/`.en.html`（ストア審査必須物）、30秒縦型リール2本（`promo/reel-30s.html`＝効率vs冗長性／`reel-30s-history.html`＝歴史題材の安全版、両者 `?lang=en` 対応）とその自動録画 `make reels`（`scripts/record-reel.mjs`）、ストア用アイコン/スプラッシュ生成 `scripts/gen-icons.mjs`（T4/T5/T10/T13/T16/T25/T26/T27）。
 
@@ -234,7 +282,7 @@ T1〜T35 に続く第8〜10スプリント（T36〜T49）。**アプリのUI見�
 
 ### ドキュメント
 
-- データ辞書 `docs/DATA-DICTIONARY.md`/`.en.md`（エクスポート全フィールドの定義と実装式の対応表）、METHODOLOGY/DEVELOPMENT（日英）の現状同期、EN ローンチキット `docs/launch-en.md`（Show HN/PH ドラフト＋フェーズ2ゲート）、ストア掲載文 `docs/store-listing.md`、KPI週次ログ `docs/kpi-log.md`、インタビュー・ガイド `docs/interview-guide.md`、X投稿テンプレ集 `docs/x-post-templates.md`、Zenn 記事ドラフト3本（`docs/articles/`）、**PAGE 5 設計凍結 `design-note-page5.md`**（実名ゼロ・構造で語る発動条件）。
+- データ辞書 `docs/DATA-DICTIONARY.md`/`.en.md`（エクスポート全フィールドの定義と実装式の対応表）、METHODOLOGY/DEVELOPMENT（日英）の現状同期、EN ローンチキット `docs/launch-en.md`（Show HN/PH ドラフト＋フェーズ2ゲート）、ストア掲載文 `docs/store-listing.md`、KPI週次ログ `docs/kpi-log.md`、インタビュー・ガイド `docs/interview-guide.md`、X投稿テンプレ集 `docs/x-post-templates.md`、Zenn 記事ドラフト3本（`docs/articles/`）、**PAGE 5 設計凍結 `docs/story/page5-design-note.md`**（実名ゼロ・構造で語る発動条件）。
 
 ### プロセス
 

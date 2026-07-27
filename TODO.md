@@ -14,7 +14,7 @@
 | ~~☐2~~ | ~~Actions 自動デプロイ有効化~~ | ~~10分~~ | ~~計25分~~ | ✅ 完了（2026-07-12・`make aws-wire` で Secrets/Variables 設定済） |
 | ~~☐3~~ | ~~main ブランチ保護~~ | ~~5分~~ | ~~5分~~ | ✅ 完了（2026-07-12・`make protect`・CI必須 web/infra）。2026-07-14 に classic → ruleset（id 18896897・DeployKey バイパス）へ移行。`make protect` は再実行禁止（docs/operations-runbook.md §8 参照）。 |
 | ☐4 | Capacitor 実機（任意） | 30〜60分 | iOS +15分（cocoapods）/ Android +30〜60分（Studio+JDK17）| やや重い |
-| ☐5 | 30秒リールを録画して X 固定ポストに | 15分 | 15分 | かんたん |
+| ☐5 | 自動生成済み30秒リールを X 固定ポストに | 5分 | 5分 | かんたん |
 | ☐6 | 教員向け1枚ガイドを PDF 化（**自動化済み** `make classroom-pdf`） | 0分 | 0分 | 自動 |
 | ☐7 | リポジトリの iCloud 外移設（推奨） | 15分 | 15分 | 普通 |
 
@@ -134,20 +134,17 @@ git push
 
 ---
 
-## ☐ 5. 30秒リールを録画して X 固定ポストに — 15分
+## ☐ 5. 自動生成済み30秒リールを X 固定ポストに — 5分
 
-1. スマホで開く: Mac でリポジトリ直下から `python3 -m http.server 8000` → 同じWi-Fiのスマホで
-   `http://<MacのIP>:8000/promo/reel-30s.html`（または `reel-30s.html` を AirDrop して開くだけでも動く）。
-2. 全画面表示 → 画面録画 → 30秒撮って止めるだけ（PAUSE/RESTART ボタンは右下・ほぼ透明）。
-   Mac だけで済ませるなら: Chrome のウィンドウを縦長にして QuickTime の画面収録でも可。
-3. X のプロフィール固定ポストに動画＋Web版URLを投稿。
+録画は自動化済み。`make social-reels` でX向け10本を `dist/social-reels/` に一括生成する。
+個別の再生成は `npm run record:social-reels -- --only page4-meeting`。各動画は420×740・30秒で、
+生成時にConsoleエラー・寸法・長さを検査する。ffmpegがある環境ではMP4も同時生成し、なければWebMまで生成する。
+
+残る人間作業は、第一候補 `01-page4-meeting.mp4` をXのプロフィール固定ポストへアップロードするだけ。
+投稿順・画像・本文は `make x-launch-kit` で `dist/x-launch-kit/` に一括整理済み。
    - **投稿文に必ず「※演出用に簡略化したデモ映像です」を添える**（制作規約）。
    - ハッシュタグは `#社会デバッガー`（アプリ内の共有と同じ固定タグ）。
-   - リールは2本ある: `promo/reel-30s.html`（防災/P2）と `promo/reel-30s-history.html`（歴史/P1・安全版はこちらを先に）。
-   - **英語版の録画は URL 末尾に `?lang=en`**（Show HN 用。文言はアプリの実EN i18n）。
-   - **本物のエンジンで録りたい場合**: アプリ本体を `?demo=1` 付きで開くと、ゴーストカーソルが
-     ワイマール崩壊→介入→回復を自動再生（ループ）。これを画面録画すれば「実物と完全一致」の映像になる
-     （この場合「演出用デモ」の注記は不要）。
+   - 投稿文は `docs/announce-post.md` の「PAGE 4 / 会議室の物語版」を使用する。
 
 ## ☐ 6. 教員向け1枚ガイドを PDF 化 — **自動化済み（手動印刷は不要）**
 

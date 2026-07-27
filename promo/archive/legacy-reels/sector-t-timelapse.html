@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECTOR-T 実験03 — 延命都市 vs 賢い縮退都市</title>
+<style>
+:root{--bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 16px 26px;position:relative;z-index:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--bdr);gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:1rem;color:var(--cyan);text-shadow:0 0 22px rgba(0,212,255,.45);letter-spacing:.12em}
+.hdr .sub{color:var(--muted);font-size:.6rem;margin-top:3px}
+.rec{display:inline-flex;align-items:center;gap:6px;font-size:.6rem;letter-spacing:.18em;color:var(--red)}
+.rec .d{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.stage{position:relative;margin-top:14px;border:1px solid var(--bdr);border-radius:3px;background:var(--bg1);overflow:hidden}
+#cv{width:100%;height:470px;display:block}
+.banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 24px;border-radius:3px;font-size:.72rem;font-weight:bold;letter-spacing:.14em;white-space:nowrap;transition:opacity .6s}
+.b1{background:rgba(0,212,255,.1);border:1px solid var(--cyan);color:var(--cyan)}
+.b2{background:rgba(255,204,0,.12);border:1px solid var(--yel);color:var(--yel)}
+.b3{background:rgba(0,255,136,.1);border:1px solid var(--green);color:var(--green)}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:rgba(7,11,20,.85);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity 1.6s;text-align:center;padding:20px}
+.endcard.on{opacity:1;pointer-events:auto}
+.endcard .big{font-size:1.05rem;color:var(--green);letter-spacing:.14em;text-shadow:0 0 24px rgba(0,255,136,.6)}
+.endcard .msg{font-size:.7rem;line-height:2.1;max-width:600px}
+.endcard .msg em{color:var(--cyan);font-style:normal}.endcard .msg b{color:var(--red)}
+.btn{padding:8px 18px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;cursor:pointer;letter-spacing:.12em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.ctrl{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.tbar{height:3px;background:var(--bdr);margin-top:10px;border-radius:2px;overflow:hidden}
+.tfill{height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--yel),var(--green))}
+.foot{text-align:center;padding-top:14px;font-size:.54rem;color:var(--muted);margin-top:14px;border-top:1px solid var(--bdr)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <h1>▶ SECTOR-T LAB 03 — 延命都市 vs 賢い縮退都市（20年タイムラプス）</h1>
+      <div class="sub">ショックは一撃だけじゃない。「ゆっくり来る危機」に対する2つの戦略を20年間早送りで観測する</div>
+    </div>
+    <div class="rec"><span class="d"></span>REC — EXPERIMENT 03</div>
+  </div>
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="banner" id="banner" style="opacity:0"></div>
+    <div class="endcard" id="endcard">
+      <div class="big">2045年 — 生存者: CITY-B（スマートシュリンク）</div>
+      <div class="msg">
+        人口減少は両都市とも同じ速度で進んだ。違ったのは<em>縮み方</em>だけ。<br>
+        <b>全域延命のCITY-A</b>は「どこも見捨てない」と言いながら、全域を薄く腐らせた。<br>
+        CITY-Bは撤退線を引く痛みを先に払い、<em>核と拠点を最後まで生かした</em>。<br>
+        縮むこと自体は敗北ではない。<em>賢く縮めないことが敗北。</em>
+      </div>
+      <button class="btn" onclick="restart()">↺ REPLAY 20 YEARS</button>
+    </div>
+  </div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="tbar"><div class="tfill" id="tfill"></div></div>
+  <div class="foot">SECTOR-T LAB 03 — スマートシュリンクの先行デバッグ / 画面録画で動画化できます</div>
+</div>
+<script>
+const DUR=58, T_START=5, T_MID=28, T_END=46; // boot / years roll / divergence obvious / judgment
+let t=0, playing=true, last=performance.now(), ended=false;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=470*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+addEventListener('resize',fit);fit();
+const W=()=>cv.getBoundingClientRect().width, H=470;
+
+// year mapping: T_START..T_END => 2025..2045
+const year=()=>t<T_START?2025:Math.min(2045,2025+Math.floor((t-T_START)/(T_END-T_START)*20));
+const yr=()=>Math.max(0,Math.min(1,(t-T_START)/(T_END-T_START)));
+
+// districts: ring of 10 around center. A keeps all; B consolidates to core+3拠点.
+function makeCity(cx0,w){
+  const c={x0:cx0,w,core:{x:cx0+w/2,y:255},dist:[]};
+  for(let i=0;i<10;i++){
+    const a=i/10*Math.PI*2;
+    c.dist.push({x:cx0+w/2+Math.cos(a)*(w*.3),y:255+Math.sin(a)*140,health:1,keep:i%3===0,archived:0,burstT:0});
+  }
+  return c;
+}
+let A,B;function build(){const w=W();A=makeCity(0,w/2);B=makeCity(w/2,w/2);}
+build();addEventListener('resize',build);
+let budgetA=80,budgetB=80,qolA=70,qolB=70,pop=100;
+const eventsA=[]; // pipe burst popups {x,y,age,msg}
+
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;if(!ended){ended=true;document.getElementById('endcard').classList.add('on');}}
+  const p=yr();
+  pop=100-p*32; // both lose population equally
+  // CITY-A: maintain everything -> per-district budget thins -> decay accelerates
+  A.dist.forEach(d=>{
+    d.health=Math.max(.06,1-p*1.15+Math.sin(t+d.x)*0.02);
+    if(p>.35&&Math.random()<dt*(p*.5)){d.burstT=1;eventsA.push({x:d.x,y:d.y,age:0,msg:['水道破裂','橋 通行止','空き家増'][Math.floor(Math.random()*3)]});}
+    d.burstT=Math.max(0,d.burstT-dt);
+  });
+  eventsA.forEach(e=>e.age+=dt);
+  for(let i=eventsA.length-1;i>=0;i--)if(eventsA[i].age>2.4)eventsA.splice(i,1);
+  budgetA=Math.max(2,80-p*76);
+  qolA=Math.max(8,70-p*54);
+  // CITY-B: archive non-keep districts early (painful dip), then core+拠点 thrive
+  B.dist.forEach(d=>{
+    if(!d.keep){d.archived=Math.min(1,Math.max(0,(p-.15)*3));d.health=Math.max(.15,1-d.archived);}
+    else d.health=Math.min(1.15,.9+p*.3);
+  });
+  budgetB=p<.3?80-p*60:62+ (p-.3)*20; // dip then recover
+  qolB=p<.25?70-p*24:64+(p-.25)*30;
+}
+
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-4);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,6);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,6);
+  cx.fillStyle=col;cx.fillText(Math.round(val),x+w+6,y+6);
+}
+function district(d,accent,cityB){
+  const h=d.health;
+  const col=h>.6?accent:(h>.3?'#ffcc00':'#ff2244');
+  if(cityB&&d.archived>0.05){
+    // gracefully archived: gray outline + checkmark
+    cx.globalAlpha=1-d.archived*.75;
+    cx.strokeStyle='#5a6f94';cx.setLineDash([3,4]);
+    cx.strokeRect(d.x-13,d.y-13,26,26);cx.setLineDash([]);cx.globalAlpha=1;
+    if(d.archived>.8){cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText('✓移転完了',d.x-18,d.y+24);}
+    return;
+  }
+  cx.shadowBlur=h>.6?8:0;cx.shadowColor=col;
+  cx.fillStyle=col;cx.globalAlpha=.25+h*.6;
+  cx.fillRect(d.x-13,d.y-13,26,26);cx.globalAlpha=1;cx.shadowBlur=0;
+  cx.strokeStyle=col;cx.strokeRect(d.x-13,d.y-13,26,26);
+  if(d.burstT>0){cx.fillStyle=`rgba(255,34,68,${d.burstT})`;cx.beginPath();cx.arc(d.x,d.y,16+14*(1-d.burstT),0,7);cx.fill();}
+}
+function drawCity(c,title,accent,isB){
+  cx.fillStyle=accent;cx.font='bold 12px Courier New';cx.fillText(title,c.x0+18,60);
+  // roads core->district
+  c.dist.forEach(d=>{
+    const dead=isB?d.archived>.8:d.health<.25;
+    cx.strokeStyle=dead?'rgba(255,34,68,.14)':(isB?'rgba(0,255,136,.22)':'rgba(0,212,255,.2)');
+    cx.setLineDash(dead?[3,5]:[]);cx.lineWidth=isB&&d.keep?2:1;
+    cx.beginPath();cx.moveTo(c.core.x,c.core.y);cx.lineTo(d.x,d.y);cx.stroke();cx.setLineDash([]);
+  });
+  c.dist.forEach(d=>district(d,accent,isB));
+  // core
+  const coreGlow=isB?(.9+yr()*.5):(1-yr()*.75);
+  const ccol=coreGlow>.5?accent:'#ff2244';
+  cx.shadowBlur=16*coreGlow;cx.shadowColor=ccol;cx.fillStyle=ccol;
+  cx.beginPath();cx.arc(c.core.x,c.core.y,14+(isB?yr()*6:0),0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle='#070b14';cx.font='bold 8px Courier New';cx.textAlign='center';cx.fillText('CORE',c.core.x,c.core.y+3);cx.textAlign='left';
+}
+function render(){
+  const w=W();cx.clearRect(0,0,w,H);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(w/2,40);cx.lineTo(w/2,H-10);cx.stroke();
+  // year counter
+  cx.fillStyle='#ffcc00';cx.font='bold 20px Courier New';cx.textAlign='center';
+  cx.fillText(year(),w/2,34);
+  cx.fillStyle='rgba(90,111,148,.7)';cx.font='9px Courier New';
+  cx.fillText('人口 '+Math.round(pop)+'%（両都市とも同じ速度で減少）',w/2,H-72);
+  cx.textAlign='left';
+  drawCity(A,'CITY-A ▸ 全域延命都市（撤退しないGreedy）','#00d4ff',false);
+  drawCity(B,'CITY-B ▸ スマートシュリンク都市（賢い縮退DP）','#00ff88',true);
+  // A events popups
+  eventsA.forEach(e=>{
+    cx.globalAlpha=Math.max(0,1-e.age/2.4);
+    cx.fillStyle='#ff2244';cx.font='9px Courier New';
+    cx.fillText('⚠'+e.msg,e.x-20,e.y-20-e.age*10);cx.globalAlpha=1;
+  });
+  // gauges
+  gauge(20,H-46,120,'維持予算残',budgetA,budgetA<25?'#ff2244':'#00d4ff');
+  gauge(180,H-46,120,'1人あたり生活質',qolA,qolA<30?'#ff2244':'#00d4ff');
+  gauge(w/2+20,H-46,120,'維持予算残',budgetB,'#00ff88');
+  gauge(w/2+180,H-46,120,'1人あたり生活質',qolB,'#00ff88');
+  // mid caption: B's painful choice
+  if(t>=12&&t<19){cx.fillStyle='rgba(7,11,20,.9)';cx.strokeStyle='#ffcc00';
+    rrect(w/2-160,70,320,40,4);cx.fill();cx.stroke();
+    cx.fillStyle='#ffcc00';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('CITY-B、批判覚悟で撤退線を宣言 — 「7地区を核へ移転します」',w/2,88);
+    cx.fillStyle='#5a6f94';cx.fillText('短期的には支持率もQOLも低下（＝DP戦略の先払いコスト）',w/2,102);cx.textAlign='left';}
+  // judgment
+  if(t>=T_END){
+    cx.textAlign='center';
+    cx.fillStyle='rgba(255,34,68,.13)';cx.fillRect(0,40,w/2,H-50);
+    cx.fillStyle='#ff2244';cx.font='bold 24px Courier New';cx.fillText('✗ SPRAWL COLLAPSE',w/4,H/2-6);
+    cx.font='10px Courier New';cx.fillText('全部を守ろうとして、全部が薄く壊死した',w/4,H/2+16);
+    cx.fillStyle='rgba(0,255,136,.1)';cx.fillRect(w/2,40,w/2,H-50);
+    cx.fillStyle='#00ff88';cx.font='bold 24px Courier New';cx.fillText('✓ COMPACT & ALIVE',w*3/4,H/2-6);
+    cx.font='10px Courier New';cx.fillText('小さくなったが、核は前より明るい',w*3/4,H/2+16);
+    cx.textAlign='left';
+  }
+  if(t<3.4){cx.globalAlpha=Math.min(1,t)*(t>2.4?(3.4-t):1);
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.textAlign='center';
+    cx.fillText('EXPERIMENT 03 — 危機は一撃だけじゃない。「ゆっくり来る危機」20年早送り',w/2,H/2-6);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('両都市の人口は同じ速度で減る。違うのは戦略だけ。',w/2,H/2+16);cx.textAlign='left';cx.globalAlpha=1;}
+}
+const banner=document.getElementById('banner');
+function ui(){
+  banner.style.opacity=t<1.4?0:1;
+  if(t<T_MID){banner.className='banner b1';banner.textContent='PHASE 01 — 人口減少開始: どちらも「まだ大丈夫」に見える';}
+  else if(t<T_END){banner.className='banner b2';banner.textContent='⚠ PHASE 02 — 分岐: 薄く広く腐るA / 痛みを先払いしたB';}
+  else{banner.className='banner b3';banner.textContent='PHASE 03 — 2045年判定: 縮み方が運命を分けた';}
+  document.getElementById('tfill').style.width=(t/DUR*100)+'%';
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();ui();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;eventsA.length=0;build();budgetA=budgetB=80;qolA=qolB=70;pop=100;
+  document.getElementById('endcard').classList.remove('on');document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

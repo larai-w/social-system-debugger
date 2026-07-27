@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SECTOR-H 正常化 — キャラクター版</title>
+<style>
+:root{
+  --bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;
+  --cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--pur:#9945ff;--yel:#ffcc00;
+  --txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 16px 26px;position:relative;z-index:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--bdr);gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:1.0rem;color:var(--cyan);text-shadow:0 0 22px rgba(0,212,255,.45);letter-spacing:.13em}
+.hdr .sub{color:var(--muted);font-size:.6rem;margin-top:3px;letter-spacing:.06em}
+.rec{display:inline-flex;align-items:center;gap:6px;font-size:.6rem;letter-spacing:.18em;color:var(--red)}
+.rec .d{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.stage{position:relative;margin-top:14px;border:1px solid var(--bdr);border-radius:3px;background:var(--bg1);overflow:hidden}
+#cv{width:100%;height:500px;display:block}
+.banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 24px;border-radius:3px;font-size:.74rem;font-weight:bold;letter-spacing:.2em;white-space:nowrap;transition:opacity .6s}
+.b-crash{background:rgba(255,34,68,.13);border:1px solid var(--red);color:var(--red);text-shadow:0 0 16px rgba(255,34,68,.8);animation:ap 1s infinite}
+.b-debug{background:rgba(0,212,255,.1);border:1px solid var(--cyan);color:var(--cyan)}
+.b-normal{background:rgba(0,255,136,.1);border:1px solid var(--green);color:var(--green)}
+@keyframes ap{0%,100%{box-shadow:0 0 16px rgba(255,34,68,.5)}50%{box-shadow:none}}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(7,11,20,.84);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity 1.6s;text-align:center;padding:20px}
+.endcard.on{opacity:1;pointer-events:auto}
+.endcard .big{font-size:1.1rem;color:var(--green);letter-spacing:.18em;text-shadow:0 0 24px rgba(0,255,136,.6)}
+.endcard .msg{font-size:.7rem;color:var(--txt);line-height:2;max-width:560px}
+.endcard .msg em{color:var(--cyan);font-style:normal}
+.ctrl{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 18px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;cursor:pointer;transition:all .2s;letter-spacing:.12em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.2)}
+.pi{padding:4px 11px;font-size:.55rem;letter-spacing:.12em;border:1px solid var(--bdr);border-radius:2px;color:var(--muted);transition:all .4s}
+.pi.c{border-color:var(--red);color:var(--red)}
+.pi.d{border-color:var(--cyan);color:var(--cyan)}
+.pi.n{border-color:var(--green);color:var(--green)}
+.phase-ind{display:flex;gap:6px;margin-left:auto}
+.tbar{height:3px;background:var(--bdr);margin-top:10px;border-radius:2px;overflow:hidden}
+.tfill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--cyan),var(--green))}
+.foot{text-align:center;padding-top:14px;font-size:.54rem;color:var(--muted);letter-spacing:.1em;margin-top:14px;border-top:1px solid var(--bdr)}
+@media(prefers-reduced-motion:reduce){.rec .d,.b-crash{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <h1>▶ SECTOR-H 正常化シーケンス — CHARACTER EDITION</h1>
+      <div class="sub">登場人物は全て架空のキャラクターです（実在の人物・団体とは関係ありません）</div>
+    </div>
+    <div class="rec"><span class="d"></span>REC — EPISODE 01</div>
+  </div>
+
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="banner" id="banner" style="opacity:0"></div>
+    <div class="endcard" id="endcard">
+      <div class="big">✓ SECTOR-H — 正常稼働状態</div>
+      <div class="msg">
+        騒がしい人たちは去り、まちには <em>ふつうの賑やかさ</em> が戻った。<br>
+        新リーダーの声はデカいが、それは <em>生活のための声</em>。<br>
+        「エラー画面」から「ユーザーファースト画面」へ — デバッグ完了。
+      </div>
+      <button class="btn" onclick="restart()">↺ REPLAY EPISODE</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+    <div class="phase-ind">
+      <span class="pi" id="pi0">01 炎上のまち</span>
+      <span class="pi" id="pi1">02 新リーダー着任</span>
+      <span class="pi" id="pi2">03 ふつうの賑やかさ</span>
+    </div>
+  </div>
+  <div class="tbar"><div class="tfill" id="tfill"></div></div>
+
+  <div class="foot">SECTOR-H CHARACTER EDITION — 画面録画で動画化できます / 全キャラクター架空</div>
+</div>
+
+<script>
+const DUR=68, P1=24, P2=48;
+let t=0, playing=true, last=performance.now(), ended=false;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=500*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+addEventListener('resize',fit);fit();
+const W=()=>cv.getBoundingClientRect().width, H=500, GROUND=H-70;
+
+// ---------- background network (subtle, upper area) ----------
+const nodes=[];for(let i=0;i<26;i++)nodes.push({x:Math.random()*900+40,y:30+Math.random()*180,vx:(Math.random()-.5)*.1,vy:(Math.random()-.5)*.1,sick:false,ph:Math.random()*6});
+
+// ---------- characters ----------
+// residents: standing along ground
+const residents=[];for(let i=0;i<9;i++)residents.push({x:90+i*95+Math.random()*26,base:GROUND,mood:0,ph:Math.random()*6,col:'#00d4ff'});
+// trolls: fictional agitators, jump in during crash, get filtered out in debug
+const trolls=[];for(let i=0;i<6;i++)trolls.push({x:-60-i*90,tx:140+i*140,y:GROUND-130-Math.random()*60,alive:true,fade:0,ph:Math.random()*6,shout:i%3});
+// leader: fictional new leader, arrives at P1
+const leader={x:-80,y:GROUND,ph:0};
+// staff: two aides chasing leader with laptops
+const staff=[{x:-160,y:GROUND,ph:1},{x:-220,y:GROUND,ph:2}];
+
+const TROLL_SHOUTS=['炎上！','敵だ！','切り抜き！'];
+const LEADER_LINES=[
+  {t:26,d:4.5,s:'政局よりまず生活や！！'},
+  {t:32,d:4.5,s:'予算は現場へ！今すぐ！'},
+  {t:40,d:4.5,s:'右も左も関係ない、暮らしや！'},
+  {t:52,d:5,s:'『このまちに生まれてよかった』にする！'}
+];
+const STAFF_LINES=[
+  {t:35,d:3.5,s:'し、仕様変更が速すぎます…！'},
+  {t:44,d:3.5,s:'徹夜ですが…うれしい悲鳴です'}
+];
+const RES_LINES=[
+  {t:8,d:3,s:'もう疲れたよ…',i:2},
+  {t:13,d:3,s:'また揉めてる…',i:6},
+  {t:56,d:4,s:'やっと普通に戻ったね',i:3},
+  {t:60,d:4,s:'税金がちゃんと生活に来てる',i:7}
+];
+
+// ---------- drawing helpers ----------
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function bubble(x,y,text,col){
+  cx.font='11px Courier New';const w=cx.measureText(text).width+18;
+  const bx=Math.min(Math.max(x-w/2,8),W()-w-8), by=y-46;
+  cx.fillStyle='rgba(7,11,20,.92)';cx.strokeStyle=col;cx.lineWidth=1;
+  rrect(bx,by,w,24,4);cx.fill();cx.stroke();
+  cx.beginPath();cx.moveTo(x-5,by+24);cx.lineTo(x+5,by+24);cx.lineTo(x,by+31);cx.closePath();cx.fillStyle=col;cx.fill();
+  cx.fillStyle=col;cx.fillText(text,bx+9,by+16);
+}
+// simple person: head + body; mood -1 sad, 0 neutral, 1 happy
+function person(x,y,col,mood,ph,scale=1,arms='down'){
+  const s=scale, bob=Math.sin(ph)* (mood>0?2.5:1)*s;
+  const hy=y-34*s+bob;
+  cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=2.4*s;cx.lineCap='round';
+  // body
+  cx.beginPath();cx.moveTo(x,hy+8*s);cx.lineTo(x,y-10*s);cx.stroke();
+  // legs
+  cx.beginPath();cx.moveTo(x,y-10*s);cx.lineTo(x-6*s,y);cx.moveTo(x,y-10*s);cx.lineTo(x+6*s,y);cx.stroke();
+  // arms
+  cx.beginPath();
+  if(arms==='up'){cx.moveTo(x,hy+12*s);cx.lineTo(x-9*s,hy+2*s);cx.moveTo(x,hy+12*s);cx.lineTo(x+9*s,hy+2*s);}
+  else if(arms==='mega'){cx.moveTo(x,hy+12*s);cx.lineTo(x-8*s,hy+18*s);cx.moveTo(x,hy+12*s);cx.lineTo(x+10*s,hy+6*s);}
+  else if(mood<0){cx.moveTo(x,hy+12*s);cx.lineTo(x-6*s,hy+22*s);cx.moveTo(x,hy+12*s);cx.lineTo(x+6*s,hy+22*s);}
+  else{cx.moveTo(x,hy+12*s);cx.lineTo(x-8*s,hy+18*s);cx.moveTo(x,hy+12*s);cx.lineTo(x+8*s,hy+18*s);}
+  cx.stroke();
+  // head
+  cx.shadowBlur=8*s;cx.shadowColor=col;
+  cx.beginPath();cx.arc(x,hy,7*s,0,7);cx.fill();cx.shadowBlur=0;
+  // face
+  cx.strokeStyle='#070b14';cx.lineWidth=1.3*s;
+  cx.beginPath();
+  if(mood>0)cx.arc(x,hy+1.5*s,3*s,.15*Math.PI,.85*Math.PI);
+  else if(mood<0)cx.arc(x,hy+4.5*s,3*s,1.15*Math.PI,1.85*Math.PI);
+  else{cx.moveTo(x-2.5*s,hy+2.5*s);cx.lineTo(x+2.5*s,hy+2.5*s);}
+  cx.stroke();
+  // slump posture for sad: small head tilt line omitted for simplicity
+}
+// megaphone for trolls & leader
+function megaphone(x,y,col,flip=1){
+  cx.fillStyle=col;cx.beginPath();
+  cx.moveTo(x,y);cx.lineTo(x+14*flip,y-7);cx.lineTo(x+14*flip,y+7);cx.closePath();cx.fill();
+  cx.fillRect(x-4*flip- (flip<0?0:0),y-3,4,6);
+}
+
+// ---------- master step ----------
+function step(dt){
+  t+=dt;
+  if(t>=DUR){t=DUR;if(!ended){ended=true;document.getElementById('endcard').classList.add('on');}}
+  // network agitation
+  nodes.forEach(n=>{
+    n.ph+=dt*2;n.x+=n.vx*(t<P1?2:.5);n.y+=n.vy*(t<P1?2:.5);
+    if(n.x<20||n.x>W()-20)n.vx*=-1;if(n.y<20||n.y>210)n.vy*=-1;
+  });
+  if(t<P1){if(Math.random()<dt*2.2){const h=nodes.filter(n=>!n.sick);if(h.length)h[Math.floor(Math.random()*h.length)].sick=true;}}
+  else{if(Math.random()<dt*4){const s=nodes.filter(n=>n.sick);if(s.length)s[Math.floor(Math.random()*s.length)].sick=false;}}
+  // trolls
+  trolls.forEach(tr=>{
+    tr.ph+=dt*6;
+    if(t<P1){tr.fade=Math.min(1,tr.fade+dt*.8);tr.x+=(tr.tx-tr.x)*dt*1.4;}
+    else if(t<P2){ if(tr.alive&&Math.random()<dt*1.1)tr.alive=false;
+      if(!tr.alive){tr.fade=Math.max(0,tr.fade-dt*1.1);tr.y-=dt*45;tr.x+=dt*60;}}
+    else tr.fade=0;
+  });
+  // residents mood
+  residents.forEach(r=>{
+    r.ph+=dt*(t>=P2?3.2:1.6);
+    const target=t<P1?-1:(t<P2?0:1);
+    r.mood+=(target-r.mood)*dt*1.2;
+  });
+  // leader & staff enter at P1
+  if(t>=P1){
+    leader.ph+=dt*8;
+    const lx=W()*.5;leader.x+=(lx-leader.x)*dt*1.6;
+    staff.forEach((s,i)=>{s.ph+=dt*7;const sx=W()*.5-60-i*46+Math.sin(t*3+i)*6;s.x+=(sx-s.x)*dt*1.5;});
+  }
+}
+
+// ---------- render ----------
+function render(){
+  const w=W();cx.clearRect(0,0,w,H);
+  // crash vignette
+  if(t<P1){const p=Math.min(1,t/6);
+    const g=cx.createRadialGradient(w/2,H/2,H*.3,w/2,H/2,H*.9);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(255,34,68,${.11*p*(0.7+0.3*Math.sin(t*4))})`);
+    cx.fillStyle=g;cx.fillRect(0,0,w,H);}
+  // upper network
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+    const a=nodes[i],b=nodes[j],d=(a.x-b.x)**2+(a.y-b.y)**2;
+    if(d<120*120){cx.strokeStyle=(a.sick||b.sick)?'rgba(255,34,68,.2)':'rgba(0,212,255,.11)';cx.lineWidth=1;
+      cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();}
+  }
+  nodes.forEach(n=>{const col=n.sick?'#ff2244':'#00d4ff';cx.shadowBlur=6;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(n.x,n.y,2.8+Math.sin(n.ph)*.6,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='rgba(90,111,148,.5)';cx.font='9px Courier New';cx.fillText('INFORMATION SPACE — SNSタイムライン',12,18);
+  // ground
+  cx.strokeStyle='#172340';cx.lineWidth=1;cx.beginPath();cx.moveTo(0,GROUND+1);cx.lineTo(w,GROUND+1);cx.stroke();
+  cx.fillStyle='rgba(90,111,148,.5)';cx.fillText('SECTOR-H — まち（生活レイヤー）',12,GROUND+20);
+  // skyline silhouettes
+  cx.fillStyle='rgba(15,24,41,.9)';
+  for(let i=0;i<10;i++){const bw=50+((i*37)%40),bh=60+((i*53)%90);cx.fillRect(30+i*100,GROUND-bh-150,bw,bh);}
+  cx.strokeStyle='rgba(23,35,64,.9)';
+  for(let i=0;i<10;i++){const bw=50+((i*37)%40),bh=60+((i*53)%90);cx.strokeRect(30+i*100,GROUND-bh-150,bw,bh);
+    // windows glow up in normal phase
+    if(t>=P2){cx.fillStyle='rgba(0,255,136,.25)';
+      for(let wy=0;wy<3;wy++)for(let wx=0;wx<3;wx++)if((i+wx+wy)%2)cx.fillRect(38+i*100+wx*13,GROUND-bh-142+wy*20,7,9);
+      cx.fillStyle='rgba(15,24,41,.9)';}
+  }
+  // residents
+  residents.forEach((r,i)=>{
+    const m=r.mood>0.4?1:(r.mood<-0.4?-1:0);
+    person(r.x,r.base,m>0?'#00ff88':'#00d4ff',m,r.ph,1,(m>0&&Math.sin(r.ph)>0.3)?'up':'down');
+  });
+  RES_LINES.forEach(l=>{if(t>=l.t&&t<l.t+l.d)bubble(residents[l.i].x,residents[l.i].base-70,l.s,t<P2?'#8fa5cc':'#00ff88');});
+  // trolls
+  trolls.forEach(tr=>{
+    if(tr.fade<=0)return;
+    cx.globalAlpha=tr.fade;
+    person(tr.x,tr.y,'#ff6b2b',0,tr.ph,1.05,'mega');
+    megaphone(tr.x+10,tr.y-42+Math.sin(tr.ph)*2,'#ff6b2b');
+    // shout rings
+    if(tr.alive&&t<P1){cx.strokeStyle='rgba(255,107,43,.5)';cx.lineWidth=1;
+      const rr=8+ (tr.ph%2)*14;cx.beginPath();cx.arc(tr.x+26,tr.y-44,rr,-.6,.6);cx.stroke();
+      if(Math.sin(tr.ph)>0.4)bubble(tr.x,tr.y-58,TROLL_SHOUTS[tr.shout],'#ff6b2b');}
+    if(!tr.alive){cx.fillStyle='rgba(255,107,43,.9)';cx.font='10px Courier New';cx.fillText('LOGOUT',tr.x-18,tr.y-60);}
+    cx.globalAlpha=1;
+  });
+  // leader (fictional): green, big gestures
+  if(t>=P1){
+    const armUp=Math.sin(leader.ph)>0;
+    person(leader.x,leader.y,'#00ff88',1,leader.ph,1.5,armUp?'up':'mega');
+    if(!armUp)megaphone(leader.x+14,leader.y-64,'#00ff88');
+    cx.fillStyle='#00ff88';cx.font='bold 10px Courier New';cx.textAlign='center';
+    cx.fillText('新リーダー（架空）',leader.x,leader.y+16);cx.textAlign='left';
+    LEADER_LINES.forEach(l=>{if(t>=l.t&&t<l.t+l.d)bubble(leader.x,leader.y-92,l.s,'#00ff88');});
+    // staff
+    staff.forEach((s,i)=>{
+      person(s.x,s.y,'#00d4ff',0,s.ph,1.1,'down');
+      cx.fillStyle='#0f1829';cx.strokeStyle='#00d4ff';cx.lineWidth=1;
+      cx.fillRect(s.x-9,s.y-26,18,11);cx.strokeRect(s.x-9,s.y-26,18,11); // laptop
+      // sweat drops
+      if(t<P2){cx.fillStyle='rgba(0,212,255,.8)';cx.beginPath();cx.arc(s.x+10,s.y-46+((t*40+i*20)%14),1.8,0,7);cx.fill();}
+    });
+    STAFF_LINES.forEach((l,i)=>{if(t>=l.t&&t<l.t+l.d)bubble(staff[0].x,staff[0].y-70,l.s,'#00d4ff');});
+  }
+  // boot title
+  if(t<3.4){cx.globalAlpha=Math.min(1,t)*(t>2.4?(3.4-t):1);
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.textAlign='center';
+    cx.fillText('EPISODE 01 — 炎上するまちに、新しいリーダーがやってくる',w/2,H/2-6);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('※登場人物はすべて架空です',w/2,H/2+16);cx.textAlign='left';cx.globalAlpha=1;}
+}
+
+const banner=document.getElementById('banner');
+function ui(){
+  if(t<1.4)banner.style.opacity=0;else banner.style.opacity=1;
+  if(t<P1){banner.className='banner b-crash';banner.textContent='⚠ SECTOR-H — 炎上と分断でシステム過負荷 ⚠';}
+  else if(t<P2){banner.className='banner b-debug';banner.textContent='▶ 新リーダー着任 — 目的関数を「生活」に復元中';}
+  else{banner.className='banner b-normal';banner.textContent='✓ ふつうの賑やかさ — SYSTEM NORMAL';}
+  document.getElementById('pi0').className='pi'+(t<P1?' c':'');
+  document.getElementById('pi1').className='pi'+(t>=P1&&t<P2?' d':'');
+  document.getElementById('pi2').className='pi'+(t>=P2?' n':'');
+  document.getElementById('tfill').style.width=(t/DUR*100)+'%';
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();ui();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;
+  nodes.forEach(n=>n.sick=false);
+  trolls.forEach((tr,i)=>{tr.x=-60-i*90;tr.alive=true;tr.fade=0;tr.y=GROUND-130-Math.random()*60;});
+  residents.forEach(r=>r.mood=0);leader.x=-80;staff[0].x=-160;staff[1].x=-220;
+  document.getElementById('endcard').classList.remove('on');
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

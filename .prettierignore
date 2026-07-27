@@ -17,6 +17,8 @@ web/*.html
 web/config.js
 share-card-generator.html
 promo/*.html
+promo/campaigns/**/reel.html
+promo/archive/**/*.html
 
 # 手書きのドキュメントは整形対象外（プロズのリフロー/大差分回避）。対象はコード/データ/設定のみ。
 *.md

@@ -36,7 +36,10 @@ social-system-debugger/
 │   └── privacy.html / .en.html     # プライバシーポリシー（ストア提出／フッター導線）
 ├── content/weekly/          # 週替わりシナリオJSON（*.json + latest.json）＋ weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront＋GitHub OIDCロール
-├── promo/                   # プロモリールHTML（?lang=en 対応。make reels で自動録画）
+├── promo/
+│   ├── campaigns/          # 完成済みX企画（1フォルダに reel.html + post.md）
+│   └── archive/            # 旧長尺版・生成器・重複コピー
+├── docs/story/             # PAGE 5候補と既存週次シナリオの対応表
 ├── tests/                   # ユニット/ガードレール（engine / goal / share / invariants / weekly-reachability / i18n-completeness / export-dictionary）8ファイル
 ├── scripts/                 # validate-weekly / verify / verify-offline / record-reel / gen-icons / gen-og-image /
 │                            #   gen-classroom-pdf / gen-store-shots / gen-announce-cards / gh-project-backfill 等
@@ -162,10 +165,13 @@ npm run serve              # → http://localhost:8000 （http で開く。file:
   make verify         # ★完了ごとの必須チェックの自動化（下記）
   make verify-offline # PWAオフライン起動検証（SW登録→回線遮断→リロードで動くか）
   make reels          # プロモリールを自動録画（dist/reels/ へ webm、ffmpegがあれば mp4 も）
+  make social-reels   # X向け30秒リール10本を一括録画（dist/social-reels/）
   make gen-icons      # ストア用アイコン/スプラッシュを resources/ に生成
   make classroom-pdf  # 教員向け1枚ガイドを dist/classroom.pdf / .en.pdf に生成
   make store-shots    # ストア提出用スクショ6枚を dist/store-shots/ に撮影
   make announce-cards # X告知用画像カード4枚を dist/announce/ に生成
+  make promo-visuals  # Xプロモ用キービジュアル・図解5枚を dist/promo-visuals/ に生成
+  make x-launch-kit   # 動画・画像・投稿文を dist/x-launch-kit/ に番号順で整理
   make gh-project     # 開発履歴を GitHub Issues/Milestones へバックフィル（要 gh）
   make synth          # cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
   ```

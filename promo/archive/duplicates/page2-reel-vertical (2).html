@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAGE 2 REEL — 倫理観はヘリの燃料</title>
+<style>
+:root{--bg0:#070b14;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:#d8e4ff;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.frame{position:relative;width:min(96vw,420px)}
+.stage{position:relative;border:1px solid var(--bdr);border-radius:6px;background:var(--bg0);overflow:hidden}
+#cv{width:100%;display:block}
+.ctrl{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.btn{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;letter-spacing:.1em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;font-size:.55rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">PAGE 2 単体リール（約54秒・縦型9:16）— プリセット値・デッドロック式・ヘリ判定は実アプリv6.1の実装準拠</div>
+</div>
+<script>
+const CW=420, CH=740;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.parentElement.getBoundingClientRect();const s=r.width/CW;
+  cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=(CH*s)+'px';
+  cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+
+// ===== timeline =====
+// 0-3.5 hook / 3.5-5 card / 5-13 静(⚙効率至上) / 13-14 alert / 14.5 shock1 → 物理的運休
+// 22-23 beat「復旧会議」/ 23.6 🏚他責デッドロック → 修復CPU 0% / 30-31 beat「倫理観を上げる」
+// 31.2 🌱スマート縮退(e80/DP) → ヘリ復帰 / 35.2 shock2 → SURVIVED / 39-54 conclusion
+const DUR=54;
+const T_CARD=3.5,T_ALERT=13,T_SHOCK1=14.5,T_BEAT2=22,T_DEAD=23.6,T_BEAT3=30,T_SMART=31.2,T_SHOCK2=35.2,T_CONC=39;
+let t=0, playing=true, last=performance.now(), ended=false, shake=0;
+
+// ===== helpers =====
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+const inW=(a,b)=>t>=a&&t<b;
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function slider(x,y,w,label,lo,hi,val,col,active){
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText(label,x,y-10);
+  cx.fillStyle='#172340';rrect(x,y,w,8,4);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(6,w*val/100),8,4);cx.fill();
+  cx.shadowBlur=active?12:5;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+4,active?8:6,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText(lo,x,y+20);cx.textAlign='right';cx.fillText(hi,x+w,y+20);cx.textAlign='left';
+  cx.fillStyle=col;cx.font='bold 11px Courier New';cx.fillText(Math.round(val)+'%',x+w+10,y+8);}
+function mini(x,y,w,label,val,col,hot){
+  cx.fillStyle=hot?col:'#5a6f94';cx.font=(hot?'bold ':'')+'9px Courier New';cx.fillText(label,x,y-8);
+  cx.fillStyle='#172340';rrect(x,y,w,6,3);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(4,w*val/100),6,3);cx.fill();
+  cx.shadowBlur=hot?10:6;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+3,hot?6:5,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+8);}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-5);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,7);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function btnUI(x,y,w,h,label,col,on){
+  cx.fillStyle=on?col:'rgba(15,24,41,1)';cx.strokeStyle=col;cx.lineWidth=1.4;
+  rrect(x,y,w,h,4);cx.fill();cx.stroke();
+  cx.fillStyle=on?'#070b14':col;cx.font='bold 9px Courier New';cx.textAlign='center';
+  cx.fillText(label,x+w/2,y+h/2+3.5);cx.textAlign='left';}
+function stamp(text,col,scale,yy){
+  cx.save();cx.translate(CW/2,yy);cx.rotate(-.08);cx.scale(scale,scale);cx.globalAlpha=Math.min(1,scale);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;cx.font='bold 23px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+34;cx.strokeRect(-w/2,-23,w,38);
+  cx.shadowBlur=22;cx.shadowColor=col;cx.fillText(text,0,5);cx.shadowBlur=0;
+  cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,y,col){
+  cx.font='bold 12px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+22;
+  cx.fillStyle='rgba(7,11,20,.88)';rrect(CW/2-w/2,y-15,w,24,4);cx.fill();
+  cx.fillStyle=col;cx.fillText(text,CW/2,y+2);cx.textAlign='left';}
+
+// ===== ghost cursor =====
+let cursor={x:CW/2,y:CH-60}, clickPulse=0, lastClickT=-1;
+const KF=[];const k=(tt,x,y,c)=>KF.push({t:tt,x,y,click:!!c});
+k(5.4,70,109);k(6,70,109,1);          // ⚙効率至上都市 (25,96,90,26)
+k(14,210,611);k(14.5,210,611,1);      // ⚡ショック注入 (70,596,280,30)
+k(23,260,109);k(23.6,260,109,1);      // 🏚他責デッドロック (215,96,90,26)
+k(30.8,353,109);k(31.2,353,109,1);    // 🌱スマート縮退 (310,96,86,26)
+k(34.6,210,611);k(35.2,210,611,1);    // ⚡ショック再注入
+function cursorAt(){
+  if(t<KF[0].t){cursor.x=KF[0].x;cursor.y=KF[0].y;return;}
+  for(let i=0;i<KF.length-1;i++)if(t>=KF[i].t&&t<=KF[i+1].t){
+    const p=ss(KF[i].t,KF[i+1].t,t);
+    cursor.x=KF[i].x+(KF[i+1].x-KF[i].x)*p;cursor.y=KF[i].y+(KF[i+1].y-KF[i].y)*p;return;}
+  const L=KF[KF.length-1];cursor.x=L.x;cursor.y=L.y;}
+function checkClicks(){KF.forEach(f=>{if(f.click&&t>=f.t&&lastClickT<f.t){clickPulse=1;lastClickT=f.t;
+  if(Math.abs(f.t-T_SHOCK1)<.01||Math.abs(f.t-T_SHOCK2)<.01)shake=1;}});clickPulse=Math.max(0,clickPulse-.045);}
+function drawCursor(){
+  if(t<4.8||t>37.5)return;
+  cx.shadowBlur=14;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(cursor.x,cursor.y,3.5,0,7);cx.fill();cx.shadowBlur=0;
+  if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(cursor.x,cursor.y,10+26*(1-clickPulse),0,7);cx.stroke();}}
+
+// ===== 実プリセット値（アプリのPRESETS_P2そのまま）=====
+// efficiency:{s:90,d:70,e:45,greedy,r:false} / deadlock:{s:20,d:20,e:25,greedy,r:false} / smart:{s:65,d:75,e:80,dp,r:false}
+function lerp3(v0,t1,v1,t2,v2,t3,v3){ // 3段プリセット遷移
+  if(t<t1)return v0;if(t<t1+.9)return v0+(v1-v0)*ss(t1,t1+.9,t);
+  if(t<t2)return v1;if(t<t2+.9)return v1+(v2-v1)*ss(t2,t2+.9,t);
+  if(t<t3)return v2;if(t<t3+.9)return v2+(v3-v2)*ss(t3,t3+.9,t);return v3;}
+const agg=()=>lerp3(30,6,90,T_DEAD,20,T_SMART,65);
+const dx =()=>lerp3(40,6,70,T_DEAD,20,T_SMART,75);
+const eth=()=>lerp3(55,6,45,T_DEAD,25,T_SMART,80);
+const greedy=()=>t>=6&&t<T_SMART+.5, dp=()=>t>=T_SMART+.5;
+const reboot=()=>false; // 3プリセットとも r:false（実値）
+const infraError=()=>t>=T_SHOCK1;
+// ★実装式: deadlock = !リブート × 倫理観<40 × Greedy × インフラ障害
+const deadlock=()=>!reboot()&&eth()<40&&greedy()&&infraError();
+// ★実装式: cpuBlame = deadlock?100 : clamp((1-e)*22+(greedy?14:0),0,75)
+function cpuBlame(){if(deadlock())return 100;
+  return Math.max(0,Math.min(75,(1-eth()/100)*22+(greedy()?14:0)));}
+const cpuRepair=()=>100-cpuBlame();
+function infra(){
+  if(t<T_SHOCK1)return 74;
+  if(t<17)return Math.max(12,74-62*ss(T_SHOCK1,17,t));
+  if(t<T_SMART+.9)return 12;                      // 他責中は誰も直さない → 回復ゼロ
+  if(t<34.6)return 12+60*ss(T_SMART+.9,34.6,t);   // 倫理観80 → 修復再開
+  if(inW(T_SHOCK2,T_SHOCK2+1.4))return 72-24*ss(T_SHOCK2,T_SHOCK2+1.4,t);
+  if(t>=T_SHOCK2+1.4)return Math.min(72,48+(t-T_SHOCK2-1.4)*7);
+  return 72;}
+function buffer(){
+  if(t<6)return 55;if(t<7)return 55-31*ss(6,7,t);   // 効率至上 → 24（コメント通りBuffer<30）
+  if(t<T_DEAD)return 24;
+  if(t<T_DEAD+.9)return 24-6*ss(T_DEAD,T_DEAD+.9,t);
+  if(t<T_SMART)return 18;
+  if(t<T_SMART+1.2)return 18+40*ss(T_SMART,T_SMART+1.2,t);
+  if(inW(T_SHOCK2,T_SHOCK2+1.4))return 58-14*ss(T_SHOCK2,T_SHOCK2+1.2,t);
+  if(t>=T_SHOCK2+1.4)return Math.min(58,44+(t-T_SHOCK2-1.4)*5);
+  return 58;}
+// ★実装式: heliOp = crash中?false : (リブートON?true : infra>35 && cpuRepair>25)
+const crashing=()=>inW(T_SHOCK1,T_SHOCK1+1.2);
+const heliOp=()=>!crashing()&&(reboot()||(infra()>35&&cpuRepair()>25));
+
+// ===== ④ SECTOR-T OPERATION LOG =====
+const LOG_EFF=[['n','INFRA_MAINT_SCHEDULED ........ OK'],['g','HELI_DISPATCH_STATUS ......... ONLINE'],['n','BUDGET_ALLOCATION ............ BALANCED'],['o','INFRA_DEGRADATION ............ WARNING']];
+const LOG_CRASH=[['b','BLACK_SWAN_EVENT ............. DETECTED'],['b','SYSTEM_SHOCK ................. INJECTED'],['b','INFRA_STRESS_TEST ............ CRITICAL'],['o','EMERGENCY_PROTOCOL ........... ACTIVATED']];
+const LOG_DEAD=[['b','BLAME_SHIFT_INITIATED ........ PRESS_CONF'],['b','FAULT_VECTOR_ASSIGNED ........ EXTERNAL'],['b','ACCOUNTABILITY_CHECK ......... REFUSED'],['b','ADMIN_CPU_REROUTED ........... →BLAME_100%'],['b','REPAIR_QUEUE ................. SUSPENDED'],['b','EXTERNAL_CAUSE_CITED ......... LOOP_x99']];
+const LOG_SMART=[['c','SMART_SHRINK_OPS ............. RUNNING'],['c','DX_PIPELINE .................. SYNCED'],['g','MAINTENANCE_QUEUE ............ CLEAR'],['g','HELI_DISPATCH_STATUS ......... ONLINE']];
+const LOG_SURV=[['o','REDUNDANCY_TEST .............. RUNNING'],['c','RESILIENCE_CHECK ............. IN_PROGRESS'],['g','SECTOR_T_STATUS .............. GREEN'],['g','HELI_DISPATCH_STATUS ......... ONLINE']];
+let log=[], logT=0, logI=0, phase='';
+function pushLog(){
+  const ph=t<T_ALERT?'eff':t<T_DEAD?'crash':t<T_SMART?'dead':t<T_SHOCK2?'smart':'surv';
+  if(ph!==phase){phase=ph;logI=0;}
+  const pool={eff:LOG_EFF,crash:LOG_CRASH,dead:LOG_DEAD,smart:LOG_SMART,surv:LOG_SURV}[ph];
+  const iv={eff:1.8,crash:0.8,dead:0.55,smart:0.9,surv:1.0}[ph];
+  logT-=0.016;
+  if(logT<=0&&t>6.5){log.push(pool[logI++%pool.length]);logT=iv;if(log.length>4)log.shift();}
+}
+
+// ===== hook & conclusion =====
+function drawHook(){
+  cx.textAlign='center';
+  const gl=Math.random()<.14;
+  cx.fillStyle='#00ff88';cx.shadowBlur=20;cx.shadowColor='#00ff88';
+  cx.font='bold 21px Courier New';
+  const ox=gl?(Math.random()-.5)*8:0;
+  cx.fillText('救命ヘリを止めるのは、',CW/2+ox,CH/2-50);
+  cx.fillText('災害だと思っていた。',CW/2-ox,CH/2-16);cx.shadowBlur=0;
+  if(gl){cx.fillStyle='rgba(255,34,68,.5)';cx.fillText('災害だと思っていた。',CW/2-ox+3,CH/2-15);}
+  if(t>1.6){cx.globalAlpha=ss(1.6,2.3,t);
+    cx.fillStyle='#ff2244';cx.font='bold 12px Courier New';
+    cx.fillText('本当の敵は、23秒後に現れる。',CW/2,CH/2+30);cx.globalAlpha=1;}
+  cx.textAlign='left';
+}
+function drawConclusion(){
+  cx.textAlign='center';
+  cx.globalAlpha=ss(39.5,40.5,t);
+  cx.fillStyle='#d8e4ff';cx.font='bold 15px Courier New';
+  cx.fillText('災害がヘリを止めるのは、一時だ。',CW/2,220);
+  cx.globalAlpha=ss(41.5,42.5,t);
+  cx.fillStyle='#ff2244';cx.font='bold 15px Courier New';
+  cx.fillText('他責は、永遠に止める。',CW/2,258);
+  cx.globalAlpha=ss(43.5,44.5,t);
+  cx.fillStyle='#00ff88';cx.shadowBlur=16;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';
+  cx.fillText('倫理観は、救命ヘリの燃料。',CW/2,320);cx.shadowBlur=0;
+  cx.globalAlpha=ss(45.5,46.5,t);
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+  cx.fillText('実装式: Deadlock = 倫理観<40 × Greedy × 障害発生',CW/2,368);
+  cx.fillText('→ 行政CPU100%が「責任回避・他者攻撃」へ / 修復 0%',CW/2,386);
+  if(t>47.5){const a=ss(47.5,48.5,t);cx.globalAlpha=a;
+    cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(CW/2-150,430,300,96,6);cx.stroke();
+    cx.fillStyle='rgba(0,212,255,.05)';rrect(CW/2-150,430,300,96,6);cx.fill();
+    cx.fillStyle='#00d4ff';cx.font='bold 14px Courier New';cx.shadowBlur=12;cx.shadowColor='#00d4ff';
+    cx.fillText('社会＆地域インフラ・デバッガー',CW/2,464);cx.shadowBlur=0;
+    cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+    cx.fillText('v6.1 — PAGE 2: SECTOR-T / プリセット4種を試せ',CW/2,484);
+    const bl=Math.sin(t*4)>0;cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.4)';
+    cx.font='bold 11px Courier New';cx.fillText('→ 適用後に ⚡ショック注入 で耐性を比較せよ',CW/2,510);}
+  cx.globalAlpha=1;cx.textAlign='left';
+}
+
+// ===== main page draw =====
+function drawP2(){
+  cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';
+  cx.fillText('▶ PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T',20,36);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,46);cx.lineTo(CW-20,46);cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('v6.1',CW-20,36);cx.textAlign='left';
+  // presets（実アプリの4種・実値）
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText('PRESETS ▶',25,90);
+  btnUI(25,96,90,26,'⚙ 効率至上都市','#00d4ff',inW(6,T_DEAD));
+  btnUI(120,96,90,26,'🛡 冗長性確保','#00ff88',false);
+  btnUI(215,96,90,26,'🏚 他責デッドロック','#ff2244',inW(T_DEAD,T_SMART));
+  btnUI(310,96,86,26,'🌱 スマート縮退','#00ff88',t>=T_SMART);
+  slider(40,168,280,'インフラ集約化率','レガシー全面延命','拠点集約・周辺廃止',agg(),'#00d4ff',inW(6,7.2));
+  mini(40,232,140,'産業DX・法人化投資',dx(),'#00d4ff',false);
+  // ★主役: 行政リーダーの倫理観
+  const eHot=inW(T_DEAD,T_DEAD+1.4)||inW(T_SMART,T_SMART+1.4);
+  mini(238,232,140,'行政リーダーの倫理観',eth(),eth()<40?'#ff2244':'#00ff88',eHot);
+  if(eth()<40){cx.fillStyle='#ff2244';cx.font='bold 8px Courier New';
+    if(Math.sin(t*9)>0)cx.fillText('⚠ 40%未満 — 他責・責任回避ゾーン',238,254);}
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('予算配分戦略',40,272);
+  btnUI(40,278,86,22,'DP戦略','#00ff88',dp());
+  btnUI(134,278,100,22,'Greedy戦略','#ff6b2b',greedy());
+  btnUI(244,278,152,22,'公共性リブート ○ OFF','#5a6f94',false);
+  // gauges
+  gauge(40,326,250,'インフラ維持力 INFRASTRUCTURE',infra(),infra()<35?'#ff2244':'#00d4ff');
+  gauge(40,360,250,'社会的耐故障性 REDUNDANCY BUFFER',buffer(),buffer()<30?'#ff2244':'#00ff88');
+  // ② RESCUE HELI STATUS（実装式で駆動）
+  const hd=!heliOp();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('② RESCUE HELI STATUS',40,386);
+  cx.strokeStyle=hd?'#ff2244':'#00ff88';cx.lineWidth=1.4;
+  rrect(40,392,340,44,4);cx.stroke();
+  cx.fillStyle=hd?'rgba(255,34,68,.07)':'rgba(0,255,136,.06)';rrect(40,392,340,44,4);cx.fill();
+  const hx=78,hy=414,rot=hd?0.5:(performance.now()/30)%7,hcol=hd?'#ff2244':'#00ff88';
+  cx.strokeStyle=hcol;cx.fillStyle=hcol;cx.lineWidth=2;
+  cx.beginPath();cx.ellipse(hx,hy+2+(hd?4:0),11,5,0,0,7);cx.stroke();
+  cx.beginPath();cx.moveTo(hx-14*Math.cos(rot),hy-5);cx.lineTo(hx+14*Math.cos(rot),hy-5);cx.stroke();
+  cx.font='bold 10px Courier New';
+  cx.fillText(hd?'🚁 LONG-TERM SUSPENSION — 長期運休':'🚁 OPERATIONAL — 常時稼働中',108,410);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';
+  cx.fillText(hd?(deadlock()?'MALFUNCTION — 修復予算なし（他責処理中）':'復旧待ち — 修復キュー処理中'):'Dispatch Ready — 出動待機中',108,425);
+  // ▌CPU ALLOCATION MATRIX（実UI: 一本積み上げバー + REPAIR/BLAME-SHIFT表記）
+  const dl=deadlock();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+  cx.fillText('▌ CPU ALLOCATION MATRIX',40,458);
+  cx.fillStyle=dl?'#ff2244':'#5a6f94';cx.font='bold 8px Courier New';cx.textAlign='right';
+  cx.fillText(dl?'DEADLOCK: ACTIVE':'DEADLOCK: INACTIVE',380,458);cx.textAlign='left';
+  cx.fillStyle='#172340';cx.fillRect(40,466,340,10);
+  cx.fillStyle='#00d4ff';cx.fillRect(40,466,340*cpuRepair()/100,10);
+  cx.fillStyle='#ff2244';cx.fillRect(40+340*cpuRepair()/100,466,340*cpuBlame()/100,10);
+  cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';
+  cx.fillText('REPAIR: '+Math.round(cpuRepair())+'%',40,488);
+  cx.fillStyle='#ff2244';cx.textAlign='right';
+  cx.fillText('BLAME-SHIFT: '+Math.round(cpuBlame())+'%',380,488);cx.textAlign='left';
+  cx.fillStyle=dl?'#ff2244':'#3d4f73';cx.font='8px Courier New';
+  cx.fillText(dl?'⚠ 行政CPUが100%「責任回避・他者攻撃」に割当。修復処理ゼロ。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中',40,504);
+  // ④ SECTOR-T OPERATION LOG
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('④ SECTOR-T OPERATION LOG',30,520);
+  cx.strokeStyle='#172340';rrect(30,526,360,58,3);cx.stroke();
+  cx.fillStyle='rgba(15,24,41,.6)';rrect(30,526,360,58,3);cx.fill();
+  pushLog();
+  log.forEach((L,i)=>{
+    const col=L[0]==='g'?'#00ff88':L[0]==='o'?'#ff6b2b':L[0]==='b'?'#ff2244':L[0]==='c'?'#00d4ff':'#5a6f94';
+    cx.fillStyle=col;cx.font=(inW(T_DEAD,T_SMART)?'bold ':'')+'9px Courier New';
+    cx.fillText('> '+L[1],38,540+i*13);});
+  btnUI(70,596,280,30,'⚡ 環境ショック注入 (Inject System Shock)','#ffcc00',inW(T_SHOCK1,T_SHOCK1+.4)||inW(T_SHOCK2,T_SHOCK2+.4));
+  // stamps & captions
+  if(inW(8,T_ALERT))caption('数値は健全に見える。バッファ以外は。',668,'#00d4ff');
+  if(inW(T_SHOCK1+1.6,T_BEAT2))stamp('SECTOR-T COLLAPSE','#ff2244',Math.min(1,(t-T_SHOCK1-1.6)*2),300);
+  if(inW(17.5,T_BEAT2))caption('維持力35%割れ — ここまでは"物理"の話。',668,'#ff2244');
+  if(inW(T_DEAD+1.5,28.5))stamp('DEADLOCK','#ff2244',Math.min(1,(t-T_DEAD-1.5)*2),300);
+  if(inW(25,27.6))caption('行政CPU100% →「責任回避・他者攻撃」へ。',668,'#ff2244');
+  if(inW(27.6,T_BEAT3))caption('修復ゼロ・崩壊速度3倍 — 危険なのは、県民。',668,'#ff2244');
+  if(inW(T_SMART+1.2,T_SHOCK2))caption('倫理観80 — 犯人探しをやめた瞬間、ヘリが戻る。',668,'#00ff88');
+  if(t>T_SHOCK2+1.8&&t<T_CONC)stamp('SURVIVED','#00ff88',Math.min(1,(t-T_SHOCK2-1.8)*2),300);
+  if(inW(T_SHOCK2+2.4,T_CONC))caption('同じ一撃。ヘリは一度も止まらなかった。',668,'#00ff88');
+}
+
+// ===== main loop =====
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;ended=true;}
+  if(inW(T_SHOCK1,T_SHOCK1+.6)||inW(16.5,16.8)||inW(T_SHOCK2,T_SHOCK2+.4))shake=Math.max(shake,.85);
+  shake=Math.max(0,shake-dt*1.8);
+  cursorAt();checkClicks();
+}
+function render(){
+  cx.save();
+  if(shake>0)cx.translate((Math.random()-.5)*11*shake,(Math.random()-.5)*9*shake);
+  cx.fillStyle='#070b14';cx.fillRect(-12,-12,CW+24,CH+24);grid();
+  if(inW(T_SHOCK1,T_SMART)){const g=cx.createRadialGradient(CW/2,CH/2,CH*.2,CW/2,CH/2,CH*.8);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(255,34,68,${.12*(0.6+0.4*Math.sin(t*6))})`);
+    cx.fillStyle=g;cx.fillRect(0,0,CW,CH);}
+  if(t<T_CARD)drawHook();
+  else if(t<T_CONC){
+    drawP2();
+    const a=Math.min(1,(t-T_CARD)*2.2)*(t<T_CARD+1.4?1:Math.max(0,1-(t-T_CARD-1.4)*2.2));
+    if(a>0){cx.fillStyle=`rgba(7,11,20,${.92*a})`;cx.fillRect(0,0,CW,CH);
+      cx.globalAlpha=a;cx.textAlign='center';
+      cx.fillStyle='#00ff88';cx.font='bold 14px Courier New';cx.fillText('▶ PAGE 2',CW/2,CH/2-30);
+      cx.font='bold 20px Courier New';cx.fillText('地方インフラ',CW/2,CH/2+2);
+      cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('REGIONAL INFRASTRUCTURE — SECTOR-T',CW/2,CH/2+28);
+      cx.textAlign='left';cx.globalAlpha=1;}
+  }
+  else drawConclusion();
+  // beat flashes
+  if(inW(T_ALERT,T_ALERT+.18)){cx.fillStyle='rgba(255,204,0,.55)';cx.fillRect(0,0,CW,CH);
+    cx.fillStyle='#070b14';cx.font='bold 20px Courier New';cx.textAlign='center';
+    cx.fillText('⚡ BLACK SWAN INBOUND',CW/2,CH/2);cx.textAlign='left';}
+  if(inW(T_BEAT2,T_BEAT2+.14)){cx.fillStyle='rgba(255,255,255,.7)';cx.fillRect(0,0,CW,CH);}
+  if(inW(T_BEAT2+.14,T_DEAD)){cx.fillStyle='rgba(7,11,20,.78)';cx.fillRect(0,0,CW,CH);
+    cx.fillStyle='#ff2244';cx.font='bold 18px Courier New';cx.textAlign='center';
+    cx.fillText('— 復旧会議、開始 —',CW/2,CH/2-10);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('ここからが、本当の実験。',CW/2,CH/2+18);cx.textAlign='left';}
+  if(inW(T_BEAT3,T_BEAT3+.14)){cx.fillStyle='rgba(255,255,255,.7)';cx.fillRect(0,0,CW,CH);}
+  if(inW(T_BEAT3+.14,T_SMART)){cx.fillStyle='rgba(7,11,20,.78)';cx.fillRect(0,0,CW,CH);
+    cx.fillStyle='#00ff88';cx.font='bold 18px Courier New';cx.textAlign='center';
+    cx.fillText('— 倫理観を、上げる —',CW/2,CH/2-10);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('災害はそのまま。人の姿勢だけを変える。',CW/2,CH/2+18);cx.textAlign='left';}
+  if(inW(T_SMART,T_SMART+.14)){cx.fillStyle='rgba(0,255,136,.35)';cx.fillRect(0,0,CW,CH);}
+  drawCursor();
+  cx.fillStyle='#172340';cx.fillRect(0,CH-4,CW,4);
+  const pg=cx.createLinearGradient(0,0,CW,0);
+  pg.addColorStop(0,'#00d4ff');pg.addColorStop(.5,'#ff2244');pg.addColorStop(1,'#00ff88');
+  cx.fillStyle=pg;cx.fillRect(0,CH-4,CW*t/DUR,4);
+  if(!ended){cx.fillStyle=Math.sin(t*6)>0?'#ff2244':'rgba(255,34,68,.3)';
+    cx.beginPath();cx.arc(CW-26,20,4,0,7);cx.fill();
+    cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('REC',CW-36,23);cx.textAlign='left';}
+  cx.restore();
+  if(ended){cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('↺ RESTART で最初から',CW/2,CH-20);cx.textAlign='left';}
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;shake=0;lastClickT=-1;clickPulse=0;log=[];logT=0;logI=0;phase='';
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

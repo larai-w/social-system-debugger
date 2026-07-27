@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 危機は、一撃で来るとは限らない</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--yellow:#ffcc00;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px;background:#03060c;color:var(--text);font-family:'Courier New',monospace}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / PAGE 2 / 20年比較 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,clicked=false;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText(label,x,y-5);cx.fillStyle='#172340';cx.fillRect(x,y,w,6);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,6);cx.fillStyle=col;cx.font='bold 9px Courier New';cx.fillText(Math.round(val),x+w+5,y+6);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.4;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 9px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+3);cx.textAlign='left';}
+function stamp(text,col,a,x,y,size=19){cx.save();cx.translate(x,y);cx.rotate(-.08);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=2.5;cx.font=`bold ${size}px Courier New`;cx.textAlign='center';const w=cx.measureText(text).width+22;cx.strokeRect(-w/2,-20,w,34);cx.shadowBlur=16;cx.shadowColor=col;cx.fillText(text,0,4);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,625,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,644);cx.textAlign='left';}
+function timeline(){return ss(4,18,t);}
+function year(){return 2025+Math.round(20*timeline());}
+function population(){return 100-32*timeline();}
+function aBudget(){return 80-76*timeline();}
+function aQuality(){return 70-54*timeline();}
+function bBudget(){const p=timeline();return p<.35?80-30*p/.35:50+32*ss(.35,1,p);}
+function bQuality(){const p=timeline();return p<.3?70-18*p/.3:52+34*ss(.3,1,p);}
+const districts=[];for(let i=0;i<10;i++)districts.push({a:i/10*Math.PI*2,keep:i%3===0});
+function drawDistrict(x,y,health,col,archived){if(archived){cx.strokeStyle='#5a6f94';cx.setLineDash([3,3]);cx.strokeRect(x-9,y-9,18,18);cx.setLineDash([]);return;}const c=health>.6?col:health>.3?'#ffcc00':'#ff2244';cx.fillStyle=c;cx.globalAlpha=.2+health*.65;cx.fillRect(x-9,y-9,18,18);cx.globalAlpha=1;cx.strokeStyle=c;cx.strokeRect(x-9,y-9,18,18);}
+function drawCity(x,y,w,mode){
+  const isA=mode==='A',col=isA?'#00d4ff':'#00ff88',p=timeline();
+  cx.fillStyle='rgba(15,24,41,.72)';cx.strokeStyle=isA?'rgba(0,212,255,.35)':'rgba(0,255,136,.35)';rrect(x,y,w,410,5);cx.fill();cx.stroke();
+  cx.fillStyle=col;cx.font='bold 12px Courier New';cx.textAlign='center';cx.fillText(isA?'CITY A':'CITY B',x+w/2,y+27);cx.fillStyle='#d8e4ff';cx.font='bold 10px Courier New';cx.fillText(isA?'全域維持型':'拠点再編型',x+w/2,y+46);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText('人口 '+Math.round(population())+'%',x+w/2,y+63);cx.textAlign='left';
+  const bx=x+w/2,by=y+205,coreHealth=isA?Math.max(.15,1-p*.8):Math.min(1.15,.88+p*.27);
+  districts.forEach((d,i)=>{const dx=bx+Math.cos(d.a)*60,dy=by+Math.sin(d.a)*75,archived=!isA&&!d.keep&&p>.35,health=isA?Math.max(.08,1-p*1.05):(d.keep?Math.min(1.1,.88+p*.25):Math.max(.15,1-p*1.6));cx.strokeStyle=archived?'rgba(90,111,148,.2)':isA?`rgba(0,212,255,${.22*(1-p*.7)})`:'rgba(0,255,136,.24)';cx.setLineDash(archived?[3,4]:[]);cx.beginPath();cx.moveTo(bx,by);cx.lineTo(dx,dy);cx.stroke();cx.setLineDash([]);drawDistrict(dx,dy,health,col,archived);});
+  const coreCol=coreHealth>.5?col:'#ff2244';cx.fillStyle=coreCol;cx.shadowBlur=12;cx.shadowColor=coreCol;cx.beginPath();cx.arc(bx,by,isA?11:11+p*5,0,7);cx.fill();cx.shadowBlur=0;cx.fillStyle='#070b14';cx.font='bold 7px Courier New';cx.textAlign='center';cx.fillText('CORE',bx,by+2);cx.textAlign='left';
+  gauge(x+14,y+320,w-46,'維持予算',isA?aBudget():bBudget(),isA&&aBudget()<25?'#ff2244':col);gauge(x+14,y+354,w-46,'生活サービス',isA?aQuality():bQuality(),isA&&aQuality()<30?'#ff2244':col);
+  if(!isA&&t>=7&&t<18){button(x+12,y+378,w-24,24,'拠点再編を開始','#00ff88',t>=8);}
+  if(t>=18){stamp(isA?'広く低下':'核を維持',isA?'#ff2244':'#00ff88',Math.min(1,(t-18)*2),x+w/2,y+213,18);}
+}
+function drawHeader(){cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';cx.fillText('▶ PAGE 2 — 20年タイムラプス',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('社会デバッガー v6',400,36);cx.textAlign='left';}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 21px Courier New';cx.fillText('危機は、一撃で来るとは',CW/2,315);cx.fillStyle='#ffcc00';cx.shadowBlur=17;cx.shadowColor='#ffcc00';cx.fillText('限らない。',CW/2,354);cx.shadowBlur=0;if(t>1.2){cx.globalAlpha=ss(1.2,2,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('ゆっくり来る変化を、20年早送り',CW/2,392);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawLab(){drawHeader();cx.fillStyle='#ffcc00';cx.font='bold 18px Courier New';cx.textAlign='center';cx.fillText(year(),CW/2,86);cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('人口は両都市とも同じ速度で変化',CW/2,103);cx.textAlign='left';drawCity(20,118,182,'A');drawCity(218,118,182,'B');if(t>=7&&t<12)caption('CITY Bは、移行コストを先に払う','#ffcc00');if(t>=18&&t<24.5)caption('同じ人口変化。違ったのは、縮み方。','#00ff88');drawCursor();}
+function drawCursor(){if(t<5||t>13)return;const x=309,y=t<8?330+190*ss(5,8,t):508;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(x,y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(0,255,136,${clickPulse})`;cx.beginPath();cx.arc(x,y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('縮むことが、失敗ではない。',CW/2,220);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 18px Courier New';cx.fillText('準備せず、薄くなることが危険だ。',CW/2,264);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,326,320,164,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,326,320,164,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,362);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,388);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,418);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ あなたなら、何を先に残す？',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}if(t>=8&&!clicked){clickPulse=1;clicked=true;}clickPulse=Math.max(0,clickPulse-dt*2.8);}
+function render(){cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();if(t<3)drawHook();else if(t<24.5)drawLab();else drawEnd();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#00d4ff');g.addColorStop(.55,'#ffcc00');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;clicked=false;clickPulse=0;last=performance.now();document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 接続しているのに、現実から遠ざかる</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--orange:#ff6b2b;--purple:#9945ff;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#03060c;color:var(--text);font-family:'Courier New',monospace;padding:10px}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / PAGE 3 / 無音で完結 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,lastClick=-1;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';cx.lineWidth=1;for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-6);cx.fillStyle='#172340';cx.fillRect(x,y,w,7);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.5;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function stamp(text,col,a,y=430){cx.save();cx.translate(CW/2,y);cx.rotate(-.08);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=3;cx.font='bold 31px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+36;cx.strokeRect(-w/2,-29,w,48);cx.shadowBlur=22;cx.shadowColor=col;cx.fillText(text,0,6);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,618,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,637);cx.textAlign='left';}
+function connection(){if(t<4)return 20;if(t<9)return 20+72*ss(4,9,t);if(t<18.2)return 92;if(t<20)return 92-72*ss(18.2,20,t);return 20;}
+function resync(){return t>=18.2;}
+function sanity(){const c=connection();return resync()?Math.min(88,30+(t-18.2)*14):Math.max(30,96-c*.72);}
+function falsify(){const c=connection();return resync()?Math.min(84,18+(t-18.2)*15):Math.max(18,86-c*.74);}
+function load(){const c=connection();return resync()?Math.max(18,88-(t-18.2)*16):Math.min(88,16+c*.78);}
+const nodes=[];for(let i=0;i<18;i++)nodes.push({a:i/18*Math.PI*2,r:58+((i*17)%30),p:i%5===0});
+const KF=[{t:3.8,x:96,y:189},{t:9,x:298,y:189},{t:17.5,x:210,y:568},{t:18.2,x:210,y:568,c:1}];
+let cursor={x:96,y:189};
+function cursorAt(){if(t<KF[0].t){cursor={x:KF[0].x,y:KF[0].y};return;}for(let i=0;i<KF.length-1;i++)if(t>=KF[i].t&&t<=KF[i+1].t){const p=ss(KF[i].t,KF[i+1].t,t);cursor.x=KF[i].x+(KF[i+1].x-KF[i].x)*p;cursor.y=KF[i].y+(KF[i+1].y-KF[i].y)*p;return;}cursor={x:KF.at(-1).x,y:KF.at(-1).y};}
+function clicks(){KF.forEach(k=>{if(k.c&&t>=k.t&&lastClick<k.t){clickPulse=1;lastClick=k.t;}});clickPulse=Math.max(0,clickPulse-.05);}
+function drawCursor(){if(t<3||t>24.5)return;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(cursor.x,cursor.y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(cursor.x,cursor.y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 22px Courier New';cx.fillText('接続しているのに、',CW/2,315);cx.fillStyle='#9945ff';cx.shadowBlur=18;cx.shadowColor='#9945ff';cx.fillText('現実から遠ざかる。',CW/2,354);cx.shadowBlur=0;if(t>1.2){cx.globalAlpha=ss(1.2,2,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('同じ脳で、条件だけを変える実験',CW/2,392);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawExperiment(){
+  cx.fillStyle='#9945ff';cx.font='bold 12px Courier New';cx.fillText('▶ PAGE 3 — 認知回復シミュレーター',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('社会デバッガー v6',400,36);cx.textAlign='left';
+  const c=connection(),sync=resync();
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('タイムライン接続時間 / 日',40,170);cx.fillStyle='#172340';rrect(40,182,280,8,4);cx.fill();cx.fillStyle='#ff6b2b';rrect(40,182,Math.max(6,280*c/100),8,4);cx.fill();cx.fillStyle='#fff';cx.shadowBlur=8;cx.shadowColor='#ff6b2b';cx.beginPath();cx.arc(40+280*c/100,186,7,0,7);cx.fill();cx.shadowBlur=0;cx.fillStyle='#ff6b2b';cx.font='bold 11px Courier New';cx.fillText(Math.round(c*.18)+'時間',330,190);
+  gauge(40,250,250,'反応過負荷',load(),'#ff2244');gauge(40,292,250,'認知健全性',sanity(),sanity()<45?'#ff2244':'#00ff88');gauge(40,334,250,'反証許容度',falsify(),falsify()<35?'#ff2244':'#00d4ff');
+  if(!sync&&c>75&&Math.sin(t*7)>0){cx.fillStyle='#ff2244';cx.font='bold 9px Courier New';cx.fillText('⚠ 現実との照合不足 — 閉ループ形成中',40,369);}
+  const bx=CW/2,by=458;for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j+=5){const a=nodes[i],b=nodes[j],ax=bx+Math.cos(a.a+t*.25)*a.r,ay=by+Math.sin(a.a+t*.25)*a.r*.55,bx2=bx+Math.cos(b.a+t*.25)*b.r,by2=by+Math.sin(b.a+t*.25)*b.r*.55;cx.strokeStyle=!sync&&c>60?'rgba(255,34,68,.2)':'rgba(0,212,255,.14)';cx.beginPath();cx.moveTo(ax,ay);cx.lineTo(bx2,by2);cx.stroke();}
+  nodes.forEach((n,i)=>{const sick=!sync&&c>55&&!n.p,col=sick?'#ff2244':(sync&&n.p?'#00ff88':'#00d4ff'),wob=sick?Math.sin(t*9+i)*5:0,x=bx+Math.cos(n.a+t*.25)*n.r+wob,y=by+Math.sin(n.a+t*.25)*n.r*.55;cx.fillStyle=col;cx.shadowBlur=6;cx.shadowColor=col;cx.beginPath();cx.arc(x,y,3.5,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';cx.fillText('認知ネットワーク（緑=現実照合ノード）',bx,526);cx.textAlign='left';
+  button(70,550,280,36,'一時切断して、現実と再同期','#00ff88',sync);
+  if(!sync&&c>85&&t>11)stamp('閉ループ化','#ff2244',Math.min(1,(t-11)*2));
+  if(sync&&t>21.2)stamp('再同期','#00ff88',Math.min(1,(t-21.2)*2));
+  if(t>12&&t<17.4)caption('接続16時間 → 反証を受け付けない状態へ','#ff2244');
+  if(t>22&&t<25.5)caption('切断と再接続で、現実との照合を戻す','#00ff88');
+}
+function drawBeat(){cx.textAlign='center';cx.fillStyle='#00ff88';cx.font='bold 18px Courier New';cx.shadowBlur=16;cx.shadowColor='#00ff88';cx.fillText('同じ脳で、もう一度。',CW/2,350);cx.shadowBlur=0;cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('変えるのは、誰かではなく接続条件',CW/2,384);cx.textAlign='left';}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('壊れていたのは、人格ではない。',CW/2,230);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';cx.fillText('接続の条件だった。',CW/2,274);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,330,320,156,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,330,320,156,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,366);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,391);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,420);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ あなたなら、どの条件を変える？',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}cursorAt();clicks();}
+function render(){cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();if(t<3)drawHook();else if(t<16.5)drawExperiment();else if(t<18.2)drawBeat();else if(t<25.5)drawExperiment();else drawEnd();drawCursor();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#9945ff');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;last=performance.now();lastClick=-1;clickPulse=0;document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

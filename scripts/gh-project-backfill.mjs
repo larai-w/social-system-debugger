@@ -55,9 +55,9 @@ const MILESTONES = [
       'Verification harnesses, researcher export, education channel assets, weekly content pipeline with reachability guarantees.',
   },
   {
-    title: 'Delegation sprints (T25–T96)',
+    title: 'Delegation sprints (T25–T102)',
     description:
-      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), the usage-modes / mobile-verification sprint (T90–T92), and the 5-incident chain / ruleset migration sprint (T94–T96).',
+      'AI-subagent delegation protocol: main session writes specs, reviews, verifies and commits; subagents implement self-contained tasks. Includes portfolio-hardening, PWA-completion (T44–T54), quality/security (T55–T64), the first Sonnet-delegated task (T66), release-prep (T67–T70), the methodology-audit / self-improvement sprint (T79–T84), the sentinel-driven / education-kit sprint (T85–T89), the usage-modes / mobile-verification sprint (T90–T92), the 5-incident chain / ruleset migration sprint (T94–T96), automated X-reel export (T97), promotional visuals (T98), the ready-to-post X launch kit (T99), story/promo asset information architecture (T100), the complete Page 5 narrative specification (T101), and its visual storyboard (T102).',
   },
 ];
 // NOTE: this milestone was previously named 'Delegation sprints (T25–T43)', then
@@ -66,7 +66,7 @@ const MILESTONES = [
 // 'Delegation sprints (T25–T89)', then 'Delegation sprints (T25–T93)'.
 // If an older milestone with any of those prior titles already exists in the repo,
 // either rename it via:
-//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T96)'
+//   gh api -X PATCH repos/OWNER/REPO/milestones/<n> -f title='Delegation sprints (T25–T102)'
 // or close the stale one by hand — the create step below is idempotent by title, so it
 // will add the new one alongside the old rather than renaming it.
 const msOf = (id) =>
@@ -709,6 +709,48 @@ const TASKS = [
     ['area:marketing'],
     true,
     'Adds four Monday post drafts for 2027-W02 through W05 to docs/x-post-templates.md (audit-type themes, no mention of gated weekly feature). Adds a reach-layer comparison table (educators / researchers / general public) to docs/kpi-log.md for tracking differentiated response patterns.',
+  ],
+  [
+    'T97',
+    'Automated export for ten X-ready 30-second reels',
+    ['area:marketing', 'area:testing'],
+    false,
+    'Adds make social-reels and scripts/record-social-reels.mjs. Playwright records the ten finished HTML reels at 420x740, hides manual controls, validates console/page errors plus canvas/video dimensions and duration, supports --only for targeted reruns, and converts to MP4 when ffmpeg is available.',
+  ],
+  [
+    'T98',
+    'Four attractive X promotional visuals and explanatory diagrams',
+    ['area:marketing', 'area:testing'],
+    false,
+    'Adds four 1200x675 assets: campaign hero, four-page system map, Page 4 decision-weight diagram, and Page 2 same-shock comparison. make promo-visuals renders high-resolution PNGs and validates console/page errors, dimensions, and file size.',
+  ],
+  [
+    'T99',
+    'Ready-to-post X launch kit with generated key-art card',
+    ['area:marketing', 'area:testing'],
+    false,
+    'Adds a fifth promotional card using generated abstract city-system key art, plus make x-launch-kit. The command packages the pinned-post video, five ordered images, exact post copy, cadence guidance, and safety checklist into dist/x-launch-kit/.',
+  ],
+  [
+    'T100',
+    'Organize story sources and pair every finished promo reel with its X copy',
+    ['area:marketing', 'area:docs', 'area:testing'],
+    false,
+    'Moves Page 5 story candidates into docs/story, archives historical implementation prompts, and groups ten finished 30-second campaigns under promo/campaigns. Each campaign keeps reel.html and post.md together; an automated test prevents the pair and recording target from drifting apart.',
+  ],
+  [
+    'T101',
+    'Complete Page 5 narrative specification and keep private prompts out of Git',
+    ['area:content', 'area:docs', 'area:marketing'],
+    false,
+    'Defines the complete eight-scene Same Trigger, Different Scars experience, including bilingual key copy, branching outcomes, share cards, ethical boundaries, and future implementation acceptance criteria. Historical Claude Code prompts remain local-only and ignored by Git.',
+  ],
+  [
+    'T102',
+    'Visual storyboard for the complete Page 5 experience',
+    ['area:content', 'area:marketing', 'area:docs'],
+    false,
+    'Adds a standalone eight-scene HTML storyboard for Page 5 with desktop/mobile layouts, scene navigation, bilingual key copy, information hierarchy, motion direction, structural intervention choices, and audit-card composition. It does not connect Page 5 to the application or change its release gate.',
   ],
 ];
 

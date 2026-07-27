@@ -1,6 +1,9 @@
 .DS_Store
 Thumbs.db
 
+# Local working notes and prompts (never publish)
+.local/
+
 # Node / Capacitor (Phase 1)
 node_modules/
 dist/

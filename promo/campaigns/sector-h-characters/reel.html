@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 誰も入れ替えずに、街を直せるか</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--orange:#ff6b2b;--purple:#9945ff;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px;background:#03060c;color:var(--text);font-family:'Courier New',monospace}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / 架空キャラクター版 / 無音で完結 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,clicked=false;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-6);cx.fillStyle='#172340';cx.fillRect(x,y,w,7);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.5;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function bubble(x,y,text,col){cx.font='bold 9px Courier New';const w=cx.measureText(text).width+16,bx=Math.max(7,Math.min(CW-w-7,x-w/2));cx.fillStyle='rgba(7,11,20,.94)';cx.strokeStyle=col;rrect(bx,y,w,23,4);cx.fill();cx.stroke();cx.fillStyle=col;cx.fillText(text,bx+8,y+15);}
+function person(x,y,col,happy,role){const bob=happy?Math.sin(t*4+x)*2:0;cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=2.5;cx.lineCap='round';cx.beginPath();cx.moveTo(x,y-50+bob);cx.lineTo(x,y-16);cx.moveTo(x,y-16);cx.lineTo(x-7,y);cx.moveTo(x,y-16);cx.lineTo(x+7,y);cx.moveTo(x,y-40);if(happy){cx.lineTo(x-12,y-52);cx.moveTo(x,y-40);cx.lineTo(x+12,y-52);}else{cx.lineTo(x-9,y-27);cx.moveTo(x,y-40);cx.lineTo(x+9,y-27);}cx.stroke();cx.shadowBlur=8;cx.shadowColor=col;cx.beginPath();cx.arc(x,y-60+bob,9,0,7);cx.fill();cx.shadowBlur=0;cx.strokeStyle='#070b14';cx.lineWidth=1.2;cx.beginPath();if(happy)cx.arc(x,y-59+bob,4,.15*Math.PI,.85*Math.PI);else{cx.moveTo(x-3,y-57+bob);cx.lineTo(x+3,y-57+bob);}cx.stroke();cx.fillStyle=col;cx.font='bold 9px Courier New';cx.textAlign='center';cx.fillText(role,x,y+18);cx.textAlign='left';}
+function stamp(text,col,a,y=445){cx.save();cx.translate(CW/2,y);cx.rotate(-.07);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=3;cx.font='bold 27px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+32;cx.strokeRect(-w/2,-26,w,43);cx.shadowBlur=19;cx.shadowColor=col;cx.fillText(text,0,5);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,627,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,646);cx.textAlign='left';}
+function patched(){return t>=12;}
+function progress(){return ss(12,21,t);}
+function conflict(){return patched()?86-72*progress():86;}
+function commonFact(){return patched()?18+70*progress():18;}
+function work(){return patched()?24+64*progress():24;}
+function drawHeader(){cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';cx.fillText('▶ SECTOR-H — CHARACTER TEST',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('全キャラクター架空',400,36);cx.textAlign='left';}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 21px Courier New';cx.fillText('誰も入れ替えずに、',CW/2,315);cx.fillStyle='#00d4ff';cx.shadowBlur=17;cx.shadowColor='#00d4ff';cx.fillText('街を直せるか。',CW/2,354);cx.shadowBlur=0;if(t>1.2){cx.globalAlpha=ss(1.2,2,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('同じ3人。変えるのは、会話の条件だけ',CW/2,392);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawScene(){
+  drawHeader();const p=progress(),good=p>.65;
+  gauge(40,138,250,'対立ループ',conflict(),conflict()>50?'#ff2244':'#00ff88');gauge(40,180,250,'共通事実への接続',commonFact(),commonFact()<45?'#ff2244':'#00d4ff');gauge(40,222,250,'生活課題の実務進捗',work(),work()<45?'#ff2244':'#00ff88');
+  const chars=[{x:90,col:'#00d4ff',role:'生活者'},{x:210,col:'#9945ff',role:'実務担当'},{x:330,col:'#00ff88',role:'検証役'}],y=480;
+  if(!patched()){cx.strokeStyle='rgba(255,34,68,.55)';cx.setLineDash([5,5]);cx.beginPath();cx.moveTo(145,335);cx.lineTo(145,500);cx.moveTo(270,335);cx.lineTo(270,500);cx.stroke();cx.setLineDash([]);}else{cx.strokeStyle=`rgba(0,255,136,${.15+.45*p})`;cx.lineWidth=2;cx.beginPath();cx.moveTo(90,y-58);cx.lineTo(210,y-58);cx.lineTo(330,y-58);cx.lineTo(90,y-58);cx.stroke();}
+  chars.forEach(c=>person(c.x,y,c.col,good,c.role));
+  if(!patched()){bubble(90,315,'また争点だけ増えた…','#ff6b2b');bubble(210,350,'実務に時間が回らない','#ff2244');bubble(330,385,'資料が別々で比べられない','#9945ff');}
+  else if(p<.35){bubble(90,320,'困っている順に並べよう','#00d4ff');bubble(210,355,'進捗を同じ画面へ','#9945ff');bubble(330,390,'一次情報をつなぎ直す','#00ff88');}
+  else{bubble(90,320,'交通の復旧を確認した','#00d4ff');bubble(210,355,'次は生活支援へ進む','#9945ff');bubble(330,390,'結果を全員で検証できる','#00ff88');}
+  if(!patched()){button(70,550,280,38,'▶ 会話の条件を変更','#00d4ff',false);}else{cx.fillStyle='rgba(0,212,255,.05)';cx.strokeStyle='#172340';rrect(65,545,290,66,4);cx.fill();cx.stroke();const rows=['共通事実を同じ画面へ','結果を引き受ける課題から','実務の進捗を見える化'];rows.forEach((row,i)=>{const on=p>(i+1)*.22;cx.fillStyle=on?'#00ff88':'#5a6f94';cx.font='bold 9px Courier New';cx.fillText((on?'✓ ':'○ ')+row,84,564+i*18);});}
+  if(!patched()&&t>8.5)stamp('会話が分断','#ff2244',Math.min(1,(t-8.5)*2));
+  if(patched()&&t>20.5)stamp('協働再開','#00ff88',Math.min(1,(t-20.5)*2));
+  if(t>9&&t<12)caption('同じ人でも、条件が対立を増幅する','#ff2244');
+  if(t>21.2&&t<25)caption('人は同じ。会話が、生活の処理へ戻った。','#00ff88');
+  drawCursor();
+}
+function drawCursor(){if(t<5||t>17)return;const x=210,y=t<11.8?350+219*ss(5,11.8,t):569;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(x,y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(x,y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('変えたのは、人ではない。',CW/2,220);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';cx.fillText('会話が流れる条件だった。',CW/2,264);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,326,320,164,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,326,320,164,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,362);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,388);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,418);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ あなたなら、どの条件を変える？',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}if(t>=11.8&&!clicked){clickPulse=1;clicked=true;}clickPulse=Math.max(0,clickPulse-dt*2.8);}
+function render(){cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();if(t<3)drawHook();else if(t<25)drawScene();else drawEnd();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※登場人物はすべて架空です。特定の人物・団体を描いたものではありません',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#ff2244');g.addColorStop(.55,'#00d4ff');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;clicked=false;clickPulse=0;last=performance.now();document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

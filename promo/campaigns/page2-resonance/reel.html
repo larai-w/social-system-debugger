@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — ヘリを止めたのは、災害じゃない</title>
+<style>
+:root{--bg0:#070b14;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:#d8e4ff;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.frame{position:relative;width:min(96vw,420px)}
+.stage{position:relative;border:1px solid var(--bdr);border-radius:6px;background:var(--bg0);overflow:hidden}
+#cv{width:100%;display:block}
+.ctrl{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.btn{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;letter-spacing:.1em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;font-size:.55rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒リール（刺激的・構造批判版 / PAGE 2）— 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420, CH=740;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.parentElement.getBoundingClientRect();const s=r.width/CW;
+  cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=(CH*s)+'px';
+  cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+
+// ===== timeline (30s) =====
+// 0-2.6 hook / 2.6-4 card / 5.2 🏚他責デッドロック / 7.2 ⚡shock → DEADLOCK
+// 12.6-14.2 beat / 14.2 🌱スマート縮退(倫理観80) → ヘリ復帰 / 18.4 ⚡再shock → SURVIVED / 22-30 end
+const DUR=30;
+const T_CARD=2.6,T_DEAD=5.2,T_SHOCK1=7.2,T_BEAT=12.6,T_SMART=14.2,T_SHOCK2=18.4,T_END=22;
+let t=0, playing=true, last=performance.now(), ended=false, shake=0;
+
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+const inW=(a,b)=>t>=a&&t<b;
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function mini(x,y,w,label,val,col,hot){
+  cx.fillStyle=hot?col:'#5a6f94';cx.font=(hot?'bold ':'')+'9px Courier New';cx.fillText(label,x,y-8);
+  cx.fillStyle='#172340';rrect(x,y,w,6,3);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(4,w*val/100),6,3);cx.fill();
+  cx.shadowBlur=hot?10:6;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+3,hot?6:5,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+8);}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-5);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,7);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function btnUI(x,y,w,h,label,col,on){
+  cx.fillStyle=on?col:'rgba(15,24,41,1)';cx.strokeStyle=col;cx.lineWidth=1.4;
+  rrect(x,y,w,h,4);cx.fill();cx.stroke();
+  cx.fillStyle=on?'#070b14':col;cx.font='bold 9px Courier New';cx.textAlign='center';
+  cx.fillText(label,x+w/2,y+h/2+3.5);cx.textAlign='left';}
+function stamp(text,col,scale,yy){
+  cx.save();cx.translate(CW/2,yy);cx.rotate(-.08);cx.scale(scale,scale);cx.globalAlpha=Math.min(1,scale);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;cx.font='bold 23px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+34;cx.strokeRect(-w/2,-23,w,38);
+  cx.shadowBlur=22;cx.shadowColor=col;cx.fillText(text,0,5);cx.shadowBlur=0;
+  cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,y,col){
+  cx.font='bold 12px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+22;
+  cx.fillStyle='rgba(7,11,20,.88)';rrect(CW/2-w/2,y-15,w,24,4);cx.fill();
+  cx.fillStyle=col;cx.fillText(text,CW/2,y+2);cx.textAlign='left';}
+
+// ===== ghost cursor =====
+let cursor={x:CW/2,y:CH-60}, clickPulse=0, lastClickT=-1;
+const KF=[];const k=(tt,x,y,c)=>KF.push({t:tt,x,y,click:!!c});
+k(4.4,260,143);k(T_DEAD,260,143,1);     // 🏚他責デッドロック (215,130,90,26)
+k(6.6,210,593);k(T_SHOCK1,210,593,1);   // ⚡ショック注入 (70,578,280,30)
+k(13.6,353,143);k(T_SMART,353,143,1);   // 🌱スマート縮退 (310,130,86,26)
+k(17.8,210,593);k(T_SHOCK2,210,593,1);  // ⚡再注入
+function cursorAt(){
+  if(t<KF[0].t){cursor.x=KF[0].x;cursor.y=KF[0].y;return;}
+  for(let i=0;i<KF.length-1;i++)if(t>=KF[i].t&&t<=KF[i+1].t){
+    const p=ss(KF[i].t,KF[i+1].t,t);
+    cursor.x=KF[i].x+(KF[i+1].x-KF[i].x)*p;cursor.y=KF[i].y+(KF[i+1].y-KF[i].y)*p;return;}
+  const L=KF[KF.length-1];cursor.x=L.x;cursor.y=L.y;}
+function checkClicks(){KF.forEach(f=>{if(f.click&&t>=f.t&&lastClickT<f.t){clickPulse=1;lastClickT=f.t;
+  if(Math.abs(f.t-T_SHOCK1)<.01||Math.abs(f.t-T_SHOCK2)<.01)shake=1;}});clickPulse=Math.max(0,clickPulse-.045);}
+function drawCursor(){
+  if(t<3.8||t>T_END-1)return;
+  cx.shadowBlur=14;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(cursor.x,cursor.y,3.5,0,7);cx.fill();cx.shadowBlur=0;
+  if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(cursor.x,cursor.y,10+26*(1-clickPulse),0,7);cx.stroke();}}
+
+// ===== state（実プリセット: deadlock e:25/greedy, smart e:80/dp / 実装式）=====
+function eth(){if(t<T_DEAD)return 55;if(t<T_DEAD+.7)return 55-30*ss(T_DEAD,T_DEAD+.7,t);
+  if(t<T_SMART)return 25;if(t<T_SMART+.7)return 25+55*ss(T_SMART,T_SMART+.7,t);return 80;}
+const greedy=()=>t>=T_DEAD&&t<T_SMART+.4, dp=()=>t>=T_SMART+.4;
+const infraError=()=>t>=T_SHOCK1;
+const deadlock=()=>eth()<40&&greedy()&&infraError();
+function cpuBlame(){if(deadlock())return 100;
+  return Math.max(0,Math.min(75,(1-eth()/100)*22+(greedy()?14:0)));}
+const cpuRepair=()=>100-cpuBlame();
+function infra(){
+  if(t<T_SHOCK1)return 74;
+  if(t<9.4)return Math.max(12,74-62*ss(T_SHOCK1,9.4,t));
+  if(t<T_SMART+.7)return 12;                       // 他責中: 修復ゼロで回復なし
+  if(t<17.6)return 12+60*ss(T_SMART+.7,17.6,t);    // 倫理観80 → 修復再開
+  if(inW(T_SHOCK2,T_SHOCK2+1.2))return 72-24*ss(T_SHOCK2,T_SHOCK2+1.2,t);
+  if(t>=T_SHOCK2+1.2)return Math.min(72,48+(t-T_SHOCK2-1.2)*9);
+  return 72;}
+const crashing=()=>inW(T_SHOCK1,T_SHOCK1+1);
+const heliOp=()=>!crashing()&&infra()>35&&cpuRepair()>25;
+
+// ===== ④ OPERATION LOG（実文言）=====
+const LOG_A=[['n','INFRA_MAINT_SCHEDULED ........ OK'],['g','HELI_DISPATCH_STATUS ......... ONLINE']];
+const LOG_B=[['b','BLACK_SWAN_EVENT ............. DETECTED'],['b','BLAME_SHIFT_INITIATED ........ PRESS_CONF'],['b','FAULT_VECTOR_ASSIGNED ........ EXTERNAL'],['b','ACCOUNTABILITY_CHECK ......... REFUSED'],['b','ADMIN_CPU_REROUTED ........... →BLAME_100%'],['b','REPAIR_QUEUE ................. SUSPENDED']];
+const LOG_C=[['c','SMART_SHRINK_OPS ............. RUNNING'],['g','MAINTENANCE_QUEUE ............ CLEAR'],['g','HELI_DISPATCH_STATUS ......... ONLINE']];
+const LOG_D=[['o','REDUNDANCY_TEST .............. RUNNING'],['g','SECTOR_T_STATUS .............. GREEN'],['g','HELI_DISPATCH_STATUS ......... ONLINE']];
+let log=[], logT=0, logI=0, phase='';
+function pushLog(){
+  const ph=t<T_SHOCK1?'a':t<T_SMART?'b':t<T_SHOCK2?'c':'d';
+  if(ph!==phase){phase=ph;logI=0;}
+  const pool={a:LOG_A,b:LOG_B,c:LOG_C,d:LOG_D}[ph];
+  const iv={a:1.6,b:0.5,c:0.9,d:1.0}[ph];
+  logT-=0.016;
+  if(logT<=0&&t>4.5){log.push(pool[logI++%pool.length]);logT=iv;if(log.length>4)log.shift();}
+}
+
+// ===== hook & end =====
+function drawHook(){
+  cx.textAlign='center';
+  const gl=Math.random()<.15;
+  cx.fillStyle='#d8e4ff';cx.font='bold 23px Courier New';
+  const ox=gl?(Math.random()-.5)*8:0;
+  cx.fillText('ヘリを止めたのは、',CW/2+ox,CH/2-44);
+  cx.fillStyle='#ff2244';cx.shadowBlur=20;cx.shadowColor='#ff2244';
+  cx.fillText('災害じゃない。',CW/2-ox,CH/2-2);cx.shadowBlur=0;
+  if(gl){cx.fillStyle='rgba(0,212,255,.5)';cx.fillText('災害じゃない。',CW/2-ox+3,CH/2-1);}
+  if(t>1.3){cx.globalAlpha=ss(1.3,1.9,t);
+    cx.fillStyle='#5a6f94';cx.font='11px Courier New';
+    cx.fillText('「修復」より「責任回避」を選んだ構造の話',CW/2,CH/2+36);cx.globalAlpha=1;}
+  cx.textAlign='left';
+}
+function drawEnd(){
+  cx.textAlign='center';
+  cx.globalAlpha=ss(22.4,23.2,t);
+  cx.fillStyle='#d8e4ff';cx.font='bold 14px Courier New';
+  cx.fillText('災害がヘリを止めるのは、一時。',CW/2,196);
+  cx.globalAlpha=ss(23.6,24.4,t);
+  cx.fillStyle='#ff2244';cx.font='bold 14px Courier New';
+  cx.fillText('責任回避は、修復を止め続ける。',CW/2,226);
+  cx.globalAlpha=ss(24.8,25.6,t);
+  cx.fillStyle='#00ff88';cx.shadowBlur=16;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';
+  cx.fillText('止めたのは、壊れた構造だった。',CW/2,282);cx.shadowBlur=0;
+  if(t>26.2){const a=ss(26.2,27,t);cx.globalAlpha=a;
+    cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(CW/2-160,330,320,130,6);cx.stroke();
+    cx.fillStyle='rgba(0,212,255,.05)';rrect(CW/2-160,330,320,130,6);cx.fill();
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.shadowBlur=12;cx.shadowColor='#00d4ff';
+    cx.fillText('社会デバッガー',CW/2,366);cx.shadowBlur=0;
+    cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+    cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,388);
+    cx.fillStyle='#ffcc00';cx.font='bold 11px Courier New';
+    cx.fillText('パラメータを動かす。構造が答える。',CW/2,416);
+    cx.fillStyle='#00d4ff';cx.font='bold 10px Courier New';
+    cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,442);}
+  if(t>27.6){cx.globalAlpha=ss(27.6,28.4,t);
+    const bl=Math.sin(t*4)>0;cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.4)';
+    cx.font='bold 12px Courier New';
+    cx.fillText('▶ あなたなら、何を先に直す？',CW/2,500);}
+  cx.globalAlpha=1;cx.textAlign='left';
+}
+
+// ===== main page =====
+function drawP2(){
+  cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';
+  cx.fillText('▶ PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T',20,36);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,46);cx.lineTo(CW-20,46);cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('v6',CW-20,36);cx.textAlign='left';
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText('PRESETS ▶',25,124);
+  btnUI(25,130,90,26,'⚙ 効率至上都市','#00d4ff',false);
+  btnUI(120,130,90,26,'🛡 冗長性確保','#00ff88',false);
+  btnUI(215,130,90,26,'🏚 他責デッドロック','#ff2244',inW(T_DEAD,T_SMART));
+  btnUI(310,130,86,26,'🌱 スマート縮退','#00ff88',t>=T_SMART);
+  // ★主役: 行政リーダーの倫理観（大きめ・中央）
+  const eHot=inW(T_DEAD,T_DEAD+1.2)||inW(T_SMART,T_SMART+1.2);
+  mini(60,206,240,'行政の実務倫理（責任回避 ↔ 修復・法治）',eth(),eth()<40?'#ff2244':'#00ff88',eHot);
+  if(eth()<40&&Math.sin(t*9)>0){cx.fillStyle='#ff2244';cx.font='bold 8px Courier New';
+    cx.fillText('⚠ 40%未満 — 他責・責任回避ゾーン',60,228);}
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('予算配分戦略:',60,252);
+  cx.fillStyle=dp()?'#00ff88':'#ff6b2b';cx.font='bold 10px Courier New';
+  cx.fillText(dp()?'DP戦略 — 救命医療・コア産業最優先':'Greedy戦略 — 自己保身・ネット選挙ゲーム最優先',150,252);
+  gauge(60,286,240,'インフラ維持力 INFRASTRUCTURE',infra(),infra()<35?'#ff2244':'#00d4ff');
+  // ▌CPU ALLOCATION MATRIX（実UI: 積み上げバー）
+  const dl=deadlock();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('▌ CPU ALLOCATION MATRIX',40,322);
+  cx.fillStyle=dl?'#ff2244':'#5a6f94';cx.font='bold 8px Courier New';cx.textAlign='right';
+  cx.fillText(dl?'DEADLOCK: ACTIVE':'DEADLOCK: INACTIVE',380,322);cx.textAlign='left';
+  cx.fillStyle='#172340';cx.fillRect(40,330,340,12);
+  cx.fillStyle='#00d4ff';cx.fillRect(40,330,340*cpuRepair()/100,12);
+  cx.fillStyle='#ff2244';cx.fillRect(40+340*cpuRepair()/100,330,340*cpuBlame()/100,12);
+  cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';
+  cx.fillText('REPAIR: '+Math.round(cpuRepair())+'%',40,356);
+  cx.fillStyle='#ff2244';cx.textAlign='right';
+  cx.fillText('BLAME-SHIFT: '+Math.round(cpuBlame())+'%',380,356);cx.textAlign='left';
+  cx.fillStyle=dl?'#ff2244':'#3d4f73';cx.font='8px Courier New';
+  cx.fillText(dl?'⚠ 行政CPUが100%「責任回避・他者攻撃」に割当。修復処理ゼロ。':'DEADLOCK INACTIVE — 実務・修復処理が正常稼働中',40,372);
+  // ② RESCUE HELI STATUS
+  const hd=!heliOp();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('② RESCUE HELI STATUS',40,396);
+  cx.strokeStyle=hd?'#ff2244':'#00ff88';cx.lineWidth=1.4;
+  rrect(40,402,340,46,4);cx.stroke();
+  cx.fillStyle=hd?'rgba(255,34,68,.07)':'rgba(0,255,136,.06)';rrect(40,402,340,46,4);cx.fill();
+  const hx=78,hy=425,rot=hd?0.5:(performance.now()/30)%7,hcol=hd?'#ff2244':'#00ff88';
+  cx.strokeStyle=hcol;cx.fillStyle=hcol;cx.lineWidth=2;
+  cx.beginPath();cx.ellipse(hx,hy+2+(hd?4:0),11,5,0,0,7);cx.stroke();
+  cx.beginPath();cx.moveTo(hx-14*Math.cos(rot),hy-5);cx.lineTo(hx+14*Math.cos(rot),hy-5);cx.stroke();
+  cx.font='bold 10px Courier New';
+  cx.fillText(hd?'🚁 LONG-TERM SUSPENSION — 長期運休':'🚁 OPERATIONAL — 常時稼働中',108,420);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';
+  cx.fillText(hd?(deadlock()?'MALFUNCTION — 修復予算なし（他責処理中）':'復旧待ち — 修復キュー処理中'):'Dispatch Ready — 出動待機中',108,436);
+  // ④ OPERATION LOG
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('④ SECTOR-T OPERATION LOG',30,474);
+  cx.strokeStyle='#172340';rrect(30,480,360,58,3);cx.stroke();
+  cx.fillStyle='rgba(15,24,41,.6)';rrect(30,480,360,58,3);cx.fill();
+  pushLog();
+  log.forEach((L,i)=>{
+    const col=L[0]==='g'?'#00ff88':L[0]==='o'?'#ff6b2b':L[0]==='b'?'#ff2244':L[0]==='c'?'#00d4ff':'#5a6f94';
+    cx.fillStyle=col;cx.font=(inW(T_SHOCK1,T_SMART)?'bold ':'')+'9px Courier New';
+    cx.fillText('> '+L[1],38,494+i*13);});
+  btnUI(70,578,280,30,'⚡ 環境ショック注入 (Inject System Shock)','#ffcc00',inW(T_SHOCK1,T_SHOCK1+.4)||inW(T_SHOCK2,T_SHOCK2+.4));
+  // stamps & captions
+  if(inW(9.2,T_BEAT))stamp('DEADLOCK','#ff2244',Math.min(1,(t-9.2)*2.4),260);
+  if(inW(9.8,T_BEAT))caption('直せるのに、修復CPUはゼロになった。',644,'#ff2244');
+  if(inW(15.6,T_SHOCK2))caption('変えたのは、修復を優先する姿勢だけ。',644,'#00ff88');
+  if(t>T_SHOCK2+1.6&&t<T_END)stamp('SURVIVED','#00ff88',Math.min(1,(t-T_SHOCK2-1.6)*2.4),260);
+  if(inW(T_SHOCK2+2.2,T_END))caption('同じ災害。ヘリは、もう止まらない。',644,'#00ff88');
+}
+
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;ended=true;}
+  if(inW(T_SHOCK1,T_SHOCK1+.5)||inW(T_SHOCK2,T_SHOCK2+.4))shake=Math.max(shake,.85);
+  shake=Math.max(0,shake-dt*1.9);
+  cursorAt();checkClicks();
+}
+function render(){
+  cx.save();
+  if(shake>0)cx.translate((Math.random()-.5)*11*shake,(Math.random()-.5)*9*shake);
+  cx.fillStyle='#070b14';cx.fillRect(-12,-12,CW+24,CH+24);grid();
+  if(inW(T_SHOCK1,T_SMART)){const g=cx.createRadialGradient(CW/2,CH/2,CH*.2,CW/2,CH/2,CH*.8);
+    g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(255,34,68,${.12*(0.6+0.4*Math.sin(t*6))})`);
+    cx.fillStyle=g;cx.fillRect(0,0,CW,CH);}
+  if(t<T_CARD)drawHook();
+  else if(t<T_END){
+    drawP2();
+    const a=Math.min(1,(t-T_CARD)*2.4)*(t<T_CARD+1.2?1:Math.max(0,1-(t-T_CARD-1.2)*2.4));
+    if(a>0){cx.fillStyle=`rgba(7,11,20,${.92*a})`;cx.fillRect(0,0,CW,CH);
+      cx.globalAlpha=a;cx.textAlign='center';
+      cx.fillStyle='#00ff88';cx.font='bold 13px Courier New';cx.fillText('実験: 誰が、救命ヘリを止めるのか',CW/2,CH/2-8);
+      cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('PAGE 2 — SECTOR-T',CW/2,CH/2+18);
+      cx.textAlign='left';cx.globalAlpha=1;}
+  }
+  else drawEnd();
+  // beat flash
+  if(inW(T_BEAT,T_BEAT+.14)){cx.fillStyle='rgba(255,255,255,.65)';cx.fillRect(0,0,CW,CH);}
+  if(inW(T_BEAT+.14,T_SMART)){cx.fillStyle='rgba(7,11,20,.78)';cx.fillRect(0,0,CW,CH);
+    cx.fillStyle='#00ff88';cx.font='bold 17px Courier New';cx.textAlign='center';
+    cx.fillText('— 倫理観を、上げる —',CW/2,CH/2-8);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('災害はそのまま。姿勢だけを変える。',CW/2,CH/2+18);cx.textAlign='left';}
+  drawCursor();
+  // 固定免責フッター（全編）
+  cx.fillStyle='rgba(7,11,20,.85)';cx.fillRect(0,CH-26,CW,22);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';
+  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,CH-12);cx.textAlign='left';
+  cx.fillStyle='#172340';cx.fillRect(0,CH-4,CW,4);
+  const pg=cx.createLinearGradient(0,0,CW,0);
+  pg.addColorStop(0,'#ff2244');pg.addColorStop(.6,'#00d4ff');pg.addColorStop(1,'#00ff88');
+  cx.fillStyle=pg;cx.fillRect(0,CH-4,CW*t/DUR,4);
+  if(!ended&&t<T_END){cx.fillStyle=Math.sin(t*6)>0?'#ff2244':'rgba(255,34,68,.3)';
+    cx.beginPath();cx.arc(CW-26,20,4,0,7);cx.fill();
+    cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('REC',CW-36,23);cx.textAlign='left';}
+  cx.restore();
+  if(ended){cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('↺ RESTART で最初から',CW/2,CH-36);cx.textAlign='left';}
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;shake=0;lastClickT=-1;clickPulse=0;log=[];logT=0;logI=0;phase='';
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

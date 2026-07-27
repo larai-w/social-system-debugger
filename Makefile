@@ -3,7 +3,7 @@
 .DEFAULT_GOAL := help
 GITHUB_REPO ?= larai-w/social-system-debugger
 
-.PHONY: help setup hooks serve test check verify verify-offline verify-pages lint format gen-og gen-icons classroom-pdf store-shots announce-cards reels synth handoff protect \
+.PHONY: help setup hooks serve test check verify verify-offline verify-pages lint format gen-og gen-icons classroom-pdf store-shots announce-cards promo-visuals x-launch-kit reels social-reels synth handoff protect \
         aws-bootstrap aws-deploy aws-wire ios android vendor-check
 
 help: ## このヘルプを表示
@@ -58,8 +58,17 @@ store-shots: ## ストア提出用スクショ6枚を実アプリから自動撮
 announce-cards: ## X 告知用 画像カード4枚を dist/announce/ に生成（PWAインストール告知）
 	npm run gen:announce
 
+promo-visuals: ## Xプロモ用キービジュアル・図解5枚を dist/promo-visuals/ に生成
+	npm run gen:promo-visuals
+
+x-launch-kit: promo-visuals ## 動画・画像・投稿文を番号順に dist/x-launch-kit/ へ整理
+	npm run gen:x-launch-kit
+
 reels: ## リール5本を自動録画（dist/reels/ へ webm、ffmpegがあればmp4も）
 	npm run record:reels
+
+social-reels: ## X向け30秒リール10本を自動録画（dist/social-reels/、個別指定はnpm側の--only）
+	npm run record:social-reels
 
 synth: ## cdk synth（cdk-nag セキュリティ検査込み・AWS不要）
 	cd infra && npm ci && npm run synth

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 社会を詰まらせていたのは、流れの設計だった</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--orange:#ff6b2b;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px;background:#03060c;color:var(--text);font-family:'Courier New',monospace}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / 抽象社会システム / 無音で完結 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,clicked=false;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-6);cx.fillStyle='#172340';cx.fillRect(x,y,w,7);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.5;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function stamp(text,col,a,y=430){cx.save();cx.translate(CW/2,y);cx.rotate(-.08);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=3;cx.font='bold 29px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+34;cx.strokeRect(-w/2,-27,w,45);cx.shadowBlur=20;cx.shadowColor=col;cx.fillText(text,0,6);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,627,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,646);cx.textAlign='left';}
+function debug(){return t>=12;}
+function progress(){return ss(12,21,t);}
+function entropy(){return debug()?88-70*progress():88;}
+function trust(){return debug()?28+56*progress():28;}
+function throughput(){return debug()?26+64*progress():26;}
+const nodes=[];for(let i=0;i<26;i++)nodes.push({a:i/26*Math.PI*2,r:58+((i*19)%46),fact:i%7===0});
+function nodeState(i){if(!debug())return nodes[i].fact?'neutral':(i%4===0?'healthy':'closed');const p=progress();if(nodes[i].fact)return'fact';return i/26<p?'healthy':'closed';}
+function drawNetwork(){
+  const bx=CW/2,by=425,p=progress();
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j+=6){const a=nodes[i],b=nodes[j],ax=bx+Math.cos(a.a+t*.16)*a.r,ay=by+Math.sin(a.a+t*.16)*a.r*.54,bx2=bx+Math.cos(b.a+t*.16)*b.r,by2=by+Math.sin(b.a+t*.16)*b.r*.54,s=nodeState(i)==='closed'||nodeState(j)==='closed';cx.strokeStyle=s?'rgba(255,34,68,.18)':'rgba(0,212,255,.14)';cx.beginPath();cx.moveTo(ax,ay);cx.lineTo(bx2,by2);cx.stroke();}
+  nodes.forEach((n,i)=>{const state=nodeState(i),col=state==='closed'?'#ff2244':state==='fact'?'#00ff88':'#00d4ff',wob=state==='closed'?Math.sin(t*9+i)*5:0,x=bx+Math.cos(n.a+t*.16)*n.r+wob,y=by+Math.sin(n.a+t*.16)*n.r*.54;cx.fillStyle=col;cx.shadowBlur=7;cx.shadowColor=col;cx.beginPath();cx.arc(x,y,state==='fact'?4.5:3.5,0,7);cx.fill();cx.shadowBlur=0;});
+  for(let i=0;i<10;i++){const a=i/10*Math.PI*2+t*.35,rr=debug()?118+p*115+i*3:118+Math.sin(t*3+i)*5,x=bx+Math.cos(a)*rr,y=by+Math.sin(a)*rr*.46,alpha=debug()?Math.max(0,1-p*1.3):1;if(x<8||x>CW-8)continue;cx.globalAlpha=alpha;cx.fillStyle='#ff6b2b';cx.shadowBlur=6;cx.shadowColor='#ff6b2b';cx.fillRect(x-3.5,y-3.5,7,7);cx.shadowBlur=0;cx.globalAlpha=1;}
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';cx.fillText('社会ネットワーク（緑=検証・実務 / 橙=外部ゲーム）',bx,525);cx.textAlign='left';
+}
+function drawHeader(){cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';cx.fillText('▶ SECTOR-H — FLOW DEBUG',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('社会デバッガー v6',400,36);cx.textAlign='left';}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 20px Courier New';cx.fillText('社会を詰まらせていたのは、',CW/2,315);cx.fillStyle='#00d4ff';cx.shadowBlur=17;cx.shadowColor='#00d4ff';cx.fillText('声ではなく、流れの設計だった。',CW/2,354);cx.shadowBlur=0;if(t>1.2){cx.globalAlpha=ss(1.2,2,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('人ではなく、条件をデバッグする',CW/2,392);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawSystem(){
+  drawHeader();const d=debug(),p=progress();
+  cx.fillStyle=d?'#00d4ff':'#ff2244';cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(d?'DEBUG IN PROGRESS — 条件を再配線':'SYSTEM CONGESTION — 処理帯域が詰まっている',CW/2,92);cx.textAlign='left';
+  gauge(40,150,250,'無秩序度',entropy(),entropy()>50?'#ff2244':'#00ff88');gauge(40,192,250,'社会的信頼',trust(),trust()<45?'#ff2244':'#00d4ff');gauge(40,234,250,'生活課題の実務処理率',throughput(),throughput()<45?'#ff2244':'#00ff88');
+  drawNetwork();
+  if(!d){button(70,555,280,38,'▶ 人ではなく、条件をデバッグ','#00d4ff',false);}
+  else{cx.fillStyle='rgba(0,212,255,.05)';cx.strokeStyle='#172340';rrect(65,548,290,62,4);cx.fill();cx.stroke();const rows=['反証経路を再接続','結果との接続を重みに反映','実務処理へ帯域を戻す'];rows.forEach((row,i)=>{const on=p>(i+1)*.22;cx.fillStyle=on?'#00ff88':'#5a6f94';cx.font='bold 9px Courier New';cx.fillText((on?'✓ ':'○ ')+row,85,566+i*17);});}
+  if(!d&&t>8.3)stamp('FLOW BLOCKED','#ff2244',Math.min(1,(t-8.3)*2));
+  if(d&&t>20.2)stamp('FLOW RESTORED','#00ff88',Math.min(1,(t-20.2)*2));
+  if(t>8.8&&t<12)caption('対立ループが、生活課題の処理帯域を奪う','#ff2244');
+  if(t>21&&t<25)caption('流れを直すと、信頼と実務が同時に戻る','#00ff88');
+  drawCursor();
+}
+function drawCursor(){if(t<5||t>18)return;const x=210,y=t<11.7?355+219*ss(5,11.7,t):574;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(x,y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(x,y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('正常化は、静寂ではない。',CW/2,220);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 18px Courier New';cx.fillText('生活の処理が、前へ流れること。',CW/2,264);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,326,320,164,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,326,320,164,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,362);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,388);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,418);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ あなたなら、どの流れを直す？',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}if(t>=11.7&&!clicked){clickPulse=1;clicked=true;}clickPulse=Math.max(0,clickPulse-dt*2.8);}
+function render(){cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();if(t<3)drawHook();else if(t<25)drawSystem();else drawEnd();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#ff2244');g.addColorStop(.55,'#00d4ff');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;clicked=false;clickPulse=0;last=performance.now();document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

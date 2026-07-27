@@ -36,7 +36,10 @@ social-system-debugger/
 │   └── privacy.html / .en.html     # privacy policy (store submission / footer link)
 ├── content/weekly/          # weekly scenario JSON (*.json + latest.json) + weekly.schema.json
 ├── infra/                   # AWS CDK (TypeScript): S3(OAC)+CloudFront + GitHub OIDC role
-├── promo/                   # promo reel HTML (?lang=en supported; auto-recorded by make reels)
+├── promo/
+│   ├── campaigns/          # finished X campaigns (reel.html + post.md kept together)
+│   └── archive/            # legacy long cuts, generators, and duplicate copies
+├── docs/story/             # Page 5 candidates mapped to existing weekly scenarios
 ├── tests/                   # unit / guardrail tests (engine / goal / share / invariants / weekly-reachability / i18n-completeness / export-dictionary) — 8 files
 ├── scripts/                 # validate-weekly / verify / verify-offline / record-reel / gen-icons / gen-og-image /
 │                            #   gen-classroom-pdf / gen-store-shots / gen-announce-cards / gh-project-backfill, etc.

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社会デバッガー v6.1 — FULL INTRO REEL</title>
+<style>
+:root{--bg0:#070b14;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--pur:#9945ff;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:#d8e4ff;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.frame{position:relative;width:min(96vw,420px)}
+.stage{position:relative;border:1px solid var(--bdr);border-radius:6px;background:var(--bg0);overflow:hidden}
+#cv{width:100%;display:block}
+.ctrl{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.btn{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;letter-spacing:.1em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;font-size:.55rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">縦型 9:16 フルイントロ（約110秒）— 全ラベルは実アプリv6.1準拠 / 画面録画でSNS用動画に</div>
+</div>
+<script>
+const CW=420, CH=760;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.parentElement.getBoundingClientRect();const s=r.width/CW;
+  cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=(CH*s)+'px';
+  cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+
+// ===== timeline =====
+// 0-8 intro cascade / 8-30 P1 / 30-54 P2 / 54-74 P3 / 74-92 P4 / 92-110 conclusion
+const DUR=110;
+let t=0, playing=true, last=performance.now(), ended=false, shake=0;
+
+// ===== helpers =====
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function header(title,color){
+  cx.fillStyle=color;cx.font='bold 12px Courier New';cx.fillText(title,20,36);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,46);cx.lineTo(CW-20,46);cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';
+  cx.fillText('社会＆地域インフラ・デバッガー v6.1',CW-20,36);cx.textAlign='left';}
+function slider(x,y,w,label,lo,hi,val,col,active){
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText(label,x,y-10);
+  cx.fillStyle='#172340';rrect(x,y,w,8,4);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(6,w*val/100),8,4);cx.fill();
+  cx.shadowBlur=active?12:5;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+4,active?8:6,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText(lo,x,y+20);cx.textAlign='right';cx.fillText(hi,x+w,y+20);cx.textAlign='left';
+  cx.fillStyle=col;cx.font='bold 11px Courier New';cx.fillText(Math.round(val)+'%',x+w+10,y+8);}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-5);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,7);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function mini(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-8);
+  cx.fillStyle='#172340';rrect(x,y,w,6,3);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(4,w*val/100),6,3);cx.fill();
+  cx.shadowBlur=6;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+3,5,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+8);}
+function btnUI(x,y,w,h,label,col,on){
+  cx.fillStyle=on?col:'rgba(15,24,41,1)';cx.strokeStyle=col;cx.lineWidth=1.4;
+  rrect(x,y,w,h,4);cx.fill();cx.stroke();
+  cx.fillStyle=on?'#070b14':col;cx.font='bold 10px Courier New';cx.textAlign='center';
+  cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function stamp(text,col,scale,yy=CH/2-80){
+  cx.save();cx.translate(CW/2,yy);cx.rotate(-.08);cx.scale(scale,scale);cx.globalAlpha=Math.min(1,scale);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;cx.font='bold 26px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+36;cx.strokeRect(-w/2,-26,w,42);
+  cx.shadowBlur=22;cx.shadowColor=col;cx.fillText(text,0,5);cx.shadowBlur=0;
+  cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,y,col){
+  cx.font='bold 12px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+22;
+  cx.fillStyle='rgba(7,11,20,.88)';rrect(CW/2-w/2,y-15,w,24,4);cx.fill();
+  cx.fillStyle=col;cx.fillText(text,CW/2,y+2);cx.textAlign='left';}
+function chapterCard(n,title,en,col,t0){
+  const a=Math.min(1,(t-t0)*2)*(t<t0+1.5?1:Math.max(0,1-(t-t0-1.5)*2));
+  if(a<=0)return;
+  cx.fillStyle=`rgba(7,11,20,${.92*a})`;cx.fillRect(0,0,CW,CH);
+  cx.globalAlpha=a;cx.textAlign='center';
+  cx.fillStyle=col;cx.font='bold 14px Courier New';cx.fillText('▶ PAGE '+n,CW/2,CH/2-36);
+  cx.font='bold 20px Courier New';cx.fillText(title,CW/2,CH/2);
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText(en,CW/2,CH/2+26);
+  cx.textAlign='left';cx.globalAlpha=1;}
+
+// ===== ghost cursor =====
+let cursor={x:CW/2,y:CH-60}, clickPulse=0, lastClickT=-1;
+const KF=[];const k=(tt,x,y,c)=>KF.push({t:tt,x,y,click:!!c});
+// P1 presets: ⚡ワイマール (30,110,175,30) center(117,125) / 🌿北欧型 (215,110,175,30) center(302,125)
+k(9.6,117,125);k(11,117,125,1);
+k(17,302,125);k(18.4,302,125,1);
+// P2: slider(40,178,280): 30%→92% ; GREEDY btn(170,240,120,26)c(230,253); shock(70,566,280,30)c(210,581)
+k(31.8,52+280*.30,182);k(35,52+280*.92,182);
+k(35.6,230,253,0);k(36.1,230,253,1);
+k(36.9,210,581);k(37.4,210,581,1);
+// DP btn(50,240,100,26)c(100,253); リブートON(190,296,180,26)c(280,309)
+k(43.4,100,253);k(43.9,100,253,1);
+k(44.7,280,309);k(45.2,280,309,1);
+k(46.1,210,581);k(46.6,210,581,1);
+// P3: slider(40,188): 70%→12%; DROP_OUT btn(70,566,280,30)c(210,581)
+k(55.8,52+280*.70,192);k(59.2,52+280*.12,192);
+k(61,210,581);k(61.6,210,581,1);
+// P4: slider(40,188): 10%→88%; PACKET_FILTERING c(210,581)
+k(75.8,52+280*.10,192);k(79.2,52+280*.88,192);
+k(81.7,210,581);k(82.3,210,581,1);
+function cursorAt(){
+  if(t<KF[0].t){cursor.x=KF[0].x;cursor.y=KF[0].y;return;}
+  for(let i=0;i<KF.length-1;i++)if(t>=KF[i].t&&t<=KF[i+1].t){
+    const p=ss(KF[i].t,KF[i+1].t,t);
+    cursor.x=KF[i].x+(KF[i+1].x-KF[i].x)*p;cursor.y=KF[i].y+(KF[i+1].y-KF[i].y)*p;return;}
+  const L=KF[KF.length-1];cursor.x=L.x;cursor.y=L.y;}
+function checkClicks(){KF.forEach(f=>{if(f.click&&t>=f.t&&lastClickT<f.t){clickPulse=1;lastClickT=f.t;}});clickPulse=Math.max(0,clickPulse-.045);}
+function drawCursor(){
+  if(t<8||t>90)return;
+  cx.shadowBlur=14;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(cursor.x,cursor.y,3.5,0,7);cx.fill();cx.shadowBlur=0;
+  if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(cursor.x,cursor.y,10+26*(1-clickPulse),0,7);cx.stroke();}}
+
+// ===== state functions =====
+const inW=(a,b)=>t>=a&&t<b;
+// P1: weimar 11-18.4, nordic after 18.4
+function p1_ent(){if(t<11)return 24;if(t<16)return 24+64*ss(11,16,t);if(t<18.4)return 88;return Math.max(16,88-72*ss(18.4,23,t));}
+function p1_par(){if(t<11)return 14;if(t<16.5)return 14+66*ss(11,16.5,t);if(t<18.4)return 80;return Math.max(10,80-70*ss(18.4,23.5,t));}
+function p1_f(){if(t<11)return 46;if(t<11.8)return 46+42*ss(11,11.8,t);if(t<18.4)return 88;return 88-70*ss(18.4,19.2,t);}
+function p1_e(){if(t<11)return 55;if(t<11.8)return 55-43*ss(11,11.8,t);if(t<18.4)return 12;return 12+78*ss(18.4,19.2,t);}
+// P2
+function p2_agg(){return t<31.8?30:31.8<=t&&t<35?30+62*ss(31.8,35,t):92;}
+const p2_greedy=()=>inW(36.1,43.9), p2_dp=()=>t>=43.9, p2_reboot=()=>t>=45.2;
+const p2_shock1=()=>inW(37.4,43), p2_shock2=()=>t>=46.6&&t<54;
+function p2_buf(){let b=100-p2_agg()*.8; if(p2_greedy())b-=12; if(p2_reboot())b+=42; return Math.max(6,Math.min(95,b));}
+function p2_infra(){if(p2_shock1())return Math.max(12,70-(t-37.4)*22);if(t>=43)return Math.min(78,12+(t-43)*14);return 70;}
+// P3
+function p3_sync(){if(t<55.8)return 70;if(t<59.2)return 70-58*ss(55.8,59.2,t);if(t<61.6)return 12;return Math.min(84,12+(t-61.6)*11);}
+const p3_drop=()=>t>=61.6;
+function p3_cog(){const s=p3_sync();return p3_drop()?Math.min(90,34+(t-61.6)*9):Math.max(28,20+s*.9);}
+function p3_fal(){return p3_drop()?Math.min(86,26+(t-61.6)*10):Math.max(18,12+p3_sync()*.85);}
+function p3_dopa(){return p3_drop()?Math.max(12,88-(t-61.6)*12):Math.min(92,100-p3_sync()*1.05);}
+// P4
+function p4_ext(){if(t<75.8)return 10;if(t<79.2)return 10+78*ss(75.8,79.2,t);return 88;}
+const p4_fil=()=>t>=82.3;
+function p4_ratio(){return p4_fil()?Math.min(93,16+(t-82.3)*13):Math.max(14,100-p4_ext()*.98);}
+
+// ===== intro & conclusion: 4-layer cascade =====
+const LAYERS=[
+  ['LAYER 1','情報空間','汚染された情報が意思決定を狂わせる'],
+  ['LAYER 2','物理インフラ','崩壊する現実が個人の認知を追い詰める'],
+  ['LAYER 3','個人の認知','ハックされた群衆が当事者の声をかき消す'],
+  ['LAYER 4','当事者性','']];
+function cascade(y0,progress,healing){
+  for(let i=0;i<4;i++){
+    const y=y0+i*92, lit=progress>i/4;
+    const col=healing?'#00ff88':'#ff2244';
+    const a=lit?1:.25;
+    cx.globalAlpha=a;
+    cx.strokeStyle=lit?col:'#172340';cx.lineWidth=1.4;
+    cx.fillStyle=lit?(healing?'rgba(0,255,136,.07)':'rgba(255,34,68,.08)'):'rgba(15,24,41,.8)';
+    rrect(60,y,300,54,4);cx.fill();cx.stroke();
+    cx.fillStyle=lit?col:'#5a6f94';cx.font='bold 9px Courier New';cx.fillText(LAYERS[i][0],74,y+20);
+    cx.fillStyle=lit?'#d8e4ff':'#5a6f94';cx.font='bold 13px Courier New';cx.fillText(LAYERS[i][1],74,y+40);
+    if(i<3){const ay=y+54;
+      cx.fillStyle=lit&&progress>(i+.6)/4?col:'#172340';cx.font='bold 13px Courier New';cx.textAlign='center';
+      cx.fillText(healing?'▲':'▼',CW/2,ay+26);cx.textAlign='left';
+      if(lit&&progress>(i+.6)/4){cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';
+        cx.fillText(LAYERS[i][2],CW/2,ay+40);cx.textAlign='left';}}
+    cx.globalAlpha=1;}
+}
+function drawIntro(){
+  cx.textAlign='center';
+  const a1=ss(0.3,1,t);
+  cx.globalAlpha=a1;cx.fillStyle='#d8e4ff';cx.font='bold 15px Courier New';
+  cx.fillText('この社会は、4つのレイヤーが',CW/2,86);
+  cx.fillText('連鎖して崩壊する',CW/2,110);cx.globalAlpha=1;cx.textAlign='left';
+  cascade(150,ss(1.2,5.2,t),false);
+  if(t>5.8){cx.globalAlpha=ss(5.8,6.6,t);cx.textAlign='center';
+    cx.fillStyle='#00d4ff';cx.shadowBlur=16;cx.shadowColor='#00d4ff';cx.font='bold 17px Courier New';
+    cx.fillText('社会＆地域インフラ・デバッガー v6.1',CW/2,600);cx.shadowBlur=0;
+    const bl=Math.sin(t*5)>0;cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.35)';
+    cx.font='bold 12px Courier New';cx.fillText('▶ デバッグを開始する',CW/2,636);
+    cx.textAlign='left';cx.globalAlpha=1;}
+}
+function drawConclusion(){
+  cx.textAlign='center';
+  const a1=ss(92.5,93.5,t);
+  cx.globalAlpha=a1;cx.fillStyle='#d8e4ff';cx.font='bold 14px Courier New';
+  cx.fillText('4つのレイヤーは、連鎖して崩壊する。',CW/2,80);cx.globalAlpha=1;
+  cascade(112,ss(93.5,97,t),true);
+  if(t>97.5){cx.globalAlpha=ss(97.5,98.5,t);
+    cx.fillStyle='#00ff88';cx.shadowBlur=14;cx.shadowColor='#00ff88';cx.font='bold 17px Courier New';
+    cx.fillText('そして、連鎖して回復する。',CW/2,520);cx.shadowBlur=0;cx.globalAlpha=1;}
+  if(t>100){const a=ss(100,101,t);cx.globalAlpha=a;
+    cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(CW/2-160,548,320,150,6);cx.stroke();
+    cx.fillStyle='rgba(0,212,255,.05)';rrect(CW/2-160,548,320,150,6);cx.fill();
+    cx.fillStyle='#00d4ff';cx.font='bold 14px Courier New';cx.shadowBlur=12;cx.shadowColor='#00d4ff';
+    cx.fillText('社会＆地域インフラ・デバッガー',CW/2,580);cx.shadowBlur=0;
+    cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+    cx.fillText('⚡ ワイマール〜北欧、5つのシナリオプリセット',CW/2,606);
+    cx.fillText('⇄ 4ページ連動 — P2予算戦略はP3反証許容度と連鎖',CW/2,624);
+    cx.fillText('⎘ 監査報告書の自動生成 / URL共有',CW/2,642);
+    const bl=Math.sin(t*4)>0;cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.4)';cx.font='bold 12px Courier New';
+    cx.fillText('▶ すべてのパラメータは、あなたの手の中に',CW/2,676);
+    cx.globalAlpha=1;}
+  cx.textAlign='left';
+}
+
+// ===== PAGE 1 =====
+const net1=[];for(let i=0;i<20;i++)net1.push({a:i/20*Math.PI*2,r:60+((i*19)%40),ph:Math.random()*6,fc:i%5===0});
+function drawP1(){
+  header('▶ PAGE 1: INFORMATION SPACE — 情報空間','#00d4ff');
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('SCENARIOS ▶ 1タップで歴史をロード',30,100);
+  const wei=inW(11,18.4), nor=t>=18.4;
+  btnUI(30,110,175,30,'⚡ ワイマール崩壊','#ff2244',wei);
+  btnUI(215,110,175,30,'🌿 北欧型民主主義','#00ff88',nor);
+  // 実機同様: プリセットが2本のスライダーとアルゴリズムを実際に動かす
+  mini(40,180,140,'情報フィルタリング率',p1_f(),'#ff6b2b');
+  mini(238,180,140,'リーダーの倫理観',p1_e(),'#00d4ff');
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('意思決定アルゴリズム:',40,218);
+  cx.fillStyle=t>=18.4?'#00ff88':(t>=11?'#ff6b2b':'#5a6f94');cx.font='bold 10px Courier New';
+  cx.fillText(t>=18.4?'動的計画法 (DP) — 長期最適化':(t>=11?'Greedy — 短期利益最大化・局所最適解':'—'),178,218);
+  gauge(40,252,250,'エントロピー（無秩序度）',p1_ent(),p1_ent()>55?'#ff2244':'#00ff88');
+  gauge(40,292,250,'精神病・パラノイア発症リスク',p1_par(),p1_par()>50?'#ff2244':'#00d4ff');
+  // agent network
+  const bx=CW/2,by=445;
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('④ AGENT NETWORK SIMULATION',30,330);
+  net1.forEach(n=>n.ph+=0.016*(wei?4:1));
+  for(let i=0;i<net1.length;i++)for(let j=i+1;j<net1.length;j+=4){
+    const A=net1[i],B=net1[j];
+    const ax=bx+Math.cos(A.a+t*.15)*A.r, ay=by+Math.sin(A.a+t*.15)*A.r*.62;
+    const bx2=bx+Math.cos(B.a+t*.15)*B.r, by2=by+Math.sin(B.a+t*.15)*B.r*.62;
+    const sick=wei&&!(A.fc||B.fc);
+    cx.strokeStyle=sick?'rgba(255,34,68,.22)':'rgba(0,212,255,.12)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(ax,ay);cx.lineTo(bx2,by2);cx.stroke();}
+  net1.forEach(n=>{
+    const x=bx+Math.cos(n.a+t*.15)*n.r, y=by+Math.sin(n.a+t*.15)*n.r*.62;
+    let col=n.fc&&nor?'#00ff88':(wei&&!n.fc?'#ff2244':'#00d4ff');
+    const wob=wei&&!n.fc?Math.sin(n.ph*3)*4:0;
+    cx.shadowBlur=7;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(x+wob,y,3.6+Math.sin(n.ph)*.8,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText('● 健全  ● 感染中  ● エコーチェンバー  ● ファクトチェッカー',56,586);
+  if(wei&&t>14.6)stamp('SYSTEM CRASH DETECTED','#ff2244',Math.min(1,(t-14.6)*2),445);
+  if(nor&&t>21)stamp('STABLE','#00ff88',Math.min(1,(t-21)*2),445);
+  if(inW(15.2,18.4))caption('📍 ワイマール共和国末期（1932–33） — 3年で全崩壊',650,'#ff2244');
+  if(t>21.6&&t<29)caption('同じ社会。違うのはパラメータだけ。',650,'#00ff88');
+  chapterCard(1,'情報空間','INFORMATION SPACE','#00d4ff',8);
+}
+
+// ===== PAGE 2 =====
+function drawP2(){
+  header('▶ PAGE 2: REGIONAL INFRASTRUCTURE — SECTOR-T','#00ff88');
+  slider(40,178,280,'インフラ集約化率','レガシー全面延命','拠点集約・周辺廃止',p2_agg(),'#00d4ff',inW(31.8,35.2));
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('予算配分戦略',40,232);
+  btnUI(50,240,100,26,'DP戦略','#00ff88',p2_dp());
+  btnUI(170,240,120,26,'Greedy戦略','#ff6b2b',p2_greedy());
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText(p2_greedy()?'自己保身・ネット選挙ゲーム最優先':'救命医療・コア産業最優先',50,282);
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('公共性リブート',40,304);
+  btnUI(190,296,180,26,p2_reboot()?'● ON — 公共性最優先':'○ OFF — 市場原理','#00d4ff',p2_reboot());
+  gauge(40,368,250,'インフラ維持力 INFRASTRUCTURE',p2_infra(),p2_infra()<30?'#ff2244':'#00d4ff');
+  gauge(40,410,250,'社会的耐故障性 REDUNDANCY BUFFER',p2_buf(),p2_buf()<30?'#ff2244':'#00ff88');
+  if(p2_buf()<30){cx.fillStyle='#ff2244';cx.font='bold 9px Courier New';
+    if(Math.sin(t*8)>0)cx.fillText('⚠ バッファ30%未満 — ショック一撃で崩壊圏',40,436);}
+  // ② RESCUE HELI STATUS
+  const heliDown=p2_shock1();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('② RESCUE HELI STATUS',40,470);
+  cx.strokeStyle=heliDown?'#ff2244':'#00ff88';cx.lineWidth=1.4;
+  rrect(40,480,340,54,4);cx.stroke();
+  cx.fillStyle=heliDown?'rgba(255,34,68,.07)':'rgba(0,255,136,.06)';rrect(40,480,340,54,4);cx.fill();
+  // heli icon
+  const hx=86,hy=507,rot=heliDown?0.5:(performance.now()/30)%7;
+  const hcol=heliDown?'#ff2244':'#00ff88';
+  cx.strokeStyle=hcol;cx.fillStyle=hcol;cx.lineWidth=2;
+  cx.beginPath();cx.ellipse(hx,hy+3+(heliDown?Math.min(10,(t-37.4)*6):0),12,6,0,0,7);cx.stroke();
+  cx.beginPath();cx.moveTo(hx-16*Math.cos(rot),hy-6);cx.lineTo(hx+16*Math.cos(rot),hy-6);cx.stroke();
+  cx.font='bold 11px Courier New';
+  cx.fillText(heliDown?'🚁 LONG-TERM SUSPENSION — 長期運休':'🚁 OPERATIONAL — 常時稼働中',120,505);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';
+  cx.fillText(heliDown?'MALFUNCTION — 修復予算なし（他責処理中）':'Dispatch Ready — 出動待機中',120,521);
+  btnUI(70,566,280,30,'⚡ 環境ショック注入 (Inject System Shock)','#ffcc00',inW(37.4,37.9)||inW(46.6,47.1));
+  if(p2_shock1()&&t>38.4)stamp('SECTOR-T COLLAPSE','#ff2244',Math.min(1,(t-38.4)*2),330);
+  if(p2_shock2()&&t>47.6)stamp('SURVIVED','#00ff88',Math.min(1,(t-47.6)*2),330);
+  if(inW(39.2,43))caption('集約92%×Greedy → ヘリごと墜ちた',650,'#ff2244');
+  if(t>48.2&&t<53.5)caption('集約はそのまま。公共性リブートONだけで生還',650,'#00ff88');
+  chapterCard(2,'地方インフラ','REGIONAL INFRASTRUCTURE — SECTOR-T','#00ff88',30);
+}
+
+// ===== PAGE 3 =====
+const net3=[];for(let i=0;i<16;i++)net3.push({a:i/16*Math.PI*2,ph:Math.random()*6});
+function drawP3(){
+  header('▶ PAGE 3: COGNITIVE RECOVERY — 個人の認知','#9945ff');
+  slider(40,188,280,'現実同期レート','ネット常時接続','物理現実回帰・SNS断食',p3_sync(),'#9945ff',inW(55.8,59.4));
+  gauge(40,262,250,'正義感カウンター DOPAMINE SURGE',p3_dopa(),p3_dopa()>60?'#ff2244':'#9945ff');
+  gauge(40,304,250,'認知健全性 COGNITIVE INTEGRITY',p3_cog(),p3_cog()<45?'#ff2244':'#00ff88');
+  gauge(40,346,250,'反証許容度 FALSIFIABILITY',p3_fal(),p3_fal()<35?'#ff2244':'#00d4ff');
+  const attack=p3_sync()<30&&!p3_drop();
+  if(attack&&Math.sin(t*7)>0){cx.fillStyle='#ff2244';cx.font='bold 10px Courier New';cx.textAlign='center';
+    cx.fillText('⚠ POISONING ATTACK IN PROGRESS ⚠',CW/2,388);cx.textAlign='left';}
+  if(p3_drop()&&t<70){cx.fillStyle='#00ff88';cx.font='bold 9px Courier New';cx.textAlign='center';
+    cx.fillText('▌ DROPOUT ACTIVE — GROUNDING… ▐',CW/2,388);cx.textAlign='left';}
+  // cognitive network
+  const bx=CW/2,by=470;
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('① COGNITIVE NETWORK — POISONING ATTACK MONITOR',30,414);
+  net3.forEach(n=>n.ph+=0.016*(attack?4:1.4));
+  net3.forEach((n,i)=>{
+    const sick=attack&&i%4!==0;
+    const wob=sick?Math.sin(n.ph*2.4)*6:Math.sin(n.ph)*2;
+    const x=bx+Math.cos(n.a+t*.2)*(66+wob), y=by+Math.sin(n.a+t*.2)*(44+wob);
+    for(let j=i+1;j<net3.length;j+=5){
+      const x2=bx+Math.cos(net3[j].a+t*.2)*66,y2=by+Math.sin(net3[j].a+t*.2)*44;
+      cx.strokeStyle=sick?'rgba(255,34,68,.18)':'rgba(0,212,255,.12)';
+      cx.beginPath();cx.moveTo(x,y);cx.lineTo(x2,y2);cx.stroke();}
+    const col=sick?'#ff2244':(p3_drop()?'#00ff88':'#00d4ff');
+    cx.shadowBlur=6;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(x,y,3.4,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText('● 偽装ノード（自称・良識派）  ● 一般ノード  ● 中立ノード（事実）',60,540);
+  btnUI(70,566,280,30,'▶ EXECUTE: DROP_OUT','#00ff88',t>=61.6);
+  if(attack&&t>60)stamp('POISONED','#ff2244',Math.min(1,(t-60)*2),468);
+  if(p3_drop()&&t>64)stamp('COGNITIVE RESTORED','#00ff88',Math.min(1,(t-64)*2),468);
+  if(inW(59.6,61.4))caption('常時接続 → 脳が"怒り"に過学習',650,'#ff2244');
+  if(t>65&&t<73)caption('DROP_OUT実行 → 物理現実に再同期',650,'#00ff88');
+  chapterCard(3,'個人の認知','COGNITIVE RECOVERY','#9945ff',54);
+}
+
+// ===== PAGE 4 =====
+function drawP4(){
+  header('▶ PAGE 4: STAKEHOLDER ASYMMETRY — 当事者性','#ff6b2b');
+  slider(40,188,280,'外部ノード流入率','当事者のみ','部外者・推し活の殺到',p4_ext(),'#ff6b2b',inW(75.8,79.4));
+  gauge(40,268,250,'真の当事者コミット比率 TRUE STAKEHOLDER RATIO',p4_ratio(),p4_ratio()<40?'#ff2244':'#00ff88');
+  const hij=p4_ext()>70&&!p4_fil();
+  if(hij&&Math.sin(t*7)>0){cx.fillStyle='#ff6b2b';cx.font='bold 10px Courier New';cx.textAlign='center';
+    cx.fillText('⚠ OBJECTIVE HIJACK — 目的関数乗っ取り ⚠',CW/2,308);cx.textAlign='left';}
+  if(p4_fil()&&t<89){cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.textAlign='center';
+    cx.fillText('▌ PACKET_FILTERING ACTIVE — SYBIL TRAFFIC BLOCKED ▐',CW/2,308);cx.textAlign='left';}
+  // stakeholder network
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('① STAKEHOLDER NETWORK — SYBIL FLOOD MONITOR',30,340);
+  const bx=CW/2,by=452;
+  cx.strokeStyle='#172340';cx.fillStyle='#0f1829';
+  cx.beginPath();cx.ellipse(bx,by,56,26,0,0,7);cx.fill();cx.stroke();
+  for(let i=0;i<5;i++){const a=i/5*Math.PI*2+t*.4;
+    cx.shadowBlur=6;cx.shadowColor='#00ff88';cx.fillStyle='#00ff88';
+    cx.beginPath();cx.arc(bx+Math.cos(a)*64,by+Math.sin(a)*30,4+Math.sin(t*2+i)*.8,0,7);cx.fill();cx.shadowBlur=0;}
+  const swn=Math.round(p4_ext()/5);
+  for(let i=0;i<swn;i++){const a=i/Math.max(1,swn)*Math.PI*2+t*(p4_fil()?2.6:.9);
+    const rr=p4_fil()?96+(t-82.3)*55+i*4:96+Math.sin(t*3+i)*7;
+    const sx=bx+Math.cos(a)*rr, sy=by+Math.sin(a)*rr*.5;
+    if(sx<12||sx>CW-12||sy<352||sy>560)continue;
+    cx.globalAlpha=p4_fil()?Math.max(0,1-(t-82.3)*.45):1;
+    cx.shadowBlur=5;cx.shadowColor='#ff6b2b';cx.fillStyle='#ff6b2b';
+    cx.fillRect(sx-3.5,sy-3.5,7,7);cx.shadowBlur=0;cx.globalAlpha=1;
+    if(p4_fil()){cx.strokeStyle='rgba(255,107,43,.25)';cx.setLineDash([2,4]);
+      cx.beginPath();cx.moveTo(sx,sy);cx.lineTo(bx,by);cx.stroke();cx.setLineDash([]);}}
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText('● 生活者ノード（静かな明滅）  ■ 外部スパムノード（1ビット思考）',56,556);
+  btnUI(70,566,280,30,'▶ EXECUTE: PACKET_FILTERING','#00d4ff',p4_fil());
+  if(hij&&t>80.4)stamp('HIJACKED','#ff6b2b',Math.min(1,(t-80.4)*2),452);
+  if(p4_fil()&&t>85)stamp('OBJECTIVE RESTORED','#00ff88',Math.min(1,(t-85)*2),452);
+  if(inW(80.8,82.2))caption('声の総量が、当事者の声を上書き',650,'#ff6b2b');
+  if(t>86&&t<91)caption('シビル遮断 → 目的関数が持ち主に戻る',650,'#00ff88');
+  chapterCard(4,'当事者性','STAKEHOLDER ASYMMETRY','#ff6b2b',74);
+}
+
+// ===== main =====
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;ended=true;}
+  if(inW(37.4,38.2)||inW(46.6,47.2))shake=1;shake=Math.max(0,shake-dt*1.7);
+  cursorAt();checkClicks();
+}
+function render(){
+  cx.save();
+  if(shake>0)cx.translate((Math.random()-.5)*10*shake,(Math.random()-.5)*8*shake);
+  cx.fillStyle='#070b14';cx.fillRect(-10,-10,CW+20,CH+20);grid();
+  if(t<8)drawIntro();
+  else if(t<30)drawP1();
+  else if(t<54)drawP2();
+  else if(t<74)drawP3();
+  else if(t<92)drawP4();
+  else drawConclusion();
+  drawCursor();
+  cx.fillStyle='#172340';cx.fillRect(0,CH-4,CW,4);
+  const pg=cx.createLinearGradient(0,0,CW,0);
+  pg.addColorStop(0,'#00d4ff');pg.addColorStop(.5,'#9945ff');pg.addColorStop(1,'#00ff88');
+  cx.fillStyle=pg;cx.fillRect(0,CH-4,CW*t/DUR,4);
+  if(!ended){cx.fillStyle=Math.sin(t*6)>0?'#ff2244':'rgba(255,34,68,.3)';
+    cx.beginPath();cx.arc(CW-26,20,4,0,7);cx.fill();
+    cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('REC',CW-36,23);cx.textAlign='left';}
+  cx.restore();
+  if(ended){cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('↺ RESTART で最初から',CW/2,CH-20);cx.textAlign='left';}
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;shake=0;lastClickT=-1;clickPulse=0;
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

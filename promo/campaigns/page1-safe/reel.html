@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30秒リール — 誰の話もしていない（静かで知的な実験版）</title>
+<style>
+:root{--bg0:#070b14;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:#d8e4ff;font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.frame{position:relative;width:min(96vw,420px)}
+.stage{position:relative;border:1px solid var(--bdr);border-radius:6px;background:var(--bg0);overflow:hidden}
+#cv{width:100%;display:block}
+.ctrl{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.btn{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;letter-spacing:.1em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;font-size:.55rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">30秒リール（静かで知的な実験版 / PAGE 1）— 無音で完結 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420, CH=740;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.parentElement.getBoundingClientRect();const s=r.width/CW;
+  cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=(CH*s)+'px';
+  cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+
+// ===== timeline (30s) =====
+// 0-2.6 hook / 2.6-4 card / 4-13 閉じた条件(→崩壊) / 13-14 beat / 14-21.5 確かめる条件(→安定) / 21.5-30 endcard
+const DUR=30;
+const T_CARD=2.6,T_WEI=5.2,T_BEAT=13,T_NOR=14.6,T_END=21.5;
+let t=0, playing=true, last=performance.now(), ended=false;
+
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+const inW=(a,b)=>t>=a&&t<b;
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function mini(x,y,w,label,val,col,hot){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-8);
+  cx.fillStyle='#172340';rrect(x,y,w,6,3);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(4,w*val/100),6,3);cx.fill();
+  cx.shadowBlur=hot?10:6;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(x+w*val/100,y+3,hot?6:5,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+8);}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-5);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,7);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function btnUI(x,y,w,h,label,col,on){
+  cx.fillStyle=on?col:'rgba(15,24,41,1)';cx.strokeStyle=col;cx.lineWidth=1.4;
+  rrect(x,y,w,h,4);cx.fill();cx.stroke();
+  cx.fillStyle=on?'#070b14':col;cx.font='bold 10px Courier New';cx.textAlign='center';
+  cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function stamp(text,col,scale,yy){
+  cx.save();cx.translate(CW/2,yy);cx.rotate(-.08);cx.scale(scale,scale);cx.globalAlpha=Math.min(1,scale);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;cx.font='bold 24px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+36;cx.strokeRect(-w/2,-24,w,40);
+  cx.shadowBlur=22;cx.shadowColor=col;cx.fillText(text,0,5);cx.shadowBlur=0;
+  cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,y,col){
+  cx.font='bold 12px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+22;
+  cx.fillStyle='rgba(7,11,20,.88)';rrect(CW/2-w/2,y-15,w,24,4);cx.fill();
+  cx.fillStyle=col;cx.fillText(text,CW/2,y+2);cx.textAlign='left';}
+
+// ===== ghost cursor =====
+let cursor={x:CW/2,y:CH-60}, clickPulse=0, lastClickT=-1;
+const KF=[];const k=(tt,x,y,c)=>KF.push({t:tt,x,y,click:!!c});
+k(4.4,117,145);k(T_WEI,117,145,1);      // ⚠ 閉じた情報空間 (30,130,175,30)
+k(14,302,145);k(T_NOR,302,145,1);       // 🌿 確かめる情報空間 (215,130,175,30)
+function cursorAt(){
+  if(t<KF[0].t){cursor.x=KF[0].x;cursor.y=KF[0].y;return;}
+  for(let i=0;i<KF.length-1;i++)if(t>=KF[i].t&&t<=KF[i+1].t){
+    const p=ss(KF[i].t,KF[i+1].t,t);
+    cursor.x=KF[i].x+(KF[i+1].x-KF[i].x)*p;cursor.y=KF[i].y+(KF[i+1].y-KF[i].y)*p;return;}
+  const L=KF[KF.length-1];cursor.x=L.x;cursor.y=L.y;}
+function checkClicks(){KF.forEach(f=>{if(f.click&&t>=f.t&&lastClickT<f.t){clickPulse=1;lastClickT=f.t;}});clickPulse=Math.max(0,clickPulse-.045);}
+function drawCursor(){
+  if(t<3.8||t>T_END-1)return;
+  cx.shadowBlur=14;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(cursor.x,cursor.y,3.5,0,7);cx.fill();cx.shadowBlur=0;
+  if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(cursor.x,cursor.y,10+26*(1-clickPulse),0,7);cx.stroke();}}
+
+// ===== state: 2つの条件（closed f88/e12/short-term, verifying f18/e90/long-term）=====
+const wei=()=>inW(T_WEI,T_NOR), nor=()=>t>=T_NOR;
+function fRate(){if(t<T_WEI)return 46;if(t<T_WEI+.7)return 46+42*ss(T_WEI,T_WEI+.7,t);if(t<T_NOR)return 88;if(t<T_NOR+.7)return 88-70*ss(T_NOR,T_NOR+.7,t);return 18;}
+function eth(){if(t<T_WEI)return 55;if(t<T_WEI+.7)return 55-43*ss(T_WEI,T_WEI+.7,t);if(t<T_NOR)return 12;if(t<T_NOR+.7)return 12+78*ss(T_NOR,T_NOR+.7,t);return 90;}
+function ent(){if(t<T_WEI)return 24;if(t<10.5)return 24+64*ss(T_WEI,10.5,t);if(t<T_NOR)return 88;return Math.max(16,88-72*ss(T_NOR,19.5,t));}
+function par(){if(t<T_WEI)return 14;if(t<11)return 14+66*ss(T_WEI,11,t);if(t<T_NOR)return 80;return Math.max(10,80-70*ss(T_NOR,20,t));}
+
+// ===== agent network =====
+const net=[];for(let i=0;i<20;i++)net.push({a:i/20*Math.PI*2,r:62+((i*19)%42),ph:Math.random()*6,fc:i%5===0});
+
+function drawP1(){
+  cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';
+  cx.fillText('▶ PAGE 1: INFORMATION SPACE — 情報空間',20,36);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,46);cx.lineTo(CW-20,46);cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';
+  cx.fillText('社会デバッガー v6',CW-20,36);cx.textAlign='left';
+  // hook echo line
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+  cx.fillText('CONDITIONS ▶ 同じ街に、2つの条件',30,120);
+  btnUI(30,130,175,30,'⚠ 閉じた情報空間','#ff2244',wei());
+  btnUI(215,130,175,30,'🌿 確かめる情報空間','#00ff88',nor());
+  // sliders（プリセットが実際に動かす）
+  const hot1=inW(T_WEI,T_WEI+1)||inW(T_NOR,T_NOR+1);
+  mini(40,206,140,'情報フィルタリング率',fRate(),'#ff6b2b',hot1);
+  mini(238,206,140,'意思決定の公共性',eth(),eth()<40?'#ff2244':'#00ff88',hot1);
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('意思決定アルゴリズム:',40,244);
+  cx.fillStyle=nor()?'#00ff88':(wei()?'#ff6b2b':'#5a6f94');cx.font='bold 10px Courier New';
+  cx.fillText(nor()?'長期の信頼を最適化':(wei()?'短期の反応を最大化':'—'),178,244);
+  gauge(40,282,250,'エントロピー（無秩序度）',ent(),ent()>55?'#ff2244':'#00ff88');
+  gauge(40,320,250,'認知負荷・疑心リスク',par(),par()>50?'#ff2244':'#00d4ff');
+  // network
+  const bx=CW/2,by=470;
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('④ AGENT NETWORK SIMULATION',30,362);
+  net.forEach(n=>n.ph+=0.016*(wei()?4:1.4));
+  for(let i=0;i<net.length;i++)for(let j=i+1;j<net.length;j+=4){
+    const A=net[i],B=net[j];
+    const ax=bx+Math.cos(A.a+t*.15)*A.r, ay=by+Math.sin(A.a+t*.15)*A.r*.6;
+    const bx2=bx+Math.cos(B.a+t*.15)*B.r, by2=by+Math.sin(B.a+t*.15)*B.r*.6;
+    const sick=wei()&&!(A.fc||B.fc);
+    cx.strokeStyle=sick?'rgba(255,34,68,.22)':'rgba(0,212,255,.12)';cx.lineWidth=1;
+    cx.beginPath();cx.moveTo(ax,ay);cx.lineTo(bx2,by2);cx.stroke();}
+  net.forEach(n=>{
+    const x=bx+Math.cos(n.a+t*.15)*n.r, y=by+Math.sin(n.a+t*.15)*n.r*.6;
+    const col=n.fc&&nor()?'#00ff88':(wei()&&!n.fc?'#ff2244':'#00d4ff');
+    const wob=wei()&&!n.fc?Math.sin(n.ph*3)*4:0;
+    cx.shadowBlur=7;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(x+wob,y,3.6+Math.sin(n.ph)*.8,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='#3d4f73';cx.font='8px Courier New';
+  cx.fillText('● 安定  ● 過負荷  ● エコーチェンバー  ● 確かめるノード',56,596);
+  // stamps & captions
+  if(wei()&&t>8.6)stamp('SYSTEM CRASH DETECTED','#ff2244',Math.min(1,(t-8.6)*2.4),470);
+  if(nor()&&t>17.5)stamp('STABLE','#00ff88',Math.min(1,(t-17.5)*2.4),470);
+  if(inW(9.4,T_BEAT))caption('外の声を閉じたとき、内側の無秩序が増幅した',636,'#ff2244');
+  if(inW(18,T_END))caption('変えたのは、誰かではなく条件だけ。',636,'#00ff88');
+}
+
+function drawHook(){
+  cx.textAlign='center';
+  const gl=Math.random()<.15;
+  cx.fillStyle='#d8e4ff';cx.font='bold 24px Courier New';
+  const ox=gl?(Math.random()-.5)*8:0;
+  cx.fillText('誰の話も、していない。',CW/2+ox,CH/2-44);
+  cx.fillStyle='#00d4ff';cx.shadowBlur=20;cx.shadowColor='#00d4ff';
+  cx.fillText('なのに、思い当たる。',CW/2-ox,CH/2-2);cx.shadowBlur=0;
+  if(gl){cx.fillStyle='rgba(255,34,68,.5)';cx.fillText('なのに、思い当たる。',CW/2-ox+3,CH/2-1);}
+  if(t>1.3){cx.globalAlpha=ss(1.3,1.9,t);
+    cx.fillStyle='#5a6f94';cx.font='11px Courier New';
+    cx.fillText('同じ街に、2つの条件を置いてみる',CW/2,CH/2+36);cx.globalAlpha=1;}
+  cx.textAlign='left';
+}
+function drawEnd(){
+  cx.textAlign='center';
+  cx.globalAlpha=ss(22,22.8,t);
+  cx.fillStyle='#d8e4ff';cx.font='bold 15px Courier New';
+  cx.fillText('変えたのは、誰かではない。',CW/2,206);
+  cx.fillText('条件だけ。',CW/2,232);
+  cx.globalAlpha=ss(23.4,24.2,t);
+  cx.fillStyle='#00ff88';cx.shadowBlur=16;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';
+  cx.fillText('構造は、壊れ方にも',CW/2,282);
+  cx.fillText('直り方にも現れる。',CW/2,310);cx.shadowBlur=0;
+  if(t>25.4){const a=ss(25.4,26.2,t);cx.globalAlpha=a;
+    cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(CW/2-160,340,320,130,6);cx.stroke();
+    cx.fillStyle='rgba(0,212,255,.05)';rrect(CW/2-160,340,320,130,6);cx.fill();
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.shadowBlur=12;cx.shadowColor='#00d4ff';
+    cx.fillText('社会デバッガー',CW/2,376);cx.shadowBlur=0;
+    cx.fillStyle='#5a6f94';cx.font='9px Courier New';
+    cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,398);
+    cx.fillStyle='#ffcc00';cx.font='bold 11px Courier New';
+    cx.fillText('パラメータを動かす。構造が答える。',CW/2,426);
+    cx.fillStyle='#00d4ff';cx.font='bold 10px Courier New';
+    cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,452);}
+  if(t>27){cx.globalAlpha=ss(27,27.8,t);
+    const bl=Math.sin(t*4)>0;cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.4)';
+    cx.font='bold 12px Courier New';
+    cx.fillText('▶ あなたは、どの条件を変える？',CW/2,510);}
+  cx.globalAlpha=1;cx.textAlign='left';
+}
+
+function render(){
+  cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();
+  if(t<T_CARD)drawHook();
+  else if(t<T_END){
+    drawP1();
+    const a=Math.min(1,(t-T_CARD)*2.4)*(t<T_CARD+1.2?1:Math.max(0,1-(t-T_CARD-1.2)*2.4));
+    if(a>0){cx.fillStyle=`rgba(7,11,20,${.92*a})`;cx.fillRect(0,0,CW,CH);
+      cx.globalAlpha=a;cx.textAlign='center';
+      cx.fillStyle='#00d4ff';cx.font='bold 13px Courier New';cx.fillText('実験: 同じ社会に、2つの設定',CW/2,CH/2-8);
+      cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('PAGE 1 — INFORMATION SPACE',CW/2,CH/2+18);
+      cx.textAlign='left';cx.globalAlpha=1;}
+  }
+  else drawEnd();
+  // beat flash
+  if(inW(T_BEAT,T_BEAT+.14)){cx.fillStyle='rgba(255,255,255,.65)';cx.fillRect(0,0,CW,CH);}
+  if(inW(T_BEAT+.14,T_NOR)){cx.fillStyle='rgba(7,11,20,.75)';cx.fillRect(0,0,CW,CH);
+    cx.fillStyle='#00ff88';cx.font='bold 17px Courier New';cx.textAlign='center';
+    cx.fillText('同じ社会で、もう一度。',CW/2,CH/2);cx.textAlign='left';}
+  drawCursor();
+  // 固定免責フッター（全編常時表示）
+  cx.fillStyle='rgba(7,11,20,.85)';cx.fillRect(0,CH-26,CW,22);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';
+  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,CH-12);cx.textAlign='left';
+  // progress
+  cx.fillStyle='#172340';cx.fillRect(0,CH-4,CW,4);
+  const pg=cx.createLinearGradient(0,0,CW,0);
+  pg.addColorStop(0,'#ff2244');pg.addColorStop(.6,'#00d4ff');pg.addColorStop(1,'#00ff88');
+  cx.fillStyle=pg;cx.fillRect(0,CH-4,CW*t/DUR,4);
+  if(!ended&&t<T_END){cx.fillStyle=Math.sin(t*6)>0?'#ff2244':'rgba(255,34,68,.3)';
+    cx.beginPath();cx.arc(CW-26,20,4,0,7);cx.fill();
+    cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('REC',CW-36,23);cx.textAlign='left';}
+  if(ended){cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('↺ RESTART で最初から',CW/2,CH-36);cx.textAlign='left';}
+}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}cursorAt();checkClicks();}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;lastClickT=-1;clickPulse=0;
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

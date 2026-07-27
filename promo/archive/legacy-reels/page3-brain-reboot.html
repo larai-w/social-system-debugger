@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAGE 3 — 脳内OSリブート: 24時間グラウンディング</title>
+<style>
+:root{--bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--pur:#9945ff;--yel:#ffcc00;--txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,.025)1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.025)1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.wrap{max-width:1100px;margin:0 auto;padding:14px 16px 26px;position:relative;z-index:1}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid var(--bdr);gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:1rem;color:var(--pur);text-shadow:0 0 22px rgba(153,69,255,.5);letter-spacing:.12em}
+.hdr .sub{color:var(--muted);font-size:.6rem;margin-top:3px}
+.rec{display:inline-flex;align-items:center;gap:6px;font-size:.6rem;letter-spacing:.18em;color:var(--red)}
+.rec .d{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:blink 1.1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.stage{position:relative;margin-top:14px;border:1px solid var(--bdr);border-radius:3px;background:var(--bg1);overflow:hidden}
+#cv{width:100%;height:470px;display:block}
+.banner{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 24px;border-radius:3px;font-size:.72rem;font-weight:bold;letter-spacing:.14em;white-space:nowrap;transition:opacity .6s}
+.b1{background:rgba(255,34,68,.12);border:1px solid var(--red);color:var(--red)}
+.b2{background:rgba(153,69,255,.12);border:1px solid var(--pur);color:var(--pur)}
+.b3{background:rgba(0,255,136,.1);border:1px solid var(--green);color:var(--green)}
+.endcard{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;background:rgba(7,11,20,.85);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity 1.6s;text-align:center;padding:20px}
+.endcard.on{opacity:1;pointer-events:auto}
+.endcard .big{font-size:1.05rem;color:var(--green);letter-spacing:.14em;text-shadow:0 0 24px rgba(0,255,136,.6)}
+.endcard .msg{font-size:.7rem;line-height:2.1;max-width:600px}
+.endcard .msg em{color:var(--cyan);font-style:normal}
+.btn{padding:8px 18px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.66rem;cursor:pointer;letter-spacing:.12em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.ctrl{display:flex;gap:8px;margin-top:12px;align-items:center;flex-wrap:wrap}
+.tbar{height:3px;background:var(--bdr);margin-top:10px;border-radius:2px;overflow:hidden}
+.tfill{height:100%;width:0%;background:linear-gradient(90deg,var(--red),var(--pur),var(--green))}
+.foot{text-align:center;padding-top:14px;font-size:.54rem;color:var(--muted);margin-top:14px;border-top:1px solid var(--bdr)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+    <div>
+      <h1>▶ PAGE 3 EPISODE — 脳内OSリブート: 24時間グラウンディング・プロトコル</h1>
+      <div class="sub">タイムラインに過学習した脳が、物理現実に再同期するまでの24時間を早送りで観測する</div>
+    </div>
+    <div class="rec"><span class="d"></span>REC — COGNITIVE LOG</div>
+  </div>
+  <div class="stage">
+    <canvas id="cv"></canvas>
+    <div class="banner" id="banner" style="opacity:0"></div>
+    <div class="endcard" id="endcard">
+      <div class="big">✓ GROUNDING COMPLETE — 認知OS正常化</div>
+      <div class="msg">
+        タイムラインは世界の要約ではなく、<em>怒りで並べ替えられた世界の断片</em>だった。<br>
+        切断の禁断症状は数時間で消え、脳は一次情報 — 光、風、体温、会話 — に再同期した。<br>
+        <em>一次情報は、物理現実にしかない。</em>
+      </div>
+      <button class="btn" onclick="restart()">↺ REPLAY 24H</button>
+    </div>
+  </div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="tbar"><div class="tfill" id="tfill"></div></div>
+  <div class="foot">PAGE 3 COGNITIVE RECOVERY — ドロップアウトは脳の正則化 / 画面録画で動画化できます</div>
+</div>
+<script>
+// 0-4 boot / 4-22 過学習(doomscroll) / 22-30 切断+禁断症状 / 30-48 自然同期 / 48-56 正常化
+const DUR=56, T_DOOM=4, T_CUT=22, T_NATURE=30, T_OK=48;
+let t=0, playing=true, last=performance.now(), ended=false;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.getBoundingClientRect();cv.width=r.width*devicePixelRatio;cv.height=470*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+addEventListener('resize',fit);fit();
+const W=()=>cv.getBoundingClientRect().width, H=470;
+
+// clock: 0:00..24:00 mapped over T_DOOM..T_OK
+const clock=()=>{const p=Math.max(0,Math.min(1,(t-T_DOOM)/(T_OK-T_DOOM)));const h=Math.floor(p*24);return String(h).padStart(2,'0')+':00';};
+
+// brain: neuron ring network at center-right of person's head position
+const HEADX=()=>W()*.5, HEADY=170;
+const neurons=[];for(let i=0;i<22;i++){const a=i/22*Math.PI*2,r=52+((i*17)%26);
+  neurons.push({a,r,x:0,y:0,sick:0,ph:Math.random()*6});}
+// feed packets: from phone (left) into head
+const feed=[];const FEEDW=['敵','炎上','怒','煽','デマ','切抜','嫉妬','急上昇'];
+// nature packets: from right side trees/waves into head
+const nature=[];const NATW=['風','光','鳥','緑','波','呼吸','会話','土'];
+let sanity=88, dopamine=20, falsif=70; // 認知健全性 / ドーパミン依存 / 反証許容度
+let cutFlash=0;
+
+const THOUGHTS=[
+  {t:8,d:3,s:'もう1スクロールだけ…',c:'#ff6b2b'},
+  {t:13,d:3,s:'こいつは敵。こっちは味方。',c:'#ff2244'},
+  {t:18,d:3,s:'怒ってるのに、やめられない',c:'#ff2244'},
+  {t:24,d:2.5,s:'（切断）…そわそわする',c:'#9945ff'},
+  {t:27,d:2.5,s:'手が勝手にスマホを探す',c:'#9945ff'},
+  {t:34,d:3,s:'風の音、久しぶりに聞いた',c:'#00ff88'},
+  {t:40,d:3,s:'あの論争、現実では誰も話してない',c:'#00d4ff'},
+  {t:50,d:4,s:'世界は思ってたより、静かで広い',c:'#00ff88'}
+];
+
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;if(!ended){ended=true;document.getElementById('endcard').classList.add('on');}}
+  neurons.forEach(n=>{n.ph+=dt*(n.sick>.5?8:2);
+    const wob=n.sick*6;
+    n.x=HEADX()+Math.cos(n.a+t*.1)*n.r+Math.sin(n.ph)*wob;
+    n.y=HEADY+Math.sin(n.a+t*.1)*n.r*.8+Math.cos(n.ph)*wob;});
+  if(t<T_CUT){ // doomscroll phase
+    if(Math.random()<dt*6)feed.push({x:120,y:150+Math.random()*120,p:0,w:FEEDW[Math.floor(Math.random()*FEEDW.length)]});
+    if(Math.random()<dt*2.2){const h=neurons.filter(n=>n.sick<.5);if(h.length)h[Math.floor(Math.random()*h.length)].sick=1;}
+    sanity=Math.max(22,sanity-dt*3.6);dopamine=Math.min(96,dopamine+dt*4.2);falsif=Math.max(12,falsif-dt*3.2);
+  }else if(t<T_NATURE){ // withdrawal
+    if(t-dt<T_CUT)cutFlash=1;
+    dopamine=Math.max(30,dopamine-dt*6);
+    sanity=Math.min(40,sanity+dt*1.2);
+  }else{ // nature sync
+    if(Math.random()<dt*5)nature.push({x:W()-110,y:130+Math.random()*160,p:0,w:NATW[Math.floor(Math.random()*NATW.length)]});
+    if(Math.random()<dt*3.4){const s=neurons.filter(n=>n.sick>.5);if(s.length)s[Math.floor(Math.random()*s.length)].sick=0;}
+    sanity=Math.min(92,sanity+dt*3.4);dopamine=Math.max(14,dopamine-dt*2.4);falsif=Math.min(84,falsif+dt*3);
+  }
+  cutFlash=Math.max(0,cutFlash-dt*.8);
+  feed.forEach(p=>p.p+=dt*(t<T_CUT?1.1:2.5));
+  nature.forEach(p=>p.p+=dt*.9);
+  for(let i=feed.length-1;i>=0;i--)if(feed[i].p>=1)feed.splice(i,1);
+  for(let i=nature.length-1;i>=0;i--)if(nature[i].p>=1)nature.splice(i,1);
+}
+
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-4);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,6);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,6);
+  cx.fillStyle=col;cx.fillText(Math.round(val),x+w+6,y+6);
+}
+function bubble(x,y,text,col){
+  cx.font='11px Courier New';const w=cx.measureText(text).width+18;
+  const bx=Math.min(Math.max(x-w/2,8),W()-w-8);
+  cx.fillStyle='rgba(7,11,20,.92)';cx.strokeStyle=col;cx.lineWidth=1;
+  rrect(bx,y,w,24,4);cx.fill();cx.stroke();
+  cx.fillStyle=col;cx.fillText(text,bx+9,y+16);
+}
+function render(){
+  const w=W();cx.clearRect(0,0,w,H);
+  const inDoom=t<T_CUT, inNature=t>=T_NATURE;
+  // ---- left: phone / timeline ----
+  const phoneA=inDoom?1:Math.max(0,1-(t-T_CUT)/4);
+  if(phoneA>0){
+    cx.globalAlpha=phoneA;
+    cx.fillStyle='#0f1829';cx.strokeStyle=inDoom?'#ff2244':'#5a6f94';cx.lineWidth=1.5;
+    rrect(58,120,86,180,10);cx.fill();cx.stroke();
+    // scrolling angry rows
+    for(let i=0;i<7;i++){const yy=132+((i*26+t*46)%168);
+      cx.fillStyle=`rgba(255,${34+((i*40)%80)},68,.55)`;cx.fillRect(66,yy,70,9);}
+    cx.fillStyle='#ff2244';cx.font='9px Courier New';cx.fillText('TIMELINE',70,114);
+    if(inDoom){const gl=cx.createRadialGradient(101,210,10,101,210,150);
+      gl.addColorStop(0,'rgba(255,34,68,.16)');gl.addColorStop(1,'rgba(255,34,68,0)');
+      cx.fillStyle=gl;cx.fillRect(0,60,320,340);}
+    cx.globalAlpha=1;
+  }
+  if(cutFlash>0){ // link severed effect
+    cx.strokeStyle=`rgba(153,69,255,${cutFlash})`;cx.lineWidth=3;
+    cx.beginPath();cx.moveTo(160,205);cx.lineTo(HEADX()-90,190);cx.stroke();
+    cx.font='bold 13px Courier New';cx.fillStyle=`rgba(153,69,255,${cutFlash})`;
+    cx.fillText('✂ CONNECTION DROPPED',HEADX()-190,150);
+  }
+  // ---- right: nature (trees + waves) ----
+  const natA=inNature?Math.min(1,(t-T_NATURE)/3):(t>T_CUT?Math.min(.4,(t-T_CUT)/8):0);
+  if(natA>0){cx.globalAlpha=natA;
+    for(let i=0;i<4;i++){const tx=w-150+i*34,ty=260-i*14;
+      cx.fillStyle='#0f2a1e';cx.strokeStyle='#00ff88';cx.lineWidth=1;
+      cx.beginPath();cx.moveTo(tx,ty);cx.lineTo(tx-15,ty+48);cx.lineTo(tx+15,ty+48);cx.closePath();cx.fill();cx.stroke();
+      cx.strokeRect(tx-2,ty+48,4,10);}
+    // waves
+    cx.strokeStyle='rgba(0,212,255,.5)';cx.lineWidth=1.4;
+    for(let k=0;k<3;k++){cx.beginPath();
+      for(let x=w-210;x<w-20;x+=4)cx.lineTo(x,340+k*16+Math.sin(x*.06+t*2+k)*4);
+      cx.stroke();}
+    cx.fillStyle='#00ff88';cx.font='9px Courier New';cx.fillText('PHYSICAL REALITY',w-190,240);
+    cx.globalAlpha=1;}
+  // ---- person (center) ----
+  const mood=t<T_CUT?-1:(t<T_NATURE?0:1);
+  const px=HEADX(), py=330;
+  const col=mood>0?'#00ff88':(mood<0?'#ff6b2b':'#9945ff');
+  cx.strokeStyle=col;cx.lineWidth=2.6;cx.lineCap='round';
+  const bob=Math.sin(t*3)*(mood>0?3:1);
+  cx.beginPath();cx.moveTo(px,py-52+bob);cx.lineTo(px,py-14);cx.stroke(); // body
+  cx.beginPath();cx.moveTo(px,py-14);cx.lineTo(px-9,py);cx.moveTo(px,py-14);cx.lineTo(px+9,py);cx.stroke();
+  cx.beginPath();
+  if(mood<0){cx.moveTo(px,py-44);cx.lineTo(px-14,py-30);} // arm holding phone
+  else if(mood>0){cx.moveTo(px,py-44);cx.lineTo(px-11,py-56);cx.moveTo(px,py-44);cx.lineTo(px+11,py-56);}
+  else{cx.moveTo(px,py-44);cx.lineTo(px-8,py-30);cx.moveTo(px,py-44);cx.lineTo(px+8,py-30);}
+  cx.stroke();
+  cx.shadowBlur=10;cx.shadowColor=col;cx.fillStyle=col;
+  cx.beginPath();cx.arc(px,py-62+bob,9,0,7);cx.fill();cx.shadowBlur=0;
+  // ---- brain network ring above head ----
+  for(let i=0;i<neurons.length;i++)for(let j=i+1;j<neurons.length;j++){
+    const a=neurons[i],b=neurons[j],d=(a.x-b.x)**2+(a.y-b.y)**2;
+    if(d<70*70){const s=a.sick>.5||b.sick>.5;
+      cx.strokeStyle=s?'rgba(255,34,68,.28)':'rgba(0,212,255,.16)';cx.lineWidth=1;
+      cx.beginPath();cx.moveTo(a.x,a.y);cx.lineTo(b.x,b.y);cx.stroke();}}
+  neurons.forEach(n=>{const c=n.sick>.5?'#ff2244':(inNature?'#00ff88':'#00d4ff');
+    cx.shadowBlur=6;cx.shadowColor=c;cx.fillStyle=c;
+    cx.beginPath();cx.arc(n.x,n.y,3+Math.sin(n.ph)*.8,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='rgba(90,111,148,.6)';cx.font='9px Courier New';cx.textAlign='center';
+  cx.fillText('BRAIN OS',HEADX(),64);cx.textAlign='left';
+  // ---- packets ----
+  feed.forEach(p=>{const x=p.x+(HEADX()-60-p.x)*p.p,y=p.y+(HEADY-p.y)*p.p;
+    cx.fillStyle='#ff2244';cx.font='10px Courier New';cx.globalAlpha=1-p.p*.4;cx.fillText(p.w,x,y);cx.globalAlpha=1;});
+  nature.forEach(p=>{const x=p.x+(HEADX()+60-p.x)*p.p,y=p.y+(HEADY-p.y)*p.p;
+    cx.fillStyle='#00ff88';cx.font='10px Courier New';cx.globalAlpha=1-p.p*.3;cx.fillText(p.w,x,y);cx.globalAlpha=1;});
+  // thoughts
+  THOUGHTS.forEach(th=>{if(t>=th.t&&t<th.t+th.d)bubble(px,py+16,th.s,th.c);});
+  // clock + gauges
+  cx.fillStyle='#ffcc00';cx.font='bold 16px Courier New';cx.textAlign='center';cx.fillText('⏱ '+clock(),w/2,34);cx.textAlign='left';
+  gauge(20,H-46,130,'認知健全性',sanity,sanity<40?'#ff2244':'#00ff88');
+  gauge(200,H-46,130,'ドーパミン依存ループ',dopamine,dopamine>60?'#ff2244':'#9945ff');
+  gauge(380,H-46,130,'反証許容度',falsif,falsif<30?'#ff2244':'#00d4ff');
+  if(t<3.4){cx.globalAlpha=Math.min(1,t)*(t>2.4?(3.4-t):1);
+    cx.fillStyle='#9945ff';cx.font='bold 15px Courier New';cx.textAlign='center';
+    cx.fillText('COGNITIVE LOG — ある脳の24時間: 過学習からグラウンディングまで',w/2,H/2-6);
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('被験者: 匿名（架空） / 処方: ドロップアウト＋物理現実同期',w/2,H/2+16);cx.textAlign='left';cx.globalAlpha=1;}
+}
+const banner=document.getElementById('banner');
+function ui(){
+  banner.style.opacity=t<1.4?0:1;
+  if(t<T_CUT){banner.className='banner b1';banner.textContent='⚠ PHASE 01 — 過学習: タイムラインが脳の目的関数を書き換え中';}
+  else if(t<T_NATURE){banner.className='banner b2';banner.textContent='✂ PHASE 02 — ドロップアウト実行: 禁断症状を観測';}
+  else{banner.className='banner b3';banner.textContent='✓ PHASE 03 — グラウンディング: 一次情報に再同期中';}
+  document.getElementById('tfill').style.width=(t/DUR*100)+'%';
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();ui();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;feed.length=0;nature.length=0;
+  neurons.forEach(n=>n.sick=0);sanity=88;dopamine=20;falsif=70;cutFlash=0;
+  document.getElementById('endcard').classList.remove('on');document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

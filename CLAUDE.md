@@ -47,6 +47,12 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **T102（PAGE 5ビジュアル・ストーリーボード・直営）**: `docs/story/page5-storyboard.html` に全8シーンの画面モックを実装。本体未接続の独立レビュー資料として、上部タイムライン／左右キー／`?scene=0..7` で切替可能。既存のダーク・ターミナル調を継承し、P1〜4集約、平時比較、同一ショック、人物交換、因果診断、構造介入、再実験、監査ログ＋共有カードまで情報階層と演出指示を可視化。1440×1000のSCENE 00/02と390×844のSCENE 07をChromiumで目視し、横崩れなし。アプリ本体・公開ゲートは変更なし。
+- ✅ **T101（PAGE 5完成ストーリー設計・直営）**: `docs/story/page5-complete-story.md` に「同じ引き金、違う傷跡」の全8シーンを確定。平時比較→同一ショック→人物交換→攻撃面診断→構造介入→再実験までを、主要ja/en文言・分岐・共有カード・倫理境界・実装時の受け入れ条件込みで仕様化。元案の断定を「トリガーの責任は残るが、差を説明したのは攻撃面」へ精密化。実装ゲートは解除しない。旧Claude CodeプロンプトはGit未追跡を確認し、ignore済み `.local/claude-code-prompts/` へ移した。
+- ✅ **T100（ストーリー／プロモ素材の情報設計・直営）**: 散在していた素材を用途別に再編。PAGE 5候補と既存週次シナリオの対応を `docs/story/` に集約し、旧Claude Code実装依頼書はGit管理外のローカル資料として分離。完成済み30秒リール10本は `promo/campaigns/<企画名>/` に移し、各 `reel.html` とX投稿文 `post.md` を同居させた。長尺・生成器・重複コピーは `promo/archive/` に保存。録画スクリプトと文書参照を新パスへ同期し、全キャンペーンで動画と文言が揃うことをテストで固定。
+- ✅ **T99（X投稿直前キット・直営）**: 生成キービジュアルを背景に使った第5カード「壊れるのは、人ではなく、接続かもしれない」を追加し、`make promo-visuals` を5枚体制へ拡張。`make x-launch-kit` で固定ポスト動画＋キービジュアル＋PAGE 4図解＋全体構造図＋PAGE 2比較図＋予備カード＋投稿本文ガイドを `dist/x-launch-kit/` に番号順で集約する。`docs/x-launch-kit.md` に2〜3日間隔の投稿順、コピー可能な本文、投稿前チェックを収録。5枚を実生成して目視、7ファイルのパッケージ生成を確認。
+- ✅ **T98（プロモーションビジュアル4枚・直営）**: 既存の機能説明カードと役割を分け、Xで目を止める1200×675のキービジュアル・図解を `promo/promo-visuals.html` に4枚追加。①「社会は、壊れる前に兆候を出す」メイン告知 ②4ページの相互接続マップ ③PAGE 4「1000の声と6人の当事者」 ④PAGE 2「同じショック、違う結末」。`make promo-visuals` で `dist/promo-visuals/` に高精細PNGを生成し、Console/pageerror・寸法・最小ファイルサイズを自動検査。全4枚を実生成・目視確認し、実名/実在地域/政治記号ゼロ・免責表示を確認。
+- ✅ **T97（Xリール書き出し自動化・直営）**: `promo/campaigns/*/reel.html` の完成済み30秒リール10本を `make social-reels` で一括録画する `scripts/record-social-reels.mjs` を追加。420×740の映像面だけを録画し、手動操作用ボタンは自動除外。各動画ごとにConsole/pageerror・Canvas寸法・出力サイズ・動画寸法/長さを検査し、ffmpegがあればX向けMP4へ自動変換（なければWebM）。`--only page4-meeting` 形式の個別再録画にも対応。10本を `dist/social-reels/` へ実生成済み。人間作業はMP4のXアップロードだけに縮小。
 - ✅ **T94〜T96（インシデント対応・発信準備スプリント・Opus2件＋Sonnet1件＋直営）**: 月曜朝の3ワークフロー失敗（weekly-rotate/lighthouse/dependabot-auto-rebase）を**5連鎖の根本原因**まで掘って恒久対処。**T94=Opus委任38件目＋直営** ①classic保護がbotの直接pushを拒否（GH006） ②lighthouse checkout漏れ ③auto-rebase GH_REPO漏れ ④「ActionsはPR作成不可」設定 ⑤GITHUB_TOKENのPRはCI不発火＋botのPR実行は手動承認必須（承認APIはfork専用）＝**botのPR自動マージは完全自動化不可能と実証**。最終解=**classic保護→ruleset移行（id 18896897・人間はPR+CI green+linear history必須のまま）＋書き込みデプロイキー（secret WEEKLY_ROTATE_DEPLOY_KEY）でbotのみバイパス直接push**。検証: ローテrun green・latest.json W29回転・デプロイ成功・#119クローズ。**`make protect` は再実行禁止に改修**（実行するとローテが再び壊れる罠を潰した）。**T95=Sonnet委任14件目** learnings **IN-14〜18** 台帳化＋runbook §8「ブランチ保護とbot運用」＋CHANGELOG/PROGRESS/バックフィル帳簿。**T96=Opus委任39件目** X月曜告知 W02〜W05 下書き（⛔Web有効化までの投稿禁止ゲート付き）＋kpi-logレイヤー別比較表。受け入れ: check 36 green・warnゼロ。
 - ✅ **T93（週次補充・Opus委任1件）**: 週次シナリオ **2027-W02〜W05** の4週分補充＝PAGE 5 素材第4弾「同じ火/毒/洪水も、あらかじめ開いていた条件のある街だけを壊す」（監査系・W02=P1 断層×対立フレーム／W03=P2 予備削減／W04=P3 浅読み癖／W05=P4 開けた門）。在庫は **2027-W05 まで（30週）**。確立済みの完全委任運用（委任→到達可能性CI green→親レビュー→コミット）どおり。あわせて Dependabot PR の自動 rebase ワークフロー追加（`dependabot-auto-rebase.yml`・☐12 の恒久自動化）。Issues #118。
 - ✅ **T90〜T92（利用形態の説明・モバイル検証スプリント・Opus2件＋Sonnet1件＋直営）**: **T90=Opus** `web/faq.html`/`.en.html`＝「ブラウザ/PWA/ストア版（準備中）」の**正直な3形態比較**が核（週次・通知に触れないゲート遵守）＋データ保存/オフライン/研究利用。比較カード **card5**（「中身は同じ、起動のしかたを選ぶだけ」）で告知画像は計10枚。verify-pages に faq/404 追加・README 導線。**直営**: ≡メニューに「❓ よくある質問」（openAppPage('faq')・sw v6-366・DEVELOPMENT footer同期）。**T91=Sonnet** 帳簿＝CHANGELOG T85〜T89・バックフィル96 issues・learnings に IN-10/11。**T92=Opus** verify.mjs にモバイル 390×844 パス＝**4パス体制**（ブラウザ1回起動に最適化・分岐なし同一スモーク）。ユーザー側も ☐0/☐1/☐12 完了（Dependabot rebase 済み）。受け入れ: check 36 green・warn ゼロ→（本エントリ追記で T92 分の warn が再点灯=設計どおり）・4パス green・ページ検証 green・カード10枚生成・card5/FAQ 目視。
@@ -75,9 +81,9 @@
 
 - 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
 - **フェーズ1は完了。T1〜T38 のスプリント履歴と詳細は `PROGRESS.md` と `CHANGELOG.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
-- **T54 まで完了＝コーディング側の提案タスクは全消化**。アプリの入手経路: 今すぐ=ブラウザURL＋PWAインストール（≡メニュー「📲 アプリとして入れる」）／将来=ネイティブ（`docs/store-submission.md` のランブック、人間側 ☐4）。ポートフォリオ資産（ARCHITECTURE.en / cv-highlights.en / hero画像 / Issues バックフィル）は整備済み。次の主ボトルネックは人間側 TODO（☐11 gh 導入→`make gh-project`・☐9 計測有効化・☐5 リール投稿）と W43〜W50 の反応データ収集。週次在庫は 2027-W05（2027/2/1週）まで、`npm run check` が残り3週で警告する。
+- **T102 まで完了**。PAGE 5の完成ストーリーと全8シーンのビジュアル・ストーリーボードは設計済みだが、コード実装ゲートは未達のため保留。X向け30秒リール10本は `promo/campaigns/` で投稿文と対にして整理済み。次の主ボトルネックは人間側 TODO（☐9 計測サービスの有効化・☐5 生成済みMP4/画像のX投稿）と反応データ収集。週次在庫は 2027-W05（2027/2/1週）まで、`npm run check` が残り3週で警告する。
 - **GitHub Issues 運用（☐11 完了後）**: スプリント開始時にタスクを**英語で issue 起票**し、完了コミット末尾に `Closes #N`。委任タスクには `process:ai-subagent` ラベル。手順は `docs/github-project.md`。
-- **PAGE 5 / SWAP THE LEADER の投入判定**: design-note-page5.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
+- **PAGE 5 / SWAP THE LEADER の投入判定**: docs/story/page5-design-note.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
 ## ユーザーが手を動かす設定
 
@@ -89,4 +95,4 @@
 - **週次シナリオの Web 有効化（WEEKLY_ENABLED ガードの解除）**: ユーザー判断で保留（2026-07-10「十分に準備できたらやっていい」）。実施はユーザーの明示 OK を待つ。着手時は ①ガード解除（通知許可はネイティブ限定のまま） ②verify 3種 ③告知素材 card4/announce-post の解禁、をセットで。**それまで X 告知で週次に触れない**（見えない機能の宣伝＝嘘になる）。
 
 - フェーズ2: 共同カウンター(累積で守られた街の数)、週替わりの守り人署名、リモートプッシュ(APNs/FCM)、AWS拡張(API Gateway+Lambda+DynamoDB)。
-- SWAP THE LEADER 先行版 / PAGE 5「比較OS診断」フル実装。発動条件は別ノート `design-note-page5.md` に凍結済み（実名ゼロ・構造で語る・週替わりシナリオで小出しに検証してから）。
+- SWAP THE LEADER 先行版 / PAGE 5「比較OS診断」フル実装。発動条件は別ノート `docs/story/page5-design-note.md` に凍結済み（実名ゼロ・構造で語る・週替わりシナリオで小出しに検証してから）。

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 6人の会議に、外から1000の声が来た</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--orange:#ff6b2b;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px;background:#03060c;color:var(--text);font-family:'Courier New',monospace}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / PAGE 4物語版 / 無音で完結 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,clicked=false;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-6);cx.fillStyle='#172340';cx.fillRect(x,y,w,7);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.5;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function bubble(x,y,text,col){cx.font='bold 9px Courier New';const w=cx.measureText(text).width+16,bx=Math.max(7,Math.min(CW-w-7,x-w/2));cx.fillStyle='rgba(7,11,20,.94)';cx.strokeStyle=col;rrect(bx,y,w,23,4);cx.fill();cx.stroke();cx.fillStyle=col;cx.fillText(text,bx+8,y+15);}
+function stamp(text,col,a,y=446){cx.save();cx.translate(CW/2,y);cx.rotate(-.08);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=3;cx.font='bold 27px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+32;cx.strokeRect(-w/2,-26,w,43);cx.shadowBlur=20;cx.shadowColor=col;cx.fillText(text,0,5);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,627,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,646);cx.textAlign='left';}
+function flood(){return ss(8,14,t);}
+function weighted(){return t>=17;}
+function restore(){return ss(17,23,t);}
+function resultWeight(){if(!weighted())return 84-66*flood();return 18+70*restore();}
+function decision(){if(!weighted())return 18+72*flood();return 90-76*restore();}
+const locals=[];for(let i=0;i<6;i++)locals.push({a:i/6*Math.PI*2});
+const external=[];for(let i=0;i<18;i++)external.push({a:i/18*Math.PI*2,r:112+((i*13)%38)});
+function drawHeader(){cx.fillStyle='#ff6b2b';cx.font='bold 12px Courier New';cx.fillText('▶ PAGE 4 — DECISION WEIGHT',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('架空の会議シミュレーション',400,36);cx.textAlign='left';}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 21px Courier New';cx.fillText('6人の会議に、',CW/2,306);cx.fillStyle='#ff6b2b';cx.shadowBlur=17;cx.shadowColor='#ff6b2b';cx.fillText('外から1000の声が来た。',CW/2,346);cx.shadowBlur=0;if(t>1.1){cx.globalAlpha=ss(1.1,1.9,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('声の数だけで決めたら、誰の街になる？',CW/2,386);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawMeter(){const x=40,y=136,w=340,v=decision();cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('意思決定の行き先',x,y-8);cx.fillStyle='#172340';rrect(x,y,w,10,5);cx.fill();const g=cx.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#00ff88');g.addColorStop(1,'#ff6b2b');cx.globalAlpha=.35;cx.fillStyle=g;rrect(x,y,w,10,5);cx.fill();cx.globalAlpha=1;const nx=x+w*v/100;cx.fillStyle=v>55?'#ff6b2b':'#00ff88';cx.shadowBlur=8;cx.shadowColor=cx.fillStyle;cx.beginPath();cx.moveTo(nx,y-3);cx.lineTo(nx-6,y-13);cx.lineTo(nx+6,y-13);cx.closePath();cx.fill();cx.shadowBlur=0;cx.fillStyle='#00ff88';cx.font='8px Courier New';cx.fillText('◀ 雨漏り改修',x,y+26);cx.fillStyle='#ff6b2b';cx.textAlign='right';cx.fillText('勝敗ゲーム ▶',x+w,y+26);cx.textAlign='left';}
+function drawMeeting(){
+  drawHeader();drawMeter();gauge(40,208,250,'結果と接続する声の決定ウェイト',resultWeight(),resultWeight()<40?'#ff2244':'#00ff88');
+  const bx=CW/2,by=405,f=flood(),r=restore();cx.fillStyle='#0f1829';cx.strokeStyle='#172340';cx.beginPath();cx.ellipse(bx,by,64,28,0,0,7);cx.fill();cx.stroke();cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';cx.fillText('議題: 施設の雨漏りを直す？',bx,by+5);cx.textAlign='left';
+  locals.forEach((n,i)=>{const x=bx+Math.cos(n.a)*88,y=by+Math.sin(n.a)*48,col='#00ff88';cx.fillStyle=col;cx.shadowBlur=6;cx.shadowColor=col;cx.beginPath();cx.arc(x,y,4.5,0,7);cx.fill();cx.shadowBlur=0;const vol=weighted()?5+8*r:Math.max(2,10-7*f);cx.fillStyle='rgba(0,255,136,.65)';cx.fillRect(x-2,y-15-vol,4,vol);});
+  external.forEach((n,i)=>{const a=n.a+t*.35,rr=n.r-(weighted()?18*r:25*f),x=bx+Math.cos(a)*rr,y=by+Math.sin(a)*rr*.54,alpha=.2+.8*f*(weighted()?1-.65*r:1);cx.globalAlpha=alpha;cx.fillStyle='#ff6b2b';cx.shadowBlur=5;cx.shadowColor='#ff6b2b';cx.fillRect(x-3.5,y-3.5,7,7);cx.shadowBlur=0;const vol=weighted()?5:5+18*f*(.5+.5*Math.sin(t*6+i));cx.fillRect(x-2,y-12-vol,4,vol);cx.globalAlpha=1;});
+  if(t<8){bubble(210,277,'雨漏りの修理費を確認しよう','#00ff88');}
+  else if(!weighted()){bubble(95,275,'どっちが勝つ？','#ff6b2b');bubble(210,307,'もっと燃える案を！','#ff6b2b');bubble(330,275,'数字で決めよう！','#ff6b2b');}
+  else{bubble(95,275,'発言はそのまま残す','#00d4ff');bubble(210,307,'決定の重みだけ変更','#00d4ff');bubble(330,275,'結果との接続を反映','#00ff88');}
+  if(!weighted()){button(70,550,280,38,'▶ 結果との接続を重みに反映','#00d4ff',false);}else{button(70,550,280,38,'✓ 重みづけ変更 — 発言は消さない','#00d4ff',true);}
+  if(!weighted()&&f>.85&&t>14)stamp('目的が移動','#ff6b2b',Math.min(1,(t-14)*2));
+  if(weighted()&&t>21.5)stamp('目的を復元','#00ff88',Math.min(1,(t-21.5)*2));
+  if(t>14.5&&t<17)caption('声量で、生活課題が勝敗ゲームに変わった','#ff6b2b');
+  if(t>22&&t<25)caption('意見は残す。決定の重みを、結果へつなぐ。','#00ff88');
+  drawCursor();
+}
+function drawCursor(){if(t<8||t>21)return;const x=210,y=t<16.8?350+219*ss(8,16.8,t):569;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(x,y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;cx.beginPath();cx.arc(x,y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('変えたのは、発言権ではない。',CW/2,220);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 18px Courier New';cx.fillText('意思決定の重みづけだった。',CW/2,264);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,326,320,164,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,326,320,164,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,362);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,388);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,418);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ その声は、結果とつながっている？',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}if(t>=16.8&&!clicked){clickPulse=1;clicked=true;}clickPulse=Math.max(0,clickPulse-dt*2.8);}
+function render(){cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();if(t<3)drawHook();else if(t<25)drawMeeting();else drawEnd();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※架空の会議です。特定の人物・地域・意見を描いたものではありません',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#ff6b2b');g.addColorStop(.55,'#00d4ff');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;clicked=false;clickPulse=0;last=performance.now();document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

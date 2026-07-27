@@ -12,7 +12,7 @@
   忠実性: card2/card3 のインストール手順は web/index.html の pwaInstallModal（pwa_body, ja/en）の実文言と一致させている。
     - iPhone/iPad（Safari）: 共有ボタン（□に↑）→「ホーム画面に追加」
     - Android（Chrome）: メニュー（⋮）→「アプリをインストール」
-    - PC（Chrome / Edge）: アドレスバー右端のインストールアイコン、またはメニュー→「インストール」
+    - PC / Chromebook（Chrome / Edge）: アドレスバー右端のインストールアイコン、またはメニュー→「インストール」
   card4 は content/weekly/2026-W51.json の実タイトル（ja/en とも実物を転記）を例示。
   card5 は「ブラウザ／PWA／ストア」の3形態の違い（ストアは準備中＝機能差は書かない）。faq.html と整合。
   en の免責1行は reel-30s.html / classroom.en.html の既存文言を流用（新造しない）。
@@ -139,18 +139,18 @@
 
 <!-- ══════════ CARD 1 — メイン告知 ══════════ -->
 <section class="card" id="card1">
-  <div class="kicker"><span class="dot"></span><span data-en="Social Debugger / free · no sign-up">Social Debugger / 無料・登録なし</span></div>
+  <div class="kicker"><span class="dot"></span><span data-en="60-second social experiment / free · no sign-up">60秒の社会実験 / 無料・登録なし</span></div>
   <div style="height:26px"></div>
   <div class="brand" data-en="SOCIAL DEBUGGER">社会デバッガー</div>
   <div style="height:22px"></div>
-  <h1 data-en="A free society simulator<br>that lives on your home screen">ホーム画面に置ける、<br>無料の社会シミュレーター</h1>
+  <h1 data-en="Where does a society<br>begin to break?">社会は、<br>どこから壊れる？</h1>
   <div style="height:24px"></div>
-  <p class="tagline" data-en="Will your town survive?">あなたの街は、生き残れるか。</p>
+  <p class="tagline" data-en="Move the parameters. Watch the structure answer.">パラメータを動かす。構造が答える。</p>
   <div class="spacer"></div>
   <div class="chips">
     <span class="chip on" data-en="No sign-up">登録なし</span>
     <span class="chip on" data-en="Works offline">オフラインでも動く</span>
-    <span class="chip" data-en="60 seconds in your browser">ブラウザで60秒</span>
+    <span class="chip" data-en="Four layers to debug">4つの崩壊レイヤー</span>
   </div>
   <div style="height:26px"></div>
   <div class="urlbox"><span class="run">▶</span> larai-w.github.io/social-system-debugger</div>
@@ -158,50 +158,38 @@
 
 <!-- ══════════ CARD 2 — iPhone / iPad 手順 ══════════ -->
 <section class="card" id="card2">
-  <div class="kicker"><span class="dot"></span><span data-en="iPhone / iPad (Safari)">iPhone / iPad（Safari）で入れる</span></div>
+  <div class="kicker"><span class="dot"></span><span data-en="Install on your phone">スマホに入れる</span></div>
   <div style="height:18px"></div>
-  <h1 style="font-size:46px" data-en="Home screen, in 3 taps">ホーム画面に、3タップで</h1>
-  <div style="height:34px"></div>
-  <div class="steps">
-    <div class="step">
-      <div class="num">1</div>
-      <div class="iconrow"><span class="glyph">🧭</span></div>
-      <div class="st" data-en="Open in <b>Safari</b>"><b>Safari</b> で開く</div>
-      <div class="sub" data-en="Enter the URL above in Safari's address bar">上のURLを Safari のアドレスバーに入力</div>
-    </div>
-    <div class="arrow">→</div>
-    <div class="step">
-      <div class="num">2</div>
-      <div class="ios-share"><span class="box"></span><span class="arw"></span></div>
-      <div class="st" data-en="Tap the <b>Share</b> button"><b>共有ボタン</b>を押す</div>
-      <div class="sub" data-en="The box-with-↑ icon (bottom or top of screen)">□に↑ のアイコン（画面下または上）</div>
-    </div>
-    <div class="arrow">→</div>
-    <div class="step">
-      <div class="num">3</div>
-      <div class="iconrow"><span class="glyph">➕</span></div>
-      <div class="st" data-en="Choose &quot;<b>Add to Home Screen</b>&quot;">「<b>ホーム画面に追加</b>」を選ぶ</div>
-      <div class="sub" data-en="Launches full-screen · works offline">全画面で起動・オフラインでも動く</div>
-    </div>
-  </div>
-  <div class="spacer"></div>
-  <div class="footer" data-en="No sign-up, no cost. Launch it like an app from the home screen icon.">登録・料金は不要。ホーム画面のアイコンから、アプリのように起動します。</div>
-</section>
-
-<!-- ══════════ CARD 3 — Android / PC 手順 ══════════ -->
-<section class="card" id="card3">
-  <div class="kicker"><span class="dot"></span><span data-en="Install on Android / PC">Android / PC で入れる</span></div>
-  <div style="height:18px"></div>
-  <h1 style="font-size:46px" data-en="On your phone, on your PC">スマホでも、パソコンでも</h1>
+  <h1 style="font-size:46px" data-en="iPhone or Android — both work">iPhone でも、Android でも</h1>
   <div style="height:34px"></div>
   <div class="rows">
+    <div class="rowline">
+      <div class="tag">iPhone</div>
+      <div class="body" data-en="Safari <em>Share</em> (box with ↑) → &quot;<b>Add to Home Screen</b>&quot;">Safari の<em>共有</em>（□に↑）→「<b>ホーム画面に追加</b>」</div>
+    </div>
     <div class="rowline">
       <div class="tag">Android</div>
       <div class="body" data-en="Chrome Menu (<em>⋮</em>) → &quot;<b>Install app</b>&quot;">Chrome のメニュー（<em>⋮</em>）→「<b>アプリをインストール</b>」</div>
     </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="footer" data-en="No sign-up or payment. You can also keep using it directly in the browser.">登録・料金は不要。入れずにブラウザでそのまま使うこともできます。</div>
+</section>
+
+<!-- ══════════ CARD 3 — Android / PC 手順 ══════════ -->
+<section class="card" id="card3">
+  <div class="kicker"><span class="dot"></span><span data-en="Use it on PC / Chromebook">PC / Chromebook で使う</span></div>
+  <div style="height:18px"></div>
+  <h1 style="font-size:46px" data-en="Open it now. Install if you like.">そのまま開く。気に入ったら入れる。</h1>
+  <div style="height:34px"></div>
+  <div class="rows">
     <div class="rowline">
-      <div class="tag">PC</div>
-      <div class="body" data-en="The <b>install icon</b> (<em>⊕</em>) at the right end of the Chrome / Edge address bar, or Menu → &quot;<b>Install</b>&quot;">Chrome / Edge のアドレスバー右端の<b>インストールアイコン</b>（<em>⊕</em>）、またはメニュー→「<b>インストール</b>」</div>
+      <div class="tag">Browser</div>
+      <div class="body" data-en="Open the URL in <b>Chrome / Edge</b>. Nothing to install."><b>Chrome / Edge</b> でURLを開くだけ。インストール不要。</div>
+    </div>
+    <div class="rowline">
+      <div class="tag">Install</div>
+      <div class="body" data-en="Use the <b>install icon</b> at the right end of the address bar, or Menu → &quot;<b>Install</b>&quot;">アドレスバー右端の<b>インストールアイコン</b>、またはメニュー→「<b>インストール</b>」</div>
     </div>
   </div>
   <div style="height:30px"></div>

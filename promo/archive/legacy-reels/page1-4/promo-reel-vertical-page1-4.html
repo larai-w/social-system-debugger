@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>社会デバッガー — PAGE 1〜4・60秒完全版</title>
+<style>
+:root{--bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--yel:#ffcc00;--pur:#9945ff;--txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#03060c;color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px}
+.frame{position:relative;width:min(96vw,420px)}
+.stage{position:relative;border:1px solid var(--bdr);border-radius:6px;background:var(--bg0);overflow:hidden}
+#cv{width:100%;display:block}
+.ctrl{display:flex;gap:8px;margin-top:10px;justify-content:center}
+.btn{padding:7px 16px;background:var(--bg2);border:1px solid var(--bdr);border-radius:3px;color:var(--muted);font-family:inherit;font-size:.64rem;cursor:pointer;letter-spacing:.1em}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;font-size:.55rem;color:var(--muted);text-align:center;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">PAGE 1〜4・60秒完全版（4つの実験 / 縦型9:16）— 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420, CH=740;
+const cv=document.getElementById('cv'), cx=cv.getContext('2d');
+function fit(){const r=cv.parentElement.getBoundingClientRect();const s=r.width/CW;
+  cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;
+  cv.style.height=(CH*s)+'px';
+  cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+
+// ============ timeline ============
+// 0-3 hook / 3-15 PAGE1 / 15-27 PAGE2 / 27-39 PAGE3 / 39-51 PAGE4 / 51-60 conclusion+CTA
+const DUR=60;
+let t=0, playing=true, last=performance.now(), ended=false;
+
+// ============ helpers ============
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';cx.lineWidth=1;
+  for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}
+  for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function panelHeader(title,color){
+  cx.fillStyle=color;cx.font='bold 13px Courier New';cx.fillText(title,22,40);
+  cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(22,50);cx.lineTo(CW-22,50);cx.stroke();
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='right';
+  cx.fillText('社会デバッガー v6',CW-22,40);cx.textAlign='left';
+}
+function slider(x,y,w,label,val,col,active){
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText(label,x,y-8);
+  cx.fillStyle='#172340';rrect(x,y,w,8,4);cx.fill();
+  cx.fillStyle=col;rrect(x,y,Math.max(6,w*val/100),8,4);cx.fill();
+  const hx=x+w*val/100;
+  cx.shadowBlur=active?12:5;cx.shadowColor=col;cx.fillStyle='#fff';
+  cx.beginPath();cx.arc(hx,y+4,active?8:6,0,7);cx.fill();cx.shadowBlur=0;
+  cx.fillStyle=col;cx.font='bold 11px Courier New';cx.textAlign='right';
+  cx.fillText(Math.round(val)+'%',x+w+34,y+9);cx.textAlign='left';
+  return {hx,hy:y+4};
+}
+function gauge(x,y,w,label,val,col){
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText(label,x,y-5);
+  cx.fillStyle='#172340';cx.fillRect(x,y,w,7);
+  cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,7);
+  cx.fillStyle=col;cx.font='bold 10px Courier New';cx.fillText(Math.round(val),x+w+8,y+7);
+}
+function bigBtn(x,y,w,h,label,col,pressed){
+  cx.fillStyle=pressed?col:'rgba(15,24,41,1)';cx.strokeStyle=col;cx.lineWidth=1.5;
+  rrect(x,y,w,h,4);cx.fill();cx.stroke();
+  cx.fillStyle=pressed?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';
+  cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';
+}
+function stamp(text,col,scale){
+  cx.save();cx.translate(CW/2,CH/2-40);cx.rotate(-.09);cx.scale(scale,scale);
+  cx.globalAlpha=Math.min(1,scale);
+  cx.strokeStyle=col;cx.lineWidth=3;cx.fillStyle=col;
+  cx.font='bold 34px Courier New';cx.textAlign='center';
+  const w=cx.measureText(text).width+40;
+  cx.strokeRect(-w/2,-32,w,52);
+  cx.shadowBlur=24;cx.shadowColor=col;cx.fillText(text,0,6);cx.shadowBlur=0;
+  cx.restore();cx.globalAlpha=1;cx.textAlign='left';
+}
+function caption(text,y,col){
+  cx.font='bold 13px Courier New';cx.textAlign='center';
+  cx.fillStyle='rgba(7,11,20,.85)';const w=cx.measureText(text).width+24;
+  rrect(CW/2-w/2,y-16,w,26,4);cx.fill();
+  cx.fillStyle=col;cx.fillText(text,CW/2,y+2);cx.textAlign='left';
+}
+
+// ============ ghost cursor keyframes ============
+// per-chapter local coords defined in draw functions via computed positions
+let cursor={x:CW/2,y:CH-60}, clickPulse=0;
+const KF=[]; // {t,x,y,click}
+function addKF(tt,x,y,click){KF.push({t:tt,x,y,click:!!click});}
+// PAGE1: compare a closed information space with a verifiable one
+addKF(3.4,118,141);addKF(4.3,118,141,true);
+addKF(8.6,302,141);addKF(9.2,302,141,true);
+// PAGE2: concentration slider, strategy toggle, and two shocks
+addKF(15.4,52+280*0.30,204);addKF(18,52+280*0.95,204);
+addKF(18.4,248,285,true);
+addKF(19.5,CW/2,566,true);
+addKF(22.3,52+280*0.95,204);addKF(23.5,52+280*0.45,204);
+addKF(24,CW/2,566,true);
+// PAGE3: slider (40,210) drag 10->92; dropout btn (CW/2,560)
+addKF(27.4,52+280*0.10,214);addKF(30.1,52+280*0.92,214);
+addKF(33.1,CW/2,566,true);
+// PAGE4: slider (40,210) 5->90; filter toggle btn
+addKF(39.4,52+280*0.05,214);addKF(42.1,52+280*0.90,214);
+addKF(45.1,CW/2,566,true);
+function cursorAt(tt){
+  if(!KF.length)return;
+  let a=KF[0],b=KF[KF.length-1];
+  for(let i=0;i<KF.length-1;i++)if(tt>=KF[i].t&&tt<=KF[i+1].t){a=KF[i];b=KF[i+1];break;}
+  if(tt<KF[0].t){cursor.x=KF[0].x;cursor.y=KF[0].y;return;}
+  if(tt>b.t){cursor.x=b.x;cursor.y=b.y;return;}
+  const p=ss(a.t,b.t,tt);
+  cursor.x=a.x+(b.x-a.x)*p;cursor.y=a.y+(b.y-a.y)*p;
+}
+let lastClickT=-1;
+function checkClicks(){KF.forEach(k=>{if(k.click&&t>=k.t&&lastClickT<k.t){clickPulse=1;lastClickT=k.t;}});clickPulse=Math.max(0,clickPulse-0.04);}
+function drawCursor(){
+  if(t<3||t>50.5)return;
+  cx.shadowBlur=14;cx.shadowColor='#fff';
+  cx.strokeStyle='#fff';cx.lineWidth=2;
+  cx.beginPath();cx.arc(cursor.x,cursor.y,9,0,7);cx.stroke();
+  cx.fillStyle='rgba(255,255,255,.85)';cx.beginPath();cx.arc(cursor.x,cursor.y,3.5,0,7);cx.fill();
+  cx.shadowBlur=0;
+  if(clickPulse>0){cx.strokeStyle=`rgba(0,212,255,${clickPulse})`;
+    cx.beginPath();cx.arc(cursor.x,cursor.y,10+26*(1-clickPulse),0,7);cx.stroke();}
+}
+
+// ============ chapter state ============
+let shake=0;
+function p1_closed(){return t>=4.3&&t<9.2;}
+function p1_verify(){return t>=9.2;}
+function val_p1_filter(){
+  if(t<4.3)return 46;if(t<5)return 46+42*ss(4.3,5,t);
+  if(t<9.2)return 88;if(t<10)return 88-70*ss(9.2,10,t);return 18;}
+function val_p1_public(){
+  if(t<4.3)return 55;if(t<5)return 55-43*ss(4.3,5,t);
+  if(t<9.2)return 12;if(t<10)return 12+78*ss(9.2,10,t);return 90;}
+function val_p2_agg(){ // 集約化率
+  if(t<15.4)return 30;if(t<18)return 30+65*ss(15.4,18,t);
+  if(t<22.3)return 95;if(t<23.5)return 95-50*ss(22.3,23.5,t);return 45;}
+function p2_shock1(){return t>=19.5&&t<22.3;}
+function p2_shock2(){return t>=24&&t<27;}
+function val_p3_sns(){if(t<27.4)return 10;if(t<30.1)return 10+82*ss(27.4,30.1,t);return 92;}
+function p3_drop(){return t>=33.1;}
+function val_p4_ext(){if(t<39.4)return 5;if(t<42.1)return 5+85*ss(39.4,42.1,t);return 90;}
+function p4_filter(){return t>=45.1;}
+
+// ============ page drawings ============
+function chapterCard(n,title,sub,col,t0){
+  const a=Math.min(1,(t-t0)*2)*(t<t0+1.6?1:Math.max(0,1-(t-t0-1.6)*2));
+  if(a<=0)return;
+  cx.fillStyle=`rgba(7,11,20,${.9*a})`;cx.fillRect(0,0,CW,CH);
+  cx.globalAlpha=a;cx.textAlign='center';
+  cx.fillStyle=col;cx.font='bold 15px Courier New';
+  cx.fillText('PAGE '+n,CW/2,CH/2-34);
+  cx.font='bold 19px Courier New';cx.fillText(title,CW/2,CH/2);
+  cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText(sub,CW/2,CH/2+28);
+  cx.textAlign='left';cx.globalAlpha=1;
+}
+
+const infoNodes=[];
+for(let i=0;i<20;i++)infoNodes.push({a:i/20*Math.PI*2,r:60+((i*19)%42),open:i%5===0});
+function drawPage1(){
+  panelHeader('▸ PAGE 1 — 情報空間シミュレーター','#00d4ff');
+  const closed=p1_closed(), verify=p1_verify();
+  const filter=val_p1_filter(), publicness=val_p1_public();
+  const disorder=closed?Math.min(88,24+(t-4.3)*18):(verify?Math.max(16,88-(t-9.2)*22):24);
+  const doubt=closed?Math.min(80,14+(t-4.3)*17):(verify?Math.max(10,80-(t-9.2)*23):14);
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('同じ街に、2つの情報条件',30,104);
+  bigBtn(30,120,175,30,'閉じた情報空間','#ff2244',closed);
+  bigBtn(215,120,175,30,'確かめる情報空間','#00ff88',verify);
+  slider(40,205,280,'情報フィルタリング率',filter,'#ff6b2b',t>4&&t<5.2||t>9&&t<10.2);
+  gauge(40,276,250,'意思決定の公共性',publicness,publicness<40?'#ff2244':'#00ff88');
+  gauge(40,316,250,'情報空間の無秩序度',disorder,disorder>55?'#ff2244':'#00ff88');
+  gauge(40,356,250,'疑心・認知負荷',doubt,doubt>50?'#ff2244':'#00d4ff');
+  const bx=CW/2,by=482;
+  for(let i=0;i<infoNodes.length;i++)for(let j=i+1;j<infoNodes.length;j+=5){
+    const a=infoNodes[i],b=infoNodes[j];
+    const ax=bx+Math.cos(a.a+t*.18)*a.r,ay=by+Math.sin(a.a+t*.18)*a.r*.58;
+    const bx2=bx+Math.cos(b.a+t*.18)*b.r,by2=by+Math.sin(b.a+t*.18)*b.r*.58;
+    cx.strokeStyle=closed&&!a.open?'rgba(255,34,68,.20)':'rgba(0,212,255,.12)';
+    cx.beginPath();cx.moveTo(ax,ay);cx.lineTo(bx2,by2);cx.stroke();}
+  infoNodes.forEach((node,i)=>{
+    const x=bx+Math.cos(node.a+t*.18)*node.r,y=by+Math.sin(node.a+t*.18)*node.r*.58;
+    const col=verify&&node.open?'#00ff88':(closed&&!node.open?'#ff2244':'#00d4ff');
+    const wob=closed&&!node.open?Math.sin(t*10+i)*4:0;
+    cx.shadowBlur=7;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(x+wob,y,3.6,0,7);cx.fill();cx.shadowBlur=0;});
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';
+  cx.fillText('情報ネットワーク（緑=外部検証 / 赤=閉ループ）',bx,588);cx.textAlign='left';
+  if(closed&&t>6.1)stamp('閉ループ化','#ff2244',Math.min(1,(t-6.1)*2));
+  if(verify&&t>10.8)stamp('再検証可能','#00ff88',Math.min(1,(t-10.8)*2));
+  if(t>6.6&&t<9.2)caption('外の声を閉じる → 内側の無秩序が増幅',640,'#ff2244');
+  if(t>11.2&&t<15)caption('確かめる経路を戻す → 同じ街が安定',640,'#00ff88');
+  chapterCard(1,'情報空間','変えたのは、誰かではなく条件だけ','#00d4ff',3);
+}
+
+function drawPage2(){
+  panelHeader('▸ PAGE 2 — 地域インフラ・シミュレーター','#00d4ff');
+  const agg=val_p2_agg();
+  const buf=Math.max(8,100-agg*0.93);
+  slider(40,200,280,'インフラ集約化率（効率を上げる）',agg,'#00d4ff',t>15.3&&t<18.2||t>22.2&&t<23.7);
+  // greedy toggle
+  const greedy=t>=18.4&&t<22.6;
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('予算戦略',40,282);
+  bigBtn(95,272,95,26,'長期最適',greedy?'#172340':'#00ff88',!greedy&&t>22.6);
+  bigBtn(200,272,95,26,'短期最適',greedy?'#ff6b2b':'#172340',greedy);
+  // gauges
+  gauge(40,346,250,'冗長性バッファ',buf,buf<30?'#ff2244':'#00ff88');
+  gauge(40,386,250,'平時コスト効率',30+agg*0.68,'#00d4ff');
+  if(buf<30){cx.fillStyle='#ff2244';cx.font='bold 10px Courier New';
+    cx.fillText('⚠ バッファ30%未満 — ショック一撃で崩壊圏',40,420);}
+  // mini city
+  const cy=470, hubAlive=!(p2_shock1());
+  for(let i=0;i<6;i++){const bx=70+i*48;
+    const lit=p2_shock1()?Math.max(0,1-(t-19.5-i*.28)):(p2_shock2()&&i>3?.5:1);
+    cx.strokeStyle='#172340';cx.fillStyle='#0f1829';cx.fillRect(bx-10,cy-24,20,24);cx.strokeRect(bx-10,cy-24,20,24);
+    cx.fillStyle=lit>.5?`rgba(0,212,255,${.5*lit})`:'rgba(255,34,68,.3)';
+    cx.fillRect(bx-6,cy-19,4,5);cx.fillRect(bx+2,cy-19,4,5);cx.fillRect(bx-6,cy-10,4,5);cx.fillRect(bx+2,cy-10,4,5);
+    cx.strokeStyle=lit>.5?'rgba(0,212,255,.25)':'rgba(255,34,68,.2)';
+    cx.beginPath();cx.moveTo(bx,cy);cx.lineTo(CW/2,cy+34);cx.stroke();}
+  if(hubAlive||t<19.5||t>=22.3){const hcol=agg>70?'#00d4ff':'#00ff88';
+    cx.shadowBlur=12;cx.shadowColor=hcol;cx.fillStyle=hcol;
+    cx.beginPath();cx.arc(CW/2,cy+34,10,0,7);cx.fill();cx.shadowBlur=0;}
+  else{cx.strokeStyle='#ff2244';cx.lineWidth=2;
+    cx.beginPath();cx.arc(CW/2,cy+34,10,0,7);cx.stroke();
+    cx.beginPath();cx.moveTo(CW/2-7,cy+27);cx.lineTo(CW/2+7,cy+41);cx.moveTo(CW/2+7,cy+27);cx.lineTo(CW/2-7,cy+41);cx.stroke();}
+  // shock button
+  const pressed=(t>=19.5&&t<19.9)||(t>=24&&t<24.4);
+  bigBtn(CW/2-110,550,220,32,'⚡ 環境ショックを注入','#ffcc00',pressed);
+  // results
+  if(p2_shock1()&&t>20.2)stamp('CRASHED','#ff2244',Math.min(1,(t-20.2)*2));
+  if(p2_shock2()&&t>24.7)stamp('SURVIVED','#00ff88',Math.min(1,(t-24.7)*2));
+  if(t>20.8&&t<22.3)caption('集約95%×短期最適 → 単一障害から連鎖停止',640,'#ff2244');
+  if(t>25&&t<27)caption('余力を残す → 同じショックを吸収',640,'#00ff88');
+  chapterCard(2,'地域インフラ','効率と生存は、同じ意味じゃない','#00d4ff',15);
+}
+
+function drawPage3(){
+  panelHeader('▸ PAGE 3 — 認知回復シミュレーター','#9945ff');
+  const sns=val_p3_sns(), drop=p3_drop();
+  const sanity=drop?Math.min(90,30+(t-33.1)*18):Math.max(30,95-sns*0.72);
+  const falsif=drop?Math.min(85,20+(t-33.1)*19):Math.max(18,85-sns*0.74);
+  slider(40,210,280,'タイムライン接続時間 / 日',sns,'#ff6b2b',t>27.3&&t<30.3);
+  cx.fillStyle='#ff6b2b';cx.font='10px Courier New';
+  cx.fillText(Math.round(sns*0.18)+' 時間/日',40,244);
+  gauge(40,296,250,'認知健全性',sanity,sanity<45?'#ff2244':'#00ff88');
+  gauge(40,336,250,'反証許容度（違う意見を聞ける力）',falsif,falsif<35?'#ff2244':'#00d4ff');
+  if(!drop&&sns>70){cx.fillStyle='#ff2244';cx.font='bold 10px Courier New';
+    const bl=Math.sin(t*8)>0;if(bl)cx.fillText('⚠ 過学習検出 — エコーチェンバー形成中',40,372);}
+  // brain ring viz
+  const bx=CW/2,by=468;
+  for(let i=0;i<16;i++){const a=i/16*Math.PI*2+t*.3;
+    const sick=!drop&&sns>40&&(i%3!==0||sns>75);
+    const wob=sick?Math.sin(t*9+i)*5:Math.sin(t*2+i)*2;
+    const nx=bx+Math.cos(a)*(62+wob),ny=by+Math.sin(a)*(46+wob);
+    const col=sick?'#ff2244':(drop?'#00ff88':'#00d4ff');
+    for(let j=i+1;j<16;j+=5){const a2=j/16*Math.PI*2+t*.3;
+      cx.strokeStyle=sick?'rgba(255,34,68,.16)':'rgba(0,212,255,.12)';
+      cx.beginPath();cx.moveTo(nx,ny);cx.lineTo(bx+Math.cos(a2)*62,by+Math.sin(a2)*46);cx.stroke();}
+    cx.shadowBlur=6;cx.shadowColor=col;cx.fillStyle=col;
+    cx.beginPath();cx.arc(nx,ny,3.4,0,7);cx.fill();cx.shadowBlur=0;}
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';
+  cx.fillText('BRAIN OS',bx,by+72);cx.textAlign='left';
+  const pressed=t>=33.1&&t<33.6;
+  bigBtn(CW/2-110,550,220,32,'✂ 一時切断して再同期','#00ff88',pressed||drop);
+  if(!drop&&sns>85&&t>30.8)stamp('過学習','#ff2244',Math.min(1,(t-30.8)*2));
+  if(drop&&t>34.3)stamp('再同期','#00ff88',Math.min(1,(t-34.3)*2));
+  if(t>30.5&&t<33.1)caption('接続16時間 → 反証を受け付けない状態へ',640,'#ff2244');
+  if(t>34.6&&t<39)caption('一度切断 → 現実と再同期して回復',640,'#00ff88');
+  chapterCard(3,'認知回復','壊れているのは社会か、視界か','#9945ff',27);
+}
+
+function drawPage4(){
+  panelHeader('▸ PAGE 4 — ステークホルダー非対称性','#ff6b2b');
+  const ext=val_p4_ext(), fil=p4_filter();
+  const ratio=fil?Math.min(92,18+(t-45.1)*20):Math.max(14,95-ext*0.9);
+  slider(40,210,280,'外部ノード流入量（結果と接続しない声）',ext,'#ff6b2b',t>39.3&&t<42.3);
+  gauge(40,286,250,'当事者コミット比率',ratio,ratio<40?'#ff2244':'#00ff88');
+  // decision meter
+  cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('意思決定の行き先',40,346);
+  cx.fillStyle='#172340';rrect(40,356,280,12,6);cx.fill();
+  const mval=fil?Math.max(10,90-(t-45.1)*34):Math.min(90,10+ext*0.92);
+  const g=cx.createLinearGradient(40,0,320,0);g.addColorStop(0,'#00ff88');g.addColorStop(1,'#ff6b2b');
+  cx.globalAlpha=.3;cx.fillStyle=g;rrect(40,356,280,12,6);cx.fill();cx.globalAlpha=1;
+  const nx2=40+280*mval/100;
+  cx.fillStyle=mval>55?'#ff6b2b':'#00ff88';cx.shadowBlur=8;cx.shadowColor=cx.fillStyle;
+  cx.beginPath();cx.moveTo(nx2,352);cx.lineTo(nx2-6,342);cx.lineTo(nx2+6,342);cx.closePath();cx.fill();cx.shadowBlur=0;
+  cx.font='9px Courier New';cx.fillStyle='#00ff88';cx.fillText('◀ 生活の課題',40,384);
+  cx.fillStyle='#ff6b2b';cx.textAlign='right';cx.fillText('勝敗ゲーム ▶',320,384);cx.textAlign='left';
+  // swarm viz: center table + orbiting external squares
+  const bx=CW/2,by=468;
+  cx.strokeStyle='#172340';cx.fillStyle='#0f1829';
+  cx.beginPath();cx.ellipse(bx,by,58,26,0,0,7);cx.fill();cx.stroke();
+  for(let i=0;i<5;i++){const a=i/5*Math.PI*2;
+    cx.shadowBlur=6;cx.shadowColor='#00ff88';cx.fillStyle='#00ff88';
+    cx.beginPath();cx.arc(bx+Math.cos(a)*66,by+Math.sin(a)*30,4,0,7);cx.fill();cx.shadowBlur=0;}
+  const swn=Math.round(ext/6);
+  for(let i=0;i<swn;i++){const a=i/Math.max(1,swn)*Math.PI*2+t*(fil?2.4:0.8);
+    const rr=fil?95+(t-45.1)*64+i*4:95+Math.sin(t*3+i)*6;
+    const sx2=bx+Math.cos(a)*rr,sy2=by+Math.sin(a)*rr*.5;
+    if(sx2<10||sx2>CW-10||sy2<400)continue;
+    cx.globalAlpha=fil?Math.max(0,1-(t-45.1)*.55):1;
+    cx.shadowBlur=5;cx.shadowColor='#ff6b2b';cx.fillStyle='#ff6b2b';
+    cx.fillRect(sx2-3.5,sy2-3.5,7,7);cx.shadowBlur=0;cx.globalAlpha=1;}
+  cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.textAlign='center';
+  cx.fillText('会議室（緑=結果と接続 / 橙=外部ゲーム）',bx,by+66);cx.textAlign='left';
+  const pressed=t>=45.1&&t<45.6;
+  bigBtn(CW/2-120,550,240,32,'🛡 結果接続フィルター ON','#00d4ff',pressed||fil);
+  if(!fil&&ext>80&&t>43)stamp('HIJACKED','#ff6b2b',Math.min(1,(t-43)*2));
+  if(fil&&t>46.2)stamp('目的関数 復元','#00ff88',Math.min(1,(t-46.2)*2));
+  if(t>43.3&&t<45.1)caption('声の多さで、街の目的が書き換わった',640,'#ff6b2b');
+  if(t>46.8&&t<51)caption('結果との接続を、重みに戻す',640,'#00ff88');
+  chapterCard(4,'ステークホルダー非対称性','その声は、結果を引き受けるのか','#ff6b2b',39);
+}
+
+// ============ hook & conclusion ============
+function drawHook(){
+  cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();
+  const gl=Math.random()<.12&&t<3.2;
+  cx.textAlign='center';
+  cx.fillStyle='#00d4ff';cx.font='bold 22px Courier New';
+  const ox=gl?(Math.random()-.5)*8:0;
+  cx.shadowBlur=20;cx.shadowColor='#00d4ff';
+  cx.fillText('もし、社会を',CW/2+ox,CH/2-46);
+  cx.fillText('"デバッグ"できたら？',CW/2-ox,CH/2-12);
+  cx.shadowBlur=0;
+  if(gl){cx.fillStyle='rgba(255,34,68,.5)';cx.fillText('"デバッグ"できたら？',CW/2-ox+3,CH/2-11);}
+  if(t>1.3){cx.globalAlpha=ss(1.3,2,t);
+    cx.fillStyle='#5a6f94';cx.font='11px Courier New';
+    cx.fillText('崩壊も、回復も、パラメータで再現するシミュレーター',CW/2,CH/2+30);cx.globalAlpha=1;}
+  if(t>2.3){cx.globalAlpha=ss(2.3,2.9,t);
+    cx.fillStyle='#ffcc00';cx.font='bold 12px Courier New';
+    cx.fillText('▶ 4つの実験を60秒で',CW/2,CH/2+64);cx.globalAlpha=1;}
+  cx.textAlign='left';
+}
+function drawConclusion(){
+  cx.fillStyle='#070b14';cx.fillRect(0,0,CW,CH);grid();
+  cx.textAlign='center';
+  const l1=ss(51.3,52,t), l2=ss(52.8,53.5,t), l3=ss(54.1,54.8,t), cta=ss(56.4,57.1,t);
+  cx.globalAlpha=l1;cx.fillStyle='#d8e4ff';cx.font='bold 17px Courier New';
+  cx.fillText('社会の崩壊は、感情ではなく',CW/2,220);
+  cx.fillText('構造で起きる。',CW/2,250);
+  cx.globalAlpha=l2;cx.fillStyle='#00ff88';cx.shadowBlur=16;cx.shadowColor='#00ff88';
+  cx.font='bold 19px Courier New';
+  cx.fillText('だから、構造で直せる。',CW/2,320);cx.shadowBlur=0;
+  cx.globalAlpha=l3;cx.fillStyle='#5a6f94';cx.font='11px Courier New';
+  cx.fillText('情報は「確かめられる余白」',CW/2,372);
+  cx.fillText('基盤は「余力で生き残る」',CW/2,394);
+  cx.fillText('認知は「切断と再接続で戻る」',CW/2,416);
+  cx.fillText('決定は「結果とつながる声」',CW/2,438);
+  if(cta>0){cx.globalAlpha=cta;
+    cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;
+    rrect(CW/2-160,478,320,148,6);cx.stroke();
+    cx.fillStyle='rgba(0,212,255,.06)';rrect(CW/2-160,478,320,148,6);cx.fill();
+    cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.shadowBlur=14;cx.shadowColor='#00d4ff';
+    cx.fillText('社会デバッガー',CW/2,514);cx.shadowBlur=0;
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';
+    cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,536);
+    cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';
+    cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,564);
+    const bl=Math.sin(t*4)>0;
+    cx.fillStyle=bl?'#00ff88':'rgba(0,255,136,.4)';cx.font='bold 12px Courier New';
+    cx.fillText('▶ あなたの街は、生き残れるか。',CW/2,598);}
+  cx.globalAlpha=1;cx.textAlign='left';
+}
+
+// ============ main loop ============
+function step(dt){
+  t+=dt;if(t>=DUR){t=DUR;ended=true;}
+  if((t>=6.1&&t<6.7)||(t>=19.5&&t<20.1)||(t>=24&&t<24.5))shake=1;
+  shake=Math.max(0,shake-dt*1.6);
+  cursorAt(t);checkClicks();
+}
+function render(){
+  cx.save();
+  if(shake>0)cx.translate((Math.random()-.5)*10*shake,(Math.random()-.5)*8*shake);
+  cx.fillStyle='#070b14';cx.fillRect(-10,-10,CW+20,CH+20);grid();
+  if(t<3)drawHook();
+  else if(t<15)drawPage1();
+  else if(t<27)drawPage2();
+  else if(t<39)drawPage3();
+  else if(t<51)drawPage4();
+  else drawConclusion();
+  drawCursor();
+  // 固定免責フッター（全編）
+  cx.fillStyle='rgba(7,11,20,.86)';cx.fillRect(0,CH-28,CW,24);
+  cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';
+  cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,CH-13);
+  cx.textAlign='left';
+  // progress
+  cx.fillStyle='#172340';cx.fillRect(0,CH-4,CW,4);
+  const pg=cx.createLinearGradient(0,0,CW,0);
+  pg.addColorStop(0,'#ff2244');pg.addColorStop(.5,'#00d4ff');pg.addColorStop(1,'#00ff88');
+  cx.fillStyle=pg;cx.fillRect(0,CH-4,CW*t/DUR,4);
+  // REC
+  if(!ended){cx.fillStyle=Math.sin(t*6)>0?'#ff2244':'rgba(255,34,68,.3)';
+    cx.beginPath();cx.arc(CW-30,22,4,0,7);cx.fill();
+    cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';
+    cx.fillText('REC',CW-40,25);cx.textAlign='left';}
+  cx.restore();
+  if(ended){ // hold conclusion + replay hint
+    cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.textAlign='center';
+    cx.fillText('↺ RESTART で最初から',CW/2,CH-24);cx.textAlign='left';}
+}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
+  if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;ended=false;playing=true;shake=0;lastClickT=-1;clickPulse=0;
+  document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>X向け30秒リール — 平時の勝者は、最悪の日も勝つのか</title>
+<style>
+:root{--bg:#070b14;--panel:#0f1829;--line:#172340;--cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--yellow:#ffcc00;--text:#d8e4ff;--muted:#5a6f94}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px;background:#03060c;color:var(--text);font-family:'Courier New',monospace}
+.frame{width:min(96vw,420px)}
+.stage{overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+#cv{display:block;width:100%}
+.ctrl{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.btn{padding:7px 16px;border:1px solid var(--line);border-radius:3px;background:var(--panel);color:var(--muted);font:10px 'Courier New',monospace;letter-spacing:.1em;cursor:pointer}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.note{margin-top:8px;color:var(--muted);font-size:9px;text-align:center}
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage"><canvas id="cv"></canvas></div>
+  <div class="ctrl">
+    <button class="btn" id="playBtn" onclick="togglePlay()">❚❚ PAUSE</button>
+    <button class="btn" onclick="restart()">↺ RESTART</button>
+  </div>
+  <div class="note">X向け30秒 / PAGE 2 / 同条件比較 / 縦型9:16 / 免責フッター全編固定</div>
+</div>
+<script>
+const CW=420,CH=740,DUR=30;
+const cv=document.getElementById('cv'),cx=cv.getContext('2d');
+function fit(){const w=cv.parentElement.getBoundingClientRect().width,s=w/CW;cv.width=CW*devicePixelRatio*s;cv.height=CH*devicePixelRatio*s;cv.style.height=CH*s+'px';cx.setTransform(devicePixelRatio*s,0,0,devicePixelRatio*s,0,0);}
+addEventListener('resize',fit);fit();
+let t=0,playing=true,ended=false,last=performance.now(),clickPulse=0,clicked=false,shake=0;
+function ss(a,b,x){const p=Math.max(0,Math.min(1,(x-a)/(b-a)));return p*p*(3-2*p);}
+function rrect(x,y,w,h,r){cx.beginPath();cx.moveTo(x+r,y);cx.arcTo(x+w,y,x+w,y+h,r);cx.arcTo(x+w,y+h,x,y+h,r);cx.arcTo(x,y+h,x,y,r);cx.arcTo(x,y,x+w,y,r);cx.closePath();}
+function grid(){cx.strokeStyle='rgba(0,212,255,.035)';for(let x=0;x<CW;x+=42){cx.beginPath();cx.moveTo(x,0);cx.lineTo(x,CH);cx.stroke();}for(let y=0;y<CH;y+=42){cx.beginPath();cx.moveTo(0,y);cx.lineTo(CW,y);cx.stroke();}}
+function gauge(x,y,w,label,val,col){cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.fillText(label,x,y-5);cx.fillStyle='#172340';cx.fillRect(x,y,w,6);cx.fillStyle=col;cx.fillRect(x,y,w*Math.max(0,Math.min(100,val))/100,6);cx.fillStyle=col;cx.font='bold 9px Courier New';cx.fillText(Math.round(val),x+w+5,y+6);}
+function button(x,y,w,h,label,col,on){cx.fillStyle=on?col:'#0f1829';cx.strokeStyle=col;cx.lineWidth=1.5;rrect(x,y,w,h,4);cx.fill();cx.stroke();cx.fillStyle=on?'#070b14':col;cx.font='bold 11px Courier New';cx.textAlign='center';cx.fillText(label,x+w/2,y+h/2+4);cx.textAlign='left';}
+function stamp(text,col,a,x,y,size=25){cx.save();cx.translate(x,y);cx.rotate(-.08);cx.scale(a,a);cx.globalAlpha=Math.min(1,a);cx.strokeStyle=col;cx.fillStyle=col;cx.lineWidth=2.5;cx.font=`bold ${size}px Courier New`;cx.textAlign='center';const w=cx.measureText(text).width+24;cx.strokeRect(-w/2,-23,w,38);cx.shadowBlur=18;cx.shadowColor=col;cx.fillText(text,0,4);cx.restore();cx.globalAlpha=1;cx.textAlign='left';}
+function caption(text,col){cx.font='bold 13px Courier New';cx.textAlign='center';const w=cx.measureText(text).width+22;cx.fillStyle='rgba(7,11,20,.9)';rrect(CW/2-w/2,627,w,27,4);cx.fill();cx.fillStyle=col;cx.fillText(text,CW/2,646);cx.textAlign='left';}
+function shock(){return t>=12;}
+function verdict(){return t>=20;}
+function aService(){if(!shock())return 98;return Math.max(4,98-94*ss(12,17,t));}
+function bService(){if(!shock())return 90;if(t<15)return 90-30*ss(12,15,t);return Math.min(84,60+24*ss(15,19,t));}
+function drawHub(x,y,alive,col,r=8){if(alive){cx.fillStyle=col;cx.shadowBlur=10;cx.shadowColor=col;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill();cx.shadowBlur=0;}else{cx.strokeStyle='#ff2244';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,r,0,7);cx.stroke();cx.beginPath();cx.moveTo(x-5,y-5);cx.lineTo(x+5,y+5);cx.moveTo(x+5,y-5);cx.lineTo(x-5,y+5);cx.stroke();}}
+function building(x,y,lit,col){cx.fillStyle='#0f1829';cx.strokeStyle='#172340';cx.fillRect(x-8,y-22,16,22);cx.strokeRect(x-8,y-22,16,22);cx.fillStyle=lit?col:'rgba(255,34,68,.3)';cx.fillRect(x-4,y-17,3,4);cx.fillRect(x+2,y-17,3,4);cx.fillRect(x-4,y-9,3,4);cx.fillRect(x+2,y-9,3,4);}
+function drawCity(x,y,w,mode){
+  const isA=mode==='A',col=isA?'#00d4ff':'#00ff88',aliveA=!shock(),lostB=shock();
+  cx.fillStyle='rgba(15,24,41,.72)';cx.strokeStyle=isA?'rgba(0,212,255,.35)':'rgba(0,255,136,.35)';rrect(x,y,w,370,5);cx.fill();cx.stroke();
+  cx.fillStyle=col;cx.font='bold 12px Courier New';cx.textAlign='center';cx.fillText(isA?'CITY A':'CITY B',x+w/2,y+28);cx.fillStyle='#d8e4ff';cx.font='bold 10px Courier New';cx.fillText(isA?'平時効率型':'余力保持型',x+w/2,y+47);cx.textAlign='left';
+  gauge(x+15,y+82,w-48,'平時効率',isA?95:72,'#00d4ff');gauge(x+15,y+118,w-48,'冗長性',isA?12:(shock()?28:58),isA?'#ff2244':'#00ff88');gauge(x+15,y+154,w-48,'サービス稼働',isA?aService():bService(),(isA?aService():bService())<35?'#ff2244':col);
+  const cx0=x+w/2,cy=y+260,bx=[cx0-52,cx0-18,cx0+18,cx0+52,cx0-35,cx0+35],by=[cy-54,cy-64,cy-64,cy-54,cy+38,cy+38];
+  if(isA){for(let i=0;i<bx.length;i++){cx.strokeStyle=aliveA?'rgba(0,212,255,.22)':'rgba(255,34,68,.15)';cx.beginPath();cx.moveTo(cx0,cy);cx.lineTo(bx[i],by[i]);cx.stroke();building(bx[i],by[i],aliveA,col);}drawHub(cx0,cy,aliveA,col,12);}
+  else{const hubs=[[cx0-38,cy],[cx0+38,cy-18],[cx0+10,cy+36]];cx.strokeStyle='rgba(0,255,136,.3)';cx.beginPath();cx.moveTo(...hubs[0]);cx.lineTo(...hubs[1]);cx.lineTo(...hubs[2]);cx.closePath();cx.stroke();for(let i=0;i<bx.length;i++){const h=hubs[i%3],hAlive=!(lostB&&i%3===1);cx.strokeStyle=hAlive?'rgba(0,255,136,.22)':'rgba(255,34,68,.12)';cx.beginPath();cx.moveTo(...h);cx.lineTo(bx[i],by[i]);cx.stroke();building(bx[i],by[i],true,col);}hubs.forEach((h,i)=>drawHub(h[0],h[1],!(lostB&&i===1),col,8));}
+  if(verdict()){stamp(isA?'CRASHED':'SURVIVED',isA?'#ff2244':'#00ff88',Math.min(1,(t-20)*2),x+w/2,y+264,isA?22:20);}
+}
+function drawHeader(){cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';cx.fillText('▶ PAGE 2 — 同条件ショック実験',20,36);cx.strokeStyle='#172340';cx.beginPath();cx.moveTo(20,47);cx.lineTo(400,47);cx.stroke();cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='right';cx.fillText('社会デバッガー v6',400,36);cx.textAlign='left';}
+function drawHook(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 21px Courier New';cx.fillText('平時の勝者は、',CW/2,315);cx.fillStyle='#ffcc00';cx.shadowBlur=17;cx.shadowColor='#ffcc00';cx.fillText('最悪の日も勝つのか。',CW/2,354);cx.shadowBlur=0;if(t>1.2){cx.globalAlpha=ss(1.2,2,t);cx.fillStyle='#5a6f94';cx.font='11px Courier New';cx.fillText('2つの都市に、同じショックを入れる',CW/2,392);cx.globalAlpha=1;}cx.textAlign='left';}
+function drawLab(){drawHeader();drawCity(20,118,182,'A');drawCity(218,118,182,'B');button(70,550,280,38,'⚡ 同時・同規模の環境ショック','#ffcc00',t>=11.2&&t<12.5);if(t>=4&&t<10){cx.textAlign='center';cx.fillStyle='#00d4ff';cx.font='bold 12px Courier New';cx.fillText('平時スコア  A:95  >  B:72',CW/2,96);cx.fillStyle='#5a6f94';cx.font='9px Courier New';cx.fillText('速いAが、勝っているように見える',CW/2,110);cx.textAlign='left';}if(t>=12&&t<20)caption('同じ障害。違うのは、残していた余力。','#ffcc00');if(t>=20&&t<25)caption('効率は平時の速さ。余力は最悪の日の命。','#00ff88');drawCursor();}
+function drawCountdown(){drawLab();cx.fillStyle='rgba(7,11,20,.82)';cx.fillRect(0,70,CW,470);cx.textAlign='center';cx.fillStyle='#ffcc00';cx.shadowBlur=18;cx.shadowColor='#ffcc00';cx.font='bold 29px Courier New';cx.fillText('SHOCK IN '+Math.max(1,Math.ceil(12-t)),CW/2,318);cx.shadowBlur=0;cx.fillStyle='#d8e4ff';cx.font='11px Courier New';cx.fillText('両都市へ、同時・同規模で注入',CW/2,352);cx.textAlign='left';}
+function drawCursor(){if(t<7||t>19)return;const y=t<11.2?340+220*ss(7,11.2,t):569,x=210;cx.shadowBlur=12;cx.shadowColor='#fff';cx.strokeStyle='#fff';cx.lineWidth=2;cx.beginPath();cx.arc(x,y,9,0,7);cx.stroke();cx.fillStyle='#fff';cx.beginPath();cx.arc(x,y,3,0,7);cx.fill();cx.shadowBlur=0;if(clickPulse>0){cx.strokeStyle=`rgba(255,204,0,${clickPulse})`;cx.beginPath();cx.arc(x,y,10+25*(1-clickPulse),0,7);cx.stroke();}}
+function drawEnd(){cx.textAlign='center';cx.fillStyle='#d8e4ff';cx.font='bold 16px Courier New';cx.fillText('「無駄」に見えた余力が、',CW/2,230);cx.fillStyle='#00ff88';cx.shadowBlur=15;cx.shadowColor='#00ff88';cx.font='bold 19px Courier New';cx.fillText('最悪の日に街を救う。',CW/2,274);cx.shadowBlur=0;cx.strokeStyle='#00d4ff';cx.lineWidth=1.5;rrect(50,330,320,156,6);cx.stroke();cx.fillStyle='rgba(0,212,255,.05)';rrect(50,330,320,156,6);cx.fill();cx.fillStyle='#00d4ff';cx.font='bold 15px Courier New';cx.fillText('社会デバッガー',CW/2,366);cx.fillStyle='#5a6f94';cx.font='10px Courier New';cx.fillText('無料・登録なし・ブラウザで約60秒',CW/2,391);cx.fillStyle='#00d4ff';cx.font='bold 9px Courier New';cx.fillText('larai-w.github.io/social-system-debugger/',CW/2,420);cx.fillStyle='#00ff88';cx.font='bold 12px Courier New';cx.fillText('▶ あなたの街は、余力を残せるか。',CW/2,458);cx.textAlign='left';}
+function step(dt){t+=dt;if(t>=DUR){t=DUR;ended=true;}if(t>=11.2&&!clicked){clickPulse=1;clicked=true;}clickPulse=Math.max(0,clickPulse-dt*2.8);if(t>=12&&t<13)shake=1;shake=Math.max(0,shake-dt*1.8);}
+function render(){cx.save();if(shake>0)cx.translate((Math.random()-.5)*8*shake,(Math.random()-.5)*6*shake);cx.fillStyle='#070b14';cx.fillRect(-10,-10,CW+20,CH+20);grid();if(t<3)drawHook();else if(t<10)drawLab();else if(t<12)drawCountdown();else if(t<25)drawLab();else drawEnd();cx.fillStyle='rgba(7,11,20,.88)';cx.fillRect(0,712,CW,24);cx.fillStyle='#5a6f94';cx.font='8px Courier New';cx.textAlign='center';cx.fillText('※特定の誰かではなく、どの社会にも起こる構造の話です（架空シミュレーション）',CW/2,727);cx.textAlign='left';cx.fillStyle='#172340';cx.fillRect(0,736,CW,4);const g=cx.createLinearGradient(0,0,CW,0);g.addColorStop(0,'#00d4ff');g.addColorStop(.5,'#ffcc00');g.addColorStop(1,'#00ff88');cx.fillStyle=g;cx.fillRect(0,736,CW*t/DUR,4);cx.restore();}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing&&!ended)step(dt);render();requestAnimationFrame(loop);}
+function togglePlay(){playing=!playing;document.getElementById('playBtn').textContent=playing?'❚❚ PAUSE':'▶ PLAY';}
+function restart(){t=0;playing=true;ended=false;clicked=false;clickPulse=0;shake=0;last=performance.now();document.getElementById('playBtn').textContent='❚❚ PAUSE';}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
