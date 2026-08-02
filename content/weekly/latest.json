@@ -1,26 +1,41 @@
 {
-  "id": "2026-W31",
-  "title": { "ja": "冗長性ショック対抗", "en": "Redundancy Shock Resilience" },
-  "intro": {
-    "ja": "効率化の名の下に、あなたの街のインフラは1か所に集約されていく。数字の上では順調だ——未知の衝撃が来るまでは。ムダに見える余白を、間に合ううちに取り戻せるか。",
-    "en": "In the name of efficiency, your town's infrastructure keeps consolidating into one place. The numbers look great — until an unknown shock arrives. Can you win back the slack that looks like waste, while there is still time?"
+  "id": "2026-W32",
+  "title": {
+    "ja": "リーダー倫理観の滝",
+    "en": "Leader Ethics Waterfall"
   },
-  "page": 2,
+  "intro": {
+    "ja": "トップの倫理観が少し緩むだけで、パラノイアが増え、信頼が痩せ、正当性が滝のように流れ落ちていく。壊すのは一瞬、戻すのは何倍も遅い。この非対称の中で、あなたの街の正当性を守り切れるか。",
+    "en": "When the leader's ethics slips just a little, paranoia grows, trust thins out, and legitimacy pours away like a waterfall. Breaking is instant; rebuilding is many times slower. Inside this asymmetry, can you keep your town's legitimacy intact?"
+  },
+  "page": 1,
   "params": {
-    "p2": { "s": 50, "d": 30, "e": 80, "al": "dp", "reboot": false },
+    "p1": {
+      "f": 30,
+      "e": 45,
+      "al": "dp"
+    },
     "hint": {
-      "ja": "集約化を下げて冗長性バッファを積み上げ、そのあと ⚡ショック注入 で生存の分岐点を確かめてください。",
-      "en": "Lower consolidation to build up the redundancy buffer, then inject ⚡ shock and see the survival branching point."
+      "ja": "すでに緩んだ倫理を立て直し、正当性を60以上まで回復させてください。壊すのは一瞬でも、戻す道はあります。",
+      "en": "Rebuild the ethics that have already slipped and recover legitimacy above 60. Breaking was instant — but there is a way back."
     }
   },
   "goal": {
-    "ja": "冗長性バッファを75以上に上げ、ショック注入後もインフラを維持して生き残る",
-    "en": "Raise the redundancy buffer above 75 and keep infrastructure alive through the shock"
+    "ja": "正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に戻す",
+    "en": "Keep legitimacy above 60 while raising the ethics score back to 50+"
   },
   "goalConds": [
-    { "metric": "redundancy", "op": ">=", "value": 75 },
-    { "metric": "infra", "op": ">=", "value": 20 }
+    {
+      "metric": "legitimacy",
+      "op": ">=",
+      "value": 60
+    },
+    {
+      "metric": "ethicsScore",
+      "op": ">=",
+      "value": 50
+    }
   ],
-  "difficulty": "hard",
-  "discoveryId": "sce_redundancy_shock"
+  "difficulty": "normal",
+  "discoveryId": "sce_ethics_cascade"
 }
