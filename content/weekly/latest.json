@@ -1,41 +1,26 @@
 {
-  "id": "2026-W32",
-  "title": {
-    "ja": "リーダー倫理観の滝",
-    "en": "Leader Ethics Waterfall"
-  },
+  "id": "2026-W33",
+  "title": { "ja": "当事者の声を取り戻す", "en": "Restore Stakeholder Voice" },
   "intro": {
-    "ja": "トップの倫理観が少し緩むだけで、パラノイアが増え、信頼が痩せ、正当性が滝のように流れ落ちていく。壊すのは一瞬、戻すのは何倍も遅い。この非対称の中で、あなたの街の正当性を守り切れるか。",
-    "en": "When the leader's ethics slips just a little, paranoia grows, trust thins out, and legitimacy pours away like a waterfall. Breaking is instant; rebuilding is many times slower. Inside this asymmetry, can you keep your town's legitimacy intact?"
+    "ja": "議論が盛り上がるほど、当事者の声は観客の歓声にかき消されていく。ゲーム化された外野のトラフィックが帯域を食い潰し、本来届くべきパケットが静かにドロップする。あなたの街の回線を、取り戻せるか。",
+    "en": "The livelier the debate, the more the stakeholders' voices drown under the spectators' cheers. Gamified outside traffic eats the bandwidth, and the packets that should get through are quietly dropped. Can you reclaim your town's channel?"
   },
-  "page": 1,
+  "page": 4,
   "params": {
-    "p1": {
-      "f": 30,
-      "e": 45,
-      "al": "dp"
-    },
+    "p4": { "ext": 50, "gam": 40 },
     "hint": {
-      "ja": "すでに緩んだ倫理を立て直し、正当性を60以上まで回復させてください。壊すのは一瞬でも、戻す道はあります。",
-      "en": "Rebuild the ethics that have already slipped and recover legitimacy above 60. Breaking was instant — but there is a way back."
+      "ja": "ゲーム化とパケットドロップ率の関係を観察し、外部トラフィックを絞って当事者比率を改善してください。",
+      "en": "Watch how gamification links to packet drop, then throttle outside traffic to improve the stakeholder ratio."
     }
   },
   "goal": {
-    "ja": "正当性（Legitimacy）を60以上に保ちながら、倫理スコアを50以上に戻す",
-    "en": "Keep legitimacy above 60 while raising the ethics score back to 50+"
+    "ja": "当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる",
+    "en": "Raise the stakeholder commit ratio above 70 and cut the packet drop rate to 40 or below"
   },
   "goalConds": [
-    {
-      "metric": "legitimacy",
-      "op": ">=",
-      "value": 60
-    },
-    {
-      "metric": "ethicsScore",
-      "op": ">=",
-      "value": 50
-    }
+    { "metric": "ratio", "op": ">=", "value": 70 },
+    { "metric": "drop", "op": "<=", "value": 40 }
   ],
   "difficulty": "normal",
-  "discoveryId": "sce_ethics_cascade"
+  "discoveryId": "sce_stakeholder_voice"
 }
