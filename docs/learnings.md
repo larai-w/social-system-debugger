@@ -450,6 +450,24 @@ API で許可（`can_approve_pull_request_reviews: true`）したが、これは
 
 ---
 
+### IN-19: CDKの同梱開発依存を本番脆弱性として監査した
+
+**何が起きたか**
+定期Security baselineが、CDK内部に同梱された `brace-expansion` の脆弱性を検出して失敗した。
+アプリの本番配信物には含まれない依存だったが、infraパッケージで本番依存として分類されていた。
+
+**根本原因**
+`aws-cdk-lib` などの合成・デプロイ専用パッケージを `dependencies` に置き、
+本番依存が存在しないパッケージにも一律で `npm audit --omit=dev` を実行していた。
+
+**追加した恒久ガード**
+- CDK関連パッケージを `devDependencies` へ移し、実行時依存との境界をpackage manifestで固定。
+- Security baselineは本番依存があるパッケージだけを監査し、対象なしの場合は理由をログへ記録する。
+
+**根拠**: 2026-08-10 Security baseline修正。
+
+---
+
 スプリント完了時、以下のいずれかに該当する事象があれば本ファイルの末尾に追記する:
 
 1. **想定外の挙動・バグ** — CI が検出した実バグ、手動レビューで発見した誤り。
