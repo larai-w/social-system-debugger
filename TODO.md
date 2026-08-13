@@ -13,7 +13,7 @@
 | ~~☐1~~ | ~~本番サイト目視確認~~ | ~~5分~~ | ~~5分（不要）~~ | ✅ 完了 |
 | ~~☐2~~ | ~~Actions 自動デプロイ有効化~~ | ~~10分~~ | ~~計25分~~ | ✅ 完了（2026-07-12・`make aws-wire` で Secrets/Variables 設定済） |
 | ~~☐3~~ | ~~main ブランチ保護~~ | ~~5分~~ | ~~5分~~ | ✅ 完了（2026-07-12・`make protect`・CI必須 web/infra）。2026-07-14 に classic → ruleset（id 18896897・DeployKey バイパス）へ移行。`make protect` は再実行禁止（docs/operations-runbook.md §8 参照）。 |
-| ☐4 | Capacitor 実機（任意） | 30〜60分 | iOS +15分（cocoapods）/ Android +30〜60分（Studio+JDK17）| やや重い |
+| ☐4 | Capacitorストア版（準備中） | 30〜60分 | Android環境導入を除く | やや重い |
 | ☐5 | 自動生成済み30秒リールを X 固定ポストに | 5分 | 5分 | かんたん |
 | ☐6 | 教員向け1枚ガイドを PDF 化（**自動化済み** `make classroom-pdf`） | 0分 | 0分 | 自動 |
 | ☐7 | リポジトリの iCloud 外移設（推奨） | 15分 | 15分 | 普通 |
@@ -96,11 +96,24 @@ make protect
 
 ---
 
-## ☐ 4.（任意）Capacitor 実機ビルド — 30〜60分
+## ☐ 4. Capacitorストア版 — 提出直前まで準備中
 
 ネイティブ機能（通知・触覚・共有シート）の実挙動確認。GUI と署名が必要。
 
-> **ストア審査提出まで通す場合の詳細ランブックは `docs/store-submission.md`**（appId 確定 → cap add/sync → iOS(TestFlight)／Android(内部テスト) → 審査対策 → 提出後対応まで、上から順に実行できる1本）。
+> 詳細ランブックは `docs/store-submission.md`。`npm run store:preflight` で機械判定できる。
+
+2026-08-13 時点:
+
+- [x] Xcode 26.2 / iOS 26 SDK要件
+- [x] Capacitor 8 / Android API 36対応
+- [x] アイコン、スプラッシュ、ストア画像6枚
+- [x] Apple required-reason API privacy manifest
+- [x] 2026年版提出ランブックとプライバシー文面整合
+- [ ] ownerが恒久appIdを承認（候補 `jp.veai.socialdebugger`）
+- [ ] ownerがネイティブ週次配信URLを承認
+- [ ] Android Studio/JDKを導入
+- [ ] 承認後にiOS/Androidプロジェクト生成・ビルド
+- [ ] 物理端末、TestFlight、Play内部テスト
 
 ### iOS
 ```bash

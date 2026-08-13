@@ -21,6 +21,7 @@
     "gen:classroom-pdf": "node scripts/gen-classroom-pdf.mjs",
     "gen:store-shots": "node scripts/gen-store-shots.mjs",
     "gen:icons": "node scripts/gen-icons.mjs",
+    "store:preflight": "node scripts/store-preflight.mjs",
     "record:reels": "node scripts/record-reel.mjs",
     "record:social-reels": "node scripts/record-social-reels.mjs",
     "cap:sync": "cap sync",
