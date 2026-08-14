@@ -76,8 +76,8 @@ async function main() {
     const run = command('java', ['-version']);
     const text = `${run.stdout || ''}${run.stderr || ''}`;
     const match = text.match(/version "(\d+)/);
-    if (run.status !== 0 || !match || Number(match[1]) < 17)
-      throw new Error('JDK 17+ is unavailable');
+    if (run.status !== 0 || !match || Number(match[1]) < 17 || Number(match[1]) > 24)
+      throw new Error('Gradle-compatible JDK 17–24 is unavailable');
     return `JDK ${match[1]}`;
   });
 
@@ -150,6 +150,19 @@ async function main() {
     );
     if (missing.length) throw new Error(`generate after appId approval: ${missing.join(', ')}`);
     return 'iOS and Android projects exist';
+  });
+
+  await check('Generated iOS release declarations', () => {
+    const project = readFileSync('ios/App/App.xcodeproj/project.pbxproj', 'utf8');
+    const plist = readFileSync('ios/App/App/Info.plist', 'utf8');
+    const manifest = readFileSync('ios/App/App/PrivacyInfo.xcprivacy', 'utf8');
+    if (!project.includes('PrivacyInfo.xcprivacy in Resources'))
+      throw new Error('PrivacyInfo.xcprivacy is not in the iOS target resources');
+    if (!plist.includes('<key>ITSAppUsesNonExemptEncryption</key>'))
+      throw new Error('iOS encryption declaration is missing');
+    if (!manifest.includes('NSPrivacyAccessedAPICategoryUserDefaults'))
+      throw new Error('generated privacy manifest is incomplete');
+    return 'privacy manifest embedded; non-exempt encryption declared false';
   });
 
   const humanChecks = [

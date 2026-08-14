@@ -27,6 +27,7 @@
     "cap:sync": "cap sync",
     "cap:add:ios": "cap add ios",
     "cap:add:android": "cap add android",
+    "native:prepare": "node scripts/prepare-native.mjs",
     "cap:open:ios": "cap open ios",
     "cap:open:android": "cap open android",
     "serve": "python3 -m http.server 8000 --directory web",
@@ -57,6 +58,7 @@
     "@capacitor/status-bar": "^8.0.2"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.1",
     "@eslint/js": "^10.0.1",
     "@napi-rs/canvas": "^1.0.2",

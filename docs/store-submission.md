@@ -33,15 +33,14 @@ npm run gen:store-shots
 npm run store:preflight
 ```
 
-`store:preflight` is read-only and is expected to report blockers until the permanent app ID,
-Android toolchain, and generated native projects exist.
+`store:preflight` is read-only and is expected to report blockers until the Android toolchain and
+generated native projects exist.
 
-## 2. Permanent identifiers — owner approval required
+## 2. Permanent identifiers
 
-The tracked `dev.socialdebugger.app` value is a placeholder. A suitable candidate is
-`jp.veai.socialdebugger`, but do not change it until the owner confirms that the same identifier is
-available and should be registered in both stores. Create the App Store Connect app record and Play
-Console app before uploading builds.
+The owner approved `jp.veai.socialdebugger` on 2026-08-13 and it is now fixed in
+`capacitor.config.json`. Confirm availability and register that exact identifier in App Store Connect
+and Play Console before uploading builds; creating either store record remains a human action.
 
 ## 3. Generate native projects
 
@@ -52,16 +51,20 @@ npx cap add ios
 npx cap add android
 npx cap sync
 npx @capacitor/assets generate
+npm run native:prepare
 ```
+
+Use a Gradle-compatible JDK (17–24). The current Android Studio bundle includes JDK 25, which is
+newer than Gradle 8.14.3 supports; on this Mac, Temurin 21 is installed for command-line builds.
 
 Before syncing, configure an absolute HTTPS `nativeContentBaseUrl` for the public weekly-content
 endpoint in `web/config.js`. This is separate from the relative Web deployment setting: an installed
 app has a local `capacitor://` origin and otherwise cannot receive the promised weekly updates.
 
-Copy `native/ios/PrivacyInfo.xcprivacy` into the iOS app target and add it to the Xcode target. It
-declares the required-reason APIs used by Capacitor Preferences and Filesystem. Set
-`ITSAppUsesNonExemptEncryption` to `false` only after confirming that the app still uses ordinary
-OS HTTPS and no custom/non-exempt cryptography.
+`native:prepare` copies `native/ios/PrivacyInfo.xcprivacy` into the iOS app target, adds it to the
+target resources, and sets `ITSAppUsesNonExemptEncryption` to `false`. This matches the current app,
+which uses ordinary OS HTTPS and no custom/non-exempt cryptography. Reassess before running the
+script if cryptography is added later.
 
 Do not upload until these generated-project checks pass:
 
