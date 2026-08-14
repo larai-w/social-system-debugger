@@ -11,8 +11,8 @@
 | アプリ名 | 社会デバッガー ／ Social Debugger |
 | カテゴリ | 教育（Education）。サブ: シミュレーション |
 | 価格 | 無料・広告なし・課金なし |
-| 年齢区分 | 4+ / Everyone（暴力・実在人物への言及なし。抽象的な社会構造の話のみ） |
-| プライバシー | アカウントなし・個人データ収集なし。匿名の集計アナリティクスのみ（App Store「データ収集なし」または「利用データ（非特定）」区分） |
+| 年齢区分 | 各ストアの現行質問票で確定（暴力・実在人物への言及なし。抽象的な社会構造の話のみ） |
+| プライバシー | アカウント・広告・課金・追跡・アナリティクスなし。任意のフィードバック送信時だけ、メッセージと任意メール等をFormspreeが処理 |
 
 ## App Store（iOS）
 
@@ -44,7 +44,7 @@ Will your town survive?
 このアプリは架空のシミュレーションです。実在の地名・人名・進行中の政治的話題は登場しません。
 「特定の誰かではなく、どの社会にも起こる構造の話」を、ゲームのように操作できる形にしました。
 
-無料・広告なし・アカウント不要・個人データの収集なし。
+無料・広告なし・アカウント不要・追跡なし。フィードバックは送信した場合だけ処理されます。
 ```
 
 **説明文（en）**
@@ -65,7 +65,7 @@ This app is a fictional simulation. No real places, people, or ongoing
 politics appear. It is about structures any society can fall into —
 made playable.
 
-Free, no ads, no account, no personal data collected.
+Free, no ads, no account, and no tracking. Feedback is processed only if you choose to submit it.
 ```
 
 **キーワード（100字以内・カンマ区切り）**
@@ -120,8 +120,9 @@ make store-shots
   触覚・共有シート・オフライン動作）を Review Notes に列挙。
 - **通知の用途** → 週1回・月曜19時のローカル通知のみ。リモートプッシュなし。初回クリア後に文脈付きで
   許可を求める（起動即許可ダイアログではない）。
-- **データ収集** → なし（アカウントなし・端末内 localStorage/Preferences のみ）。App Privacy は
-  「Data Not Collected」を選択（Plausible 等を有効化した場合は「非特定の利用データ」に変更）。
+- **データ収集** → アカウント・広告・追跡・アナリティクスなし。端末内データは localStorage / Preferences
+  のみ。任意フィードバックのメッセージ・種別・ページ・言語・任意メールは Formspree が処理するため、
+  最終ビルドに対する Apple App Privacy / Google Data safety の申告へ正確に反映する。
 
 ## ユーザー（あなた）が用意するもの
 
