@@ -1,6 +1,32 @@
-# CONTRIBUTING — 開発・引き継ぎガイド
+# CONTRIBUTING — 参加と開発のガイド
 
-人間の開発者向け。AIエージェント（Claude Code / Codex）は [`AGENTS.md`](AGENTS.md) と [`CLAUDE.md`](CLAUDE.md) を参照。
+## コードを書かない参加のしかた
+
+このプロジェクトは教育用シミュレーターです。**使った人の声がいちばん役に立ちます。**
+開発環境を用意する必要はありません。
+
+| こんなとき | どうぞ |
+|---|---|
+| 動きがおかしい | [バグ報告](../../issues/new?template=bug_report.md) |
+| こうだったらいいのに | [改善提案](../../issues/new?template=feature_request.md) |
+| 使ってみた感想、授業で使った話、シナリオへの意見 | [感想・気づき](../../issues/new?template=feedback.md) |
+| 脆弱性を見つけた | [非公開で報告](../../security/advisories/new)（Issue には書かないでください） |
+
+うまく言葉にならなくても構いません。断片でも歓迎します。
+「この現象は現実のあれに似ている」といった指摘は、シナリオ設計の材料になります。
+
+### Not a developer?
+
+This is an educational simulator — **feedback from people who actually used it matters most.**
+You do not need a development environment. Use the Issue templates above; half-formed
+thoughts are welcome. Vulnerabilities go to the private form, not to a public Issue.
+
+---
+
+## 開発・引き継ぎガイド
+
+ここから下は人間の開発者向け。AIエージェント（Claude Code / Codex）は
+[`AGENTS.md`](AGENTS.md) と [`CLAUDE.md`](CLAUDE.md) を参照。
 
 ## セットアップ
 ```bash

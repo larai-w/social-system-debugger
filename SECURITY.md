@@ -25,15 +25,26 @@ This policy covers:
 リポジトリの **Security タブ → "Report a vulnerability"** からご報告いただくと、
 非公開で開発者に届きます。
 
-Issues を使う場合は、タイトルに「**非公開希望**」または「**confidential**」と明記してください。
-脆弱性の詳細は修正が完了するまで公開しないようご協力をお願いします。
+フォームが使えない場合は **security@veai.jp** までメールでご連絡ください。
+**公開 Issue に脆弱性の詳細は書かないでください。** 投稿した時点で誰でも読めるためです。
 
 **Please prefer GitHub's Private vulnerability reporting.**  
 Go to the repository's **Security tab → "Report a vulnerability"** to submit a report
 confidentially to the maintainer.
 
-If you use a public Issue instead, please write "**confidential**" in the title and
-avoid sharing exploit details until a fix is in place.
+If the form is unavailable, email **security@veai.jp** instead.
+**Please do not put vulnerability details in a public Issue** — they are readable by
+anyone the moment they are posted.
+
+---
+
+## 脆弱性以外のご意見 / Everything else
+
+バグ報告、改善提案、使ってみた感想、授業で使った話 — **Issue で歓迎します**。
+非公開にする必要があるのは脆弱性だけです。
+
+Bug reports, ideas, and feedback from using it — **Issues are welcome**.
+Only vulnerabilities need to stay private.
 
 ---
 
@@ -69,4 +80,4 @@ The following defenses are already in place (facts only, no overclaiming):
 
 ---
 
-*最終更新 / Last updated: 2026-07-11*
+*最終更新 / Last updated: 2026-08-18*
