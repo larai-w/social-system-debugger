@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'"
+    />
+    <title>社会デバッガー — 社会は、壊れる前に兆候を出す。</title>
+    <meta
+      name="description"
+      content="社会や地域インフラが「どう壊れるか」を、パラメータ操作で体験できる教育用シミュレーター。無料・登録なし・ブラウザで約60秒。"
+    />
+    <link rel="icon" href="../icon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="社会デバッガー — 社会は、壊れる前に兆候を出す。" />
+    <meta
+      property="og:description"
+      content="4つの構造を操作して、崩壊と回復を60秒で実験する。無料・登録なしの教育用シミュレーター。"
+    />
+    <meta property="og:image" content="hero-1600.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style>
+      :root {
+        --bg0: #070b14;
+        --bg1: #0c1220;
+        --bg2: #0f1829;
+        --bdr: #172340;
+        --cyan: #00d4ff;
+        --green: #00ff88;
+        --txt: #d8e4ff;
+        --muted: #5a6f94;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg0);
+        color: var(--txt);
+        font-family: 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
+        line-height: 1.8;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      a {
+        color: var(--cyan);
+      }
+
+      /* ヒーロー */
+      .hero {
+        padding: 56px 0 40px;
+      }
+      .hero img {
+        width: 100%;
+        height: auto;
+        border-radius: 14px;
+        border: 1px solid var(--bdr);
+        display: block;
+      }
+      .eyebrow {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.22em;
+        font-size: 12px;
+        color: var(--cyan);
+        text-transform: uppercase;
+        margin: 0 0 14px;
+      }
+      h1 {
+        font-size: clamp(28px, 5.2vw, 46px);
+        line-height: 1.35;
+        margin: 0 0 16px;
+        letter-spacing: 0.01em;
+      }
+      h1 .accent {
+        color: var(--cyan);
+      }
+      .lead {
+        font-size: clamp(15px, 2.2vw, 18px);
+        color: var(--txt);
+        margin: 0 0 28px;
+        opacity: 0.92;
+      }
+
+      /* CTA */
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 28px 0 10px;
+      }
+      .btn {
+        display: inline-block;
+        padding: 15px 26px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 16px;
+        border: 1px solid transparent;
+        min-height: 44px;
+      }
+      .btn-main {
+        background: var(--cyan);
+        color: #04121c;
+      }
+      .btn-sub {
+        background: transparent;
+        color: var(--txt);
+        border-color: var(--bdr);
+      }
+      .note {
+        font-size: 13px;
+        color: var(--muted);
+        margin: 6px 0 0;
+      }
+
+      /* セクション */
+      section {
+        padding: 44px 0;
+        border-top: 1px solid var(--bdr);
+      }
+      h2 {
+        font-size: clamp(20px, 3.4vw, 26px);
+        margin: 0 0 8px;
+        letter-spacing: 0.01em;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0 0 24px;
+      }
+
+      /* 4ページ */
+      .pages {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+      }
+      @media (max-width: 560px) {
+        .pages {
+          grid-template-columns: 1fr;
+        }
+      }
+      .page {
+        background: var(--bg1);
+        border: 1px solid var(--bdr);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .page .num {
+        font-family: 'Courier New', monospace;
+        color: var(--cyan);
+        font-size: 13px;
+        letter-spacing: 0.1em;
+      }
+      .page h3 {
+        font-size: 16px;
+        margin: 8px 0 8px;
+      }
+      .page p {
+        font-size: 14px;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.75;
+      }
+
+      /* 教育機関向け */
+      .edu {
+        background: var(--bg1);
+        border: 1px solid var(--bdr);
+        border-radius: 14px;
+        padding: 26px;
+      }
+      .edu ul {
+        margin: 16px 0 0;
+        padding-left: 1.1em;
+      }
+      .edu li {
+        margin: 0 0 10px;
+        font-size: 15px;
+      }
+      .edu li strong {
+        color: var(--txt);
+      }
+
+      /* 倫理 */
+      .ethics li {
+        margin: 0 0 12px;
+        font-size: 15px;
+        color: var(--txt);
+        opacity: 0.92;
+      }
+
+      footer {
+        border-top: 1px solid var(--bdr);
+        padding: 32px 0 56px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      footer a {
+        color: var(--muted);
+      }
+      @media (max-width: 560px) {
+        .cta-row .btn {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="eyebrow">Interactive Social Simulator</p>
+        <h1>社会は、壊れる前に<br /><span class="accent">兆候を出す。</span></h1>
+        <p class="lead">
+          4つの構造を操作して、崩壊と回復を約60秒で実験する教育用シミュレーターです。
+        </p>
+
+        <div class="cta-row">
+          <a class="btn btn-main" href="../">触ってみる</a>
+          <a class="btn btn-sub" href="../classroom.html">授業で使う</a>
+        </div>
+        <p class="note">無料・登録なし・ブラウザで動きます。データは端末の外に出ません。</p>
+
+        <img
+          src="hero-1600.webp"
+          srcset="hero-900.webp 900w, hero-1600.webp 1600w"
+          sizes="(max-width:780px) 100vw, 880px"
+          width="1600"
+          height="900"
+          loading="lazy"
+          decoding="async"
+          alt="社会デバッガーのキービジュアル。情報空間・地域基盤・認知回復・意思決定の4構造が中央のシステムを囲む図"
+        />
+      </header>
+
+      <section>
+        <h2>4つの構造を、別々に壊せる</h2>
+        <p class="sub">
+          どれか一つが崩れても社会は倒れません。倒れるのは、複数が同時に痩せたときです。
+        </p>
+        <div class="pages">
+          <div class="page">
+            <p class="num">PAGE 01</p>
+            <h3>情報空間</h3>
+            <p>断片化した情報と対立フレームが、合意形成をどう削るか。</p>
+          </div>
+          <div class="page">
+            <p class="num">PAGE 02</p>
+            <h3>地域インフラ</h3>
+            <p>予備の削減と担い手の喪失が、平時には見えないまま進む。</p>
+          </div>
+          <div class="page">
+            <p class="num">PAGE 03</p>
+            <h3>認知リカバリー</h3>
+            <p>確かめる習慣が戻るとき、社会は何を取り戻すのか。</p>
+          </div>
+          <div class="page">
+            <p class="num">PAGE 04</p>
+            <h3>意思決定</h3>
+            <p>同じ声の大きさでも、届く先が違えば結果が変わる。</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>授業で使えます</h2>
+        <p class="sub">教材は用意してあります。準備なしで、そのまま持ち込めます。</p>
+        <div class="edu">
+          <ul>
+            <li>
+              <strong>教員向けガイド</strong> — ねらい、進め方、想定される反応。A4で印刷できます
+            </li>
+            <li>
+              <strong>投影スライド</strong> — 9枚。ブラウザだけで動き、JavaScript が無効でも読めます
+            </li>
+            <li><strong>生徒用ワークシート</strong> — 予想 → 実験 → 観察 → 考察の型。書き込み用</li>
+          </ul>
+          <div class="cta-row">
+            <a class="btn btn-sub" href="../classroom.html">教員向けガイドを見る</a>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>この教材が守っていること</h2>
+        <p class="sub">社会の壊れ方を扱う以上、書き方そのものに責任があります。</p>
+        <ul class="ethics">
+          <li>
+            <strong>実在の地名・人名・進行中の政局を出しません。</strong
+            >批判でも称賛でも扱いません。抽象化した型で語ります。
+          </li>
+          <li>
+            <strong>特定の誰かの話にしません。</strong
+            >どの社会にも起こりうる構造の話として設計しています。
+          </li>
+          <li>
+            <strong>データを集めません。</strong>登録も不要で、操作の記録は端末の外に出ません。
+          </li>
+          <li>
+            <strong>数式と閾値を公開しています。</strong
+            >結論だけでなく、そこに至る計算を検証できます。
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>作っている人へ</h2>
+        <p class="sub">オープンソースです。使った感想がいちばん役に立ちます。</p>
+        <div class="cta-row">
+          <a class="btn btn-sub" href="https://github.com/larai-w/social-system-debugger"
+            >GitHub リポジトリ</a
+          >
+          <a
+            class="btn btn-sub"
+            href="https://github.com/larai-w/social-system-debugger/issues/new?template=feedback.md"
+            >感想を書く</a
+          >
+        </div>
+        <p class="note">
+          バグ報告・改善提案・授業で使った話を歓迎します。うまく言葉にならなくても構いません。
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          社会デバッガー — 教育用の社会シミュレーター。<a href="../privacy.html">プライバシー</a> ・
+          <a href="../faq.html">よくある質問</a> ・
+          <a href="/social-system-debugger/lp/index.en.html">English</a>
+        </p>
+        <p>※ 架空の教育用シミュレーションです。実在の団体・地域・出来事とは関係ありません。</p>
+      </footer>
+    </div>
+  </body>
+</html>
