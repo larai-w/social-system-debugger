@@ -1,11 +1,40 @@
 #!/usr/bin/env bash
-# pre-commit — コミット前にユニットテスト＋週替わりJSON検証を走らせ、壊れたコミットを防ぐ。
+# pre-commit — コミット前にユニットテスト＋週替わりJSON検証＋シークレット走査を走らせ、壊れたコミットを防ぐ。
 # 有効化: git config core.hooksPath .githooks （初回のみ。make hooks / CONTRIBUTING 参照）
 # 一時的に無効化したいときは: git commit --no-verify
+#
+# 2つのチェックは役割が違うので、片方をもう片方で置き換えないこと:
+#   npm run check … テスト/週替わりJSON/lint/format。壊れたコミットを防ぐ。
+#   gitleaks      … staged 内の認証情報を検出する。
 set -e
+
 echo "pre-commit: npm run check ..."
 if ! npm run check --silent; then
   echo "❌ テスト/検証に失敗しました。修正するか、緊急時は 'git commit --no-verify' で回避。" >&2
   exit 1
 fi
+
+# Locate gitleaks (PATH or ~/bin)
+GL="$(command -v gitleaks || true)"
+if [ -z "$GL" ] && [ -x "$HOME/bin/gitleaks" ]; then
+  GL="$HOME/bin/gitleaks"
+fi
+if [ -n "$GL" ]; then
+  run_gitleaks() {
+    if "$GL" git --help >/dev/null 2>&1; then
+      "$GL" git --pre-commit --redact --staged --verbose
+    else
+      "$GL" protect --staged --redact --verbose
+    fi
+  }
+  if ! run_gitleaks; then
+    echo ""
+    echo "❌ pre-commit blocked: secret detected in staged changes."
+    echo "   Remove the secret, or allowlist it in .gitleaks.toml. Do NOT use --no-verify."
+    exit 1
+  fi
+else
+  echo "⚠️  gitleaks not found (PATH or ~/bin) — secret scan skipped."
+fi
+
 echo "✅ pre-commit OK"
