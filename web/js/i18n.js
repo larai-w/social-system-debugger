@@ -250,6 +250,7 @@ const I18N = {
     export_json:'📊 Export data (JSON)',
     export_csv:'📊 Export data (CSV)',
     // T35: アプリ内ページ導線
+    menu_lp:'📣 About this simulator',
     menu_classroom:'🏫 Educator guide (use in class)',
     menu_privacy:'🔒 Privacy policy',
     menu_faq:'❓ FAQ (web vs installed app)',

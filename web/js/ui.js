@@ -686,6 +686,8 @@ function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/
 function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
 // T35: アプリ内ページ導線（classroom/privacy。相対URL＝Pages/AWS両対応、言語連動で .en.html）
 function openAppPage(name){track('open_'+name);window.open(name+(lang==='en'?'.en':'')+'.html','_blank','noopener');}
+// LP は lp/index.html / lp/index.en.html という形なので openAppPage の <name>.html 規則に乗らない。
+function openLandingPage(){track('open_lp');window.open('lp/'+(lang==='en'?'index.en.html':''),'_blank','noopener');}
 
 // T50: PWA インストール導線。対応ブラウザではネイティブのインストールプロンプトを出し、
 //   非対応（iOS Safari 等）は手順モーダルへフォールバック。native アプリ内・インストール済みでは非表示。
