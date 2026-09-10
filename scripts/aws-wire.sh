@@ -53,7 +53,7 @@ gh -R "$REPO" variable set CLOUDFRONT_DIST_ID  --body "$DIST_ID"
 gh -R "$REPO" variable set CLOUDFRONT_DOMAIN   --body "$DOMAIN"
 
 # ② web/config.js に配信元を書き込み（ネイティブ/ローカルでも配信版を取得できる）
-printf 'window.SSD_CONFIG = { contentBaseUrl: "https://%s/content/weekly" };\n' "$DOMAIN" > "$ROOT/web/config.js"
+printf 'window.SSD_CONFIG = { contentBaseUrl: "https://%s/content/weekly", nativeContentBaseUrl: "https://%s/content/weekly" };\n' "$DOMAIN" "$DOMAIN" > "$ROOT/web/config.js"
 echo "→ web/config.js を更新: https://$DOMAIN/content/weekly"
 
 echo "✅ 配線完了。以後は main への push で deploy-aws.yml が自動デプロイします。"

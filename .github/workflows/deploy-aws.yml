@@ -44,8 +44,8 @@ jobs:
       - name: Inject content base URL into web/config.js
         if: ${{ vars.CLOUDFRONT_DOMAIN != '' }}
         run: |
-          printf 'window.SSD_CONFIG = { contentBaseUrl: "https://%s/content/weekly" };\n' \
-            "${{ vars.CLOUDFRONT_DOMAIN }}" > web/config.js
+          printf 'window.SSD_CONFIG = { contentBaseUrl: "https://%s/content/weekly", nativeContentBaseUrl: "https://%s/content/weekly" };\n' \
+            "${{ vars.CLOUDFRONT_DOMAIN }}" "${{ vars.CLOUDFRONT_DOMAIN }}" > web/config.js
           echo "config.js →"; cat web/config.js
 
       # web/ を同期。--delete で不要ファイルを掃除するが content/ は別管理なので除外。

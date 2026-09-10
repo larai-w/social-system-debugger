@@ -1,0 +1,7 @@
+# Issue を立てる前の選択画面。
+# セキュリティだけは公開の場に書かせないよう、Issue ではなく非公開の報告フォームへ誘導する。
+blank_issues_enabled: true
+contact_links:
+  - name: 🔒 セキュリティの報告 / Report a vulnerability
+    url: https://github.com/larai-w/social-system-debugger/security/advisories/new
+    about: 脆弱性は Issue ではなく、こちらから非公開で報告してください。Please report vulnerabilities privately here, not in a public Issue.
