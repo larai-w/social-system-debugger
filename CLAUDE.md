@@ -47,6 +47,8 @@
 
 ## 進捗ログ（新しいものを上に追記）
 
+- ✅ **ネイティブストア提出直前化（2026-08-14・直営）**: owner承認済みの恒久ID `jp.veai.socialdebugger` とCloudFront週次配信URLを固定し、Webは同一オリジン・ネイティブは絶対URLを選ぶ分岐をテストで固定。Android Studio／SDK API 36／Temurin 21を導入し、iOS privacy manifest・暗号化申告・生成素材を `npm run native:prepare` で冪等に反映するよう自動化。生成済みiOS/Androidプロジェクト（gitignore対象）で、iOS unsigned device buildとAndroid debug buildがともに成功し、`store:preflight` は **15/15 PASS**。残るのはストアアカウント・ID登録、署名、実機確認、掲載情報・申告、内部テスト配布と提出の人間ゲート。
+- ✅ **ストア提出準備の自動監査（2026-08-13・直営）**: `npm run store:preflight` を追加し、恒久appId、Xcode/JDK/Android SDK、API 36、ネイティブ週次配信URL、Apple required-reason API、アイコン/スプラッシュ、ストア画像6枚、プライバシー文面、ネイティブプロジェクト生成を fail-closed で判定。Xcode 26.2・Capacitor API 36・画像素材・iOS privacy manifest はPASS。残ゲートは owner承認のappId、Android Studio/JDK、ネイティブ配信URL、承認後のiOS/Android生成。Chart.js CDN記述と「データ収集なし」表現を現実の同梱ライブラリ／任意Formspree送信に修正し、2026年のApple/Google公式要件に合わせた `docs/store-submission.md` を復元。
 - ✅ **依存監査の誤分類を修正（2026-08-10・直営）**: CDK専用の `aws-cdk-lib` / `constructs` / `source-map-support` を `infra/package.json` の開発依存へ移動。本番依存がないパッケージでは監査を明示的にスキップするようSecurity baselineを修正し、CDKが内部同梱する未修正版 `brace-expansion` を本番脆弱性として扱う誤検知を解消。ルート `npm run check`、infra build/synthを通過。
 - ✅ **T102（PAGE 5ビジュアル・ストーリーボード・直営）**: `docs/story/page5-storyboard.html` に全8シーンの画面モックを実装。本体未接続の独立レビュー資料として、上部タイムライン／左右キー／`?scene=0..7` で切替可能。既存のダーク・ターミナル調を継承し、P1〜4集約、平時比較、同一ショック、人物交換、因果診断、構造介入、再実験、監査ログ＋共有カードまで情報階層と演出指示を可視化。1440×1000のSCENE 00/02と390×844のSCENE 07をChromiumで目視し、横崩れなし。アプリ本体・公開ゲートは変更なし。
 - ✅ **T101（PAGE 5完成ストーリー設計・直営）**: `docs/story/page5-complete-story.md` に「同じ引き金、違う傷跡」の全8シーンを確定。平時比較→同一ショック→人物交換→攻撃面診断→構造介入→再実験までを、主要ja/en文言・分岐・共有カード・倫理境界・実装時の受け入れ条件込みで仕様化。元案の断定を「トリガーの責任は残るが、差を説明したのは攻撃面」へ精密化。実装ゲートは解除しない。旧Claude CodeプロンプトはGit未追跡を確認し、ignore済み `.local/claude-code-prompts/` へ移した。
@@ -83,6 +85,7 @@
 - 決定事項: 配信は「**GitHub Pages 維持＋AWS 追加**」（URLは常に不変）。応答は日本語。委任プロトコルは上記「開発ツールの方針」。**セッション終了は `make handoff`（手順とポリシーは `docs/session-handoff.md`）**。
 - **フェーズ1は完了。T1〜T38 のスプリント履歴と詳細は `PROGRESS.md` と `CHANGELOG.md`**。人間の残作業は `TODO.md`（☐2 aws-wire / ☐3 protect / ☐4 実機 / ☐5 リール投稿 / ☐9 計測有効化 ほか）。
 - **T102 まで完了**。PAGE 5の完成ストーリーと全8シーンのビジュアル・ストーリーボードは設計済みだが、コード実装ゲートは未達のため保留。X向け30秒リール10本は `promo/campaigns/` で投稿文と対にして整理済み。次の主ボトルネックは人間側 TODO（☐9 計測サービスの有効化・☐5 生成済みMP4/画像のX投稿）と反応データ収集。週次在庫は 2027-W05（2027/2/1週）まで、`npm run check` が残り3週で警告する。
+- **ストア版の次手**: コード・素材・ローカルツールチェーン・両OSビルド・自動preflightは完了。次は人間ゲートとして、両ストアで `jp.veai.socialdebugger` を登録→署名設定→実機確認→掲載情報／プライバシー・Data safety／年齢レーティング申告→内部テスト配布の順。提出や公開はownerの明示承認まで行わない。
 - **GitHub Issues 運用（☐11 完了後）**: スプリント開始時にタスクを**英語で issue 起票**し、完了コミット末尾に `Closes #N`。委任タスクには `process:ai-subagent` ラベル。手順は `docs/github-project.md`。
 - **PAGE 5 / SWAP THE LEADER の投入判定**: docs/story/page5-design-note.md §5 の状態条件（先行版=週次4週運用＋20〜30人）。現状は未達＝着手しない。素材の小出し（T34）だけ先行。
 
