@@ -207,7 +207,13 @@ if (hasFfmpeg) {
     console.log(`🎬 ${path.basename(mp4)}  (${fmtSize(statSync(mp4).size)})`);
   }
 } else {
-  console.log('ℹ️ ffmpeg がないためwebmのみ生成しました。導入後の再実行でmp4も生成されます。');
+  console.warn('⚠️  ffmpeg が無いため webm のみ生成しました。');
+  console.warn('    X / Instagram は webm を受け付けないため、このままでは投稿できません。');
+  console.warn('    ffmpeg を入れずに変換する方法:');
+  console.warn('      python3 -m pip install --user imageio-ffmpeg');
+  console.warn(
+    '      node scripts/record-social-reels.mjs を再実行するか、README の変換手順を参照'
+  );
 }
 
 console.log(`完了: ${produced.length}本を ${OUT_DIR} に出力しました。`);
