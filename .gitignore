@@ -19,4 +19,11 @@ dist/
 # AWS CDK (Phase 1 infra)
 infra/node_modules/
 infra/cdk.out/
+# tsc の出力。outDir 未指定でソースと同じ場所に .js が出るため、
+# ビルドのたびに未追跡ファイルが増える（2026-09-03 に気づいた）。
+infra/bin/*.js
+infra/lib/*.js
+infra/*.d.ts
+infra/bin/*.d.ts
+infra/lib/*.d.ts
 cdk.out/
