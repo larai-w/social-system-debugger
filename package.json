@@ -39,7 +39,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "commonjs",
   "bugs": {
     "url": "https://github.com/larai-w/social-system-debugger/issues"
@@ -51,7 +51,7 @@
     "@capacitor/filesystem": "^8.1.2",
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.4.1",
-    "@capacitor/local-notifications": "^8.2.0",
+    "@capacitor/local-notifications": "^8.2.1",
     "@capacitor/preferences": "^8.0.1",
     "@capacitor/share": "^8.0.1",
     "@capacitor/splash-screen": "^8.0.2",
@@ -61,7 +61,7 @@
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^8.4.1",
     "@eslint/js": "^10.0.1",
-    "@napi-rs/canvas": "^1.0.2",
+    "@napi-rs/canvas": "^1.0.7",
     "eslint": "^10.6.0",
     "playwright": "^1.61.1",
     "prettier": "^3.9.6"
