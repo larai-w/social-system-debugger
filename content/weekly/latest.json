@@ -1,26 +1,26 @@
 {
-  "id": "2026-W33",
-  "title": { "ja": "当事者の声を取り戻す", "en": "Restore Stakeholder Voice" },
+  "id": "2026-W37",
+  "title": { "ja": "満員の観客席", "en": "A Packed Spectator Stand" },
   "intro": {
-    "ja": "議論が盛り上がるほど、当事者の声は観客の歓声にかき消されていく。ゲーム化された外野のトラフィックが帯域を食い潰し、本来届くべきパケットが静かにドロップする。あなたの街の回線を、取り戻せるか。",
-    "en": "The livelier the debate, the more the stakeholders' voices drown under the spectators' cheers. Gamified outside traffic eats the bandwidth, and the packets that should get through are quietly dropped. Can you reclaim your town's channel?"
+    "ja": "議論の会場は満員だ——ただし、当事者ではなく観客で。ゲーム化された歓声が帯域を埋め尽くし、生活者のパケットは4本に3本が落ちている。この騒がしさの中で、本来の声を通せるか。",
+    "en": "The debate hall is packed — with spectators, not stakeholders. Gamified cheering floods the bandwidth, and three out of four resident packets are being dropped. Can you route the real voices through all this noise?"
   },
   "page": 4,
   "params": {
-    "p4": { "ext": 50, "gam": 40 },
+    "p4": { "ext": 70, "gam": 75 },
     "hint": {
-      "ja": "ゲーム化とパケットドロップ率の関係を観察し、外部トラフィックを絞って当事者比率を改善してください。",
-      "en": "Watch how gamification links to packet drop, then throttle outside traffic to improve the stakeholder ratio."
+      "ja": "ゲーム化と外部トラフィックの両方を大きく絞る必要があります。片方だけではドロップ率が下がりきりません。",
+      "en": "You need to throttle both gamification and outside traffic hard. Either one alone won't bring the drop rate down far enough."
     }
   },
   "goal": {
-    "ja": "当事者コミット比率を70以上に上げ、パケットドロップ率を40以下に下げる",
-    "en": "Raise the stakeholder commit ratio above 70 and cut the packet drop rate to 40 or below"
+    "ja": "当事者コミット比率を75以上に上げ、パケットドロップ率を30以下に下げる",
+    "en": "Raise the stakeholder commit ratio above 75 and cut the packet drop rate to 30 or below"
   },
   "goalConds": [
-    { "metric": "ratio", "op": ">=", "value": 70 },
-    { "metric": "drop", "op": "<=", "value": 40 }
+    { "metric": "ratio", "op": ">=", "value": 75 },
+    { "metric": "drop", "op": "<=", "value": 30 }
   ],
-  "difficulty": "normal",
+  "difficulty": "hard",
   "discoveryId": "sce_stakeholder_voice"
 }

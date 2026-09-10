@@ -9,6 +9,22 @@
 Web（GitHub Pages / AWS CloudFront）＋ネイティブ（Capacitor iOS/Android）。収益化しない。
 多く使われた実績を就活（クラウドエンジニア）・CS博士出願の資料にするのが目的。
 
+## 非公開にするもの — 戦略・事業・引き継ぎ
+
+- 事業・成長・ロードマップ・価格・売上・営業/パイロット・市場分析、および
+  **内部の作業ログと引き継ぎ文書**は、**この公開リポジトリに置かない。**
+  非公開の **`larai-w/veai-private`** に置く（プロダクト別フォルダ。同期・バックアップ済み）。
+- そのマシンだけの走り書きは `docs-private/`（gitignore 済み・同期しない）。
+- pre-commit と CI の両方で `scripts/check_public_repo.py` が止める。
+  **フックを迂回して通さないこと。** 有効化は `git config core.hooksPath .githooks`（初回のみ）。
+
+⚠️ **このリポジトリでは `handoff` が機能名でもある。**
+`docs/session-handoff.md` はログアウト手順のポリシー、
+`scripts/handoff-check.sh` / `handoff-hook.sh` はそのためのツールで、
+どれも引き継ぎ「文書」ではない。ガードはファイル名で引っかけるので、
+確認のうえ `check-public-repo: allow` を書いてある。
+**新しく `handoff` を含む名前を付けるときは、中身が本当に公開してよいものかを先に見ること。**
+
 ## リポジトリ構成（要点）
 - `web/` … フロント。`js/{i18n,engine,native,share,scenario,ui}.js`（**バンドラなし・古典スクリプトでグローバル共有**、読込順が意味を持つ）。`engine.js` は **DOM/window 非依存**。
 - `content/weekly/` … 週替わりシナリオ JSON（`*.json` + `latest.json` + `weekly.schema.json`）。
