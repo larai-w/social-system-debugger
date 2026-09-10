@@ -294,3 +294,9 @@ flowchart TD
 ---
 
 *Engine: Markov Chain + Monte Carlo + Agent-Based Simulation | © 2026 Social OS Debugger — Educational Tool*
+
+## Stage 5：仮説を検証する
+
+アプリのメニューから、8場面の比較教材を別タブで開けます。初回予想、作用者の交換、条件別比較、予算付き介入、振り返りを行います。Page 1〜4の入力値とは独立した説明用モデルで、現実の因果や人物の責任は判定しません。日英表示と学習記録のJSON保存・読み戻しに対応しています。
+
+[モデルと学習の説明](docs/STAGE5.md)。Web版は本体のオフライン準備完了後、Stage 5もオフラインで利用できます。学習記録は自動保存されないため、再読み込み前にJSONを保存してください。
