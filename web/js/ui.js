@@ -685,6 +685,7 @@ function track(event,props){
 function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/blob/main/docs/'+name+(lang==='en'?'.en':'')+'.md';}
 function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
 // T35: アプリ内ページ導線（classroom/privacy。相対URL＝Pages/AWS両対応、言語連動で .en.html）
+function openStage5(){window.open('stage5.html#'+(lang==='en'?'en':'ja'),'_blank','noopener');}
 function openAppPage(name){track('open_'+name);window.open(name+(lang==='en'?'.en':'')+'.html','_blank','noopener');}
 // LP は lp/index.html / lp/index.en.html という形なので openAppPage の <name>.html 規則に乗らない。
 function openLandingPage(){track('open_lp');window.open('lp/'+(lang==='en'?'index.en.html':''),'_blank','noopener');}

@@ -109,10 +109,10 @@ make protect
 - [x] アイコン、スプラッシュ、ストア画像6枚
 - [x] Apple required-reason API privacy manifest
 - [x] 2026年版提出ランブックとプライバシー文面整合
-- [ ] ownerが恒久appIdを承認（候補 `jp.veai.socialdebugger`）
-- [ ] ownerがネイティブ週次配信URLを承認
-- [ ] Android Studio/JDKを導入
-- [ ] 承認後にiOS/Androidプロジェクト生成・ビルド
+- [x] 恒久appId `jp.veai.socialdebugger` を承認・固定済み
+- [x] ネイティブ週次配信URLを設定済み
+- [ ] Android SDKを導入・設定（JDK 21 は利用可能）
+- [ ] iOS/Androidプロジェクトを再生成し、署名前ビルドを確認
 - [ ] 物理端末、TestFlight、Play内部テスト
 
 ### iOS

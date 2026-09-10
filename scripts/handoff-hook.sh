@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# check-public-repo: allow — ファイル名の `handoff` は本リポジトリの機能名。
+# これは引き継ぎ用のフックを行うツールであって、引き継ぎ文書そのものではない。
+# 2026-09-09 に内容を確認のうえ許可した。
 # handoff-hook.sh — Claude Code の Stop フック用の「軽量」チェック（テストは走らせない＝高速）。
 # 問題（同期の競合コピー / 未コミット / 未push）があるときだけ、systemMessage を JSON で出して警告する。
 # 全て正常なら何も出さない（静かに終わる）。重い検証は `make handoff`（テスト込み）。
