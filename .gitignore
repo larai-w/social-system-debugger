@@ -27,3 +27,8 @@ infra/*.d.ts
 infra/bin/*.d.ts
 infra/lib/*.d.ts
 cdk.out/
+
+# Private local working material
+.private/
+docs-private/
+personal/

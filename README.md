@@ -22,6 +22,8 @@
 
 ---
 
+改善に参加する方は [参加ガイド](CONTRIBUTING.md)へ。小さなタスクは [Good first issue フォーム](https://github.com/larai-w/social-system-debugger/issues/new?template=good-first-issue.yml)から提案できます。
+
 ## 概要 / Overview
 
 機械学習・分散システム工学の概念（過学習、デッドロック、冗長性、Dropout、学習率、シビル攻撃）を社会現象へマッピングした**バンドラ不要のバニラJSアプリ**（`web/` 配下・古典スクリプト分割）です。スライダー操作に対してエージェント・シミュレーション、Chart.js、Canvasアニメーションが即座に応答し、同じコードが Capacitor で iOS/Android アプリにもなります。
