@@ -801,6 +801,18 @@ function closeModal(){
 }
 function closeModalIf(e){if(e.target===document.getElementById('modal'))closeModal()}
 
+function trapMetricModalFocus(event){
+  if(event.key!=='Tab')return;
+  const modal=document.getElementById('modal');
+  if(!modal?.classList.contains('on'))return;
+  const controls=[...modal.querySelectorAll('button:not([disabled]),a[href]')]
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden');
+  if(!controls.length)return;
+  const first=controls[0],last=controls.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+}
+
 function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
 
 function setAlgoUI(a){
@@ -837,7 +849,10 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
   this.style.background=`linear-gradient(90deg,var(--pur) ${pct},var(--bdr) ${pct})`;
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}
+  trapMetricModalFocus(e);
+});
 
 function switchTab(n){
   currentTab = n;
