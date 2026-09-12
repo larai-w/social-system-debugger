@@ -319,3 +319,4 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .sg-tbl td{padding:6px 5px}
 }
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg0)}::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}

@@ -1444,6 +1444,11 @@ function setText(el,txt){if(el&&el._t!==txt){el._t=txt;el.textContent=txt;}}
 function setColor(el,col){if(el&&el._c!==col){el._c=col;el.style.color=col;}}
 function setClassOn(el,name,on){if(el&&el['_k'+name]!==on){el['_k'+name]=on;el.classList.toggle(name,on);}}
 function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;}}
+function announceVerdict(text){
+  const live=document.getElementById('verdictAnnouncement');if(!live)return;
+  live.textContent='';
+  requestAnimationFrame(()=>{live.textContent=text;});
+}
 
 // v6.333: 判定バナーの3状態切替（'crash' 赤 / 'good' 緑 / '' 非表示）。状態変化時だけDOMへ書き込む。
 //   .at の data-i18n を付け替えるので言語切替は既存 applyI18nAuto が自動追従する。
@@ -1464,6 +1469,7 @@ function setVerdictBanner(alertId,state,key){
     if(state==='good'){al.classList.add('good');at.classList.add('good');}
     else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
     al.classList.add('on');
+    announceVerdict(at.textContent);
     track('verdict',{banner:alertId,state,key});
     // v6.35 (task2): 崩壊へ遷移した瞬間だけ短い振動（ネイティブのみ / Webは no-op）。
     // 上部の bst ガードで状態変化時にしか到達しないため連続振動しない。
