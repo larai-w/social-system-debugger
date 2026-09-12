@@ -875,6 +875,7 @@ function switchTab(n){
     const tb=document.getElementById('tab'+i+'Btn');
     tb.classList.toggle('active', n===i);
     tb.setAttribute('aria-selected', n===i ? 'true' : 'false'); // T55: スクリーンリーダーへ選択状態を通知
+    tb.tabIndex=n===i?0:-1;
   });
   if(n===2){ updateAllP2(); startP2Tick(); } else { stopP2Tick(); } // v6.346: 後継者ストックはP2表示中のみ時間経過
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
