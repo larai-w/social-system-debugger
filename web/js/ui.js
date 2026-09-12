@@ -760,6 +760,11 @@ function setPresetButtonState(prefix,presets,selectedId){
   });
 }
 
+function announcePreset(prefix,id){
+  const label=document.getElementById(prefix+id)?.textContent.trim();
+  if(label)announceVerdict(tt(`${label} を適用しました`,`${label} applied.`));
+}
+
 function setPreset(id){
   const p=PRESETS[id];if(!p)return;
   filterRate=p.f;ethicsScore=p.e;algo=p.a;
@@ -775,6 +780,7 @@ function setPreset(id){
   stopAnimation();
   restartAgents();
   updateAll();
+  announcePreset('p-',id);
   showShareToast({kind:'preset',page:1,preset:id});
   notePreset(1,id); if(id==='weimar')discover('d_p1_weimar'); if(id==='nordic')discover('d_p1_nordic');
 }
@@ -2312,6 +2318,7 @@ function setPresetP2(id){
   shockState=null;
   setPresetButtonState('p2-',PRESETS_P2,id);
   updateAllP2();
+  announcePreset('p2-',id);
   showShareToast({kind:'preset',page:2,preset:id});
   notePreset(2,id);
 }
@@ -2334,6 +2341,7 @@ function setPresetP3(id){
   setPct(ds);setPct(gs);setPct(ls);
   setPresetButtonState('p3-',PRESETS_P3,id);
   updateP3Chart();
+  announcePreset('p3-',id);
   showShareToast({kind:'preset',page:3,preset:id});
   notePreset(3,id);
 }
@@ -2355,6 +2363,7 @@ function setPresetP4(id){
   setPct(et);setPct(gm);
   setPresetButtonState('p4-',PRESETS_P4,id);
   updateP4Chart();
+  announcePreset('p4-',id);
   showShareToast({kind:'preset',page:4,preset:id});
   notePreset(4,id);
 }
