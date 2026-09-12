@@ -11,5 +11,5 @@ test('clickable metric explanations and links gain keyboard button semantics', (
   assert.match(ui, /el\.setAttribute\('role','button'\)/);
   assert.match(ui, /event\.key!==\'Enter\'&&event\.key!==\' \'/);
   assert.match(ui, /enhancePointerControls\(\);/);
-  assert.match(css, /\[role="button"\]\.kbd-action:focus-visible/);
+  assert.match(css, /:where\(button,a,input,select,textarea,\[role="button"\]\):focus-visible/);
 });
