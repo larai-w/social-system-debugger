@@ -681,7 +681,7 @@
     <button class="mc" aria-label="Close" onclick="closeAudit()">✕</button>
     <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
     <div class="mti" id="auditTitle" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
-    <textarea id="auditText" readonly class="audit-ta"></textarea>
+    <textarea id="auditText" readonly class="audit-ta" aria-labelledby="auditTitle"></textarea>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
       <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
       <button class="sbtn x-btn" style="margin-top:0" onclick="postAuditToX()">𝕏 Post on X</button>
@@ -725,9 +725,9 @@
     <button class="sbtn ok" onclick="closeIntro()" style="margin-top:14px" data-i18n="intro_start">▶ あなたの街をデバッグする</button>
     <!-- v6.345: 街の名前（任意スキップ可） -->
     <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--bdr)">
-      <div style="font-size:.6rem;color:var(--muted);margin-bottom:6px;letter-spacing:.06em" data-i18n="town_label">▷ あなたの街に名前を付ける（任意）</div>
+      <div id="townNameLabel" style="font-size:.6rem;color:var(--muted);margin-bottom:6px;letter-spacing:.06em" data-i18n="town_label">▷ あなたの街に名前を付ける（任意）</div>
       <div style="display:flex;gap:8px;align-items:center">
-        <input type="text" id="townNameInput" maxlength="20" data-i18n-placeholder="town_placeholder"
+        <input type="text" id="townNameInput" aria-labelledby="townNameLabel" maxlength="20" data-i18n-placeholder="town_placeholder"
           placeholder="例: 東京 / 地元の市 / 未来の街"
           style="flex:1;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:6px 10px;letter-spacing:.04em;outline:none" oninput="saveTownName(this.value)">
       </div>
@@ -828,10 +828,10 @@
         <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
         <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
       </div>
-      <div class="pd" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
-      <textarea id="fbMessage" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
-      <div class="pd" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
-      <input type="email" id="fbEmail" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
+      <div class="pd" id="fbMessageLabel" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
+      <textarea id="fbMessage" aria-labelledby="fbMessageLabel" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
+      <div class="pd" id="fbEmailLabel" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
+      <input type="email" id="fbEmail" aria-labelledby="fbEmailLabel" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
       <button type="submit" class="sbtn" id="fbSubmit" style="margin-top:14px;border-color:var(--green);color:var(--green)" data-i18n="fb_submit">送信</button>
       <div id="fbStatus" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
     </form>
@@ -888,7 +888,7 @@
     <button class="mc" aria-label="Close" onclick="closeShareComment()">✕</button>
     <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
     <div class="mti" id="shareCommentTitle" data-i18n="sc_title">一言添えて送る（任意）</div>
-    <textarea id="shareCommentInput" rows="2" maxlength="100"
+    <textarea id="shareCommentInput" aria-labelledby="shareCommentTitle" rows="2" maxlength="100"
       style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:none;letter-spacing:.03em;margin-bottom:10px"
       placeholder="自分の感想を一言…（スキップ可）"></textarea>
     <div id="scChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
