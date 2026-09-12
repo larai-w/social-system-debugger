@@ -16,3 +16,10 @@ test('feedback submission results are announced through a polite status region',
     /status\.textContent=tt\('送信に失敗しました。時間をおいて再度お試しください','Sending failed\. Please try again later\.'/
   );
 });
+
+test('researcher links use a named disclosure control and semantic hidden state', () => {
+  assert.match(html, /id="fbResearcher" aria-controls="fbDevTop"/);
+  assert.match(html, /id="fbDevTop" hidden/);
+  assert.match(ui, /if\(top\)top\.hidden=!researcherMode;/);
+  assert.match(ui, /if\(note\)note\.hidden=researcherMode;/);
+});

@@ -812,11 +812,11 @@
     <button class="mc" aria-label="Close" onclick="closeFeedback()">✕</button>
     <div class="mti" id="feedbackTitle" data-i18n="fb_title">フィードバック</div>
     <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
-      <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
-      <span data-i18n="fb_researcher">🔬 研究者・技術者として表示</span>
+      <input type="checkbox" id="fbResearcher" aria-controls="fbDevTop" onchange="setResearcherMode(this.checked)">
+      <span data-i18n="fb_researcher">🔬 研究者・技術者向けのリンクを表示</span>
     </label>
     <!-- researcherMode ON 時に格上げされる開発者導線 -->
-    <div id="fbDevTop" style="display:none;margin-bottom:14px">
+    <div id="fbDevTop" hidden style="margin-bottom:14px">
       <a class="doclink sbtn" data-doc="METHODOLOGY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/METHODOLOGY.md" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:0;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_doc_link">📄 方法論・数式仕様（METHODOLOGY）</a>
       <a class="doclink sbtn" data-doc="DATA-DICTIONARY" href="https://github.com/larai-w/social-system-debugger/blob/main/docs/DATA-DICTIONARY.md" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_data_link">📊 データ辞書（エクスポート項目と式の対応）</a>
       <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
