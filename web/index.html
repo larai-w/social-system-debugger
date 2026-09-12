@@ -234,12 +234,12 @@
 
     <div class="card">
       <div class="ct">
-        <div class="ct-l"><span class="dot" style="background:var(--green);box-shadow:0 0 7px var(--green)"></span>④ AGENT NETWORK SIMULATION</div>
+        <div class="ct-l" id="agentCanvasHeading"><span class="dot" style="background:var(--green);box-shadow:0 0 7px var(--green)"></span>④ AGENT NETWORK SIMULATION</div>
         <button class="ibtn" onclick="restartAgents()" style="font-size:.58rem;padding:4px 9px" id="resetLbl">↺ RESET</button>
       </div>
       <div class="cs" id="s4sub">48エージェントによる情報伝播シミュレーション。フィルタリング率が上がると同信念エッジのみ残りクラスターが形成される。ノードをリアルタイムで観測せよ。</div>
       <div class="ag-wrap">
-        <canvas id="agentCanvas"></canvas>
+        <canvas id="agentCanvas" role="img" aria-labelledby="agentCanvasHeading" aria-describedby="agSt1 agSt2"></canvas>
         <div class="ag-ov">
           <div class="ag-st" id="agSt1">ECHO EXPOSURE: 0%</div>
           <div class="ag-st" id="agSt2">IN ECHO CHAMBER: 0/48</div>
@@ -531,12 +531,12 @@
   <div class="charts">
     <div class="card">
       <div class="ct" style="color:var(--pur)">
-        <div class="ct-l"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span>① COGNITIVE NETWORK — POISONING ATTACK MONITOR</div>
+        <div class="ct-l" id="p3CanvasHeading"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span>① COGNITIVE NETWORK — POISONING ATTACK MONITOR</div>
         <button class="ibtn" onclick="restartP3()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
       </div>
       <div class="cs" data-i18n="p3_cs_canvas">中央の偽装ノード（自称・良識派）が周囲の正義感をハックする。探索深度3以下で一般ノードが騙され、事実を述べる中立ノードへの「正義の毒入れ攻撃」（赤点線）が発生。深度7以上でデバッグ完了。</div>
       <div class="ag-wrap" style="height:330px">
-        <canvas id="p3Canvas"></canvas>
+        <canvas id="p3Canvas" role="img" aria-labelledby="p3CanvasHeading" aria-describedby="p3St1 p3St2"></canvas>
         <div class="ag-ov">
           <div class="ag-st" id="p3St1">JUSTICE SURGE: 0%</div>
           <div class="ag-st" id="p3St2">ATTACK EDGES: 0</div>
@@ -632,12 +632,12 @@
   <div class="charts">
     <div class="card">
       <div class="ct" style="color:var(--yel)">
-        <div class="ct-l"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>① STAKEHOLDER NETWORK — SYBIL FLOOD MONITOR</div>
+        <div class="ct-l" id="p4CanvasHeading"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>① STAKEHOLDER NETWORK — SYBIL FLOOD MONITOR</div>
         <button class="ibtn" onclick="restartP4()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
       </div>
       <div class="cs" data-i18n="p4_cs_canvas">中央の青いクラスターは530万人の生活者（サイレントマジョリティ）。外部ノード流入率を上げると、画面外から1ビット思考のスパムノードが流入し、生活者同士の通信リンクを遮断・占拠する。</div>
       <div class="ag-wrap" style="height:330px">
-        <canvas id="p4Canvas"></canvas>
+        <canvas id="p4Canvas" role="img" aria-labelledby="p4CanvasHeading" aria-describedby="p4St1 p4St2"></canvas>
         <div class="ag-ov">
           <div class="ag-st" id="p4St1">JAMMED LINKS: 0/0</div>
           <div class="ag-st" id="p4St2">EXTERNAL NODES: 0/36</div>
