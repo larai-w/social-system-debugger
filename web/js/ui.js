@@ -830,7 +830,7 @@ function trapMetricModalFocus(event){
   const modal=document.getElementById('modal');
   if(!modal?.classList.contains('on'))return;
   const controls=[...modal.querySelectorAll('button:not([disabled]),a[href]')]
-    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden');
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none');
   if(!controls.length)return;
   const first=controls[0],last=controls.at(-1);
   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
@@ -840,7 +840,7 @@ function trapMetricModalFocus(event){
 const dialogFocusOrigins=new Map();
 function dialogControls(dialog){
   return [...dialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])')]
-    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden');
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none');
 }
 function trapOpenDialogFocus(event){
   if(event.key!=='Tab')return;

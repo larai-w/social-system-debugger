@@ -6,6 +6,7 @@ const ui = await readFile(new URL('../web/js/ui.js', import.meta.url), 'utf8');
 
 test('non-metric dialogs receive focus, trap Tab, and restore their trigger', () => {
   assert.match(ui, /function dialogControls\(dialog\)/);
+  assert.match(ui, /getComputedStyle\(el\)\.display!==\'none\'/);
   assert.match(ui, /function trapOpenDialogFocus\(event\)/);
   assert.match(ui, /document\.querySelectorAll\('\.mo\.on:not\(#modal\)'\)/);
   assert.match(
