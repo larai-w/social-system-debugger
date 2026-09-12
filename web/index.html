@@ -83,10 +83,10 @@
 </div>
 
 <div class="tab-bar" role="tablist">
-  <button class="tab-btn active" id="tab1Btn" role="tab" aria-selected="true" aria-controls="page1" onclick="switchTab(1)">▶ PAGE 1: INFORMATION SPACE</button>
-  <button class="tab-btn" id="tab2Btn" role="tab" aria-selected="false" aria-controls="page2" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
-  <button class="tab-btn" id="tab3Btn" role="tab" aria-selected="false" aria-controls="page3" onclick="switchTab(3)">▶ PAGE 3: COGNITIVE RECOVERY</button>
-  <button class="tab-btn" id="tab4Btn" role="tab" aria-selected="false" aria-controls="page4" onclick="switchTab(4)">▶ PAGE 4: STAKEHOLDER ASYMMETRY</button>
+  <button class="tab-btn active" id="tab1Btn" role="tab" aria-selected="true" aria-controls="page1" tabindex="0" onclick="switchTab(1)">▶ PAGE 1: INFORMATION SPACE</button>
+  <button class="tab-btn" id="tab2Btn" role="tab" aria-selected="false" aria-controls="page2" tabindex="-1" onclick="switchTab(2)">▶ PAGE 2: REGIONAL INFRASTRUCTURE</button>
+  <button class="tab-btn" id="tab3Btn" role="tab" aria-selected="false" aria-controls="page3" tabindex="-1" onclick="switchTab(3)">▶ PAGE 3: COGNITIVE RECOVERY</button>
+  <button class="tab-btn" id="tab4Btn" role="tab" aria-selected="false" aria-controls="page4" tabindex="-1" onclick="switchTab(4)">▶ PAGE 4: STAKEHOLDER ASYMMETRY</button>
 </div>
 
 <div id="page1" class="page active" role="tabpanel" aria-labelledby="tab1Btn">
