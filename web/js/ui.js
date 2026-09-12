@@ -680,6 +680,7 @@ function enhancePointerControls(){
     el.classList.add('kbd-action');
     el.setAttribute('role','button');
     el.tabIndex=0;
+    el.addEventListener('pointerdown',()=>el.focus());
     el.addEventListener('keydown',event=>{
       if(event.key!=='Enter'&&event.key!==' ')return;
       event.preventDefault();
@@ -781,15 +782,23 @@ function shareURL(){
   }catch(e){prompt('Copy this URL:',url)}
 }
 
+let modalReturnFocus=null;
 function openModal(key){
   const d=MDATA[key];if(!d)return;
+  const active=document.activeElement;
+  modalReturnFocus=active instanceof HTMLElement&&active!==document.body?active:null;
   document.getElementById('mTag').textContent=d.tag;
   document.getElementById('mTitle').textContent=lang==='ja'?d.jaTitle:d.enTitle;
   document.getElementById('mBody').innerHTML=lang==='ja'?d.jaBody:d.enBody;
   document.getElementById('mFormula').textContent=d.formula;
   document.getElementById('modal').classList.add('on');
+  requestAnimationFrame(()=>document.querySelector('#modal .mc')?.focus());
 }
-function closeModal(){document.getElementById('modal').classList.remove('on')}
+function closeModal(){
+  document.getElementById('modal').classList.remove('on');
+  const target=modalReturnFocus;modalReturnFocus=null;
+  if(target?.isConnected)requestAnimationFrame(()=>target.focus());
+}
 function closeModalIf(e){if(e.target===document.getElementById('modal'))closeModal()}
 
 function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
