@@ -745,7 +745,10 @@ function toggleAcc(id,btn){
   const el=document.getElementById(id);if(!el)return;
   const open=el.style.display==='none';
   el.style.display=open?'block':'none';
-  if(btn)btn.classList.toggle('open',open);
+  if(btn){
+    btn.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',String(open));
+  }
 }
 
 function setPresetButtonState(prefix,presets,selectedId){
