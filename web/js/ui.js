@@ -884,6 +884,21 @@ function switchTab(n){
   try{const u=new URL(location.href);u.searchParams.set('tab',n);history.replaceState(null,'',u);}catch(e){}
 }
 
+document.querySelector('.tab-bar')?.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  const tabs=[...event.currentTarget.querySelectorAll('[role="tab"]')];
+  const current=tabs.indexOf(document.activeElement);
+  if(current<0)return;
+  let next=current;
+  if(event.key==='ArrowLeft')next=(current-1+tabs.length)%tabs.length;
+  if(event.key==='ArrowRight')next=(current+1)%tabs.length;
+  if(event.key==='Home')next=0;
+  if(event.key==='End')next=tabs.length-1;
+  event.preventDefault();
+  tabs[next].focus();
+  switchTab(next+1);
+});
+
 // ── PAGE 2 STATE ──────────────────────────────────────────
 let shrinkRate=10, dxRate=30, algoP2='greedy', ethicsP2=68; // v6.334: 初期状態から p2Good（平穏）を満たす
 let p2AnimPlaying=false, p2AnimTimer=null, p2AnimStep=0, p2FullTimeline=null;
