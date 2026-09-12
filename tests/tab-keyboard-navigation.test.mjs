@@ -28,3 +28,12 @@ test('only the active page tab is in the Tab sequence', () => {
   }
   assert.match(ui, /tb\.tabIndex=n===i\?0:-1/);
 });
+
+test('cross-page links return focus to the newly selected tab', () => {
+  assert.match(ui, /const sourcePage=document\.activeElement\?\.closest\?\.\('\.page'\)/);
+  assert.match(ui, /if\(sourcePage&&!sourcePage\.classList\.contains\('active'\)\)/);
+  assert.match(
+    ui,
+    /requestAnimationFrame\(\(\)=>document\.getElementById\('tab'\+n\+'Btn'\)\?\.focus\(\)\)/
+  );
+});
