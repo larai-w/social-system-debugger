@@ -676,11 +676,11 @@
 <div class="foot" id="footerTxt" data-i18n="footerTxt">社会デバッガー v6.346 &nbsp;|&nbsp; Engine: Markov Chain + Monte Carlo + Agent-Based Simulation &nbsp;|&nbsp; 気になったら、あなたの街の設定で試してみて</div>
 </div>
 
-<div class="mo" role="dialog" aria-modal="true" id="auditModal" onclick="closeAuditIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="auditTitle" id="auditModal" onclick="closeAuditIf(event)">
   <div class="mb" style="max-width:640px;border-color:var(--green);box-shadow:0 0 40px rgba(0,255,136,.25)">
     <button class="mc" aria-label="Close" onclick="closeAudit()">✕</button>
     <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
-    <div class="mti" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
+    <div class="mti" id="auditTitle" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
     <textarea id="auditText" readonly class="audit-ta"></textarea>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
       <button class="sbtn" style="margin-top:0" id="auditCopyBtn" onclick="copyAuditReport()" data-i18n="audit_copy">⎘ Markdownをコピー</button>
@@ -690,11 +690,11 @@
   </div>
 </div>
 
-<div class="mo" role="dialog" aria-modal="true" id="introModal" onclick="closeIntroIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="introTitle" id="introModal" onclick="closeIntroIf(event)">
   <div class="mb" style="max-width:620px">
     <button class="mc" aria-label="Close" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
-    <div class="mti" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
+    <div class="mti" id="introTitle" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
     <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
     <div class="intro-layers">
       <button class="intro-layer" style="--lc:var(--cyan)" onclick="introGo(1)">
@@ -737,7 +737,7 @@
 </div>
 
 <!-- v6.2: 共有ポップオーバー（テンプレ選択 → OS共有 / LINE / X / コピー） -->
-<div class="mo" role="dialog" aria-modal="true" id="sharePopModal" onclick="closeSharePopIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="sharePopTitle" id="sharePopModal" onclick="closeSharePopIf(event)">
   <div class="mb" style="max-width:520px">
     <button class="mc" aria-label="Close" onclick="closeSharePop()">✕</button>
     <div class="mtag">⇪ SHARE EXPERIMENT</div>
@@ -762,11 +762,11 @@
 
 <!-- v6.2: 共有ガイドモーダル -->
 <!-- T50: PWA インストール手順モーダル（beforeinstallprompt が使えないブラウザ向けフォールバック） -->
-<div class="mo" role="dialog" aria-modal="true" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="pwaInstallTitle" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
   <div class="mb" style="max-width:560px">
     <button class="mc" aria-label="Close" onclick="closePwaInstall()">✕</button>
     <div class="mtag" data-i18n="pwa_tag">INSTALL — アプリとして使う</div>
-    <div class="mti" data-i18n="pwa_title">ホーム画面から、1タップで起動</div>
+    <div class="mti" id="pwaInstallTitle" data-i18n="pwa_title">ホーム画面から、1タップで起動</div>
     <div class="mbd" data-i18n="pwa_body">このサイトは PWA（インストールできるWebアプリ）です。入れておくと全画面で起動し、オフラインでも動きます。登録・料金は不要です。<br><br>
       <b>iPhone / iPad（Safari）:</b> 共有ボタン（□に↑）→「ホーム画面に追加」<br>
       <b>Android（Chrome）:</b> メニュー（⋮）→「アプリをインストール」<br>
@@ -774,11 +774,11 @@
   </div>
 </div>
 
-<div class="mo" role="dialog" aria-modal="true" id="shareGuideModal" onclick="closeShareGuideIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="shareGuideTitle" id="shareGuideModal" onclick="closeShareGuideIf(event)">
   <div class="mb" style="max-width:640px">
     <button class="mc" aria-label="Close" onclick="closeShareGuide()">✕</button>
     <div class="mtag" data-i18n="sg_tag">SHARE GUIDE — 共有のつかいかた</div>
-    <div class="mti" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
+    <div class="mti" id="shareGuideTitle" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
     <div class="mbd" style="margin-bottom:12px" data-i18n="sg_body">このアプリで共有されるのは主張ではなく、誰でも再現できる実験（パラメータ状態のURL）です。
       <br> おすすめの送り方:</div>
     <div class="sg-tblwrap">
@@ -807,10 +807,10 @@
 </div>
 
 <!-- v6.332: フィードバックモーダル -->
-<div class="mo" role="dialog" aria-modal="true" id="feedbackModal" onclick="closeFeedbackIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" id="feedbackModal" onclick="closeFeedbackIf(event)">
   <div class="mb" style="max-width:520px">
     <button class="mc" aria-label="Close" onclick="closeFeedback()">✕</button>
-    <div class="mti" data-i18n="fb_title">フィードバック</div>
+    <div class="mti" id="feedbackTitle" data-i18n="fb_title">フィードバック</div>
     <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
       <input type="checkbox" id="fbResearcher" onchange="setResearcherMode(this.checked)">
       <span data-i18n="fb_researcher">🔬 研究者・技術者として表示</span>
@@ -844,17 +844,17 @@
 </div>
 
 <!-- v6.334: 発見ログモーダル -->
-<div class="mo" role="dialog" aria-modal="true" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="discoveryTitle" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
   <div class="mb" style="max-width:480px">
     <button class="mc" aria-label="Close" onclick="closeDiscoveryLog()">✕</button>
-    <div class="mti" data-i18n="disc_title">📖 発見ログ</div>
+    <div class="mti" id="discoveryTitle" data-i18n="disc_title">📖 発見ログ</div>
     <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
     <div id="discList"></div>
   </div>
 </div>
 
 <!-- v6.35: Weekly Scenarios Modal -->
-<div class="mo" role="dialog" aria-modal="true" id="scenarioModal" onclick="closeScenarioIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="scenarioTitle" id="scenarioModal" onclick="closeScenarioIf(event)">
   <div class="mb" style="max-width:520px">
     <button class="mc" aria-label="Close" onclick="closeScenarios()">✕</button>
     <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
@@ -872,22 +872,22 @@
 </div>
 
 <!-- v6.345: 共有前コメントモーダル -->
-<div class="mo" role="dialog" aria-modal="true" id="rewindModal" onclick="closeRewindIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="rewindTitle" id="rewindModal" onclick="closeRewindIf(event)">
   <div class="mb" style="max-width:460px">
     <button class="mc" aria-label="Close" onclick="closeRewind()">✕</button>
     <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
-    <div class="mti" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
+    <div class="mti" id="rewindTitle" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
     <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
     <div id="rewindChoices" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
     <div id="rewindResult" style="display:none;padding:12px;border:1px solid var(--bdr);border-radius:3px;font-size:.65rem;line-height:1.6"></div>
   </div>
 </div>
 
-<div class="mo" role="dialog" aria-modal="true" id="shareCommentModal" onclick="closeShareCommentIf(event)">
+<div class="mo" role="dialog" aria-modal="true" aria-labelledby="shareCommentTitle" id="shareCommentModal" onclick="closeShareCommentIf(event)">
   <div class="mb" style="max-width:460px">
     <button class="mc" aria-label="Close" onclick="closeShareComment()">✕</button>
     <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
-    <div class="mti" data-i18n="sc_title">一言添えて送る（任意）</div>
+    <div class="mti" id="shareCommentTitle" data-i18n="sc_title">一言添えて送る（任意）</div>
     <textarea id="shareCommentInput" rows="2" maxlength="100"
       style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:none;letter-spacing:.03em;margin-bottom:10px"
       placeholder="自分の感想を一言…（スキップ可）"></textarea>
