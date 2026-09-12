@@ -875,6 +875,7 @@ document.addEventListener('keydown',e=>{
 });
 
 function switchTab(n){
+  const sourcePage=document.activeElement?.closest?.('.page');
   currentTab = n;
   [1,2,3,4].forEach(i=>{
     document.getElementById('page'+i).classList.toggle('active', n===i);
@@ -889,6 +890,9 @@ function switchTab(n){
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
   // v6.332: アドレスバーの tab のみ同期（他のシナリオパラメータ f/e/s/dx… は不変）
   try{const u=new URL(location.href);u.searchParams.set('tab',n);history.replaceState(null,'',u);}catch(e){}
+  if(sourcePage&&!sourcePage.classList.contains('active')){
+    requestAnimationFrame(()=>document.getElementById('tab'+n+'Btn')?.focus());
+  }
 }
 
 document.querySelector('.tab-bar')?.addEventListener('keydown',event=>{
