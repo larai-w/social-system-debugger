@@ -748,6 +748,15 @@ function toggleAcc(id,btn){
   if(btn)btn.classList.toggle('open',open);
 }
 
+function setPresetButtonState(prefix,presets,selectedId){
+  Object.keys(presets).forEach(id=>{
+    const button=document.getElementById(prefix+id);if(!button)return;
+    const selected=id===selectedId;
+    button.classList.toggle('sel',selected);
+    button.setAttribute('aria-pressed',String(selected));
+  });
+}
+
 function setPreset(id){
   const p=PRESETS[id];if(!p)return;
   filterRate=p.f;ethicsScore=p.e;algo=p.a;
@@ -758,8 +767,7 @@ function setPreset(id){
   document.getElementById('filterVal').textContent=filterRate+'%';
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setAlgoUI(algo);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
-  document.getElementById('p-'+id)?.classList.add('sel');
+  setPresetButtonState('p-',PRESETS,id);
   activePreset=id;
   stopAnimation();
   restartAgents();
@@ -825,7 +833,7 @@ function setAlgoUI(a){
 
 function setAlgo(a){
   algo=a;setAlgoUI(a);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 }
 
@@ -833,7 +841,7 @@ document.getElementById('filterRate').addEventListener('input',function(){
   filterRate=+this.value;
   document.getElementById('filterVal').textContent=filterRate+'%';
   setPct(this);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 });
 
@@ -841,7 +849,7 @@ document.getElementById('ethicsScore').addEventListener('input',function(){
   ethicsScore=+this.value;
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(this);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 });
 
@@ -2260,7 +2268,7 @@ const PRESETS_P2={
   deadlock:  {s:20,d:20,e:25,a:'greedy',r:false}, // 他責デッドロック発動デモ
   smart:     {s:65,d:75,e:80,a:'dp',    r:false}, // 持続可能な縮退運転
 };
-function clearPresetSelP2(){Object.keys(PRESETS_P2).forEach(k=>document.getElementById('p2-'+k)?.classList.remove('sel'));}
+function clearPresetSelP2(){setPresetButtonState('p2-',PRESETS_P2,null);}
 function setPresetP2(id){
   const p=PRESETS_P2[id];if(!p)return;
   shrinkRate=p.s;dxRate=p.d;ethicsP2=p.e;algoP2=p.a;publicReboot=p.r;
@@ -2283,8 +2291,7 @@ function setPresetP2(id){
   document.getElementById('btnRebootOff').setAttribute('aria-pressed',String(!p.r));
   document.getElementById('btnRebootOn').setAttribute('aria-pressed',String(p.r));
   shockState=null;
-  clearPresetSelP2();
-  document.getElementById('p2-'+id)?.classList.add('sel');
+  setPresetButtonState('p2-',PRESETS_P2,id);
   updateAllP2();
   showShareToast({kind:'preset',page:2,preset:id});
   notePreset(2,id);
@@ -2296,7 +2303,7 @@ const PRESETS_P3={
   fasting: {dp:5,g:95,lr:60}, // 物理現実回帰による回復
   debugger:{dp:9,g:70,lr:80}, // 完全デバッグ状態
 };
-function clearPresetSelP3(){Object.keys(PRESETS_P3).forEach(k=>document.getElementById('p3-'+k)?.classList.remove('sel'));}
+function clearPresetSelP3(){setPresetButtonState('p3-',PRESETS_P3,null);}
 function setPresetP3(id){
   const p=PRESETS_P3[id];if(!p)return;
   searchDepth=p.dp;groundingRate=p.g;learningRate=p.lr;
@@ -2306,8 +2313,7 @@ function setPresetP3(id){
   document.getElementById('groundVal').textContent=p.g+'%';
   document.getElementById('lrVal').textContent=p.lr+'%';
   setPct(ds);setPct(gs);setPct(ls);
-  clearPresetSelP3();
-  document.getElementById('p3-'+id)?.classList.add('sel');
+  setPresetButtonState('p3-',PRESETS_P3,id);
   updateP3Chart();
   showShareToast({kind:'preset',page:3,preset:id});
   notePreset(3,id);
@@ -2319,7 +2325,7 @@ const PRESETS_P4={
   gamified:  {ext:40,gam:75}, // 目的関数乗っ取り（ログ低エントロピー化）
   flamewar:  {ext:85,gam:90}, // 複合最悪状態
 };
-function clearPresetSelP4(){Object.keys(PRESETS_P4).forEach(k=>document.getElementById('p4-'+k)?.classList.remove('sel'));}
+function clearPresetSelP4(){setPresetButtonState('p4-',PRESETS_P4,null);}
 function setPresetP4(id){
   const p=PRESETS_P4[id];if(!p)return;
   extTraffic=p.ext;gamification=p.gam;
@@ -2328,8 +2334,7 @@ function setPresetP4(id){
   document.getElementById('extVal').textContent=p.ext+'%';
   document.getElementById('gamVal').textContent=p.gam+'%';
   setPct(et);setPct(gm);
-  clearPresetSelP4();
-  document.getElementById('p4-'+id)?.classList.add('sel');
+  setPresetButtonState('p4-',PRESETS_P4,id);
   updateP4Chart();
   showShareToast({kind:'preset',page:4,preset:id});
   notePreset(4,id);
