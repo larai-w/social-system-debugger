@@ -158,10 +158,10 @@
         </div>
         <div class="pd" id="f3desc">長期最適化 vs 短期利益最大化。Greedyは局所最適解に収束し大域的破綻を誘発する。</div>
         <div class="tog">
-          <button class="tb" id="btnDP" onclick="setAlgo('dp')">
+          <button class="tb" id="btnDP" aria-pressed="false" onclick="setAlgo('dp')">
             <span id="dpL">動的計画法 (DP)</span><br><span style="font-size:.57em;opacity:.7" id="dpS">長期最適化・将来コスト内部化</span>
           </button>
-          <button class="tb on" id="btnGreedy" onclick="setAlgo('greedy')">
+          <button class="tb on" id="btnGreedy" aria-pressed="true" onclick="setAlgo('greedy')">
             <span id="grL">Greedy Algorithm</span><br><span style="font-size:.57em;opacity:.7" id="grS">短期利益最大化・局所最適解</span>
           </button>
         </div>
@@ -311,10 +311,10 @@
         <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f4n">予算配分戦略 <span class="tag to">STRATEGY</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 反証許容度</span></span></div>
         <div class="pd" data-i18n="p2_strat_d">Greedy=自己保身・ネット選挙ゲーム最優先。DP=救命医療・コア産業を最優先。</div>
         <div class="tog">
-          <button class="tb" id="btnDPP2" onclick="setAlgoP2('dp')">
+          <button class="tb" id="btnDPP2" aria-pressed="false" onclick="setAlgoP2('dp')">
             <span data-i18n="p2_dp_t">DP戦略</span><br><span style="font-size:.57em;opacity:.7" data-i18n="p2_dp_s">救命医療・コア産業最優先</span>
           </button>
-          <button class="tb on red-on" id="btnGreedyP2" onclick="setAlgoP2('greedy')">
+          <button class="tb on red-on" id="btnGreedyP2" aria-pressed="true" onclick="setAlgoP2('greedy')">
             <span data-i18n="p2_gr_t">Greedy戦略</span><br><span style="font-size:.57em;opacity:.7" data-i18n="p2_gr_s">自己保身・ネット選挙ゲーム最優先</span>
           </button>
         </div>
@@ -325,10 +325,10 @@
         <div class="pl2" style="margin-bottom:5px"><span class="pn" data-i18n="p2_f5n">公共性リブート <span class="tag tc">PUBLIC REBOOT</span></span></div>
         <div class="pd" data-i18n="p2_reboot_d">再公営化・リダンダンシーの確保。ONにすると市場原理の効率主義を停止し公共性を最優先します。インフラ劣化速度を半減・救命ヘリを常時稼働させますが、自治体財政コストが増大します。</div>
         <div class="tog">
-          <button class="tb on" id="btnRebootOff" onclick="setPublicReboot(false)">
+          <button class="tb on" id="btnRebootOff" aria-pressed="true" onclick="setPublicReboot(false)">
             OFF<br><span style="font-size:.57em;opacity:.7" data-i18n="p2_reb_off_s">効率主義・市場原理</span>
           </button>
-          <button class="tb" id="btnRebootOn" onclick="setPublicReboot(true)">
+          <button class="tb" id="btnRebootOn" aria-pressed="false" onclick="setPublicReboot(true)">
             ON<br><span style="font-size:.57em;opacity:.7" data-i18n="p2_reb_on_s">公共性最優先・冗長性確保</span>
           </button>
         </div>

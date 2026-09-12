@@ -816,8 +816,11 @@ function trapMetricModalFocus(event){
 function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
 
 function setAlgoUI(a){
-  document.getElementById('btnDP').classList.toggle('on',a==='dp');
-  document.getElementById('btnGreedy').classList.toggle('on',a==='greedy');
+  const dp=a==='dp',greedy=a==='greedy';
+  document.getElementById('btnDP').classList.toggle('on',dp);
+  document.getElementById('btnGreedy').classList.toggle('on',greedy);
+  document.getElementById('btnDP').setAttribute('aria-pressed',String(dp));
+  document.getElementById('btnGreedy').setAttribute('aria-pressed',String(greedy));
 }
 
 function setAlgo(a){
@@ -1303,6 +1306,8 @@ function setAlgoP2(a){
   document.getElementById('btnDPP2').classList.toggle('green-on',a==='dp');
   document.getElementById('btnGreedyP2').classList.toggle('on',a==='greedy');
   document.getElementById('btnGreedyP2').classList.toggle('red-on',a==='greedy');
+  document.getElementById('btnDPP2').setAttribute('aria-pressed',String(a==='dp'));
+  document.getElementById('btnGreedyP2').setAttribute('aria-pressed',String(a==='greedy'));
   shockState=null;
   clearPresetSelP2();
   updateAllP2();
@@ -1314,6 +1319,8 @@ function setPublicReboot(on){
   document.getElementById('btnRebootOff').classList.toggle('on',!on);
   document.getElementById('btnRebootOn').classList.toggle('on',on);
   document.getElementById('btnRebootOn').classList.toggle('green-on',on);
+  document.getElementById('btnRebootOff').setAttribute('aria-pressed',String(!on));
+  document.getElementById('btnRebootOn').setAttribute('aria-pressed',String(on));
   shockState=null;
   clearPresetSelP2();
   updateAllP2();
@@ -2268,9 +2275,13 @@ function setPresetP2(id){
   document.getElementById('btnDPP2').classList.toggle('green-on',p.a==='dp');
   document.getElementById('btnGreedyP2').classList.toggle('on',p.a==='greedy');
   document.getElementById('btnGreedyP2').classList.toggle('red-on',p.a==='greedy');
+  document.getElementById('btnDPP2').setAttribute('aria-pressed',String(p.a==='dp'));
+  document.getElementById('btnGreedyP2').setAttribute('aria-pressed',String(p.a==='greedy'));
   document.getElementById('btnRebootOff').classList.toggle('on',!p.r);
   document.getElementById('btnRebootOn').classList.toggle('on',p.r);
   document.getElementById('btnRebootOn').classList.toggle('green-on',p.r);
+  document.getElementById('btnRebootOff').setAttribute('aria-pressed',String(!p.r));
+  document.getElementById('btnRebootOn').setAttribute('aria-pressed',String(p.r));
   shockState=null;
   clearPresetSelP2();
   document.getElementById('p2-'+id)?.classList.add('sel');
