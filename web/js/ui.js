@@ -830,6 +830,40 @@ function trapMetricModalFocus(event){
   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
 }
 
+const dialogFocusOrigins=new Map();
+function dialogControls(dialog){
+  return [...dialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])')]
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden');
+}
+function trapOpenDialogFocus(event){
+  if(event.key!=='Tab')return;
+  const dialog=[...document.querySelectorAll('.mo.on:not(#modal)')].at(-1);
+  if(!dialog)return;
+  const controls=dialogControls(dialog);if(!controls.length)return;
+  const first=controls[0],last=controls.at(-1),active=document.activeElement;
+  if(!dialog.contains(active)){event.preventDefault();first.focus();return;}
+  if(event.shiftKey&&active===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&active===last){event.preventDefault();first.focus();}
+}
+function observeDialogFocus(){
+  document.querySelectorAll('.mo:not(#modal)').forEach(dialog=>{
+    const observer=new MutationObserver(()=>{
+      const open=dialog.classList.contains('on');
+      if(open&&!dialogFocusOrigins.has(dialog.id)){
+        const active=document.activeElement;
+        dialogFocusOrigins.set(dialog.id,active instanceof HTMLElement?active:null);
+        requestAnimationFrame(()=>dialogControls(dialog)[0]?.focus());
+      }
+      if(!open&&dialogFocusOrigins.has(dialog.id)){
+        const target=dialogFocusOrigins.get(dialog.id);dialogFocusOrigins.delete(dialog.id);
+        if(dialog.contains(document.activeElement)&&target?.isConnected)requestAnimationFrame(()=>target.focus());
+      }
+    });
+    observer.observe(dialog,{attributes:true,attributeFilter:['class']});
+  });
+}
+observeDialogFocus();
+
 function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
 
 function setAlgoUI(a){
@@ -872,6 +906,7 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}
   trapMetricModalFocus(e);
+  trapOpenDialogFocus(e);
 });
 
 function switchTab(n){
