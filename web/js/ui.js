@@ -845,6 +845,13 @@ function trapOpenDialogFocus(event){
   if(event.shiftKey&&active===first){event.preventDefault();last.focus();}
   else if(!event.shiftKey&&active===last){event.preventDefault();first.focus();}
 }
+function closeTopDialogOnEscape(event){
+  if(event.key!=='Escape')return;
+  const dialog=[...document.querySelectorAll('.mo.on')].at(-1);
+  if(!dialog)return;
+  event.preventDefault();
+  dialog.querySelector('.mc')?.click();
+}
 function observeDialogFocus(){
   document.querySelectorAll('.mo:not(#modal)').forEach(dialog=>{
     const observer=new MutationObserver(()=>{
@@ -904,7 +911,7 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
 });
 
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}
+  closeTopDialogOnEscape(e);
   trapMetricModalFocus(e);
   trapOpenDialogFocus(e);
 });
@@ -3240,8 +3247,6 @@ function exportData(fmt){
     track('export_json');
   }
 }
-
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();closeDiscoveryLog();}});
 
 (function init(){
   const p=new URLSearchParams(location.search);
