@@ -126,7 +126,7 @@
           <span class="pv" id="filterVal">0%</span>
         </div>
         <div class="pd" id="f1desc">エコーチェンバー度。高いほど同質情報のみ流通し、現実OSとの互換性が喪失する（過学習）。</div>
-        <input type="range" id="filterRate" aria-labelledby="f1lbl" min="0" max="100" value="0">
+        <input type="range" id="filterRate" aria-labelledby="f1lbl" data-value-unit="percent" min="0" max="100" value="0">
         <div class="rl"><span id="f1L">OPEN</span><span id="f1R">ECHO CHAMBER</span></div>
       </div>
       <hr class="div">
@@ -148,7 +148,7 @@
           <span class="pv" id="immunityVal" style="color:var(--pur)">50%</span>
         </div>
         <div class="pd" id="f4desc">法的・歴史的アーカイブへの参照能力。高いとファクトチェッカーの消滅を防ぎ、誤判定（False Positive）に抵抗できる。</div>
-        <input type="range" id="historicalImmunity" aria-labelledby="f4lbl" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
+        <input type="range" id="historicalImmunity" aria-labelledby="f4lbl" data-value-unit="percent" min="0" max="100" value="50" style="background:linear-gradient(90deg,var(--pur) 50%,var(--bdr) 50%)">
         <div class="rl"><span id="f4L">歴史の忘却</span><span id="f4R">論理と法のアーカイブ</span></div>
       </div>
       <hr class="div">
@@ -284,7 +284,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p2f1lbl" data-i18n="p2_f1n">インフラ集約化率 <span class="tag to">SMART SHRINK</span></span><span class="pv" id="shrinkVal" style="color:var(--ora)">10%</span></div>
         <div class="pd" data-i18n="p2_shrink_d">拠点集約による無駄な延命コストの削減。低いと広域レガシーインフラを全面維持し財政を圧迫する。</div>
-        <input type="range" id="shrinkRate" aria-labelledby="p2f1lbl" min="0" max="100" value="10" class="ora-range">
+        <input type="range" id="shrinkRate" aria-labelledby="p2f1lbl" data-value-unit="percent" min="0" max="100" value="10" class="ora-range">
         <div class="rl"><span data-i18n="p2_shrink_l">レガシー全面延命</span><span data-i18n="p2_shrink_r">拠点集約・周辺廃止</span></div>
       </div>
       <hr class="div">
@@ -294,7 +294,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p2f2lbl" data-i18n="p2_f2n">産業DX・法人化投資 <span class="tag tc">AUTOMATION</span></span><span class="pv" id="dxVal">30%</span></div>
         <div class="pd" data-i18n="p2_dx_d">スマート農業・自動化による地域ブランド産業の持続化投資。低いと高齢職人依存が継続し後継者断絶が起きる。</div>
-        <input type="range" id="dxRate" aria-labelledby="p2f2lbl" min="0" max="100" value="30">
+        <input type="range" id="dxRate" aria-labelledby="p2f2lbl" data-value-unit="percent" min="0" max="100" value="30">
         <div class="rl"><span data-i18n="p2_dx_l">高齢農家の職人依存</span><span data-i18n="p2_dx_r">スマート自動化</span></div>
       </div>
       <hr class="div">
@@ -473,7 +473,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p3f2lbl" data-i18n="p3_f2n">現実同期レート <span class="tag tc">GROUNDING / DROPOUT</span></span><span class="pv" id="groundVal">20%</span></div>
         <div class="pd" data-i18n="p3_ground_d">物理現実との接続率。高いほどSNS断食・実世界の一次情報により認知の過学習（ノイズ蓄積）が洗い流される。</div>
-        <input type="range" id="groundingRate" aria-labelledby="p3f2lbl" min="0" max="100" value="20">
+        <input type="range" id="groundingRate" aria-labelledby="p3f2lbl" data-value-unit="percent" min="0" max="100" value="20">
         <div class="rl"><span data-i18n="p3_ground_l">ネット常時接続</span><span data-i18n="p3_ground_r">物理現実回帰・SNS断食</span></div>
       </div>
       <hr class="div">
@@ -481,7 +481,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p3f3lbl" data-i18n="p3_f3n">学習率 <span class="tag tg">LEARNING RATE</span></span><span class="pv" id="lrVal" style="color:var(--green)">40%</span></div>
         <div class="pd" data-i18n="p3_lr_d">新しい証拠（データ）への自己修正の素直さ。0%ではモデル更新が完全停止し、いくらファクトを入力しても汚染が絶対に抜けない。</div>
-        <input type="range" id="learningRate" aria-labelledby="p3f3lbl" min="0" max="100" value="40">
+        <input type="range" id="learningRate" aria-labelledby="p3f3lbl" data-value-unit="percent" min="0" max="100" value="40">
         <div class="rl"><span data-i18n="p3_lr_l">更新完全停止・アップデート拒否</span><span data-i18n="p3_lr_r">素直さ・柔軟なアップデート</span></div>
       </div>
       </div><!-- /p3Details -->
@@ -587,7 +587,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p4f1lbl" data-i18n="p4_f1n">外部ノード流入率 <span class="tag" style="background:rgba(255,34,68,.12);color:var(--red);border:1px solid rgba(255,34,68,.3)">SYBIL FLOOD</span></span><span class="pv" id="extVal" style="color:var(--red)">15%</span></div>
         <div class="pd" data-i18n="p4_ext_d">部外者・推し活アカウントの流入度。高いほど1ビット思考のスパムノードが殺到し、生活者クラスターの通信リンクを遮断・占拠する。</div>
-        <input type="range" id="extTraffic" aria-labelledby="p4f1lbl" min="0" max="100" value="15" class="red-range">
+        <input type="range" id="extTraffic" aria-labelledby="p4f1lbl" data-value-unit="percent" min="0" max="100" value="15" class="red-range">
         <div class="rl"><span data-i18n="p4_ext_l">当事者のみ</span><span data-i18n="p4_ext_r">部外者・推し活の殺到</span></div>
       </div>
       <hr class="div">
@@ -595,7 +595,7 @@
       <div style="margin-bottom:12px">
         <div class="pl2"><span class="pn" id="p4f2lbl" data-i18n="p4_f2n">目的関数のゲーム化 <span class="tag" style="background:rgba(255,204,0,.12);color:var(--yel);border:1px solid rgba(255,204,0,.3)">GAMIFICATION</span></span><span class="pv" id="gamVal" style="color:var(--yel)">15%</span></div>
         <div class="pd" data-i18n="p4_gam_d">議論の目的関数が「生活・政策の改善」から「敵味方の二元論ゲーム・推し活」へ書き換えられる度合い。70%超で目的関数乗っ取りが発生。</div>
-        <input type="range" id="gamification" aria-labelledby="p4f2lbl" min="0" max="100" value="15" class="yel-range">
+        <input type="range" id="gamification" aria-labelledby="p4f2lbl" data-value-unit="percent" min="0" max="100" value="15" class="yel-range">
         <div class="rl"><span data-i18n="p4_gam_l">生活・政策優先</span><span data-i18n="p4_gam_r">敵味方の二元論・推し活化</span></div>
       </div>
       <hr class="div">

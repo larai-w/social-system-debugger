@@ -871,7 +871,10 @@ function observeDialogFocus(){
 }
 observeDialogFocus();
 
-function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
+function setPct(el){
+  el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%');
+  if(el.dataset.valueUnit==='percent')el.setAttribute('aria-valuetext',el.value+'%');
+}
 
 function setAlgoUI(a){
   const dp=a==='dp',greedy=a==='greedy';
@@ -908,6 +911,7 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
   document.getElementById('immunityVal').textContent=historicalImmunity+'%';
   const pct=(historicalImmunity/100*100)+'%';
   this.style.background=`linear-gradient(90deg,var(--pur) ${pct},var(--bdr) ${pct})`;
+  setPct(this);
 });
 
 document.addEventListener('keydown',e=>{
@@ -3271,6 +3275,7 @@ function exportData(fmt){
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(document.getElementById('filterRate'));
   setPct(document.getElementById('ethicsScore'));
+  setPct(document.getElementById('historicalImmunity'));
   setAlgoUI(algo);
   applyI18n();
 
