@@ -1,6 +1,7 @@
 // Platform gate for weekly scenarios (native only). Kept in ui.js so engine.js
 // stays DOM/window-free and reusable server-side. Web時はfalseで従来どおり非表示。
 const WEEKLY_ENABLED = window.Capacitor?.isNativePlatform?.() ?? false;
+const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
 
 function updateHistRef(){
   const el=document.getElementById('histRef');
@@ -210,7 +211,8 @@ function startAgents(){
   const cv=document.getElementById('agentCanvas'),wrap=cv.parentElement;
   cW=wrap.clientWidth||700;cH=wrap.clientHeight||296;
   cv.width=cW;cv.height=cH;agCtx=cv.getContext('2d');
-  initAgents();agentLoop();
+  initAgents();
+  if(REDUCED_MOTION)drawAgents();else agentLoop();
 }
 
 function restartAgents(){startAgents()}
@@ -281,7 +283,8 @@ function startScatter(){
   scW2=wrap.clientWidth||400;scH2=wrap.clientHeight||222;
   cv.width=scW2;cv.height=scH2;
   scCtx2=cv.getContext('2d');
-  initScatter();scatterLoop();
+  initScatter();
+  if(REDUCED_MOTION)drawScatter();else scatterLoop();
 }
 
 // ═══ グレースフル・デグラデーション: Chart.js エラーハンドリング ═══
@@ -593,6 +596,10 @@ function updateAll(){
     }
   }
   checkScenarioGoal(m);
+  if(REDUCED_MOTION){
+    if(agCtx){stepAgents();drawAgents();}
+    if(scCtx2){stepScatter();drawScatter();}
+  }
 }
 
 function getDiag(m){
@@ -1884,13 +1891,15 @@ function simTimelineP3(depth,ground,steps=65){
 }
 
 function updateP3Chart(){
-  if(!timelineChartP3)return;
-  const eff=dropoutActive?100:groundingRate;
-  const tl=simTimelineP3(searchDepth,eff);
-  timelineChartP3.data.datasets[0].data=tl.dop;
-  timelineChartP3.data.datasets[1].data=tl.integ;
-  timelineChartP3.data.datasets[2].data=tl.grd;
-  timelineChartP3.update();
+  if(timelineChartP3){
+    const eff=dropoutActive?100:groundingRate;
+    const tl=simTimelineP3(searchDepth,eff);
+    timelineChartP3.data.datasets[0].data=tl.dop;
+    timelineChartP3.data.datasets[1].data=tl.integ;
+    timelineChartP3.data.datasets[2].data=tl.grd;
+    timelineChartP3.update();
+  }
+  if(REDUCED_MOTION&&p3Ctx){stepP3();drawP3();}
 }
 
 function startP3(){
@@ -1927,7 +1936,7 @@ function startP3(){
   cv.width=p3W;cv.height=p3H;p3Ctx=cv.getContext('2d');
   initP3Nodes();
   updateP3Chart();
-  p3Loop();
+  if(!REDUCED_MOTION)p3Loop();
 }
 
 function restartP3(){startP3();}
@@ -2260,13 +2269,15 @@ function simTimelineP4(ext,gam,steps=65){
 }
 
 function updateP4Chart(){
-  if(!timelineChartP4)return;
-  const effExt=filterActive?0:extTraffic;
-  const tl=simTimelineP4(effExt,gamification);
-  timelineChartP4.data.datasets[0].data=tl.drop;
-  timelineChartP4.data.datasets[1].data=tl.ratio;
-  timelineChartP4.data.datasets[2].data=tl.pol;
-  timelineChartP4.update();
+  if(timelineChartP4){
+    const effExt=filterActive?0:extTraffic;
+    const tl=simTimelineP4(effExt,gamification);
+    timelineChartP4.data.datasets[0].data=tl.drop;
+    timelineChartP4.data.datasets[1].data=tl.ratio;
+    timelineChartP4.data.datasets[2].data=tl.pol;
+    timelineChartP4.update();
+  }
+  if(REDUCED_MOTION&&p4Ctx){manageSpam();drawP4();}
 }
 
 function startP4(){
@@ -2303,7 +2314,7 @@ function startP4(){
   cv.width=p4W;cv.height=p4H;p4Ctx=cv.getContext('2d');
   initP4Nodes();
   updateP4Chart();
-  p4Loop();
+  if(!REDUCED_MOTION)p4Loop();
 }
 
 function restartP4(){startP4();}
