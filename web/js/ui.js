@@ -3154,8 +3154,8 @@ function setResearcherMode(on){
   const cb=document.getElementById('fbResearcher'); if(cb)cb.checked=researcherMode;
   // ON: 開発者導線を上部にボタンとして格上げ / OFF: 下部の控えめな補足リンク
   const top=document.getElementById('fbDevTop'), note=document.getElementById('fbDevNote');
-  if(top)top.style.display=researcherMode?'block':'none';
-  if(note)note.style.display=researcherMode?'none':'block';
+  if(top)top.hidden=!researcherMode;
+  if(note)note.hidden=researcherMode;
 }
 function openFeedback(){
   const msg=document.getElementById('fbMessage'), em=document.getElementById('fbEmail');
