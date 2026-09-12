@@ -20,7 +20,9 @@ if(focus)document.querySelector('[data-scene="'+state.scene+'"] h2').focus();}
 function safe(fn){try{fn();el('status').textContent='';}catch{el('status').textContent=txt('入力範囲や記録の形式を確認してください。','Check input ranges or record format.');}}
 el('next').onclick=()=>safe(()=>{capture();if(state.scene===1)locked=true;state.scene=Math.min(7,state.scene+1);render();});el('back').onclick=()=>safe(()=>{capture();state.scene=Math.max(0,state.scene-1);render();});
 el('language').onclick=()=>safe(()=>{capture();lang=lang==='ja'?'en':'ja';render(false);});
-el('restart').onclick=()=>{if(!confirm(txt('現在の記録を消して、新しい実験を始めますか？ 残す場合は先にJSONを保存してください。','Clear this record and start a new experiment? Export JSON first to keep it.')))return;state=fresh();locked=false;hydrate();render();};
+function restartExperiment(){if(!confirm(txt('現在の記録を消して、新しい実験を始めますか？ 残す場合は先にJSONを保存してください。','Clear this record and start a new experiment? Export JSON first to keep it.')))return;state=fresh();locked=false;hydrate();render();}
+el('restart').onclick=restartExperiment;
+el('restartLocked').onclick=restartExperiment;
 el('save').onclick=()=>safe(()=>{capture();const data={...state,locked,result:Stage5.evaluate(state.input,state.choices)};const raw=JSON.stringify(data,null,2);Stage5.decode(raw);const url=URL.createObjectURL(new Blob([raw],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='stage5-learning-record.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 el('load').onchange=async()=>{try{const f=el('load').files[0];if(!f)return;if(f.size>100000)throw Error();const raw=await f.text();const next=Stage5.decode(raw);const parsed=JSON.parse(raw);if(typeof parsed.locked!=='boolean')throw Error();state=next;locked=parsed.locked||next.scene>=2;hydrate();render();el('status').textContent=txt('記録を読み戻し、結果を再計算しました。','Record imported; results recomputed.');}catch{el('status').textContent=txt('読み込めません。形式・モデル版・100KB以下を確認してください。','Import failed. Check format, model version and the 100KB limit.');}finally{el('load').value='';}};
 hydrate();render(false);
