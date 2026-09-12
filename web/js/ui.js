@@ -653,6 +653,7 @@ function applyI18n(){
     radarChart.update('none');
   }
   applyI18nAuto();
+  enhancePointerControls();
   syncDocLinks();
   syncTownPlaceholder();
   // 言語切替後、表示中のバナーに街名を再展開（bstガードをリセット）
@@ -669,6 +670,21 @@ function applyI18nAuto(){
     if(I18N.ja[k]===undefined) I18N.ja[k]=el.innerHTML; // 原文(ja)をキャッシュ
     const v=I18N[lang][k];
     if(v!==undefined) el.innerHTML=v;
+  });
+}
+
+function enhancePointerControls(){
+  document.querySelectorAll('.si[onclick],.link-badge[onclick],[onclick*="openModal("]').forEach(el=>{
+    if(el.matches('button,a,input,select,textarea')||el.dataset.keyboardActionReady)return;
+    el.dataset.keyboardActionReady='true';
+    el.classList.add('kbd-action');
+    el.setAttribute('role','button');
+    el.tabIndex=0;
+    el.addEventListener('keydown',event=>{
+      if(event.key!=='Enter'&&event.key!==' ')return;
+      event.preventDefault();
+      event.currentTarget.click();
+    });
   });
 }
 
