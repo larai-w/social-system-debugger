@@ -833,7 +833,7 @@
       <div class="pd" id="fbEmailLabel" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>
       <input type="email" id="fbEmail" aria-labelledby="fbEmailLabel" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px">
       <button type="submit" class="sbtn" id="fbSubmit" style="margin-top:14px;border-color:var(--green);color:var(--green)" data-i18n="fb_submit">送信</button>
-      <div id="fbStatus" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
+      <div id="fbStatus" role="status" aria-live="polite" aria-atomic="true" style="margin-top:10px;font-size:.66rem;line-height:1.7;display:none"></div>
     </form>
     <hr class="div" style="margin:14px 0">
     <div class="mfo" id="fbDevNote" style="border-left-color:var(--muted)">

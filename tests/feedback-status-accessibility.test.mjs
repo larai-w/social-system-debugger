@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import test from 'node:test';
+
+const html = await readFile(new URL('../web/index.html', import.meta.url), 'utf8');
+const ui = await readFile(new URL('../web/js/ui.js', import.meta.url), 'utf8');
+
+test('feedback submission results are announced through a polite status region', () => {
+  assert.match(html, /id="fbStatus" role="status" aria-live="polite" aria-atomic="true"/);
+  assert.match(
+    ui,
+    /status\.textContent=tt\('✓ 送信しました。ありがとうございます','✓ Sent\. Thank you!'\)/
+  );
+  assert.match(
+    ui,
+    /status\.textContent=tt\('送信に失敗しました。時間をおいて再度お試しください','Sending failed\. Please try again later\.'/
+  );
+});
