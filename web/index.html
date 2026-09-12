@@ -822,12 +822,14 @@
       <a class="sbtn" href="https://github.com/larai-w/social-system-debugger/issues" target="_blank" rel="noopener" style="display:block;text-align:center;margin-top:8px;border-color:var(--cyan);color:var(--cyan);text-decoration:none" data-i18n="fb_dev_link">GitHub Issues へ</a>
     </div>
     <form id="fbForm" onsubmit="return submitFeedback(event)">
-      <div class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</div>
-      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:.66rem;color:var(--txt)">
-        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="improvement" checked> <span data-i18n="fb_type_improve">改善案</span></label>
-        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
-        <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
-      </div>
+      <fieldset style="border:0;padding:0;margin:0 0 12px">
+        <legend class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別</legend>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:.66rem;color:var(--txt)">
+          <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="improvement" checked> <span data-i18n="fb_type_improve">改善案</span></label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="bug"> <span data-i18n="fb_type_bug">バグ報告</span></label>
+          <label style="cursor:pointer;display:flex;align-items:center;gap:5px"><input type="radio" name="fbType" value="other"> <span data-i18n="fb_type_other">その他</span></label>
+        </div>
+      </fieldset>
       <div class="pd" id="fbMessageLabel" style="margin-bottom:5px" data-i18n="fb_msg_label">内容（必須）</div>
       <textarea id="fbMessage" aria-labelledby="fbMessageLabel" required rows="5" style="width:100%;box-sizing:border-box;background:var(--bg1);border:1px solid var(--bdr);border-radius:3px;color:var(--txt);font-family:inherit;font-size:.7rem;padding:8px;resize:vertical"></textarea>
       <div class="pd" id="fbEmailLabel" style="margin:10px 0 5px" data-i18n="fb_email_label">メール（任意・返信希望の方）</div>

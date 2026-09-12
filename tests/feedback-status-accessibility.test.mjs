@@ -23,3 +23,14 @@ test('researcher links use a named disclosure control and semantic hidden state'
   assert.match(ui, /if\(top\)top\.hidden=!researcherMode;/);
   assert.match(ui, /if\(note\)note\.hidden=researcherMode;/);
 });
+
+test('feedback type radio buttons have a shared native group label', () => {
+  assert.match(html, /<fieldset style="border:0;padding:0;margin:0 0 12px">/);
+  assert.match(
+    html,
+    /<legend class="pd" style="margin-bottom:5px" data-i18n="fb_type_label">種別<\/legend>/
+  );
+  assert.match(html, /<input type="radio" name="fbType" value="improvement" checked>/);
+  assert.match(html, /<input type="radio" name="fbType" value="bug">/);
+  assert.match(html, /<input type="radio" name="fbType" value="other">/);
+});
