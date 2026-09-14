@@ -33,5 +33,6 @@ new SocialDebuggerStack(app, 'SocialDebuggerStack', {
 });
 
 // cdk-nag: AWS Solutions ルールセットで synth 時にセキュリティ静的検査（AWS認証情報不要・CIで走る）。
-// 受容する指摘はスタック側で NagSuppressions に理由付きで明示（面接で説明できる素材にする）。
-cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }));
+// 受容する指摘はスタック側で Validations.acknowledge に理由付きで明示（面接で説明できる素材にする）。
+// cdk-nag v3 は Aspect ではなく CDK 標準のポリシー検証プラグインとして登録する。
+cdk.Validations.of(app).addPlugins(new AwsSolutionsChecks(app, { verbose: true }));
