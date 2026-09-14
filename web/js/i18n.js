@@ -251,7 +251,6 @@ const I18N = {
     export_csv:'📊 Export data (CSV)',
     // T35: アプリ内ページ導線
     menu_lp:'📣 About this simulator',
-    menu_stage5:'🧪 Stage 5: test your hypothesis',
     menu_classroom:'🏫 Educator guide (use in class)',
     menu_privacy:'🔒 Privacy policy',
     menu_faq:'❓ FAQ (web vs installed app)',
@@ -263,7 +262,7 @@ const I18N = {
     fb_data_link:'📊 Data dictionary (export fields ↔ formulas)',
     fb_btn:'💬 Feedback',
     fb_title:'Feedback',
-    fb_researcher:'🔬 Show as researcher / engineer',
+    fb_researcher:'🔬 Show links for researchers and engineers',
     fb_type_label:'Type',
     fb_type_improve:'Improvement',
     fb_type_bug:'Bug report',

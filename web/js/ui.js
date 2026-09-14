@@ -1,6 +1,7 @@
 // Platform gate for weekly scenarios (native only). Kept in ui.js so engine.js
 // stays DOM/window-free and reusable server-side. Web時はfalseで従来どおり非表示。
 const WEEKLY_ENABLED = window.Capacitor?.isNativePlatform?.() ?? false;
+const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
 
 function updateHistRef(){
   const el=document.getElementById('histRef');
@@ -210,7 +211,8 @@ function startAgents(){
   const cv=document.getElementById('agentCanvas'),wrap=cv.parentElement;
   cW=wrap.clientWidth||700;cH=wrap.clientHeight||296;
   cv.width=cW;cv.height=cH;agCtx=cv.getContext('2d');
-  initAgents();agentLoop();
+  initAgents();
+  if(REDUCED_MOTION)drawAgents();else agentLoop();
 }
 
 function restartAgents(){startAgents()}
@@ -281,7 +283,8 @@ function startScatter(){
   scW2=wrap.clientWidth||400;scH2=wrap.clientHeight||222;
   cv.width=scW2;cv.height=scH2;
   scCtx2=cv.getContext('2d');
-  initScatter();scatterLoop();
+  initScatter();
+  if(REDUCED_MOTION)drawScatter();else scatterLoop();
 }
 
 // ═══ グレースフル・デグラデーション: Chart.js エラーハンドリング ═══
@@ -593,6 +596,10 @@ function updateAll(){
     }
   }
   checkScenarioGoal(m);
+  if(REDUCED_MOTION){
+    if(agCtx){stepAgents();drawAgents();}
+    if(scCtx2){stepScatter();drawScatter();}
+  }
 }
 
 function getDiag(m){
@@ -653,6 +660,7 @@ function applyI18n(){
     radarChart.update('none');
   }
   applyI18nAuto();
+  enhancePointerControls();
   syncDocLinks();
   syncTownPlaceholder();
   // 言語切替後、表示中のバナーに街名を再展開（bstガードをリセット）
@@ -672,6 +680,22 @@ function applyI18nAuto(){
   });
 }
 
+function enhancePointerControls(){
+  document.querySelectorAll('.si[onclick],.link-badge[onclick],[onclick*="openModal("]').forEach(el=>{
+    if(el.matches('button,a,input,select,textarea')||el.dataset.keyboardActionReady)return;
+    el.dataset.keyboardActionReady='true';
+    el.classList.add('kbd-action');
+    el.setAttribute('role','button');
+    el.tabIndex=0;
+    el.addEventListener('pointerdown',()=>el.focus());
+    el.addEventListener('keydown',event=>{
+      if(event.key!=='Enter'&&event.key!==' ')return;
+      event.preventDefault();
+      event.currentTarget.click();
+    });
+  });
+}
+
 function toggleLang(){lang=lang==='ja'?'en':'ja';applyI18n();if(typeof updateDiscoveryCounter==='function')updateDiscoveryCounter();}
 
 // v6.345: プライバシーファーストの analytics ラッパー（外部スクリプト未導入時は no-op）
@@ -685,7 +709,6 @@ function track(event,props){
 function docUrl(name){return 'https://github.com/larai-w/social-system-debugger/blob/main/docs/'+name+(lang==='en'?'.en':'')+'.md';}
 function syncDocLinks(){document.querySelectorAll('a.doclink[data-doc]').forEach(a=>{a.href=docUrl(a.dataset.doc);});}
 // T35: アプリ内ページ導線（classroom/privacy。相対URL＝Pages/AWS両対応、言語連動で .en.html）
-function openStage5(){window.open('stage5.html#'+(lang==='en'?'en':'ja'),'_blank','noopener');}
 function openAppPage(name){track('open_'+name);window.open(name+(lang==='en'?'.en':'')+'.html','_blank','noopener');}
 // LP は lp/index.html / lp/index.en.html という形なので openAppPage の <name>.html 規則に乗らない。
 function openLandingPage(){track('open_lp');window.open('lp/'+(lang==='en'?'index.en.html':''),'_blank','noopener');}
@@ -729,7 +752,24 @@ function toggleAcc(id,btn){
   const el=document.getElementById(id);if(!el)return;
   const open=el.style.display==='none';
   el.style.display=open?'block':'none';
-  if(btn)btn.classList.toggle('open',open);
+  if(btn){
+    btn.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',String(open));
+  }
+}
+
+function setPresetButtonState(prefix,presets,selectedId){
+  Object.keys(presets).forEach(id=>{
+    const button=document.getElementById(prefix+id);if(!button)return;
+    const selected=id===selectedId;
+    button.classList.toggle('sel',selected);
+    button.setAttribute('aria-pressed',String(selected));
+  });
+}
+
+function announcePreset(prefix,id){
+  const label=document.getElementById(prefix+id)?.textContent.trim();
+  if(label)announceVerdict(tt(`${label} を適用しました`,`${label} applied.`));
 }
 
 function setPreset(id){
@@ -742,12 +782,12 @@ function setPreset(id){
   document.getElementById('filterVal').textContent=filterRate+'%';
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setAlgoUI(algo);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
-  document.getElementById('p-'+id)?.classList.add('sel');
+  setPresetButtonState('p-',PRESETS,id);
   activePreset=id;
   stopAnimation();
   restartAgents();
   updateAll();
+  announcePreset('p-',id);
   showShareToast({kind:'preset',page:1,preset:id});
   notePreset(1,id); if(id==='weimar')discover('d_p1_weimar'); if(id==='nordic')discover('d_p1_nordic');
 }
@@ -766,27 +806,94 @@ function shareURL(){
   }catch(e){prompt('Copy this URL:',url)}
 }
 
+let modalReturnFocus=null;
 function openModal(key){
   const d=MDATA[key];if(!d)return;
+  const active=document.activeElement;
+  modalReturnFocus=active instanceof HTMLElement&&active!==document.body?active:null;
   document.getElementById('mTag').textContent=d.tag;
   document.getElementById('mTitle').textContent=lang==='ja'?d.jaTitle:d.enTitle;
   document.getElementById('mBody').innerHTML=lang==='ja'?d.jaBody:d.enBody;
   document.getElementById('mFormula').textContent=d.formula;
   document.getElementById('modal').classList.add('on');
+  requestAnimationFrame(()=>document.querySelector('#modal .mc')?.focus());
 }
-function closeModal(){document.getElementById('modal').classList.remove('on')}
+function closeModal(){
+  document.getElementById('modal').classList.remove('on');
+  const target=modalReturnFocus;modalReturnFocus=null;
+  if(target?.isConnected)requestAnimationFrame(()=>target.focus());
+}
 function closeModalIf(e){if(e.target===document.getElementById('modal'))closeModal()}
 
-function setPct(el){el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%')}
+function trapMetricModalFocus(event){
+  if(event.key!=='Tab')return;
+  const modal=document.getElementById('modal');
+  if(!modal?.classList.contains('on'))return;
+  const controls=[...modal.querySelectorAll('button:not([disabled]),a[href]')]
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none');
+  if(!controls.length)return;
+  const first=controls[0],last=controls.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+}
+
+const dialogFocusOrigins=new Map();
+function dialogControls(dialog){
+  return [...dialog.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])')]
+    .filter(el=>!el.hidden&&getComputedStyle(el).visibility!=='hidden'&&getComputedStyle(el).display!=='none');
+}
+function trapOpenDialogFocus(event){
+  if(event.key!=='Tab')return;
+  const dialog=[...document.querySelectorAll('.mo.on:not(#modal)')].at(-1);
+  if(!dialog)return;
+  const controls=dialogControls(dialog);if(!controls.length)return;
+  const first=controls[0],last=controls.at(-1),active=document.activeElement;
+  if(!dialog.contains(active)){event.preventDefault();first.focus();return;}
+  if(event.shiftKey&&active===first){event.preventDefault();last.focus();}
+  else if(!event.shiftKey&&active===last){event.preventDefault();first.focus();}
+}
+function closeTopDialogOnEscape(event){
+  if(event.key!=='Escape')return;
+  const dialog=[...document.querySelectorAll('.mo.on')].at(-1);
+  if(!dialog)return;
+  event.preventDefault();
+  dialog.querySelector('.mc')?.click();
+}
+function observeDialogFocus(){
+  document.querySelectorAll('.mo:not(#modal)').forEach(dialog=>{
+    const observer=new MutationObserver(()=>{
+      const open=dialog.classList.contains('on');
+      if(open&&!dialogFocusOrigins.has(dialog.id)){
+        const active=document.activeElement;
+        dialogFocusOrigins.set(dialog.id,active instanceof HTMLElement?active:null);
+        requestAnimationFrame(()=>dialogControls(dialog)[0]?.focus());
+      }
+      if(!open&&dialogFocusOrigins.has(dialog.id)){
+        const target=dialogFocusOrigins.get(dialog.id);dialogFocusOrigins.delete(dialog.id);
+        if(dialog.contains(document.activeElement)&&target?.isConnected)requestAnimationFrame(()=>target.focus());
+      }
+    });
+    observer.observe(dialog,{attributes:true,attributeFilter:['class']});
+  });
+}
+observeDialogFocus();
+
+function setPct(el){
+  el.style.setProperty('--pct',(el.value-el.min)/(el.max-el.min)*100+'%');
+  if(el.dataset.valueUnit==='percent')el.setAttribute('aria-valuetext',el.value+'%');
+}
 
 function setAlgoUI(a){
-  document.getElementById('btnDP').classList.toggle('on',a==='dp');
-  document.getElementById('btnGreedy').classList.toggle('on',a==='greedy');
+  const dp=a==='dp',greedy=a==='greedy';
+  document.getElementById('btnDP').classList.toggle('on',dp);
+  document.getElementById('btnGreedy').classList.toggle('on',greedy);
+  document.getElementById('btnDP').setAttribute('aria-pressed',String(dp));
+  document.getElementById('btnGreedy').setAttribute('aria-pressed',String(greedy));
 }
 
 function setAlgo(a){
   algo=a;setAlgoUI(a);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 }
 
@@ -794,7 +901,7 @@ document.getElementById('filterRate').addEventListener('input',function(){
   filterRate=+this.value;
   document.getElementById('filterVal').textContent=filterRate+'%';
   setPct(this);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 });
 
@@ -802,7 +909,7 @@ document.getElementById('ethicsScore').addEventListener('input',function(){
   ethicsScore=+this.value;
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(this);
-  Object.keys(PRESETS).forEach(k=>document.getElementById('p-'+k)?.classList.remove('sel'));
+  setPresetButtonState('p-',PRESETS,null);
   activePreset=null;updateAll();
 });
 
@@ -811,17 +918,24 @@ document.getElementById('historicalImmunity').addEventListener('input',function(
   document.getElementById('immunityVal').textContent=historicalImmunity+'%';
   const pct=(historicalImmunity/100*100)+'%';
   this.style.background=`linear-gradient(90deg,var(--pur) ${pct},var(--bdr) ${pct})`;
+  setPct(this);
 });
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeIntro();closeAudit();}});
+document.addEventListener('keydown',e=>{
+  closeTopDialogOnEscape(e);
+  trapMetricModalFocus(e);
+  trapOpenDialogFocus(e);
+});
 
 function switchTab(n){
+  const sourcePage=document.activeElement?.closest?.('.page');
   currentTab = n;
   [1,2,3,4].forEach(i=>{
     document.getElementById('page'+i).classList.toggle('active', n===i);
     const tb=document.getElementById('tab'+i+'Btn');
     tb.classList.toggle('active', n===i);
     tb.setAttribute('aria-selected', n===i ? 'true' : 'false'); // T55: スクリーンリーダーへ選択状態を通知
+    tb.tabIndex=n===i?0:-1;
   });
   if(n===2){ updateAllP2(); startP2Tick(); } else { stopP2Tick(); } // v6.346: 後継者ストックはP2表示中のみ時間経過
   if(n===3&&!p3Started) startP3(); // 初回のみ起動（再訪時はシム状態を保持）
@@ -829,7 +943,25 @@ function switchTab(n){
   refitCanvases(); // 非表示中の画面回転・リサイズに追従
   // v6.332: アドレスバーの tab のみ同期（他のシナリオパラメータ f/e/s/dx… は不変）
   try{const u=new URL(location.href);u.searchParams.set('tab',n);history.replaceState(null,'',u);}catch(e){}
+  if(sourcePage&&!sourcePage.classList.contains('active')){
+    requestAnimationFrame(()=>document.getElementById('tab'+n+'Btn')?.focus());
+  }
 }
+
+document.querySelector('.tab-bar')?.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  const tabs=[...event.currentTarget.querySelectorAll('[role="tab"]')];
+  const current=tabs.indexOf(document.activeElement);
+  if(current<0)return;
+  let next=current;
+  if(event.key==='ArrowLeft')next=(current-1+tabs.length)%tabs.length;
+  if(event.key==='ArrowRight')next=(current+1)%tabs.length;
+  if(event.key==='Home')next=0;
+  if(event.key==='End')next=tabs.length-1;
+  event.preventDefault();
+  tabs[next].focus();
+  switchTab(next+1);
+});
 
 // ── PAGE 2 STATE ──────────────────────────────────────────
 let shrinkRate=10, dxRate=30, algoP2='greedy', ethicsP2=68; // v6.334: 初期状態から p2Good（平穏）を満たす
@@ -1264,6 +1396,8 @@ function setAlgoP2(a){
   document.getElementById('btnDPP2').classList.toggle('green-on',a==='dp');
   document.getElementById('btnGreedyP2').classList.toggle('on',a==='greedy');
   document.getElementById('btnGreedyP2').classList.toggle('red-on',a==='greedy');
+  document.getElementById('btnDPP2').setAttribute('aria-pressed',String(a==='dp'));
+  document.getElementById('btnGreedyP2').setAttribute('aria-pressed',String(a==='greedy'));
   shockState=null;
   clearPresetSelP2();
   updateAllP2();
@@ -1275,6 +1409,8 @@ function setPublicReboot(on){
   document.getElementById('btnRebootOff').classList.toggle('on',!on);
   document.getElementById('btnRebootOn').classList.toggle('on',on);
   document.getElementById('btnRebootOn').classList.toggle('green-on',on);
+  document.getElementById('btnRebootOff').setAttribute('aria-pressed',String(!on));
+  document.getElementById('btnRebootOn').setAttribute('aria-pressed',String(on));
   shockState=null;
   clearPresetSelP2();
   updateAllP2();
@@ -1445,6 +1581,11 @@ function setText(el,txt){if(el&&el._t!==txt){el._t=txt;el.textContent=txt;}}
 function setColor(el,col){if(el&&el._c!==col){el._c=col;el.style.color=col;}}
 function setClassOn(el,name,on){if(el&&el['_k'+name]!==on){el['_k'+name]=on;el.classList.toggle(name,on);}}
 function setDisp(el,disp){if(el&&el._d!==disp){el._d=disp;el.style.display=disp;}}
+function announceVerdict(text){
+  const live=document.getElementById('verdictAnnouncement');if(!live)return;
+  live.textContent='';
+  requestAnimationFrame(()=>{live.textContent=text;});
+}
 
 // v6.333: 判定バナーの3状態切替（'crash' 赤 / 'good' 緑 / '' 非表示）。状態変化時だけDOMへ書き込む。
 //   .at の data-i18n を付け替えるので言語切替は既存 applyI18nAuto が自動追従する。
@@ -1465,6 +1606,7 @@ function setVerdictBanner(alertId,state,key){
     if(state==='good'){al.classList.add('good');at.classList.add('good');}
     else if(state==='warn'){al.classList.add('warn');at.classList.add('warn');}
     al.classList.add('on');
+    announceVerdict(at.textContent);
     track('verdict',{banner:alertId,state,key});
     // v6.35 (task2): 崩壊へ遷移した瞬間だけ短い振動（ネイティブのみ / Webは no-op）。
     // 上部の bst ガードで状態変化時にしか到達しないため連続振動しない。
@@ -1749,13 +1891,15 @@ function simTimelineP3(depth,ground,steps=65){
 }
 
 function updateP3Chart(){
-  if(!timelineChartP3)return;
-  const eff=dropoutActive?100:groundingRate;
-  const tl=simTimelineP3(searchDepth,eff);
-  timelineChartP3.data.datasets[0].data=tl.dop;
-  timelineChartP3.data.datasets[1].data=tl.integ;
-  timelineChartP3.data.datasets[2].data=tl.grd;
-  timelineChartP3.update();
+  if(timelineChartP3){
+    const eff=dropoutActive?100:groundingRate;
+    const tl=simTimelineP3(searchDepth,eff);
+    timelineChartP3.data.datasets[0].data=tl.dop;
+    timelineChartP3.data.datasets[1].data=tl.integ;
+    timelineChartP3.data.datasets[2].data=tl.grd;
+    timelineChartP3.update();
+  }
+  if(REDUCED_MOTION&&p3Ctx){stepP3();drawP3();}
 }
 
 function startP3(){
@@ -1792,7 +1936,7 @@ function startP3(){
   cv.width=p3W;cv.height=p3H;p3Ctx=cv.getContext('2d');
   initP3Nodes();
   updateP3Chart();
-  p3Loop();
+  if(!REDUCED_MOTION)p3Loop();
 }
 
 function restartP3(){startP3();}
@@ -2125,13 +2269,15 @@ function simTimelineP4(ext,gam,steps=65){
 }
 
 function updateP4Chart(){
-  if(!timelineChartP4)return;
-  const effExt=filterActive?0:extTraffic;
-  const tl=simTimelineP4(effExt,gamification);
-  timelineChartP4.data.datasets[0].data=tl.drop;
-  timelineChartP4.data.datasets[1].data=tl.ratio;
-  timelineChartP4.data.datasets[2].data=tl.pol;
-  timelineChartP4.update();
+  if(timelineChartP4){
+    const effExt=filterActive?0:extTraffic;
+    const tl=simTimelineP4(effExt,gamification);
+    timelineChartP4.data.datasets[0].data=tl.drop;
+    timelineChartP4.data.datasets[1].data=tl.ratio;
+    timelineChartP4.data.datasets[2].data=tl.pol;
+    timelineChartP4.update();
+  }
+  if(REDUCED_MOTION&&p4Ctx){manageSpam();drawP4();}
 }
 
 function startP4(){
@@ -2168,7 +2314,7 @@ function startP4(){
   cv.width=p4W;cv.height=p4H;p4Ctx=cv.getContext('2d');
   initP4Nodes();
   updateP4Chart();
-  p4Loop();
+  if(!REDUCED_MOTION)p4Loop();
 }
 
 function restartP4(){startP4();}
@@ -2208,7 +2354,7 @@ const PRESETS_P2={
   deadlock:  {s:20,d:20,e:25,a:'greedy',r:false}, // 他責デッドロック発動デモ
   smart:     {s:65,d:75,e:80,a:'dp',    r:false}, // 持続可能な縮退運転
 };
-function clearPresetSelP2(){Object.keys(PRESETS_P2).forEach(k=>document.getElementById('p2-'+k)?.classList.remove('sel'));}
+function clearPresetSelP2(){setPresetButtonState('p2-',PRESETS_P2,null);}
 function setPresetP2(id){
   const p=PRESETS_P2[id];if(!p)return;
   shrinkRate=p.s;dxRate=p.d;ethicsP2=p.e;algoP2=p.a;publicReboot=p.r;
@@ -2223,13 +2369,17 @@ function setPresetP2(id){
   document.getElementById('btnDPP2').classList.toggle('green-on',p.a==='dp');
   document.getElementById('btnGreedyP2').classList.toggle('on',p.a==='greedy');
   document.getElementById('btnGreedyP2').classList.toggle('red-on',p.a==='greedy');
+  document.getElementById('btnDPP2').setAttribute('aria-pressed',String(p.a==='dp'));
+  document.getElementById('btnGreedyP2').setAttribute('aria-pressed',String(p.a==='greedy'));
   document.getElementById('btnRebootOff').classList.toggle('on',!p.r);
   document.getElementById('btnRebootOn').classList.toggle('on',p.r);
   document.getElementById('btnRebootOn').classList.toggle('green-on',p.r);
+  document.getElementById('btnRebootOff').setAttribute('aria-pressed',String(!p.r));
+  document.getElementById('btnRebootOn').setAttribute('aria-pressed',String(p.r));
   shockState=null;
-  clearPresetSelP2();
-  document.getElementById('p2-'+id)?.classList.add('sel');
+  setPresetButtonState('p2-',PRESETS_P2,id);
   updateAllP2();
+  announcePreset('p2-',id);
   showShareToast({kind:'preset',page:2,preset:id});
   notePreset(2,id);
 }
@@ -2240,7 +2390,7 @@ const PRESETS_P3={
   fasting: {dp:5,g:95,lr:60}, // 物理現実回帰による回復
   debugger:{dp:9,g:70,lr:80}, // 完全デバッグ状態
 };
-function clearPresetSelP3(){Object.keys(PRESETS_P3).forEach(k=>document.getElementById('p3-'+k)?.classList.remove('sel'));}
+function clearPresetSelP3(){setPresetButtonState('p3-',PRESETS_P3,null);}
 function setPresetP3(id){
   const p=PRESETS_P3[id];if(!p)return;
   searchDepth=p.dp;groundingRate=p.g;learningRate=p.lr;
@@ -2250,9 +2400,9 @@ function setPresetP3(id){
   document.getElementById('groundVal').textContent=p.g+'%';
   document.getElementById('lrVal').textContent=p.lr+'%';
   setPct(ds);setPct(gs);setPct(ls);
-  clearPresetSelP3();
-  document.getElementById('p3-'+id)?.classList.add('sel');
+  setPresetButtonState('p3-',PRESETS_P3,id);
   updateP3Chart();
+  announcePreset('p3-',id);
   showShareToast({kind:'preset',page:3,preset:id});
   notePreset(3,id);
 }
@@ -2263,7 +2413,7 @@ const PRESETS_P4={
   gamified:  {ext:40,gam:75}, // 目的関数乗っ取り（ログ低エントロピー化）
   flamewar:  {ext:85,gam:90}, // 複合最悪状態
 };
-function clearPresetSelP4(){Object.keys(PRESETS_P4).forEach(k=>document.getElementById('p4-'+k)?.classList.remove('sel'));}
+function clearPresetSelP4(){setPresetButtonState('p4-',PRESETS_P4,null);}
 function setPresetP4(id){
   const p=PRESETS_P4[id];if(!p)return;
   extTraffic=p.ext;gamification=p.gam;
@@ -2272,9 +2422,9 @@ function setPresetP4(id){
   document.getElementById('extVal').textContent=p.ext+'%';
   document.getElementById('gamVal').textContent=p.gam+'%';
   setPct(et);setPct(gm);
-  clearPresetSelP4();
-  document.getElementById('p4-'+id)?.classList.add('sel');
+  setPresetButtonState('p4-',PRESETS_P4,id);
   updateP4Chart();
+  announcePreset('p4-',id);
   showShareToast({kind:'preset',page:4,preset:id});
   notePreset(4,id);
 }
@@ -3004,8 +3154,8 @@ function setResearcherMode(on){
   const cb=document.getElementById('fbResearcher'); if(cb)cb.checked=researcherMode;
   // ON: 開発者導線を上部にボタンとして格上げ / OFF: 下部の控えめな補足リンク
   const top=document.getElementById('fbDevTop'), note=document.getElementById('fbDevNote');
-  if(top)top.style.display=researcherMode?'block':'none';
-  if(note)note.style.display=researcherMode?'none':'block';
+  if(top)top.hidden=!researcherMode;
+  if(note)note.hidden=researcherMode;
 }
 function openFeedback(){
   const msg=document.getElementById('fbMessage'), em=document.getElementById('fbEmail');
@@ -3113,8 +3263,6 @@ function exportData(fmt){
   }
 }
 
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();closeShareGuide();closeFeedback();closeDiscoveryLog();}});
-
 (function init(){
   const p=new URLSearchParams(location.search);
   if(p.has('f'))filterRate=clamp(+p.get('f'),0,100);
@@ -3138,6 +3286,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSharePop();clo
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(document.getElementById('filterRate'));
   setPct(document.getElementById('ethicsScore'));
+  setPct(document.getElementById('historicalImmunity'));
   setAlgoUI(algo);
   applyI18n();
 

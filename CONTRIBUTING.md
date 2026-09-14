@@ -11,6 +11,8 @@
 | こうだったらいいのに | [改善提案](../../issues/new?template=feature_request.md) |
 | 使ってみた感想、授業で使った話、シナリオへの意見 | [感想・気づき](../../issues/new?template=feedback.md) |
 | 脆弱性を見つけた | [非公開で報告](../../security/advisories/new)（Issue には書かないでください） |
+| はじめての参加を探す | [Good first issue](https://github.com/larai-w/social-system-debugger/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22) |
+| コード提案を送りたい | [変更提案（Compare）](https://github.com/larai-w/social-system-debugger/compare) |
 
 うまく言葉にならなくても構いません。断片でも歓迎します。
 「この現象は現実のあれに似ている」といった指摘は、シナリオ設計の材料になります。
