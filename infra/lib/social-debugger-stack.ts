@@ -4,7 +4,6 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { NagSuppressions } from 'cdk-nag';
 
 /**
  * フェーズ1 の配信基盤（意図的に最小構成）。
@@ -182,7 +181,8 @@ export class SocialDebuggerStack extends cdk.Stack {
     // ── cdk-nag（AWS Solutions）の指摘に対する意図的な受容 ─────────────────
     // 小規模な教育用・静的サイトという文脈で、各ルールを理解した上で受容する。
     // 事業成長時に最初に足すべきは CFR2(WAF) と CFR3/S1(アクセスログ)。
-    NagSuppressions.addStackSuppressions(this, [
+    // cdk-nag v3 は CDK 標準の Validations.acknowledge を使う（v2 の NagSuppressions は廃止）。
+    const acknowledgements: { id: string; reason: string }[] = [
       {
         id: 'AwsSolutions-S1',
         reason:
@@ -205,10 +205,14 @@ export class SocialDebuggerStack extends cdk.Stack {
           'デフォルトの *.cloudfront.net 証明書で配信（min TLS は cdk.json の TLSv1.2_2021 フラグで担保）。カスタムドメイン利用時は us-east-1 の ACM 証明書に差し替える（雛形をコメントで用意済み）。',
       },
       {
-        id: 'AwsSolutions-IAM5',
+        // v3 は指摘ごとの acknowledge が要る（ルール名だけの一括受容は効かない）。
+        id: 'AwsSolutions-IAM5[Resource::<SiteBucket397A1860.Arn>/*]',
         reason:
           'デプロイロールのオブジェクト権限は単一バケット配下 (bucket/*) に限定。aws s3 sync に必要な最小の対象内ワイルドカードであり、バケット横断ではない。',
       },
-    ]);
+    ];
+    for (const ack of acknowledgements) {
+      cdk.Validations.of(this).acknowledge(ack);
+    }
   }
 }
