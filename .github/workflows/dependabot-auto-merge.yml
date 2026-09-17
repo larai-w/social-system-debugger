@@ -1,0 +1,38 @@
+name: Dependabot auto-merge
+# patch/minor の依存更新は CI 緑で自動マージ（main まで）。major は手動レビュー。
+# 前提: リポジトリ設定 "Allow auto-merge" 有効（allow_auto_merge=true）。
+#       main のブランチ保護（必須チェック `Public boundary check` / `verify`・
+#       管理者にも適用）が実際のゲート。保護が無いとこれは自動化ではなく素通しになる。
+#
+# ⚠️ **このマージは `deploy.yml`（GitHub Pages）を起動しない。**
+#
+# GITHUB_TOKEN による push は他のワークフローを起動しない（GitHub のループ防止仕様）。
+# auto-merge の実体は GITHUB_TOKEN の push なので、`deploy.yml` の
+# `on: push: branches: [main]` は反応しない。→ main と公開中のページがずれる。
+#
+# 依存だけの更新（web/ と content/ に触らない）なら公開物は変わらないので実害は無い。
+# **web/ や content/ を含む dependabot PR が来たときは、マージ後に
+# `deploy.yml` を手動 dispatch すること。** carequest では同じ仕様で
+# 33.3時間のずれが出た（`.github/workflows/dependabot-auto-merge.yml` の記録）。
+#
+# PAT では解決しない（長期キーを増やす方向は取らない）。
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dependabot metadata
+        id: meta
+        uses: dependabot/fetch-metadata@v3
+      - name: Enable auto-merge for patch/minor
+        if: ${{ steps.meta.outputs.update-type == 'version-update:semver-patch' || steps.meta.outputs.update-type == 'version-update:semver-minor' }}
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
