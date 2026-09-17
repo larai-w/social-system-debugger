@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   rebase:
-    # Dependabot PR のみ実行
+    # Dependabot PRs only
     if: ${{ github.actor == 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     steps:

@@ -1,23 +1,25 @@
 name: Deploy to AWS (S3 + CloudFront)
 
-# GitHub Pages のデプロイ(deploy.yml)はそのまま維持し、これは AWS への配信を「追加」するもの。
-# 長期アクセスキーは保存しない。OIDC で一時クレデンシャルを取得する。
+# The GitHub Pages deploy (deploy.yml) stays as it is; this workflow ADDS
+# delivery to AWS alongside it. No long-lived access key is stored: temporary
+# credentials are obtained through OIDC.
 on:
   push:
     branches: [main]
-    # web/ か content/ が変わった時だけ動かす（インフラや docs だけの変更では動かさない）
+    # Only run when web/ or content/ changed. An infrastructure- or docs-only
+    # change does not trigger a deploy.
     paths:
       - 'web/**'
       - 'content/**'
       - '.github/workflows/deploy-aws.yml'
   workflow_dispatch:
 
-# ★ユーザー設定（GitHub リポジトリ側）:
-#   Secrets:   AWS_DEPLOY_ROLE_ARN = cdk 出力 GithubDeployRoleArn
+# Settings that must be configured on the GitHub repository:
+#   Secrets:   AWS_DEPLOY_ROLE_ARN = the GithubDeployRoleArn output from cdk
 #   Variables: AWS_REGION / S3_BUCKET(=BucketName) / CLOUDFRONT_DIST_ID(=DistributionId)
 
 permissions:
-  id-token: write # OIDC トークン発行に必須
+  id-token: write # required to mint the OIDC token
   contents: read
 
 concurrency:
@@ -27,8 +29,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    # AWS 未設定の間はこのジョブを丸ごとスキップ（赤い失敗にせず neutral/skipped にする）。
-    # S3_BUCKET の Variable を設定した時点で自動的に有効化される。
+    # While AWS is not configured, skip the whole job: report it as skipped
+    # rather than as a red failure. It switches on by itself once the S3_BUCKET
+    # variable is set.
     if: ${{ vars.S3_BUCKET != '' }}
     steps:
       - uses: actions/checkout@v7
@@ -39,8 +42,9 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      # 配信元URLを web/config.js に自動注入（手でソースを書き換えない）。
-      # CLOUDFRONT_DOMAIN 未設定なら既定(空=相対パス)のまま。
+      # Inject the delivery origin into web/config.js automatically; never edit
+      # the source by hand. If CLOUDFRONT_DOMAIN is unset it stays at the
+      # default (empty, meaning relative paths).
       - name: Inject content base URL into web/config.js
         if: ${{ vars.CLOUDFRONT_DOMAIN != '' }}
         run: |
@@ -48,20 +52,22 @@ jobs:
             "${{ vars.CLOUDFRONT_DOMAIN }}" "${{ vars.CLOUDFRONT_DOMAIN }}" > web/config.js
           echo "config.js →"; cat web/config.js
 
-      # web/ を同期。--delete で不要ファイルを掃除するが content/ は別管理なので除外。
+      # Sync web/. --delete clears files that are no longer needed, but
+      # content/ is managed separately so it is excluded.
       - name: Sync web/
         run: |
           aws s3 sync web/ "s3://${{ vars.S3_BUCKET }}/" \
             --delete --exclude "content/*" \
             --cache-control "public,max-age=300"
 
-      # content/ を個別に同期（週替わりシナリオJSON）。
+      # Sync content/ separately (the weekly scenario JSON).
       - name: Sync content/
         run: |
           aws s3 sync content/ "s3://${{ vars.S3_BUCKET }}/content/" \
             --delete --cache-control "public,max-age=300"
 
-      # 無効化は latest.json と index.html のみ（全パス /* はコストと時間の無駄）。
+      # Invalidate only latest.json and index.html. Invalidating /* wastes
+      # both money and time.
       - name: Invalidate latest.json + index.html
         run: |
           aws cloudfront create-invalidation \

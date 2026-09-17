@@ -90,7 +90,9 @@ jobs:
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: '3.12'
-      # pre-commit にしか無いガードは、フックを設定していないクローン・Web UI からの
-      # 変更・別セッションの環境差を素通しする。CI にも置くことで初めて境界になる。
+      # A guard that only exists in pre-commit lets through a clone without the
+      # hook installed, a change made in the web UI, and any environment
+      # difference in another session. It only becomes a boundary once CI runs
+      # it too.
       - name: Check tracked files against the public-repository policy
         run: python3 scripts/check_public_repo.py --tracked
