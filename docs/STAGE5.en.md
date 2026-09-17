@@ -1,6 +1,8 @@
 # Stage 5: Same trigger, different scars
 
-Open Stage 5 from the menu. Eight scenes cover conditions, prediction, initial shock, operator swap, a 2×2 comparison, intervention, rerun and reflection. Initial conditions, prediction, reason and confidence lock when results are first revealed. Start a new experiment from the final scene to change them.
+> ⚠️ **This is a design document. The feature is not in the app yet.** What follows is the specification for when it is built, not a description of current behaviour.
+
+Stage 5 would open from the menu. Eight scenes cover conditions, prediction, initial shock, operator swap, a 2×2 comparison, intervention, rerun and reflection. Initial conditions, prediction, reason and confidence lock when results are first revealed. Start a new experiment from the final scene to change them.
 
 ## Illustrative model
 
