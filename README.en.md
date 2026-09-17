@@ -182,8 +182,10 @@ Develop on the `development` branch → CI runs automatically on PRs to `main` �
 
 *Engine: Markov Chain + Monte Carlo + Agent-Based Simulation | © 2026 Social OS Debugger — Educational Tool*
 
-## Stage 5: test your hypothesis
+## Stage 5: test your hypothesis (design only — not yet implemented)
 
-Open the eight-scene lesson in a separate tab from the app menu. Record a prediction, swap operators, compare conditions, apply a budgeted intervention, and reflect. This illustrative model uses inputs independent of Pages 1–4 and does not determine real-world causes or personal responsibility. Japanese/English display and JSON export/import are supported.
+> ⚠️ **This is not in the app yet.** The current menu has three entries — teacher guide, privacy policy and FAQ — and no Stage 5 entry. What follows is a frozen design with no release date.
 
-[Model and learning guide](docs/STAGE5.en.md). On the Web, Stage 5 works offline after the main app completes offline preparation. Learning records are not saved automatically; export JSON before reloading.
+The plan is an eight-scene lesson opened in a separate tab from the app menu: record a prediction, swap operators, compare conditions, apply a budgeted intervention, and reflect. The illustrative model would use inputs independent of Pages 1–4 and would not determine real-world causes or personal responsibility. Japanese/English display and JSON export/import are planned.
+
+[Model and learning guide](docs/STAGE5.en.md) (design document). Offline use is intended to follow the main app once the feature is built.
