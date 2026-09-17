@@ -1,14 +1,15 @@
 name: CodeQL
 
-# GitHub の意味解析による自動コードレビュー（セキュリティ/バグ）。PR毎＋週次で走り、
-# 結果は Security タブに出る。公開リポジトリは無料。誰が書いたコードでも機械が検査する。
+# GitHub's semantic analysis as an automated code review (security and bugs).
+# Runs on every PR and weekly; results appear in the Security tab. Free for
+# public repos. It inspects the code whoever wrote it.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1' # 毎週月曜 03:00 UTC
+    - cron: '0 3 * * 1' # every Monday 03:00 UTC
 
 jobs:
   analyze:

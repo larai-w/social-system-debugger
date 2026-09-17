@@ -3,12 +3,13 @@ name: CI
 on:
   pull_request:
     branches: [main]
-  # weekly-rotate が作る PR は GITHUB_TOKEN 起点のため pull_request イベントで CI が
-  # 発火しない（GitHub の再帰防止）。ローテ側から明示ディスパッチして required checks を満たす。
+  # A PR opened by weekly-rotate comes from GITHUB_TOKEN, so it does not start
+  # CI on the pull_request event (GitHub's recursion guard). The rotation
+  # workflow dispatches this one explicitly so the required checks are met.
   workflow_dispatch:
 
 jobs:
-  # ── フロント: engine.js のユニットテスト + 週替わりJSONスキーマ検証 ──
+  # Frontend: engine.js unit tests plus schema validation of the weekly JSON
   web:
     runs-on: ubuntu-latest
     steps:
@@ -30,8 +31,9 @@ jobs:
       - name: Check (tests + weekly JSON + eslint + prettier — mirrors `make check`)
         run: npm run check
 
-  # ── ブラウザ実機検証: Console ゼロ（Chart.js 正常/失敗の両ケース・4タブ・プリセット・スライダー）──
-  # ローカルの `make verify` と同一スクリプト。web/infra とは独立ジョブ（ブランチ保護の必須には未指定＝助言的）。
+  # Real-browser check: zero console output (Chart.js both working and failing,
+  # 4 tabs, presets, sliders). Same script as `make verify` locally. A separate
+  # job from web/infra and not a required check, so it is advisory.
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -45,14 +47,16 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Browser verification (scripts/verify.mjs)
         run: npm run verify
-      # T62: PWA オフライン起動もPRごとに検証（SW登録→回線遮断→リロード。ジョブ自体が助言的なのは従来どおり）
+      # T62: verify PWA offline start on every PR (register SW, cut the network,
+      # reload). The job stays advisory, as before.
       - name: Offline-start verification (scripts/verify-offline.mjs)
         run: npm run verify:offline
-      # 静的ページ群（classroom/slides/privacy/announce-cards）の Console ゼロ＋構造を検証（助言的）
+      # Static pages (classroom, slides, privacy, announce-cards): zero console
+      # output and structure check. Advisory.
       - name: Static-pages verification (scripts/verify-pages.mjs)
         run: npm run verify:pages
 
-  # ── インフラ: cdk synth が通ることの確認 ──
+  # Infrastructure: confirm cdk synth succeeds
   infra:
     runs-on: ubuntu-latest
     defaults:
