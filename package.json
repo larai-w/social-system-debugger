@@ -64,7 +64,7 @@
     "@napi-rs/canvas": "^1.0.9",
     "eslint": "^10.10.0",
     "playwright": "^1.63.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.8"
   },
   "overrides": {
     "tar": "^7.5.21",
