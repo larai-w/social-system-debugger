@@ -20,6 +20,21 @@ const CONTENT_BASE_URL = (
 ).replace(/\/+$/, '');
 const LATEST_URL = CONTENT_BASE_URL + '/latest.json';
 
+// 今週（日本時間・ISO 週）のシナリオ ID。週次ワークフローの `TZ=Asia/Tokyo date +%G-W%V` と同じ数え方。
+// 2026-10-05: latest.json を毎週 main に push する方式がリポジトリのルールで止まっていた（9/13〜）。
+// 配信先には全週の JSON が置かれているので、アプリが今週のファイルを直接取りに行く。push 不要。
+function weekIdJST(now) {
+  const t = new Date((now || new Date()).getTime() + 9 * 3600 * 1000);
+  const d = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()));
+  const dow = (d.getUTCDay() + 6) % 7;          // 月曜=0
+  d.setUTCDate(d.getUTCDate() - dow + 3);       // その週の木曜で ISO 年を決める
+  const isoYear = d.getUTCFullYear();
+  const firstThursday = new Date(Date.UTC(isoYear, 0, 4));
+  firstThursday.setUTCDate(firstThursday.getUTCDate() - ((firstThursday.getUTCDay() + 6) % 7) + 3);
+  const week = 1 + Math.round((d - firstThursday) / (7 * 24 * 3600 * 1000));
+  return isoYear + '-W' + String(week).padStart(2, '0');
+}
+
 // 週次通知の曜日・時刻（変更可能な定数）: 月曜 19:00
 const WEEKLY_NOTIFY_DOW = 1;   // 0=Sun .. 1=Mon（JS Date 準拠）
 const WEEKLY_NOTIFY_HOUR = 19;
@@ -350,7 +365,11 @@ async function scheduleWeeklyNotification() {
         title: tt('今週のシナリオが届いています', 'This week\'s scenario is live'),
         body: tt('あなたの街は、今週も生き残れるか。', 'Can your town survive this week too?'),
         // Capacitor の weekday は 1=Sun..7=Sat。JS の dow(=1:Mon) に +1 で対応。
-        schedule: { on: { weekday: WEEKLY_NOTIFY_DOW + 1, hour: WEEKLY_NOTIFY_HOUR, minute: 0 }, allowWhileIdle: true, repeats: true }
+        schedule: { on: { weekday: WEEKLY_NOTIFY_DOW + 1, hour: WEEKLY_NOTIFY_HOUR, minute: 0 }, allowWhileIdle: true, repeats: true },
+        // 週1回の案内に正確な時刻は要らない。既定（true）のままだと、Android 12+ で
+        // 「アラームとリマインダー」の設定画面を開こうとする。SCHEDULE_EXACT_ALARM 権限も
+        // 出していない（scripts/prepare-native.mjs）ので、最初から inexact で予約する。
+        isExactNotification: false
       }]
     });
   } catch (e) {}
@@ -360,8 +379,12 @@ async function scheduleWeeklyNotification() {
 async function loadRemoteScenario() {
   if (!WEEKLY_ENABLED) return;
   try {
-    const res = await fetch(LATEST_URL, { cache: 'no-store' });
-    if (res.ok) { _remoteScenario = normalizeScenario(await res.json()); }
+    // 今週のファイル → latest.json（旧方式の名残）→ バンドル版、の順に試す
+    const urls = [CONTENT_BASE_URL + '/' + weekIdJST() + '.json', LATEST_URL];
+    for (const url of urls) {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (res.ok) { _remoteScenario = normalizeScenario(await res.json()); break; }
+    }
   } catch (e) { /* オフライン/失敗時はバンドル版フォールバック */ }
   initWeeklyScenarioCard();
 }
