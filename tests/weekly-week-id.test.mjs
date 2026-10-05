@@ -97,3 +97,34 @@ test('loader falls back to latest.json when this week is missing', async () => {
   assert.equal(asked.length, 2);
   assert.equal(sc.getActiveScenario().id, 'from-latest');
 });
+
+test('the weekly reminder is scheduled as inexact (no exact-alarm prompt on Android 12+)', async () => {
+  let scheduled = null;
+  const documentStub = {
+    addEventListener() {},
+    getElementById() {
+      return null;
+    },
+  };
+  const windowStub = {
+    SSD: {
+      plugins: {
+        LocalNotifications: {
+          schedule: async (arg) => {
+            scheduled = arg;
+          },
+        },
+      },
+    },
+  };
+  const sc = new Function(
+    'document',
+    'window',
+    'SSD',
+    'tt',
+    src + '\nreturn { scheduleWeeklyNotification };'
+  )(documentStub, windowStub, windowStub.SSD, (ja) => ja);
+  await sc.scheduleWeeklyNotification();
+  assert.ok(scheduled, 'schedule() was not called');
+  assert.equal(scheduled.notifications[0].isExactNotification, false);
+});

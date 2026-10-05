@@ -365,7 +365,11 @@ async function scheduleWeeklyNotification() {
         title: tt('今週のシナリオが届いています', 'This week\'s scenario is live'),
         body: tt('あなたの街は、今週も生き残れるか。', 'Can your town survive this week too?'),
         // Capacitor の weekday は 1=Sun..7=Sat。JS の dow(=1:Mon) に +1 で対応。
-        schedule: { on: { weekday: WEEKLY_NOTIFY_DOW + 1, hour: WEEKLY_NOTIFY_HOUR, minute: 0 }, allowWhileIdle: true, repeats: true }
+        schedule: { on: { weekday: WEEKLY_NOTIFY_DOW + 1, hour: WEEKLY_NOTIFY_HOUR, minute: 0 }, allowWhileIdle: true, repeats: true },
+        // 週1回の案内に正確な時刻は要らない。既定（true）のままだと、Android 12+ で
+        // 「アラームとリマインダー」の設定画面を開こうとする。SCHEDULE_EXACT_ALARM 権限も
+        // 出していない（scripts/prepare-native.mjs）ので、最初から inexact で予約する。
+        isExactNotification: false
       }]
     });
   } catch (e) {}
