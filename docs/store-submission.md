@@ -112,6 +112,9 @@ On both a physical iPhone and Android phone:
 5. Haptics occur only at the intended success/failure moments.
 6. Notification permission is requested only after the contextual opt-in; denial does not break use.
 7. The weekly notification fires at the documented local time.
+   Also confirm this week's scenario (not the bundled fallback) is shown: the app fetches
+   `content/weekly/<ISO week in JST>.json` from CloudFront through CapacitorHttp
+   (`capacitor.config.json`), because the CloudFront responses carry no CORS headers.
 8. Japanese and English layouts, larger text, VoiceOver/TalkBack labels, and dark-mode contrast are
    checked.
 9. Privacy, FAQ, classroom, export, and feedback paths work.

@@ -1,31 +1,24 @@
-name: Weekly scenario rotation
+name: Weekly scenario stock check
 
-# Every Monday at 0:00 JST (Sunday 15:00 UTC), copy that week's
-# content/weekly/<ISO week>.json to latest.json and push it straight to main.
+# Every Monday at 0:00 JST (Sunday 15:00 UTC), check that this week's and the
+# next three weeks' content/weekly/<ISO week>.json exist.
 #
-# How it gets through: main is protected by a ruleset (required checks
-# web/infra, PR required, linear history), but this workflow pushes with a
-# write deploy key (secrets.WEEKLY_ROTATE_DEPLOY_KEY) and passes through the
-# ruleset's deploy-key bypass. Human changes still require a PR with green CI.
-#
-# Automating this through a PR was tried and proven impossible: a direct push
-# with GITHUB_TOKEN is rejected, a PR opened by GITHUB_TOKEN does not start CI
-# (recursion guard), and running CI on a bot's PR needs manual approval (the
-# approval API is for forks only).
-#
-# Note: a deploy-key push does not start other workflows either, so after the
-# rotation the Pages and AWS deploys are dispatched explicitly.
+# 2026-10-05: this used to copy this week's file to latest.json and push it to
+# main with a deploy key. The push had been rejected by the repository rules
+# since 2026-09-13, so the app stopped receiving new weeks. The app now asks
+# for content/weekly/<ISO week in JST>.json directly (web/js/scenario.js
+# weekIdJST), and every week's file is already deployed with the site, so no
+# weekly commit is needed. latest.json stays only as a fallback.
 #
 # A week with no scenario in stock fails on purpose, which doubles as the
-# reminder to write more scenarios.
+# reminder to write more scenarios (the issue step below).
 on:
   schedule:
     - cron: '0 15 * * 0' # Sunday 15:00 UTC = Monday 0:00 JST
-  workflow_dispatch: # can also be run by hand, e.g. to publish a reworked week
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  actions: write # needed to dispatch the follow-up deploy workflows
+  contents: read
   issues: write # needed to file the issue with work instructions on failure
 
 concurrency:
@@ -37,46 +30,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          # Check out with the write deploy key: the remote becomes SSH and the
-          # push passes the ruleset's deploy-key bypass. A GITHUB_TOKEN push is
-          # rejected.
-          ssh-key: ${{ secrets.WEEKLY_ROTATE_DEPLOY_KEY }}
 
-      - name: Rotate latest.json to this week's scenario (JST)
-        id: rotate
+      - name: Check this week and the next three weeks are in stock (JST)
         run: |
-          WEEK_ID=$(TZ=Asia/Tokyo date +%G-W%V)
-          SRC="content/weekly/${WEEK_ID}.json"
-          echo "今週: ${WEEK_ID}"
-          if [ ! -f "$SRC" ]; then
-            echo "::error::${SRC} がありません。週替わりシナリオの在庫切れです — 新しい週のJSONを追加してください。"
-            exit 1
-          fi
-          if cmp -s "$SRC" content/weekly/latest.json; then
-            echo "latest.json は既に ${WEEK_ID} です。何もしません。"
-            echo "rotated=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          cp "$SRC" content/weekly/latest.json
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add content/weekly/latest.json
-          git commit -m "content: rotate latest.json to ${WEEK_ID}"
-          git push origin HEAD:main
-          echo "rotated=true" >> "$GITHUB_OUTPUT"
-
-      - name: Trigger deploys (Pages + AWS)
-        if: steps.rotate.outputs.rotated == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-        run: |
-          # A deploy-key push does not start other workflows, so start them here.
-          gh workflow run deploy.yml --ref main -R "$GH_REPO"
-          # If the AWS secrets are unset, deploy-aws.yml skips itself with its own
-          # if condition, which is safe.
-          gh workflow run deploy-aws.yml --ref main -R "$GH_REPO"
+          missing=0
+          for offset in 0 7 14 21; do
+            WEEK_ID=$(TZ=Asia/Tokyo date -d "+${offset} days" +%G-W%V)
+            if [ -f "content/weekly/${WEEK_ID}.json" ]; then
+              echo "ok: ${WEEK_ID}"
+            else
+              echo "::error::content/weekly/${WEEK_ID}.json がありません。週替わりシナリオの在庫切れが近いです — 新しい週のJSONを追加してください。"
+              missing=1
+            fi
+          done
+          exit $missing
 
       # On failure - usually an empty stock, i.e. a deliberate exit 1 - file an
       # issue that says how to fix it.
@@ -115,18 +82,18 @@ jobs:
             // Claude Code as-is, so it stays in the language it will be used in.
             const body = [
               '## 症状',
-              `週次ローテ（\`Weekly scenario rotation\`）が失敗しました（実行日 JST: ${weekId}）。`,
-              `今週分の \`content/weekly/<ISO週>.json\` を \`latest.json\` へ切り替える処理が完了していません。`,
+              `週次の在庫確認（\`Weekly scenario stock check\`）が失敗しました（実行日 JST: ${weekId}）。`,
+              `今週から4週先までの \`content/weekly/<ISO週>.json\` のどれかがありません（在庫切れが近い）。`,
               '',
               `- 実行ログ: ${runUrl}`,
               '',
               '## 切り分け',
-              '在庫切れ（意図的な失敗）か、それ以外（push/ディスパッチ等）かを判定してください。',
+              '在庫切れ（意図的な失敗）か、それ以外（チェックアウトの失敗など）かを判定してください。',
               '手順は運用ランブック §1 を参照:',
               '[docs/operations-runbook.md#1-週次ローテが失敗した](../blob/main/docs/operations-runbook.md#1-週次ローテが失敗した)',
               '',
               '- **在庫切れ**の場合 → 下記プロンプトで次の週分を補充する（完全委任タスク）。',
-              '- **それ以外**（在庫はある）→ ランブック §1 の (B) に従う（push 競合の再実行・`actions: write` 権限・後続ワークフロー名）。',
+              '- **それ以外**（在庫はある）→ 実行ログを見て再実行する。2026-10-05 から push はしていない（アプリが今週のファイルを直接読む）。',
               '',
               '## そのまま Claude Code に貼れるプロンプト（在庫切れ時）',
               '```',
@@ -155,7 +122,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
-                body: `週次ローテが再度失敗しました（実行日 JST: ${weekId}）。\n\n- 実行ログ: ${runUrl}`,
+                body: `週次の在庫確認が再度失敗しました（実行日 JST: ${weekId}）。\n\n- 実行ログ: ${runUrl}`,
               });
               core.info(`既存 Issue #${issueNumber} にコメント追記しました。`);
             } else {
