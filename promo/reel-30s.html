@@ -107,7 +107,7 @@ function stateAt(t){
   let buffer,infra,heliOp=true,preset=null;
   if(!B){
     preset=t>=T_CLICK_EFF?'eff':null;
-    buffer=t<T_CLICK_EFF?45:lerp(45,22,ss(T_CLICK_EFF,T_CLICK_EFF+0.8,t)); // 効率至上都市: RB 22%（<30%）
+    buffer=t<T_CLICK_EFF?45:lerp(45,22,ss(T_CLICK_EFF,T_CLICK_EFF+0.8,t)); // 余白ゼロ都市: RB 22%（<30%）
     infra=92;
     if(t>T_FLASH1){buffer=lerp(22,4,ss(T_FLASH1,8.6,t));infra=lerp(92,6,ss(T_FLASH1,9.4,t));}
     heliOp=t<6.9;                                           // インフラ<35% → 長期運休
@@ -172,7 +172,7 @@ function draw(t){
     cx.fillText('SECTOR-T INFRASTRUCTURE',16,50);
     cx.strokeStyle=BDR;cx.beginPath();cx.moveTo(16,64);cx.lineTo(404,64);cx.stroke();
     // プリセット（実ボタン名）
-    chip(21,T('⚙ 効率至上都市','⚙ Efficiency-Max City'),st.preset==='eff',ORA);
+    chip(21,T('⚙ 余白ゼロ都市','⚙ Zero-Slack City'),st.preset==='eff',ORA);
     chip(221,T('🛡 冗長性確保都市','🛡 Redundant City'),st.preset==='red',GRN);
     // ゲージ（実ラベル名）
     const bcol=st.buffer>=60?GRN:st.buffer>=30?ORA:RED;
@@ -209,7 +209,7 @@ function draw(t){
       stamp('SURVIVED',GRN,T_BANNER_B+0.5,t);
     }
     // キャプション
-    if(t>2.5&&t<5.3)caption(T('効率をきわめた街に、災害が来る','Disaster comes to an efficiency-maxed town'));
+    if(t>2.5&&t<5.3)caption(T('余白のない街に、災害が来る','Disaster comes to a town with no slack'));
     if(t>T_RUNB+0.3&&t<17)caption(T('同じ街。今度は「ムダ」を残す','Same town — this time, keep the “waste”'));
     if(t>17.9&&t<20.2)caption(T('同じ災害。','The same disaster.'));
     // ゴーストカーソル
