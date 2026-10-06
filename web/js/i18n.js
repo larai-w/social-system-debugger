@@ -133,7 +133,7 @@ const I18N = {
     p2_cs_brand:'Sustainability of the local brand industry. Low DX investment leads to succession collapse.',
     p2_cs_log:'Real-time admin CPU log. Under deadlock it fills with BLAME_SHIFT operations.',
     p2_pr_hint:'→ Apply, then ⚡ inject a shock to compare resilience',
-    p2_pr_eff:'⚙ Efficiency-Max City', p2_pr_red:'🛡 Redundant City', p2_pr_dl:'🏚 Blame Deadlock', p2_pr_smart:'🌱 Smart Shrink',
+    p2_pr_eff:'⚙ Zero-Slack City', p2_pr_red:'🛡 Redundant City', p2_pr_dl:'🏚 Blame Deadlock', p2_pr_smart:'🌱 Smart Shrink',
     // ── v5.2: P3 static ──
     p3_cs_input:'Search parameters for debugging cognitive hacks and re-grounding in physical reality.',
     p3_depth_d:'Reasoning depth. ≤3: spinal-reflex reaction to buzz — fooled by the disguised node. ≥7: verify multi-dimensional causality before judging.',

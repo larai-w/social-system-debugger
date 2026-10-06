@@ -64,8 +64,8 @@ The same guide is available in the app from the ≡ menu under "📲 Install as 
 
 ## Killer Demos
 
-### 1. Injecting a shock into an efficiency-maxed city (L2)
-1. Open Page 2 and apply the preset **"⚙ Efficiency-Maxed City"**.
+### 1. Injecting a shock into a zero-slack city (L2)
+1. Open Page 2 and apply the preset **"⚙ Zero-Slack City"**.
 2. Note that while infrastructure and budget look healthy, the **Redundancy Buffer is below 30%**.
 3. Click **"⚡ Inject System Shock"** → instant **SYSTEM CRASH**.
 4. For contrast, inject the same shock with the preset **"🛡 Redundancy-Secured City"** (Public Reboot ON) → **SURVIVED**.

@@ -1284,7 +1284,7 @@ function updateAllP2(){
   document.getElementById('p2RedundancyNum').textContent=rb;
   document.getElementById('p2RedundancyNum').style.color=rbc;
   document.getElementById('p2RedundancyBar').style.cssText=`width:${rb}%;background:${rbc}`;
-  const rbStatus=rb<30?tt('CRITICAL — 効率最優先・ショックで即崩壊','CRITICAL — efficiency-maxed; a shock means instant collapse'):rb<60?tt('WARNING — 余力不足。大規模ショックに脆弱','WARNING — insufficient slack; vulnerable to major shocks'):tt('RESILIENT — 冗長性確保。ショック耐性あり','RESILIENT — redundancy secured; shock-tolerant');
+  const rbStatus=rb<30?tt('CRITICAL — 余白が30%未満・ショックで即崩壊','CRITICAL — slack below 30%; a shock means instant collapse'):rb<60?tt('WARNING — 余力不足。大規模ショックに脆弱','WARNING — insufficient slack; vulnerable to major shocks'):tt('RESILIENT — 冗長性確保。ショック耐性あり','RESILIENT — redundancy secured; shock-tolerant');
   document.getElementById('p2RedundancyStatus').textContent=rbStatus;
   document.getElementById('p2RedundancyStatus').style.color=rbc;
   // Reboot indicator
@@ -1300,7 +1300,7 @@ function updateAllP2(){
       sp.style.display='block';
       if(shockState.type==='crash'){
         sp.className='shock-result-panel shock-crashed';
-        sp.innerHTML=tt(`<strong>⚠ あなたの街は、崩壊しました</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>効率最優先社会はインフラ・財政が即時ゼロに崩壊。再公営化なき効率化の致命的代償。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ Your town has collapsed</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>The efficiency-maxed society collapsed to zero infrastructure and budget instantly — the fatal price of efficiency without re-municipalization.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
+        sp.innerHTML=tt(`<strong>⚠ あなたの街は、崩壊しました</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>拠点を集約し、行政が目先の利益で動いた結果、余白が30%を切っていました。想定外のショックを吸収できず、インフラと財政が一気に止まりました。<br><span style="font-size:.58rem;opacity:.75">【リダンダンシー理論】冗長性なき社会は、未知のショックに対して完全無防備。</span>`,`<strong>⚠ Your town has collapsed</strong><br>Redundancy Buffer: ${shockState.rb}% (&lt; 30%)<br>With services consolidated and an administration chasing short-term gains, slack had fallen below 30%. The unexpected shock could not be absorbed, and infrastructure and budget stopped at once.<br><span style="font-size:.58rem;opacity:.75">[Redundancy theory] A society without slack is defenseless against unknown shocks.</span>`);
       }else if(shockState.type==='survived'){
         sp.className='shock-result-panel shock-survived';
         sp.innerHTML=tt(`<strong>✓ あなたの街は、生き残った</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>公共的冗長性が社会を救いました。財政は消費されましたがインフラ・救命ヘリは継続稼働。STABLE。<br><span style="font-size:.58rem;opacity:.75">【再公営化の論理】非効率に見えた余白こそが、社会の生命線でした。</span>`,`<strong>✓ Your town survived</strong><br>Redundancy Buffer: ${shockState.rb}% (≥ 60%)<br>Public redundancy saved the society. Budget was spent, but infrastructure and the rescue heli stayed online. STABLE.<br><span style="font-size:.58rem;opacity:.75">[The logic of re-municipalization] The slack that looked wasteful was the lifeline.</span>`);
@@ -1631,7 +1631,7 @@ const DISCOVERIES=[
   {id:'d_p1_good',     badge:()=>tt('🌐 澄んだ情報空間をつくった','🌐 Built a clear information space'), learn:()=>tt('開かれた入力は、社会の解像度を上げる。','Open inputs raise a society’s resolution.')},
   {id:'d_p1_weimar',   badge:()=>tt('⚡ 1933年を1タップで再現した','⚡ Recreated 1933 in one tap'), learn:()=>tt('崩壊には、いつも同じ構造がある。','Collapse tends to share the same structure.')},
   {id:'d_p1_nordic',   badge:()=>tt('🌿 北欧型の設計を試した','🌿 Tried the Nordic design'), learn:()=>tt('高い倫理と開放性は、崩壊耐性になる。','High ethics and openness buy resilience.')},
-  {id:'d_p2_crash',    badge:()=>tt('🏙 街を崩壊させた','🏙 Let a town collapse'), learn:()=>tt('効率の最大化は、余白を食い尽くす。','Maximizing efficiency devours the slack.')},
+  {id:'d_p2_crash',    badge:()=>tt('🏙 街を崩壊させた','🏙 Let a town collapse'), learn:()=>tt('余白をすべて削ると、想定外の一撃に耐えられない。','Cut away all the slack, and an unexpected blow cannot be absorbed.')},
   {id:'d_p2_deadlock', badge:()=>tt('🏚 他責デッドロックを目撃した','🏚 Witnessed a blame-shift deadlock'), learn:()=>tt('直せるのに、誰も直さない状態を見た。','You saw a fixable problem no one fixes.')},
   {id:'d_p2_survived', badge:()=>tt('🚁 ショックを生き延びた','🚁 Survived the shock'), learn:()=>tt('非効率に見えた余白が、生命線だった。','The slack that looked wasteful was the lifeline.')},
   {id:'d_p2_steady',   badge:()=>tt('🏘 平穏な街を保った','🏘 Kept a town at peace'), learn:()=>tt('危機がないことは、設計の成果でもある。','An uneventful town can itself be a design achievement.')},
@@ -2525,7 +2525,7 @@ function buildAuditReport(){
 
 ## ■ 適用されたデバッグ・パッチの検証ログ
 1. **情報空間の正則化 (Information Regularization)**: フィルターバブルを抑制し、データ多様性を確保したことで、社会OSの「汎化性能（未知のショックへの耐性）」が回復。
-2. **公共的冗長性の復元 (Public Redundancy Restoration)**: 効率至上主義の過学習を停止し、「非効率な余白（Redundancy Buffer）」を確保したことで、ブラックスワン（環境ショック）に対する社会的耐故障性が確立。
+2. **公共的冗長性の復元 (Public Redundancy Restoration)**: 目先の最適化を止め、「一見むだに見える余白（Redundancy Buffer）」を確保したことで、ブラックスワン（環境ショック）に対する社会的耐故障性が確立。
 3. **探索アルゴリズムの深化 (Search Tree Optimization)**: 認知の探索深度を上げることで、自称・良識派ノードによる「正義の毒入れ攻撃（Poisoning Attack）」の看破に成功。
 4. **地域プロトコルの保護 (Sybil Traffic Filtering)**: 外部の部外者によるシビル攻撃を遮断し、530万人の真の生活者（サイレントマジョリティ）のパケット優先度を100%に復元。
 
@@ -2545,7 +2545,7 @@ function buildAuditReport(){
 
 ## Verified Debug Patches
 1. **Information Regularization**: Suppressed filter bubbles and secured data diversity, restoring the social OS's generalization (resilience to unknown shocks).
-2. **Public Redundancy Restoration**: Halted efficiency-maximizing overfitting and secured "inefficient slack" (Redundancy Buffer), establishing fault tolerance against black swans.
+2. **Public Redundancy Restoration**: Stopped short-term over-optimization and secured seemingly wasteful slack (Redundancy Buffer), establishing fault tolerance against black swans.
 3. **Search Tree Optimization**: Deepened cognitive search, exposing the "poisoning attack" run by the self-proclaimed-fair node.
 4. **Sybil Traffic Filtering**: Blocked outsider sybil attacks and restored packet priority of 5.3M true residents (the silent majority) to 100%.
 
