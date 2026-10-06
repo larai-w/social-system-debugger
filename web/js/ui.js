@@ -1,7 +1,36 @@
 // Platform gate for weekly scenarios (native only). Kept in ui.js so engine.js
 // stays DOM/window-free and reusable server-side. Web時はfalseで従来どおり非表示。
 const WEEKLY_ENABLED = window.Capacitor?.isNativePlatform?.() ?? false;
-const REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+const OS_REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+// 端末が「動きを減らす」でも、使う人が「動かして見る」を選んだら動かす（2026-10-06）。
+// このアプリは動くネットワークを見て分かる教材なので、止まったままだと文字だけになる。既定は端末の設定に従い、選んだときだけ動かす。
+let MOTION_OPT_IN = false;
+try { MOTION_OPT_IN = localStorage.getItem('ssd_motion_optin') === '1'; } catch (e) {}
+const REDUCED_MOTION = OS_REDUCED_MOTION && !MOTION_OPT_IN;
+
+function renderMotionNotice(){
+  if(!OS_REDUCED_MOTION)return;
+  const bar=document.createElement('div');
+  bar.id='motionNotice';
+  bar.setAttribute('role','region');
+  bar.setAttribute('aria-label',tt('動きの設定','Motion setting'));
+  bar.style.cssText='margin:8px auto;max-width:1100px;padding:10px 14px;border:1px solid #00d4ff;border-radius:10px;background:#0c1220;color:#d8e4ff;font-size:.82rem;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between';
+  const msg=document.createElement('span');
+  msg.textContent=MOTION_OPT_IN
+    ? tt('この端末は「動きを減らす」設定ですが、シミュレーションを動かしています。','This device asks for reduced motion, but the simulation is running because you chose to.')
+    : tt('この端末は「動きを減らす」設定のため、シミュレーションを止めています。','This device asks for reduced motion, so the simulation is paused.');
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.id='motionToggle';
+  btn.style.cssText='min-height:40px;padding:8px 16px;border-radius:999px;border:1.5px solid #00d4ff;background:transparent;color:#00d4ff;font-weight:700;cursor:pointer';
+  btn.textContent=MOTION_OPT_IN?tt('■ 動きを止める','■ Stop motion'):tt('▶ 動かして見る','▶ Show the motion');
+  btn.addEventListener('click',()=>{
+    try{ if(MOTION_OPT_IN)localStorage.removeItem('ssd_motion_optin'); else localStorage.setItem('ssd_motion_optin','1'); }catch(e){}
+    location.reload();
+  });
+  bar.append(msg,btn);
+  document.body.prepend(bar);
+}
 
 function updateHistRef(){
   const el=document.getElementById('histRef');
@@ -3264,6 +3293,7 @@ function exportData(fmt){
 }
 
 (function init(){
+  renderMotionNotice();
   const p=new URLSearchParams(location.search);
   if(p.has('f'))filterRate=clamp(+p.get('f'),0,100);
   if(p.has('e'))ethicsScore=clamp(+p.get('e'),0,100);
