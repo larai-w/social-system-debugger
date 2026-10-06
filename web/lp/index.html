@@ -5,19 +5,22 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; base-uri 'none'; form-action 'none'"
     />
-    <title>社会デバッガー — 社会は、壊れる前に兆候を出す。</title>
+    <title>社会デバッガー — 社会は、壊れる。あなたの街は、生き残れるか。</title>
     <meta
       name="description"
-      content="社会や地域インフラが「どう壊れるか」を、パラメータ操作で体験できる教育用シミュレーター。無料・登録なし・ブラウザで約60秒。"
+      content="社会や地域インフラが「どう壊れるか」と「どう直すか」を、つまみを動かして体験できる教育用シミュレーター。無料・登録なし・ブラウザで約60秒。"
     />
     <link rel="icon" href="../icon.svg" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="社会デバッガー — 社会は、壊れる前に兆候を出す。" />
+    <meta
+      property="og:title"
+      content="社会デバッガー — 社会は、壊れる。あなたの街は、生き残れるか。"
+    />
     <meta
       property="og:description"
-      content="4つの構造を操作して、崩壊と回復を60秒で実験する。無料・登録なしの教育用シミュレーター。"
+      content="4つの構造がつながって壊れる。つまみを動かして、崩壊と回復を60秒で実験する。無料・登録なしの教育用シミュレーター。"
     />
     <meta
       property="og:image"
@@ -26,18 +29,23 @@
     <meta property="og:url" content="https://larai-w.github.io/social-system-debugger/lp/" />
     <meta name="twitter:card" content="summary_large_image" />
     <style>
+      /* 2026-10-06 作り直し: 「ショッキングに壊れて、直る」。JavaScript は使わない（CSP script-src 'none' を守る）。
+         動きは CSS だけ。prefers-reduced-motion では動画を止めて静止画にする。 */
       :root {
-        --bg0: #070b14;
-        --bg1: #0c1220;
-        --bg2: #0f1829;
+        --bg0: #05080f;
+        --bg1: #0b1120;
         --bdr: #172340;
         --cyan: #00d4ff;
         --green: #00ff88;
-        --txt: #d8e4ff;
-        --muted: #5a6f94;
+        --red: #ff2e55;
+        --txt: #e6eeff;
+        --muted: #7186ad;
       }
       * {
         box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
       }
       body {
         margin: 0;
@@ -46,162 +54,345 @@
         font-family: 'Hiragino Sans', 'Noto Sans JP', system-ui, sans-serif;
         line-height: 1.8;
         -webkit-font-smoothing: antialiased;
-      }
-      .wrap {
-        max-width: 920px;
-        margin: 0 auto;
-        padding: 0 20px;
+        overflow-x: hidden;
       }
       a {
         color: var(--cyan);
       }
-
-      /* ヒーロー */
-      .hero {
-        padding: 56px 0 40px;
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 20px;
       }
-      .hero img {
-        width: 100%;
+      .mono {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+      }
+
+      /* ── 画面全体のノイズと走査線 ───────────────────── */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 50;
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(255, 255, 255, 0.025) 0 1px,
+          transparent 1px 3px
+        );
+        mix-blend-mode: overlay;
+      }
+
+      /* ── ヒーロー ───────────────────────────────── */
+      .hero {
+        position: relative;
+        min-height: 100svh;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        overflow: hidden;
+        isolation: isolate;
+      }
+      .hero-media {
+        position: absolute;
+        inset: 0;
+        z-index: -2;
+        display: grid;
+        place-items: center;
+      }
+      .hero-media video,
+      .hero-media img {
+        width: min(120vh, 140vw);
         height: auto;
-        border-radius: 14px;
-        border: 1px solid var(--bdr);
-        display: block;
+        opacity: 0.55;
+        filter: saturate(1.3) contrast(1.15);
+        /* 映像の四角いふちを見せない */
+        -webkit-mask-image: radial-gradient(circle, #000 40%, transparent 70%);
+        mask-image: radial-gradient(circle, #000 40%, transparent 70%);
+      }
+      .hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background:
+          radial-gradient(ellipse at center, transparent 20%, var(--bg0) 75%),
+          linear-gradient(180deg, transparent 60%, var(--bg0));
+      }
+      .hero-inner {
+        padding: 80px 20px 60px;
+        animation: quake 7s infinite;
       }
       .eyebrow {
-        font-family: 'Courier New', monospace;
-        letter-spacing: 0.22em;
         font-size: 12px;
         color: var(--cyan);
-        text-transform: uppercase;
-        margin: 0 0 14px;
+        margin: 0 0 18px;
       }
       h1 {
-        font-size: clamp(28px, 5.2vw, 46px);
-        line-height: 1.35;
-        margin: 0 0 16px;
-        letter-spacing: 0.01em;
+        margin: 0;
+        font-weight: 900;
+        font-size: clamp(44px, 11vw, 120px);
+        line-height: 1.12;
+        letter-spacing: 0.02em;
       }
-      h1 .accent {
+      .glitch {
+        position: relative;
+        display: inline-block;
+        color: var(--red);
+        text-shadow: 0 0 24px rgba(255, 46, 85, 0.55);
+      }
+      .glitch::before,
+      .glitch::after {
+        content: attr(data-text);
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .glitch::before {
         color: var(--cyan);
+        transform: translate(-3px, 0);
+        clip-path: inset(0 0 60% 0);
+        animation: slice-a 2.4s infinite steps(1);
+        opacity: 0.85;
       }
-      .lead {
-        font-size: clamp(15px, 2.2vw, 18px);
+      .glitch::after {
+        color: #fff;
+        transform: translate(3px, 0);
+        clip-path: inset(55% 0 0 0);
+        animation: slice-b 2.4s infinite steps(1);
+        opacity: 0.6;
+      }
+      .hero .lead {
+        margin: 26px auto 0;
+        max-width: 34em;
+        font-size: clamp(16px, 2.4vw, 20px);
         color: var(--txt);
-        margin: 0 0 28px;
-        opacity: 0.92;
       }
-
-      /* CTA */
+      .hero .lead strong {
+        color: var(--green);
+      }
       .cta-row {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin: 28px 0 10px;
+        justify-content: center;
+        margin: 30px 0 0;
       }
       .btn {
         display: inline-block;
         padding: 15px 26px;
-        border-radius: 10px;
+        border-radius: 999px;
+        font-weight: 800;
         text-decoration: none;
-        font-weight: 700;
-        font-size: 16px;
-        border: 1px solid transparent;
-        min-height: 44px;
+        letter-spacing: 0.04em;
+        transition: transform 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn:focus-visible {
+        outline: 3px solid var(--green);
+        outline-offset: 3px;
       }
       .btn-main {
-        background: var(--cyan);
-        color: #04121c;
+        background: var(--red);
+        color: #fff;
+        box-shadow: 0 0 0 0 rgba(255, 46, 85, 0.6);
+        animation: pulse 2.2s infinite;
       }
       .btn-sub {
-        background: transparent;
-        color: var(--txt);
-        border-color: var(--bdr);
+        border: 1.5px solid var(--cyan);
+        color: var(--cyan);
       }
       .note {
+        margin: 18px 0 0;
         font-size: 13px;
         color: var(--muted);
-        margin: 6px 0 0;
+      }
+      .scroll-cue {
+        position: absolute;
+        bottom: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        color: var(--muted);
+        animation: bob 2s infinite;
       }
 
-      /* セクション */
+      /* ── セクション共通 ──────────────────────────── */
       section {
-        padding: 44px 0;
-        border-top: 1px solid var(--bdr);
+        padding: 96px 0 0;
       }
       h2 {
-        font-size: clamp(20px, 3.4vw, 26px);
-        margin: 0 0 8px;
-        letter-spacing: 0.01em;
+        font-size: clamp(26px, 5vw, 44px);
+        line-height: 1.3;
+        margin: 0 0 14px;
+        font-weight: 900;
       }
       .sub {
         color: var(--muted);
-        font-size: 14px;
-        margin: 0 0 24px;
+        margin: 0 0 30px;
+        font-size: 16px;
+      }
+      .red {
+        color: var(--red);
+      }
+      .green {
+        color: var(--green);
+      }
+      .cyan {
+        color: var(--cyan);
       }
 
-      /* 4ページ */
-      .pages {
+      /* ── 連鎖崩壊（4つの層）─────────────────────── */
+      .cascade {
+        position: relative;
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px;
+        gap: 18px;
+        padding-left: 26px;
       }
-      @media (max-width: 560px) {
-        .pages {
-          grid-template-columns: 1fr;
-        }
+      .cascade::before {
+        /* 上から下へ走る赤いひび */
+        content: '';
+        position: absolute;
+        left: 6px;
+        top: 0;
+        width: 3px;
+        height: 100%;
+        background:
+          linear-gradient(var(--red), var(--red)) top / 100% 0% no-repeat,
+          var(--bdr);
+        animation: crack-down 6s infinite;
       }
-      .page {
+      .layer {
+        position: relative;
         background: var(--bg1);
         border: 1px solid var(--bdr);
         border-radius: 12px;
-        padding: 20px;
+        padding: 18px 20px;
+        animation: break 6s infinite;
       }
-      .page .num {
-        font-family: 'Courier New', monospace;
+      .layer:nth-child(2) {
+        animation-delay: 0.9s;
+      }
+      .layer:nth-child(3) {
+        animation-delay: 1.8s;
+      }
+      .layer:nth-child(4) {
+        animation-delay: 2.7s;
+      }
+      .layer .num {
+        font-size: 12px;
         color: var(--cyan);
-        font-size: 13px;
-        letter-spacing: 0.1em;
       }
-      .page h3 {
-        font-size: 16px;
-        margin: 8px 0 8px;
+      .layer h3 {
+        margin: 4px 0 6px;
+        font-size: 19px;
       }
-      .page p {
-        font-size: 14px;
-        color: var(--muted);
+      .layer p {
         margin: 0;
-        line-height: 1.75;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .verdict {
+        margin: 28px 0 0;
+        font-size: clamp(18px, 3vw, 24px);
+        font-weight: 800;
       }
 
-      /* 教育機関向け */
-      .edu {
+      /* ── 同じ災害、ふたつの結末 ─────────────────── */
+      .versus {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .clip {
+        margin: 0;
+        background: var(--bg1);
+        border: 1px solid var(--bdr);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .clip video,
+      .clip img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 360 / 634;
+        object-fit: cover;
+        background: #000;
+      }
+      .clip figcaption {
+        padding: 12px 14px 14px;
+        font-weight: 800;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .clip figcaption small {
+        display: block;
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .clip.bad {
+        border-color: rgba(255, 46, 85, 0.6);
+        box-shadow: 0 0 28px rgba(255, 46, 85, 0.18);
+      }
+      .clip.good {
+        border-color: rgba(0, 255, 136, 0.5);
+        box-shadow: 0 0 28px rgba(0, 255, 136, 0.14);
+      }
+      .trio {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+      }
+      .demo-note {
+        margin: 14px 0 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      /* ── なら、デバッグしろ。 ─────────────────────── */
+      .debug {
+        text-align: center;
+        padding: 120px 0 40px;
+      }
+      .debug h2 {
+        font-size: clamp(40px, 9vw, 96px);
+      }
+      .debug .glitch {
+        color: var(--cyan);
+        text-shadow: 0 0 28px rgba(0, 212, 255, 0.55);
+      }
+      .debug .glitch::before {
+        color: var(--red);
+      }
+
+      /* ── 既存の説明（授業・約束・作っている人へ）──── */
+      .panel {
         background: var(--bg1);
         border: 1px solid var(--bdr);
         border-radius: 14px;
         padding: 26px;
       }
-      .edu ul {
+      .panel ul {
         margin: 16px 0 0;
         padding-left: 1.1em;
       }
-      .edu li {
+      .panel li {
         margin: 0 0 10px;
         font-size: 15px;
       }
-      .edu li strong {
-        color: var(--txt);
+      .panel .cta-row {
+        justify-content: flex-start;
       }
-
-      /* 倫理 */
-      .ethics li {
-        margin: 0 0 12px;
-        font-size: 15px;
-        color: var(--txt);
-        opacity: 0.92;
-      }
-
       footer {
         border-top: 1px solid var(--bdr);
+        margin-top: 96px;
         padding: 32px 0 56px;
         color: var(--muted);
         font-size: 13px;
@@ -209,74 +400,377 @@
       footer a {
         color: var(--muted);
       }
-      @media (max-width: 560px) {
+
+      /* ── 動き ───────────────────────────────────── */
+      @keyframes slice-a {
+        0%,
+        86%,
+        100% {
+          clip-path: inset(0 0 100% 0);
+          transform: translate(0);
+        }
+        87% {
+          clip-path: inset(10% 0 55% 0);
+          transform: translate(-6px, 1px);
+        }
+        90% {
+          clip-path: inset(60% 0 8% 0);
+          transform: translate(5px, -1px);
+        }
+        93% {
+          clip-path: inset(30% 0 40% 0);
+          transform: translate(-3px, 0);
+        }
+      }
+      @keyframes slice-b {
+        0%,
+        86%,
+        100% {
+          clip-path: inset(100% 0 0 0);
+          transform: translate(0);
+        }
+        88% {
+          clip-path: inset(70% 0 5% 0);
+          transform: translate(6px, 0);
+        }
+        91% {
+          clip-path: inset(20% 0 60% 0);
+          transform: translate(-5px, 1px);
+        }
+        94% {
+          clip-path: inset(45% 0 30% 0);
+          transform: translate(3px, 0);
+        }
+      }
+      @keyframes quake {
+        0%,
+        84%,
+        100% {
+          transform: translate(0, 0);
+        }
+        86% {
+          transform: translate(-4px, 2px);
+        }
+        88% {
+          transform: translate(4px, -2px);
+        }
+        90% {
+          transform: translate(-2px, 1px);
+        }
+        92% {
+          transform: translate(2px, 0);
+        }
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(255, 46, 85, 0.6);
+        }
+        70% {
+          box-shadow: 0 0 0 16px rgba(255, 46, 85, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(255, 46, 85, 0);
+        }
+      }
+      @keyframes bob {
+        0%,
+        100% {
+          transform: translate(-50%, 0);
+        }
+        50% {
+          transform: translate(-50%, 6px);
+        }
+      }
+      @keyframes crack-down {
+        0% {
+          background-size:
+            100% 0%,
+            auto;
+        }
+        55%,
+        80% {
+          background-size:
+            100% 100%,
+            auto;
+        }
+        100% {
+          background-size:
+            100% 100%,
+            auto;
+          opacity: 0.4;
+        }
+      }
+      @keyframes break {
+        0%,
+        10% {
+          border-color: var(--bdr);
+          transform: none;
+          box-shadow: none;
+        }
+        14% {
+          border-color: var(--red);
+          transform: translateX(-3px) rotate(-0.4deg);
+          box-shadow: 0 0 22px rgba(255, 46, 85, 0.35);
+        }
+        18% {
+          transform: translateX(3px) rotate(0.3deg);
+        }
+        22%,
+        70% {
+          border-color: var(--red);
+          transform: none;
+          box-shadow: 0 0 22px rgba(255, 46, 85, 0.25);
+        }
+        85%,
+        100% {
+          border-color: var(--green);
+          box-shadow: 0 0 18px rgba(0, 255, 136, 0.18);
+        }
+      }
+
+      @media (max-width: 720px) {
+        .trio {
+          grid-template-columns: 1fr;
+          max-width: 360px;
+          margin: 0 auto;
+        }
         .cta-row .btn {
           width: 100%;
           text-align: center;
         }
       }
+      /* 動きを減らす設定の人には、動画を止めて静止画にし、揺れ・点滅を止める */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        video {
+          display: none !important;
+        }
+        .still {
+          display: block !important;
+        }
+      }
+      .still {
+        display: none;
+      }
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <header class="hero">
-        <p class="eyebrow">Interactive Social Simulator</p>
-        <h1>社会は、壊れる前に<br /><span class="accent">兆候を出す。</span></h1>
+    <header class="hero">
+      <div class="hero-media" aria-hidden="true">
+        <video autoplay muted loop playsinline preload="auto" poster="media/hero-shatter.jpg">
+          <source src="media/hero-shatter.mp4" type="video/mp4" />
+        </video>
+        <img class="still" src="media/hero-shatter.jpg" alt="" width="720" height="720" />
+      </div>
+      <div class="hero-inner">
+        <p class="eyebrow mono">Social Debugger — 社会デバッガー</p>
+        <h1>社会は、<br /><span class="glitch" data-text="壊れる。">壊れる。</span></h1>
         <p class="lead">
-          4つの構造を操作して、崩壊と回復を約60秒で実験する教育用シミュレーターです。
+          たったひとつのつまみで。<br />
+          でも、壊れ方がわかれば、<strong>直し方が見える。</strong>
         </p>
-
         <div class="cta-row">
-          <a class="btn btn-main" href="../">触ってみる</a>
-          <a class="btn btn-sub" href="../classroom.html">授業で使う</a>
+          <a class="btn btn-main" href="../">▶ 壊して、直してみる</a>
+          <a class="btn btn-sub" href="#cascade">どう壊れるのか</a>
         </div>
-        <p class="note">無料・登録なし・ブラウザで動きます。データは端末の外に出ません。</p>
+        <p class="note">無料・登録なし・ブラウザで約60秒。操作の記録は端末の外に出ません。</p>
+      </div>
+      <p class="scroll-cue mono" aria-hidden="true">scroll ▼</p>
+    </header>
 
-        <img
-          src="hero-1600.webp"
-          srcset="hero-900.webp 900w, hero-1600.webp 1600w"
-          sizes="(max-width:780px) 100vw, 880px"
-          width="1600"
-          height="900"
-          loading="lazy"
-          decoding="async"
-          alt="社会デバッガーのキービジュアル。情報空間・地域基盤・認知回復・意思決定の4構造が中央のシステムを囲む図"
-        />
-      </header>
-
-      <section>
-        <h2>4つの構造を、別々に壊せる</h2>
+    <main class="wrap">
+      <section id="cascade">
+        <p class="mono cyan" style="font-size: 12px; margin: 0 0 10px">Cascade failure</p>
+        <h2>ひとつ壊れても、<br />社会は倒れない。</h2>
         <p class="sub">
-          どれか一つが崩れても社会は倒れません。倒れるのは、複数が同時に痩せたときです。
+          倒れるのは、上の層の壊れが、下の層へ伝わったとき。4つの層が、つながって壊れていきます。
         </p>
-        <div class="pages">
-          <div class="page">
-            <p class="num">PAGE 01</p>
+        <div class="cascade">
+          <div class="layer">
+            <p class="num mono">Layer 1</p>
             <h3>情報空間</h3>
-            <p>断片化した情報と対立フレームが、合意形成をどう削るか。</p>
+            <p>断片化した情報と対立のフレームが、合意をつくる力を削っていく。</p>
           </div>
-          <div class="page">
-            <p class="num">PAGE 02</p>
+          <div class="layer">
+            <p class="num mono">Layer 2</p>
             <h3>地域インフラ</h3>
-            <p>予備の削減と担い手の喪失が、平時には見えないまま進む。</p>
+            <p>予備の削減と担い手の喪失。平時には見えないまま、余白が消えていく。</p>
           </div>
-          <div class="page">
-            <p class="num">PAGE 03</p>
-            <h3>認知リカバリー</h3>
-            <p>確かめる習慣が戻るとき、社会は何を取り戻すのか。</p>
+          <div class="layer">
+            <p class="num mono">Layer 3</p>
+            <h3>個人の認知</h3>
+            <p>見る時間が増えるほど、ちがう意見が届かなくなる。</p>
           </div>
-          <div class="page">
-            <p class="num">PAGE 04</p>
-            <h3>意思決定</h3>
-            <p>同じ声の大きさでも、届く先が違えば結果が変わる。</p>
+          <div class="layer">
+            <p class="num mono">Layer 4</p>
+            <h3>当事者性</h3>
+            <p>声の大きさで決めると、暮らす人の話が、勝ち負けのゲームに変わる。</p>
           </div>
         </div>
+        <p class="verdict">あなたの街は、<span class="red">どこから</span>壊れるか。</p>
       </section>
 
       <section>
-        <h2>授業で使えます</h2>
-        <p class="sub">教材は用意してあります。準備なしで、そのまま持ち込めます。</p>
-        <div class="edu">
+        <p class="mono cyan" style="font-size: 12px; margin: 0 0 10px">Same shock, two endings</p>
+        <h2>
+          同じ災害。<br /><span class="red">崩れる街</span>と、<span class="green"
+            >生き残る街。</span
+          >
+        </h2>
+        <p class="sub">ちがいは、ふだんは「むだ」に見える余白を、残していたかどうか。</p>
+        <div class="versus">
+          <figure class="clip bad">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="media/p2-crash.jpg"
+              aria-label="余白が30%を切った街に環境ショックが入り、崩壊するデモ映像"
+            >
+              <source src="media/p2-crash.mp4" type="video/mp4" />
+            </video>
+            <img
+              class="still"
+              src="media/p2-crash.jpg"
+              alt="余白が30%を切った街が崩壊したデモ画面"
+              width="360"
+              height="634"
+            />
+            <figcaption class="red">
+              余白のない街に、災害が来る。<small
+                >救命ヘリが止まり、インフラと財政が一気に止まる。</small
+              >
+            </figcaption>
+          </figure>
+          <figure class="clip good">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="media/p2-survive.jpg"
+              aria-label="余白を残した街が同じショックを受けても生き残るデモ映像"
+            >
+              <source src="media/p2-survive.mp4" type="video/mp4" />
+            </video>
+            <img
+              class="still"
+              src="media/p2-survive.jpg"
+              alt="余白を残した街が生き残ったデモ画面"
+              width="360"
+              height="634"
+            />
+            <figcaption class="green">
+              余白を残した街は、生き残る。<small>同じショックを、吸収できる。</small>
+            </figcaption>
+          </figure>
+        </div>
+        <p class="demo-note">※演出用に簡略化したデモ映像です（実際のアプリ画面とは異なります）。</p>
+      </section>
+
+      <section>
+        <p class="mono cyan" style="font-size: 12px; margin: 0 0 10px">Break it. Then fix it.</p>
+        <h2>壊して、<span class="cyan">直す。</span></h2>
+        <p class="sub">変えるのは、人の性格ではなく、しくみの条件。</p>
+        <div class="trio">
+          <figure class="clip">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="media/p2-crash.jpg"
+              aria-label="地域インフラのデモ映像"
+            >
+              <source src="media/p2-crash.mp4" type="video/mp4" />
+            </video>
+            <img
+              class="still"
+              src="media/p2-crash.jpg"
+              alt="地域インフラのデモ画面"
+              width="360"
+              height="634"
+            />
+            <figcaption>
+              PAGE 2 — 地域インフラ<small>余白をすべて削ると、想定外の一撃に耐えられない。</small>
+            </figcaption>
+          </figure>
+          <figure class="clip">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="media/p3-loop.jpg"
+              aria-label="個人の認知のデモ映像"
+            >
+              <source src="media/p3-loop.mp4" type="video/mp4" />
+            </video>
+            <img
+              class="still"
+              src="media/p3-loop.jpg"
+              alt="個人の認知のデモ画面"
+              width="360"
+              height="634"
+            />
+            <figcaption>
+              PAGE 3 — 個人の認知<small>いったん離れて、現実と照らし合わせる。</small>
+            </figcaption>
+          </figure>
+          <figure class="clip">
+            <video
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+              poster="media/p4-meeting.jpg"
+              aria-label="意思決定のデモ映像"
+            >
+              <source src="media/p4-meeting.mp4" type="video/mp4" />
+            </video>
+            <img
+              class="still"
+              src="media/p4-meeting.jpg"
+              alt="意思決定のデモ画面"
+              width="360"
+              height="634"
+            />
+            <figcaption>
+              PAGE 4 — 意思決定<small>意見は消さない。変えるのは、決め方の重み。</small>
+            </figcaption>
+          </figure>
+        </div>
+        <p class="demo-note">
+          ※演出用に簡略化した架空のシミュレーションです。医療上の助言ではありません。特定の人物・地域・団体を支持したり批判したりするものではありません。
+        </p>
+      </section>
+
+      <section class="debug">
+        <h2>なら、<br /><span class="glitch" data-text="デバッグしろ。">デバッグしろ。</span></h2>
+        <p class="sub">あなたの街は、生き残れるか。</p>
+        <div class="cta-row">
+          <a class="btn btn-main" href="../">▶ 壊して、直してみる</a>
+        </div>
+        <p class="note">無料・登録なし・広告なし。ブラウザで約60秒。</p>
+      </section>
+
+      <section>
+        <div class="panel">
+          <h2 style="font-size: 26px">授業で使う</h2>
+          <p class="sub" style="margin: 0">
+            公共・情報I・探究の時間に、そのまま使える材料をそろえています。
+          </p>
           <ul>
             <li>
               <strong>教員向けガイド</strong> — ねらい、進め方、想定される反応。A4で印刷できます
@@ -293,31 +787,33 @@
       </section>
 
       <section>
-        <h2>この教材が守っていること</h2>
+        <h2 style="font-size: 26px">この教材が守っていること</h2>
         <p class="sub">社会の壊れ方を扱う以上、書き方そのものに責任があります。</p>
-        <ul class="ethics">
-          <li>
-            <strong>実在の地名・人名・進行中の政局を出しません。</strong
-            >批判でも称賛でも扱いません。抽象化した型で語ります。
-          </li>
-          <li>
-            <strong>特定の誰かの話にしません。</strong
-            >どの社会にも起こりうる構造の話として設計しています。
-          </li>
-          <li>
-            <strong>データを集めません。</strong>登録も不要で、操作の記録は端末の外に出ません。
-          </li>
-          <li>
-            <strong>数式と閾値を公開しています。</strong
-            >結論だけでなく、そこに至る計算を検証できます。
-          </li>
-        </ul>
+        <div class="panel">
+          <ul>
+            <li>
+              <strong>実在の地名・人名・進行中の政局を出しません。</strong
+              >批判でも称賛でも扱いません。抽象化した型で語ります。
+            </li>
+            <li>
+              <strong>特定の誰かの話にしません。</strong
+              >どの社会にも起こりうる構造の話として設計しています。
+            </li>
+            <li>
+              <strong>データを集めません。</strong>登録も不要で、操作の記録は端末の外に出ません。
+            </li>
+            <li>
+              <strong>数式と閾値を公開しています。</strong
+              >結論だけでなく、そこに至る計算を検証できます。
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section>
-        <h2>作っている人へ</h2>
+        <h2 style="font-size: 26px">作っている人へ</h2>
         <p class="sub">オープンソースです。使った感想がいちばん役に立ちます。</p>
-        <div class="cta-row">
+        <div class="cta-row" style="justify-content: flex-start">
           <a class="btn btn-sub" href="https://github.com/larai-w/social-system-debugger"
             >GitHub リポジトリ</a
           >
@@ -334,12 +830,14 @@
 
       <footer>
         <p>
-          社会デバッガー — 教育用の社会シミュレーター。<a href="../privacy.html">プライバシー</a> ・
-          <a href="../faq.html">よくある質問</a> ・
+          社会デバッガー — 教育用の社会シミュレーター（VEAI LAB）。<a href="../privacy.html"
+            >プライバシー</a
+          >
+          ・ <a href="../faq.html">よくある質問</a> ・
           <a href="/social-system-debugger/lp/index.en.html">English</a>
         </p>
         <p>※ 架空の教育用シミュレーションです。実在の団体・地域・出来事とは関係ありません。</p>
       </footer>
-    </div>
+    </main>
   </body>
 </html>
