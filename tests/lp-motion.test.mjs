@@ -31,7 +31,7 @@ test('still images do not show under the videos on ordinary devices', () => {
 test('YouTube videos are plain links, so nothing reaches YouTube until someone taps one', () => {
   assert.doesNotMatch(lp, /<iframe/i);
   assert.doesNotMatch(lp, /frame-src/);
-  assert.doesNotMatch(lp, /ytimg\.com/);
+  assert.ok(!lp.includes('ytimg.com'));
 });
 
 test('placeholder YouTube ids never show on the landing page', () => {
