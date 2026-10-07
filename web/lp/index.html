@@ -353,7 +353,7 @@
       /* ── 動画で見る（YouTube）。埋め込まずリンクにする: 押すまで YouTube に通信しない ── */
       .shorts {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(5, 1fr);
         gap: 14px;
       }
       .short {
@@ -384,11 +384,12 @@
         aspect-ratio: 9 / 16;
         object-fit: cover;
       }
+      /* 再生の印は下の方に置く（PAGE 1 の表紙は大きな文字が真ん中にあり、重なると読めない） */
       .short-poster::after {
         content: '▶';
         position: absolute;
         left: 50%;
-        top: 50%;
+        top: 84%;
         transform: translate(-50%, -50%);
         width: 56px;
         height: 56px;
@@ -919,6 +920,24 @@
         <h2>動画で見る</h2>
         <p class="sub">どれも30秒ほど。押すと YouTube で開きます（音が出ます）。</p>
         <div class="shorts">
+          <a
+            class="short"
+            href="https://youtube.com/shorts/l-qYhKnxZSw"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="short-poster"
+              ><img
+                src="media/yt-p1.jpg"
+                alt="「確かめる人が、敵に見えてくる。」の文字と、街が崩壊した（SYSTEM CRASH）デモ画面の場面"
+                width="540"
+                height="960"
+                loading="lazy"
+            /></span>
+            <span class="short-cap"
+              >確かめる人が、敵に見えてくる。<small>PAGE 1 — 情報空間</small></span
+            >
+          </a>
           <a
             class="short"
             href="https://youtube.com/shorts/fiUEFHcbXL8"
