@@ -350,6 +350,71 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 16px;
       }
+      /* ── 動画で見る（YouTube）。埋め込まずリンクにする: 押すまで YouTube に通信しない ── */
+      .shorts {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .short {
+        display: block;
+        border: 1px solid var(--bdr);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--bg1);
+        color: var(--txt);
+        text-decoration: none;
+      }
+      .short:hover,
+      .short:focus-visible {
+        border-color: var(--cyan);
+      }
+      .short:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 3px;
+      }
+      .short-poster {
+        position: relative;
+        display: block;
+      }
+      .short-poster img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 9 / 16;
+        object-fit: cover;
+      }
+      .short-poster::after {
+        content: '▶';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 56px;
+        height: 56px;
+        display: grid;
+        place-items: center;
+        padding-left: 4px;
+        border-radius: 50%;
+        background: rgba(5, 8, 15, 0.72);
+        border: 2px solid var(--cyan);
+        color: var(--cyan);
+        font-size: 22px;
+      }
+      .short-cap {
+        display: block;
+        padding: 10px 12px 12px;
+        font-weight: 800;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .short-cap small {
+        display: block;
+        margin-top: 4px;
+        font-weight: 400;
+        font-size: 12px;
+        color: var(--muted);
+      }
       .demo-note {
         margin: 14px 0 0;
         font-size: 12px;
@@ -529,6 +594,10 @@
       }
 
       @media (max-width: 720px) {
+        .shorts {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
         .trio {
           grid-template-columns: 1fr;
           max-width: 360px;
@@ -841,6 +910,93 @@
         </div>
         <p class="demo-note">
           ※演出用に簡略化した架空のシミュレーションです。医療上の助言ではありません。特定の人物・地域・団体を支持したり批判したりするものではありません。
+        </p>
+      </section>
+
+      <!-- YouTube の Shorts へのリンク（2026-10-07 公開）。埋め込まないので CSP は変えない。新しい動画を足すときは、公開前は仮の ID にして section を hidden にする（試験で確かめる） -->
+      <section id="videos">
+        <p class="mono cyan" style="font-size: 12px; margin: 0 0 10px">Watch</p>
+        <h2>動画で見る</h2>
+        <p class="sub">どれも30秒ほど。押すと YouTube で開きます（音が出ます）。</p>
+        <div class="shorts">
+          <a
+            class="short"
+            href="https://youtube.com/shorts/fiUEFHcbXL8"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="short-poster"
+              ><img
+                src="media/yt-p2.jpg"
+                alt="「余白のない街。救命ヘリが、止まる。」の文字と、街が崩壊した（CRASHED）デモ画面の場面"
+                width="540"
+                height="960"
+                loading="lazy"
+            /></span>
+            <span class="short-cap"
+              >余白のない街。救命ヘリが止まる。<small
+                >PAGE 2 — 同じ災害で、崩れる街と生き残る街</small
+              ></span
+            >
+          </a>
+          <a
+            class="short"
+            href="https://youtube.com/shorts/3boBAjYPhjs"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="short-poster"
+              ><img
+                src="media/yt-p3.jpg"
+                alt="「見る時間が増えるほど、ちがう意見が届かない。」の文字が出ている動画の場面"
+                width="540"
+                height="960"
+                loading="lazy"
+            /></span>
+            <span class="short-cap"
+              >つながっているのに、見えなくなる。<small>PAGE 3 — 個人の認知</small></span
+            >
+          </a>
+          <a
+            class="short"
+            href="https://youtube.com/shorts/rY9o1LSw0ps"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="short-poster"
+              ><img
+                src="media/yt-p4-meeting.jpg"
+                alt="「声の大きさで決めると、暮らしの話が、ゲームになる。」の文字が出ている動画の場面"
+                width="540"
+                height="960"
+                loading="lazy"
+            /></span>
+            <span class="short-cap"
+              >6人の会議に、1000の声。<small>PAGE 4 — 決め方の重み</small></span
+            >
+          </a>
+          <a
+            class="short"
+            href="https://youtube.com/shorts/DJ1DF3miei4"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="short-poster"
+              ><img
+                src="media/yt-p4-stakeholder.jpg"
+                alt="「外から声が押し寄せると、街の目的が、書き換わる。」の文字が出ている動画の場面"
+                width="540"
+                height="960"
+                loading="lazy"
+            /></span>
+            <span class="short-cap"
+              >その声は、結果を引き受けるか。<small>PAGE 4 — 当事者性</small></span
+            >
+          </a>
+        </div>
+        <p class="demo-note">
+          ※演出用に簡略化した架空のシミュレーションです（実際のアプリ画面とは異なります）。医療上の助言ではありません。特定の人物・地域・団体を支持したり批判したりするものではありません。音声:
+          VOICEVOX:玄野武宏 / BGM: Suno で作成
         </p>
       </section>
 
