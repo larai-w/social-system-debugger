@@ -33,7 +33,8 @@ jobs:
 
   # Real-browser check: zero console output (Chart.js both working and failing,
   # 4 tabs, presets, sliders). Same script as `make verify` locally. A separate
-  # job from web/infra and not a required check, so it is advisory.
+  # job from web/infra. Branch protection on main requires this job
+  # (with "Public boundary check"), so a failure here blocks the merge.
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -48,11 +49,11 @@ jobs:
       - name: Browser verification (scripts/verify.mjs)
         run: npm run verify
       # T62: verify PWA offline start on every PR (register SW, cut the network,
-      # reload). The job stays advisory, as before.
+      # reload). Part of the required verify job.
       - name: Offline-start verification (scripts/verify-offline.mjs)
         run: npm run verify:offline
-      # Static pages (classroom, slides, privacy, announce-cards): zero console
-      # output and structure check. Advisory.
+      # Static pages (classroom, slides, privacy, faq, lp, announce-cards): zero console
+      # output and structure check. Part of the required verify job.
       - name: Static-pages verification (scripts/verify-pages.mjs)
         run: npm run verify:pages
 
