@@ -539,27 +539,115 @@
           text-align: center;
         }
       }
-      /* 動きを減らす設定の人には、動画を止めて静止画にし、揺れ・点滅を止める */
-      @media (prefers-reduced-motion: reduce) {
-        *,
-        *::before,
-        *::after {
-          animation: none !important;
-          transition: none !important;
-        }
-        video {
-          display: none !important;
-        }
-        .still {
-          display: block !important;
-        }
-      }
-      .still {
+      /* 動きを減らす設定の人には、動画を止めて静止画にし、揺れ・点滅を止める。
+         2026-10-07: アプリ（#203）と同じく、その端末の人が選べば動かせるようにした。
+         JavaScript を使わないので、チェックボックスと :has() で切り替える（この表示の間だけ・記憶しない）。
+         :has() が使えないブラウザでは、ボタンを出さず今までどおり止めたままにする。
+         .clip img（display:block）より強くして、ふだんは動画の下に静止画が重ならないようにする。 */
+      .still,
+      .clip .still,
+      .motion-optin,
+      .motion-bar {
         display: none;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        @supports not selector(:has(a)) {
+          *,
+          *::before,
+          *::after {
+            animation: none !important;
+            transition: none !important;
+          }
+          video {
+            display: none !important;
+          }
+          .still {
+            display: block !important;
+          }
+        }
+        @supports selector(:has(a)) {
+          body:not(:has(#motion-optin:checked)) *,
+          body:not(:has(#motion-optin:checked)) *::before,
+          body:not(:has(#motion-optin:checked)) *::after {
+            animation: none !important;
+            transition: none !important;
+          }
+          body:not(:has(#motion-optin:checked)) video {
+            display: none !important;
+          }
+          body:not(:has(#motion-optin:checked)) .still {
+            display: block !important;
+          }
+          .motion-optin {
+            display: block;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+            opacity: 0;
+          }
+          .motion-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            width: calc(100% - 24px);
+            max-width: 1100px;
+            margin: 8px auto;
+            padding: 10px 14px;
+            border: 1px solid var(--cyan);
+            border-radius: 10px;
+            background: #0c1220;
+            color: #d8e4ff;
+            font-size: 0.82rem;
+            line-height: 1.6;
+          }
+          .motion-bar label {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1.5px solid var(--cyan);
+            color: var(--cyan);
+            font-weight: 700;
+            cursor: pointer;
+          }
+          #motion-optin:focus-visible ~ .motion-bar label {
+            outline: 3px solid var(--cyan);
+            outline-offset: 3px;
+          }
+          .motion-bar .is-on,
+          #motion-optin:checked ~ .motion-bar .is-off {
+            display: none;
+          }
+          #motion-optin:checked ~ .motion-bar .is-on {
+            display: inline;
+          }
+        }
       }
     </style>
   </head>
   <body>
+    <input type="checkbox" id="motion-optin" class="motion-optin" aria-label="動画を動かす" />
+    <div class="motion-bar" role="region" aria-label="動きの設定">
+      <span
+        ><span class="is-off">この端末は「動きを減らす」設定のため、動画を止めています。</span
+        ><span class="is-on"
+          >この端末は「動きを減らす」設定ですが、動画を動かしています。</span
+        ></span
+      >
+      <label for="motion-optin"
+        ><span class="is-off">▶ 動かして見る</span><span class="is-on">■ 動きを止める</span></label
+      >
+    </div>
     <header class="hero">
       <div class="hero-media" aria-hidden="true">
         <video autoplay muted loop playsinline preload="auto" poster="media/hero-shatter.jpg">
