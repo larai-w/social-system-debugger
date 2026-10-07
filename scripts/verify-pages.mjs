@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 静的ページ群（classroom / classroom-slides / privacy / announce-cards）の退行検証。
+// 静的ページ群（classroom / classroom-slides / privacy / faq / lp / announce-cards）の退行検証。
 //   アプリ本体は verify.mjs / verify-offline.mjs で守られているが、これらの補助ページは
 //   作成時の手動目視のみ＝未検証面だった。CI がラチェットとして退行を捕まえる状態にする。
 //   検証内容（各対象で共通）: file:// で開き Console error / pageerror ゼロ。
@@ -63,6 +63,66 @@ async function checkAnnounceCards(page) {
   return errs;
 }
 
+// 紹介ページ（/lp/）: 2026-10-07 に手で見つけた退行を自動で捕まえる。
+//   - ふつうの端末: 静止画が動画の下に重ならない・動きの案内は出ない
+//   - 「動きを減らす」端末: 静止画とボタンが出る → 押すと動画に切り替わる
+//   - 押す前に外への通信がない（YouTube もリンクだけ）・「動画で見る」のリンクが本物の ID
+async function checkLanding(page) {
+  const errs = [];
+  const external = [];
+  const onRequest = (req) => {
+    if (/^https?:/.test(req.url())) external.push(req.url());
+  };
+  page.on('request', onRequest);
+  const state = () =>
+    page.evaluate(() => ({
+      bar: getComputedStyle(document.querySelector('.motion-bar')).display,
+      videos: [...document.querySelectorAll('video')].map((v) => getComputedStyle(v).display),
+      stills: [...document.querySelectorAll('.still')].map((i) => getComputedStyle(i).display),
+    }));
+  try {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.reload();
+    await page.waitForTimeout(300);
+    let s = await state();
+    if (s.bar !== 'none') errs.push('ふつうの端末で動きの案内が出ている');
+    if (s.stills.some((d) => d !== 'none')) errs.push('ふつうの端末で静止画が表示されている');
+    if (s.videos.some((d) => d === 'none')) errs.push('ふつうの端末で動画が隠れている');
+
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.reload();
+    await page.waitForTimeout(300);
+    s = await state();
+    if (s.bar === 'none') errs.push('「動きを減らす」端末で案内が出ていない');
+    if (s.videos.some((d) => d !== 'none'))
+      errs.push('「動きを減らす」端末で動画が最初から出ている');
+    await page.click('.motion-bar label');
+    await page.waitForTimeout(200);
+    s = await state();
+    if (s.videos.some((d) => d === 'none')) errs.push('ボタンを押しても動画に切り替わらない');
+    if (s.stills.some((d) => d !== 'none')) errs.push('ボタンを押したあとも静止画が残っている');
+
+    const links = await page.$$eval('#videos a.short', (as) =>
+      as.map((a) => ({ href: a.getAttribute('href'), target: a.target, rel: a.rel }))
+    );
+    const hidden = await page.$eval('#videos', (e) => e.hidden);
+    if (!hidden) {
+      if (links.length === 0) errs.push('「動画で見る」にリンクがない');
+      for (const l of links) {
+        if (!/^https:\/\/youtube\.com\/shorts\/[\w-]{11}$/.test(l.href))
+          errs.push(`動画のリンクが本物の ID ではない: ${l.href}`);
+        if (l.target !== '_blank' || !/noopener/.test(l.rel))
+          errs.push(`動画のリンクに target/rel がない: ${l.href}`);
+      }
+    }
+    if (external.length) errs.push(`押す前に外へ通信している: ${external.join(', ')}`);
+  } finally {
+    page.off('request', onRequest);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+  }
+  return errs;
+}
+
 // privacy 系: Console ゼロのみ（種別固有の追加チェックなし）
 async function checkNoop() {
   return [];
@@ -105,6 +165,9 @@ const targets = [
   },
   // 404.html: Console ゼロのみ
   { name: '404.html', url: fileUrl(web('404.html')), check: checkNoop },
+  // 紹介ページ: 日本語は動き・静止画・動画リンクまで、英語は Console ゼロのみ
+  { name: 'lp/index.html', url: fileUrl(web('lp/index.html')), check: checkLanding },
+  { name: 'lp/index.en.html', url: fileUrl(web('lp/index.en.html')), check: checkNoop },
   {
     name: 'announce-cards.html',
     url: fileUrl(promo('announce-cards.html')),
@@ -127,7 +190,10 @@ for (const f of ['worksheet.html', 'worksheet.en.html']) {
 }
 
 // ── 実行: 1 ブラウザ・1 ページを使い回して全対象を順に検証 ──
-const browser = await chromium.launch();
+// 手元で Playwright の Chromium を入れられないときは PW_CHANNEL=chrome で手元の Chrome を使える（CI は既定の Chromium）
+const browser = await chromium.launch(
+  process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {}
+);
 const page = await browser.newPage({ viewport: { width: 1400, height: 1000 } });
 const allErrors = [];
 let currentErrors = [];

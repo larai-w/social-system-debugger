@@ -62,6 +62,27 @@ export class SocialDebuggerStack extends cdk.Stack {
     // withOriginAccessControl = 新方式 OAC（旧 OAI より推奨）。バケットポリシーは CDK が自動付与。
     const origin = origins.S3BucketOrigin.withOriginAccessControl(bucket);
 
+    // 末尾が / の URL（例 /lp/）を、そのフォルダの index.html に読み替える。
+    // defaultRootObject はトップ（/）にしか効かないため、/lp/ は 403 → 下の errorResponses で
+    // アプリの index.html が返っていた（2026-10-07 に実測）。GitHub Pages と同じ見え方にそろえる。
+    // 拡張子のないパス（/lp など）は今までどおり errorResponses のフォールバックに任せる。
+    const directoryIndex = new cloudfront.Function(this, 'DirectoryIndex', {
+      functionName: 'ssd-directory-index',
+      comment: 'Rewrite /path/ to /path/index.html',
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+      code: cloudfront.FunctionCode.fromInline(
+        [
+          'function handler(event) {',
+          '  var request = event.request;',
+          "  if (request.uri.endsWith('/')) {",
+          "    request.uri += 'index.html';",
+          '  }',
+          '  return request;',
+          '}',
+        ].join('\n')
+      ),
+    });
+
     const distribution = new cloudfront.Distribution(this, 'Distribution', {
       comment: 'Social Debugger static delivery',
       defaultRootObject: 'index.html',
@@ -71,6 +92,9 @@ export class SocialDebuggerStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: longCache,
         compress: true,
+        functionAssociations: [
+          { function: directoryIndex, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
+        ],
       },
       additionalBehaviors: {
         // 週替わりの「最新」ポインタだけ短TTL。他コンテンツは既定(long)のまま。
