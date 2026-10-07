@@ -2,11 +2,12 @@
 // stays DOM/window-free and reusable server-side. Web時はfalseで従来どおり非表示。
 const WEEKLY_ENABLED = window.Capacitor?.isNativePlatform?.() ?? false;
 const OS_REDUCED_MOTION = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
-// 端末が「動きを減らす」でも、使う人が「動かして見る」を選んだら動かす（2026-10-06）。
-// このアプリは動くネットワークを見て分かる教材なので、止まったままだと文字だけになる。既定は端末の設定に従い、選んだときだけ動かす。
-let MOTION_OPT_IN = false;
-try { MOTION_OPT_IN = localStorage.getItem('ssd_motion_optin') === '1'; } catch (e) {}
-const REDUCED_MOTION = OS_REDUCED_MOTION && !MOTION_OPT_IN;
+// 端末が「動きを減らす」でも、ネットワークの点がゆっくり漂う動き（canvas）は最初から見せる（2026-10-07 本人と決定）。
+// このアプリは動くネットワークを見て分かる教材なので、止まったままだと文字だけになる。点滅や揺れはなく、
+// CSS の飾りの動き（揺れ・点滅）は app.css で今までどおり止める。止めたい人は「■ アニメーションを止める」で止められ、その端末では覚えておく。
+let MOTION_OFF = false;
+try { MOTION_OFF = localStorage.getItem('ssd_motion_off') === '1'; } catch (e) {}
+const REDUCED_MOTION = OS_REDUCED_MOTION && MOTION_OFF;
 
 function renderMotionNotice(){
   if(!OS_REDUCED_MOTION)return;
@@ -16,16 +17,16 @@ function renderMotionNotice(){
   bar.setAttribute('aria-label',tt('動きの設定','Motion setting'));
   bar.style.cssText='margin:8px auto;max-width:1100px;padding:10px 14px;border:1px solid #00d4ff;border-radius:10px;background:#0c1220;color:#d8e4ff;font-size:.82rem;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between';
   const msg=document.createElement('span');
-  msg.textContent=MOTION_OPT_IN
-    ? tt('この端末は「動きを減らす」設定ですが、シミュレーションを動かしています。','This device asks for reduced motion, but the simulation is running because you chose to.')
-    : tt('この端末は「動きを減らす」設定のため、シミュレーションを止めています。','This device asks for reduced motion, so the simulation is paused.');
+  msg.textContent=MOTION_OFF
+    ? tt('シミュレーションの動きを止めています','The simulation animation is paused')
+    : tt('端末の「動きを減らす」設定がオンのため、点滅や揺れは止めて、ゆっくりした動きだけ表示しています','Your device\'s "Reduce motion" setting is on, so flashing and shaking are off and only gentle motion is shown');
   const btn=document.createElement('button');
   btn.type='button';
   btn.id='motionToggle';
   btn.style.cssText='min-height:40px;padding:8px 16px;border-radius:999px;border:1.5px solid #00d4ff;background:transparent;color:#00d4ff;font-weight:700;cursor:pointer';
-  btn.textContent=MOTION_OPT_IN?tt('■ 動きを止める','■ Stop motion'):tt('▶ 動かして見る','▶ Show the motion');
+  btn.textContent=MOTION_OFF?tt('▶ アニメーションを再生する','▶ Play animation'):tt('■ アニメーションを止める','■ Stop animation');
   btn.addEventListener('click',()=>{
-    try{ if(MOTION_OPT_IN)localStorage.removeItem('ssd_motion_optin'); else localStorage.setItem('ssd_motion_optin','1'); }catch(e){}
+    try{ if(MOTION_OFF)localStorage.removeItem('ssd_motion_off'); else localStorage.setItem('ssd_motion_off','1'); localStorage.removeItem('ssd_motion_optin'); }catch(e){}
     location.reload();
   });
   bar.append(msg,btn);

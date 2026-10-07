@@ -19,8 +19,8 @@ test('people on a reduced-motion device can choose to see the landing page move'
   // 切り替えはチェックボックスとラベル（JavaScript なし）
   assert.match(lp, /<input type="checkbox" id="motion-optin"/);
   assert.match(lp, /<label for="motion-optin"/);
-  assert.match(lp, /▶ 動かして見る/);
-  assert.match(lp, /■ 動きを止める/);
+  assert.match(lp, /▶ 動画を再生する/);
+  assert.match(lp, /■ 動画を止める/);
 });
 
 test('still images do not show under the videos on ordinary devices', () => {
