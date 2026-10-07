@@ -31,7 +31,8 @@ test('still images do not show under the videos on ordinary devices', () => {
 test('YouTube videos are plain links, so nothing reaches YouTube until someone taps one', () => {
   assert.doesNotMatch(lp, /<iframe/i);
   assert.doesNotMatch(lp, /frame-src/);
-  assert.ok(!lp.includes('ytimg.com'));
+  // 画像は自分のサイトからだけ（YouTube のサムネイルは読み込まない）
+  assert.match(lp, /img-src 'self' data:;/);
 });
 
 test('placeholder YouTube ids never show on the landing page', () => {
