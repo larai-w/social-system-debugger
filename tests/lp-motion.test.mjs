@@ -27,3 +27,14 @@ test('still images do not show under the videos on ordinary devices', () => {
   // .clip img { display: block } より強いセレクタで隠す（#202 では動画の下に静止画が重なっていた）
   assert.match(lp, /\.clip \.still,[\s\S]*?\{\s*display: none;/);
 });
+
+test('YouTube videos are plain links, so nothing reaches YouTube until someone taps one', () => {
+  assert.doesNotMatch(lp, /<iframe/i);
+  assert.doesNotMatch(lp, /frame-src/);
+  assert.doesNotMatch(lp, /ytimg\.com/);
+});
+
+test('placeholder YouTube ids never show on the landing page', () => {
+  // 公開後に VIDEO_ID_* を本物の id に差し替えるまで、動画の場所は hidden のままにする
+  if (/VIDEO_ID_/.test(lp)) assert.match(lp, /<section id="videos" hidden>/);
+});
