@@ -921,26 +921,25 @@ function setAlgoUI(a){
   document.getElementById('btnGreedy').setAttribute('aria-pressed',String(greedy));
 }
 
+function clearPresetSelP1(){setPresetButtonState('p-',PRESETS,null);activePreset=null;}
+
 function setAlgo(a){
   algo=a;setAlgoUI(a);
-  setPresetButtonState('p-',PRESETS,null);
-  activePreset=null;updateAll();
+  clearPresetSelP1();updateAll();
 }
 
 document.getElementById('filterRate').addEventListener('input',function(){
   filterRate=+this.value;
   document.getElementById('filterVal').textContent=filterRate+'%';
   setPct(this);
-  setPresetButtonState('p-',PRESETS,null);
-  activePreset=null;updateAll();
+  clearPresetSelP1();updateAll();
 });
 
 document.getElementById('ethicsScore').addEventListener('input',function(){
   ethicsScore=+this.value;
   document.getElementById('ethicsVal').textContent=ethicsScore;
   setPct(this);
-  setPresetButtonState('p-',PRESETS,null);
-  activePreset=null;updateAll();
+  clearPresetSelP1();updateAll();
 });
 
 document.getElementById('historicalImmunity').addEventListener('input',function(){

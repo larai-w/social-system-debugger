@@ -197,12 +197,15 @@ function applyScenarioParams(scenario) {
     document.getElementById('ethicsVal').textContent = p.e;
     setPct(document.getElementById('filterRate'));
     setPct(document.getElementById('ethicsScore'));
+    clearPresetSelP1();
     updateAll();
   }
   if (scenario.params.p2) {
     const p = scenario.params.p2;
     shrinkRate = p.s; dxRate = p.d; ethicsP2 = p.e; algoP2 = p.al; publicReboot = p.reboot || false;
     if (p.d >= 45) skillStock = 80; else if (p.d < 25) skillStock = 10; else skillStock = 50;
+    // 挑戦し直しでも前回の「技術ごと消滅」とショックの結果を持ち込まない（プリセットと同じ）
+    skillLost = false; shockState = null;
     document.getElementById('shrinkRate').value = p.s;
     document.getElementById('dxRate').value = p.d;
     document.getElementById('ethicsScoreP2').value = p.e;
@@ -230,6 +233,7 @@ function applyScenarioParams(scenario) {
     setPct(document.getElementById('shrinkRate'));
     setPct(document.getElementById('dxRate'));
     setPct(document.getElementById('ethicsScoreP2'));
+    clearPresetSelP2();
     updateAllP2();
   }
   if (scenario.params.p3) {
@@ -244,6 +248,7 @@ function applyScenarioParams(scenario) {
     setPct(document.getElementById('searchDepth'));
     setPct(document.getElementById('groundingRate'));
     setPct(document.getElementById('learningRate'));
+    clearPresetSelP3();
     // P3 のモニターは常時アニメーションループが更新するため、ここではチャートのみ再描画
     updateP3Chart();
   }
@@ -256,6 +261,7 @@ function applyScenarioParams(scenario) {
     document.getElementById('gamVal').textContent = p.gam + '%';
     setPct(document.getElementById('extTraffic'));
     setPct(document.getElementById('gamification'));
+    clearPresetSelP4();
     updateP4Chart();
   }
 }

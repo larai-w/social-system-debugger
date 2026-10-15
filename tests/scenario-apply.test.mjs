@@ -2,6 +2,8 @@
 // 2026-10-15: シナリオを読み込んでも、つまみ横の数字が古いまま（W36 で倫理観 30 なのに 68 と表示）
 // だった。PAGE 2 では algoP2 ではなく PAGE 1 の algo を書き換えていて、DP 指定のシナリオ
 // （W29・W31・W47・W52）がボタンだけ DP・計算は前の Greedy のまま動いていた。
+// 同日: 挑戦し直すと、前回の「技術ごと消滅」やショックの結果、選んだプリセットが残っていた
+// （W29・W36・W43・W52 は後継者ストックの回復がゴールなので、DX を上げてもクリアできなくなる）。
 // scenario.js を最小の DOM スタブと ui.js の状態変数つきで読み込み、関数を直接呼ぶ。
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -55,13 +57,16 @@ function load() {
     let extTraffic=50, gamification=50;
     function setPct(){} function updateAll(){} function updateAllP2(){} function updateP3Chart(){} function updateP4Chart(){}
     function setAlgoUI(a){ algo=a; }
+    const cleared=[];
+    function clearPresetSelP1(){cleared.push(1);} function clearPresetSelP2(){cleared.push(2);} function clearPresetSelP3(){cleared.push(3);} function clearPresetSelP4(){cleared.push(4);}
+    function __set(o){ if('skillLost' in o) skillLost=o.skillLost; if('shockState' in o) shockState=o.shockState; }
   `;
   const api = new Function(
     'document',
     'window',
     state +
       src +
-      '\nreturn { applyScenarioParams, get: () => ({ algo, algoP2, shrinkRate, ethicsP2, publicReboot, skillLost, shockState }) };'
+      '\nreturn { applyScenarioParams, set: __set, get: () => ({ algo, algoP2, shrinkRate, ethicsP2, publicReboot, skillLost, shockState, cleared }) };'
   )(document, {});
   return { ...api, el: (id) => document.getElementById(id) };
 }
@@ -103,4 +108,25 @@ test('P4: scenario load updates the value labels', () => {
   t.applyScenarioParams({ params: { p4: { ext: 70, gam: 75 } } });
   assert.equal(t.el('extVal').textContent, '70%');
   assert.equal(t.el('gamVal').textContent, '75%');
+});
+
+test('P2: retrying a scenario starts fresh (no leftover extinct skills or shock)', () => {
+  const t = load();
+  t.set({ skillLost: true, shockState: { type: 'crash', rb: 10 } });
+  t.applyScenarioParams({ params: { p2: { s: 30, d: 10, e: 80, al: 'dp', reboot: false } } });
+  assert.equal(t.get().skillLost, false);
+  assert.equal(t.get().shockState, null);
+});
+
+test('every page: loading a scenario clears the highlighted preset', () => {
+  const t = load();
+  t.applyScenarioParams({
+    params: {
+      p1: { f: 66, e: 38, al: 'greedy' },
+      p2: { s: 30, d: 10, e: 80, al: 'dp', reboot: false },
+      p3: { depth: 3, ground: 25, lr: 60 },
+      p4: { ext: 70, gam: 75 },
+    },
+  });
+  assert.deepEqual([...t.get().cleared].sort(), [1, 2, 3, 4]);
 });
