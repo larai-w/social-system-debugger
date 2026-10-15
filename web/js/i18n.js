@@ -113,7 +113,7 @@ const I18N = {
     log_infoH:'Info Health ', log_viability:'Viability   ', log_mentalWB:'Mental WB   ',
     // ── v5.2: P2 static ──
     p2_cs_input:'Fiscal & operational parameters of depopulating regional city "Sector-T". Move the sliders to simulate.',
-    p2_shrink_d:'Consolidating hubs cuts wasteful life-support costs. Low values keep all legacy infrastructure alive, crushing the budget.',
+    p2_shrink_d:'Consolidating hubs cuts wasteful life-support costs. Low values raise the Redundancy Buffer, but keeping all legacy infrastructure alive crushes the budget and lowers Infrastructure.',
     p2_shrink_l:'Keep all legacy', p2_shrink_r:'Consolidate hubs',
     p2_dx_d:'Investment in smart agriculture & automation to sustain the local brand industry. Low values prolong dependence on aging artisans until succession collapses.',
     p2_dx_l:'Aging artisan dependence', p2_dx_r:'Smart automation',
