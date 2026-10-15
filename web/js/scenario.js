@@ -191,13 +191,17 @@ function applyScenarioParams(scenario) {
     document.getElementById('btnDP').classList.toggle('green-on', p.al === 'dp');
     document.getElementById('btnGreedy').classList.toggle('on', p.al === 'greedy');
     document.getElementById('btnGreedy').classList.toggle('red-on', p.al === 'greedy');
+    document.getElementById('btnDP').setAttribute('aria-pressed', String(p.al === 'dp'));
+    document.getElementById('btnGreedy').setAttribute('aria-pressed', String(p.al === 'greedy'));
+    document.getElementById('filterVal').textContent = p.f + '%';
+    document.getElementById('ethicsVal').textContent = p.e;
     setPct(document.getElementById('filterRate'));
     setPct(document.getElementById('ethicsScore'));
     updateAll();
   }
   if (scenario.params.p2) {
     const p = scenario.params.p2;
-    shrinkRate = p.s; dxRate = p.d; ethicsP2 = p.e; algo = p.al; publicReboot = p.reboot || false;
+    shrinkRate = p.s; dxRate = p.d; ethicsP2 = p.e; algoP2 = p.al; publicReboot = p.reboot || false;
     if (p.d >= 45) skillStock = 80; else if (p.d < 25) skillStock = 10; else skillStock = 50;
     document.getElementById('shrinkRate').value = p.s;
     document.getElementById('dxRate').value = p.d;
@@ -216,6 +220,13 @@ function applyScenarioParams(scenario) {
     document.getElementById('btnRebootOff').classList.toggle('on', !p.reboot);
     document.getElementById('btnRebootOn').classList.toggle('on', p.reboot);
     document.getElementById('btnRebootOn').classList.toggle('green-on', p.reboot);
+    document.getElementById('btnDPP2').setAttribute('aria-pressed', String(p.al === 'dp'));
+    document.getElementById('btnGreedyP2').setAttribute('aria-pressed', String(p.al !== 'dp'));
+    document.getElementById('btnRebootOff').setAttribute('aria-pressed', String(!p.reboot));
+    document.getElementById('btnRebootOn').setAttribute('aria-pressed', String(!!p.reboot));
+    document.getElementById('shrinkVal').textContent = p.s + '%';
+    document.getElementById('dxVal').textContent = p.d + '%';
+    document.getElementById('ethicsP2Val').textContent = p.e;
     setPct(document.getElementById('shrinkRate'));
     setPct(document.getElementById('dxRate'));
     setPct(document.getElementById('ethicsScoreP2'));
@@ -227,6 +238,10 @@ function applyScenarioParams(scenario) {
     document.getElementById('searchDepth').value = p.depth;
     document.getElementById('groundingRate').value = p.ground;
     document.getElementById('learningRate').value = p.lr;
+    document.getElementById('depthVal').textContent = p.depth;
+    document.getElementById('groundVal').textContent = p.ground + '%';
+    document.getElementById('lrVal').textContent = p.lr + '%';
+    setPct(document.getElementById('searchDepth'));
     setPct(document.getElementById('groundingRate'));
     setPct(document.getElementById('learningRate'));
     // P3 のモニターは常時アニメーションループが更新するため、ここではチャートのみ再描画
@@ -237,6 +252,8 @@ function applyScenarioParams(scenario) {
     extTraffic = p.ext; gamification = p.gam;
     document.getElementById('extTraffic').value = p.ext;
     document.getElementById('gamification').value = p.gam;
+    document.getElementById('extVal').textContent = p.ext + '%';
+    document.getElementById('gamVal').textContent = p.gam + '%';
     setPct(document.getElementById('extTraffic'));
     setPct(document.getElementById('gamification'));
     updateP4Chart();
