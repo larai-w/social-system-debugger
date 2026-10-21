@@ -708,6 +708,7 @@ function applyI18nAuto(){
     const v=I18N[lang][k];
     if(v!==undefined) el.innerHTML=v;
   });
+  document.querySelectorAll('.mc').forEach(b=>b.setAttribute('aria-label',tt('閉じる','Close')));
 }
 
 function enhancePointerControls(){
@@ -832,8 +833,8 @@ function shareURL(){
         el.textContent='✓ COPIED!';el.classList.add('ok');
         setTimeout(()=>{el.textContent=orig;el.classList.remove('ok')},2000);
       });
-    });
-  }catch(e){prompt('Copy this URL:',url)}
+    }).catch(()=>{prompt(tt('このURLをコピーしてください:','Copy this URL:'),url)});
+  }catch(e){prompt(tt('このURLをコピーしてください:','Copy this URL:'),url)}
 }
 
 let modalReturnFocus=null;
@@ -2856,7 +2857,7 @@ function copyShareLink(btn){
     btn.textContent='✓ COPIED!';btn.classList.add('ok');
     setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1800);
   };
-  try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
+  const fb=()=>prompt(tt('このURLをコピーしてください:','Copy this URL:'),url);try{navigator.clipboard.writeText(url).then(done,fb);}catch(e){fb();}
 }
 
 function closeSharePop(){document.getElementById('sharePopModal').classList.remove('on');}
@@ -3159,6 +3160,8 @@ function showShareToast(ctx){
   tst.classList.add('on');
   clearTimeout(shareToastTimer);
   shareToastTimer=setTimeout(()=>tst.classList.remove('on'),6000);
+  // 下に出るトーストが操作ボタンを隠さないよう、画面をスクロールしたら消す（出現直後のスクロールは無視）
+  setTimeout(()=>window.addEventListener('scroll',()=>tst.classList.remove('on'),{once:true,passive:true}),600);
 }
 function shareFromToast(){
   const tst=document.getElementById('shareToast');
@@ -3240,7 +3243,7 @@ function copyPageLink(n,btn){
     btn.textContent=tt('✓ コピーしました','✓ Copied!');btn.classList.add('ok');
     setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok');},1800);
   };
-  try{navigator.clipboard.writeText(url).then(done);}catch(e){prompt('Copy this URL:',url);}
+  const fb=()=>prompt(tt('このURLをコピーしてください:','Copy this URL:'),url);try{navigator.clipboard.writeText(url).then(done,fb);}catch(e){fb();}
 }
 
 // US-08: 研究者向けエクスポート — 全パラメータ＋主要メトリクス＋再現用共有URL（JSON/CSV）

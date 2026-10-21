@@ -48,7 +48,7 @@
     <button class="ibtn" id="guideBtn" onclick="openIntro()" data-i18n="guide_btn">ℹ GUIDE</button>
   </div>
   <div class="hdr-c">
-    <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.38;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
+    <h1 id="mainTitle">[ <span data-i18n="appName">社会デバッガー</span><sup style="font-size:.42em;opacity:.75;letter-spacing:.04em;vertical-align:.6em"> v6</sup> ]</h1>
     <p id="hdrSub">あなたの街は、生き残れるか。— パラメータを動かして、社会が壊れる瞬間を見てほしい</p>
     <div><span class="badge"><span class="bdot"></span><span id="simLbl">SIMULATION ACTIVE</span></span></div>
   </div>
@@ -212,7 +212,7 @@
       <div class="card">
         <div class="ct">
           <div class="ct-l"><span class="dot"></span>② SOCIAL HEALTH TIMELINE</div>
-          <button class="ibtn" id="playBtn" onclick="playAnimation()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+          <button class="ibtn" id="playBtn" onclick="playAnimation()">▶ PLAY</button>
         </div>
         <div class="cs" id="s2sub">時系列シミュレーション。Greedy×低倫理 → ドーパミン爆発後に崩壊。DP×高倫理 → 持続的安定成長。</div>
         <div class="ch"><canvas id="timelineChart"></canvas></div>
@@ -235,7 +235,7 @@
     <div class="card">
       <div class="ct">
         <div class="ct-l" id="agentCanvasHeading"><span class="dot" style="background:var(--green);box-shadow:0 0 7px var(--green)"></span>④ AGENT NETWORK SIMULATION</div>
-        <button class="ibtn" onclick="restartAgents()" style="font-size:.58rem;padding:4px 9px" id="resetLbl">↺ RESET</button>
+        <button class="ibtn" onclick="restartAgents()" id="resetLbl">↺ RESET</button>
       </div>
       <div class="cs" id="s4sub">48エージェントによる情報伝播シミュレーション。フィルタリング率が上がると同信念エッジのみ残りクラスターが形成される。ノードをリアルタイムで観測せよ。</div>
       <div class="ag-wrap">
@@ -365,7 +365,7 @@
         <div class="si" onclick="openModal('p2Heli')"><div class="sl" data-i18n="p2_sl_heli">救命ヘリ</div><div id="p2HeliStatus" class="heli-badge heli-on" style="margin-top:4px">● ONLINE</div></div>
         <div class="si" onclick="openModal('p2Brand')"><div class="sl" data-i18n="p2_sl_brand">ブランド産業</div><div class="sv" id="p2BrandNum" style="color:var(--green)">70</div></div>
         <div class="si" onclick="openModal('p2Budget')"><div class="sl" data-i18n="p2_sl_budget">自治体財政</div><div class="sv" id="p2BudgetNum" style="color:var(--cyan)">80</div></div>
-        <div class="si" onclick="openModal('p2Deadlock')"><div class="sl"><span data-i18n="p2_sl_deadlock">デッドロック状態</span> <span class="link-badge" onclick="event.stopPropagation();switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
+        <div class="si si-stretch"><div class="sl"><span class="si-hit" onclick="openModal('p2Deadlock')" data-i18n="p2_sl_deadlock">デッドロック状態</span> <span class="link-badge" onclick="switchTab(3)">⇄ P3 ROOT</span></div><div class="sv" id="p2DeadlockBadge" style="color:var(--muted);font-size:.75rem">INACTIVE</div></div>
       </div>
       <!-- CPU Allocation -->
       <div class="cpu-meter">
@@ -390,7 +390,7 @@
     <div class="card">
       <div class="ct" style="color:var(--ora)">
         <div class="ct-l"><span class="dot" style="background:var(--ora);box-shadow:0 0 7px var(--ora)"></span>① SECTOR-T INFRASTRUCTURE TIMELINE</div>
-        <button class="ibtn" id="playBtnP2" onclick="playAnimationP2()" style="font-size:.58rem;padding:4px 9px">▶ PLAY</button>
+        <button class="ibtn" id="playBtnP2" onclick="playAnimationP2()">▶ PLAY</button>
       </div>
       <div class="cs" data-i18n="p2_cs_tl">地域インフラの時系列シミュレーション。他責デッドロック発生時、インフラ維持力は3倍速で崩壊する。</div>
       <div class="ch" style="height:230px"><canvas id="timelineChartP2"></canvas></div>
@@ -509,7 +509,7 @@
         <div class="gs" id="p3IntStatus" style="color:var(--green)">HEALTHY</div>
       </div>
       <div style="margin-bottom:10px">
-        <div class="gr"><span class="gl" onclick="openModal('p3Falsifiability')" data-i18n="p3_gl_fals">反証許容度 FALSIFIABILITY <span class="link-badge" onclick="event.stopPropagation();switchTab(2)">⇄ P2 戦略と連動</span><span class="gi">(?)</span></span><span class="gn" id="p3FalsNum" style="color:var(--cyan)">--</span></div>
+        <div class="gr"><span><span class="gl" onclick="openModal('p3Falsifiability')"><span data-i18n="p3_gl_fals">反証許容度 FALSIFIABILITY</span><span class="gi">(?)</span></span> <span class="link-badge" onclick="switchTab(2)" data-i18n="p3_gl_fals_b">⇄ P2 戦略と連動</span></span><span class="gn" id="p3FalsNum" style="color:var(--cyan)">--</span></div>
         <div class="gt"><div class="gf" id="p3FalsBar" style="width:0%;background:var(--cyan)"></div></div>
         <div class="gs" id="p3FalsStatus" style="color:var(--muted)">Page 2 の予算配分戦略と連動</div>
         <div id="p3ExcuseLog" style="display:none;margin-top:6px;padding:7px 10px;background:var(--bg1);border-radius:3px;border-left:2px solid var(--red);font-size:.58rem;line-height:1.9;color:#ff8899;font-family:inherit"></div>
@@ -532,7 +532,7 @@
     <div class="card">
       <div class="ct" style="color:var(--pur)">
         <div class="ct-l" id="p3CanvasHeading"><span class="dot" style="background:var(--pur);box-shadow:0 0 7px var(--pur)"></span>① COGNITIVE NETWORK — POISONING ATTACK MONITOR</div>
-        <button class="ibtn" onclick="restartP3()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
+        <button class="ibtn" onclick="restartP3()">↺ RESET</button>
       </div>
       <div class="cs" data-i18n="p3_cs_canvas">中央の偽装ノード（自称・良識派）が周囲の正義感をハックする。探索深度3以下で一般ノードが騙され、事実を述べる中立ノードへの「正義の毒入れ攻撃」（赤点線）が発生。深度7以上でデバッグ完了。</div>
       <div class="ag-wrap" style="height:330px">
@@ -633,7 +633,7 @@
     <div class="card">
       <div class="ct" style="color:var(--yel)">
         <div class="ct-l" id="p4CanvasHeading"><span class="dot" style="background:var(--yel);box-shadow:0 0 7px var(--yel)"></span>① STAKEHOLDER NETWORK — SYBIL FLOOD MONITOR</div>
-        <button class="ibtn" onclick="restartP4()" style="font-size:.58rem;padding:4px 9px">↺ RESET</button>
+        <button class="ibtn" onclick="restartP4()">↺ RESET</button>
       </div>
       <div class="cs" data-i18n="p4_cs_canvas">中央の青いクラスターは530万人の生活者（サイレントマジョリティ）。外部ノード流入率を上げると、画面外から1ビット思考のスパムノードが流入し、生活者同士の通信リンクを遮断・占拠する。</div>
       <div class="ag-wrap" style="height:330px">
@@ -678,7 +678,7 @@
 
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="auditTitle" id="auditModal" onclick="closeAuditIf(event)">
   <div class="mb" style="max-width:640px;border-color:var(--green);box-shadow:0 0 40px rgba(0,255,136,.25)">
-    <button class="mc" aria-label="Close" onclick="closeAudit()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeAudit()">✕</button>
     <div class="mtag" style="color:var(--green)">AUDIT REPORT — GRAND OPTIMAL</div>
     <div class="mti" id="auditTitle" data-i18n="audit_title">デバッグ完了 — 社会OSは大域的最適解に到達しました</div>
     <textarea id="auditText" readonly class="audit-ta" aria-labelledby="auditTitle"></textarea>
@@ -692,7 +692,7 @@
 
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="introTitle" id="introModal" onclick="closeIntroIf(event)">
   <div class="mb" style="max-width:620px">
-    <button class="mc" aria-label="Close" onclick="closeIntro()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeIntro()">✕</button>
     <div class="mtag" data-i18n="intro_tag">SYSTEM OVERVIEW — 社会OSの4層モデル</div>
     <div class="mti" id="introTitle" data-i18n="intro_title">あなたの街は、どこから壊れるか。</div>
     <div class="mbd" style="margin-bottom:14px" data-i18n="intro_body">4つのレイヤーは連鎖する — 上の層の障害が下の層へ伝播して、街全体が崩壊する。スライダーを動かして、あなた自身の街で試してみてほしい。</div>
@@ -739,7 +739,7 @@
 <!-- v6.2: 共有ポップオーバー（テンプレ選択 → OS共有 / LINE / X / コピー） -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="sharePopTitle" id="sharePopModal" onclick="closeSharePopIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" aria-label="Close" onclick="closeSharePop()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeSharePop()">✕</button>
     <div class="mtag">⇪ SHARE EXPERIMENT</div>
     <div class="mti" id="sharePopTitle">実験を共有</div>
     <div class="cs" id="sharePopHint" style="margin-bottom:8px"></div>
@@ -764,7 +764,7 @@
 <!-- T50: PWA インストール手順モーダル（beforeinstallprompt が使えないブラウザ向けフォールバック） -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="pwaInstallTitle" id="pwaInstallModal" onclick="closePwaInstallIf(event)">
   <div class="mb" style="max-width:560px">
-    <button class="mc" aria-label="Close" onclick="closePwaInstall()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closePwaInstall()">✕</button>
     <div class="mtag" data-i18n="pwa_tag">INSTALL — アプリとして使う</div>
     <div class="mti" id="pwaInstallTitle" data-i18n="pwa_title">ホーム画面から、1タップで起動</div>
     <div class="mbd" data-i18n="pwa_body">このサイトは PWA（インストールできるWebアプリ）です。入れておくと全画面で起動し、オフラインでも動きます。登録・料金は不要です。<br><br>
@@ -776,7 +776,7 @@
 
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="shareGuideTitle" id="shareGuideModal" onclick="closeShareGuideIf(event)">
   <div class="mb" style="max-width:640px">
-    <button class="mc" aria-label="Close" onclick="closeShareGuide()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeShareGuide()">✕</button>
     <div class="mtag" data-i18n="sg_tag">SHARE GUIDE — 共有のつかいかた</div>
     <div class="mti" id="shareGuideTitle" data-i18n="sg_title">「意見」ではなく「実験」を送る</div>
     <div class="mbd" style="margin-bottom:12px" data-i18n="sg_body">このアプリで共有されるのは主張ではなく、誰でも再現できる実験（パラメータ状態のURL）です。
@@ -809,7 +809,7 @@
 <!-- v6.332: フィードバックモーダル -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle" id="feedbackModal" onclick="closeFeedbackIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" aria-label="Close" onclick="closeFeedback()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeFeedback()">✕</button>
     <div class="mti" id="feedbackTitle" data-i18n="fb_title">フィードバック</div>
     <label style="display:flex;align-items:center;gap:8px;font-size:.62rem;color:var(--muted);margin:8px 0 10px;cursor:pointer">
       <input type="checkbox" id="fbResearcher" aria-controls="fbDevTop" onchange="setResearcherMode(this.checked)">
@@ -848,7 +848,7 @@
 <!-- v6.334: 発見ログモーダル -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="discoveryTitle" id="discoveryModal" onclick="closeDiscoveryLogIf(event)">
   <div class="mb" style="max-width:480px">
-    <button class="mc" aria-label="Close" onclick="closeDiscoveryLog()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeDiscoveryLog()">✕</button>
     <div class="mti" id="discoveryTitle" data-i18n="disc_title">📖 発見ログ</div>
     <div class="cs" style="margin-bottom:10px"><span data-i18n="disc_hint">触るたびに、新しい発見（＝短い学び）が集まります。</span> <strong id="discCount" style="color:var(--cyan)">0 / 15</strong></div>
     <div id="discList"></div>
@@ -858,7 +858,7 @@
 <!-- v6.35: Weekly Scenarios Modal -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="scenarioTitle" id="scenarioModal" onclick="closeScenarioIf(event)">
   <div class="mb" style="max-width:520px">
-    <button class="mc" aria-label="Close" onclick="closeScenarios()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeScenarios()">✕</button>
     <div class="mtag" data-i18n="scenario_title">ウィークリーチャレンジ</div>
     <div class="mti" id="scenarioTitle" style="font-size:1.2em;margin-bottom:10px">Echo Chamber Trap</div>
     <div class="cs" style="margin-bottom:10px" data-i18n="scenario_intro_hint">今週のシナリオです。ゴールに向かって、あなたの街がどう変わるか見てください。</div>
@@ -876,7 +876,7 @@
 <!-- v6.345: 共有前コメントモーダル -->
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="rewindTitle" id="rewindModal" onclick="closeRewindIf(event)">
   <div class="mb" style="max-width:460px">
-    <button class="mc" aria-label="Close" onclick="closeRewind()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeRewind()">✕</button>
     <div class="mtag" data-i18n="rw_tag">↩ REWIND</div>
     <div class="mti" id="rewindTitle" data-i18n="rw_title">もし1つだけ過去に戻せるなら？</div>
     <div class="mbd" style="font-size:.62rem;color:var(--muted);margin-bottom:14px" data-i18n="rw_body">崩壊した直前の状態で、1つだけパラメーターを変えたら — あなたの街は助かっただろうか？</div>
@@ -887,7 +887,7 @@
 
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="shareCommentTitle" id="shareCommentModal" onclick="closeShareCommentIf(event)">
   <div class="mb" style="max-width:460px">
-    <button class="mc" aria-label="Close" onclick="closeShareComment()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeShareComment()">✕</button>
     <div class="mtag" data-i18n="sc_tag">▷ SHARE NOTE</div>
     <div class="mti" id="shareCommentTitle" data-i18n="sc_title">一言添えて送る（任意）</div>
     <textarea id="shareCommentInput" aria-labelledby="shareCommentTitle" rows="2" maxlength="100"
@@ -903,7 +903,7 @@
 
 <div class="mo" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-describedby="mBody mFormula" id="modal" onclick="closeModalIf(event)">
   <div class="mb">
-    <button class="mc" aria-label="Close" onclick="closeModal()">✕</button>
+    <button class="mc" aria-label="閉じる" onclick="closeModal()">✕</button>
     <div class="mtag" id="mTag">METRIC</div>
     <div class="mti" id="mTitle"></div>
     <div class="mbd" id="mBody"></div>

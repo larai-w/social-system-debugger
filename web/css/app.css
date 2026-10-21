@@ -1,7 +1,7 @@
 :root{
   --bg0:#070b14;--bg1:#0c1220;--bg2:#0f1829;
   --cyan:#00d4ff;--green:#00ff88;--red:#ff2244;--ora:#ff6b2b;--pur:#9945ff;--yel:#ffcc00;
-  --txt:#d8e4ff;--muted:#5a6f94;--bdr:#172340;
+  --txt:#d8e4ff;--muted:#7d92b8;--bdr:#172340;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg0);color:var(--txt);font-family:'Courier New',monospace;min-height:100vh;overflow-x:hidden}
@@ -125,7 +125,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border-radius:50%;bac
 .mo{display:none;position:fixed;inset:0;background:rgba(7,11,20,.88);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
 .mo.on{display:flex}
 .mb{background:var(--bg2);border:1px solid var(--cyan);border-radius:4px;padding:26px 30px;max-width:510px;width:92%;position:relative;box-shadow:0 0 40px rgba(0,212,255,.2);max-height:90vh;overflow-y:auto}
-.mc{position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;font-family:inherit}
+.mc{position:absolute;top:0;right:4px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;font-family:inherit}
 .mc:hover{color:var(--red)}
 .mtag{font-size:.6rem;color:var(--cyan);letter-spacing:.2em;margin-bottom:7px}
 .mti{font-size:1.05rem;color:var(--txt);margin-bottom:13px;line-height:1.3}
@@ -298,7 +298,7 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 .share-toast button{padding:11px 22px;background:var(--bg2);border:1px solid var(--cyan);border-radius:3px;color:var(--cyan);font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.1em;cursor:pointer;box-shadow:0 0 18px rgba(0,212,255,.35)}
 .share-toast button:active{transform:scale(.98)}
 /* v6.334: 発見トースト（右下・軽量・自動で消える） */
-.disc-toast{position:fixed;right:14px;bottom:14px;max-width:290px;background:var(--bg2);border:1px solid var(--green);border-radius:4px;color:var(--green);font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:.04em;line-height:1.5;padding:10px 14px;box-shadow:0 0 18px rgba(0,255,136,.28);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .3s;z-index:1100}
+.disc-toast{position:fixed;right:14px;bottom:14px;max-width:min(290px,calc(100vw - 28px));background:var(--bg2);border:1px solid var(--green);border-radius:4px;color:var(--green);font-family:'Courier New',monospace;font-size:.66rem;letter-spacing:.04em;line-height:1.5;padding:10px 14px;box-shadow:0 0 18px rgba(0,255,136,.28);opacity:0;transform:translateY(10px);pointer-events:none;transition:all .3s;z-index:1100}
 .disc-toast.on{opacity:1;transform:translateY(0)}
 /* v6.334: 発見ログのリスト行 */
 .disc-row{padding:9px 12px;border:1px solid var(--bdr);border-radius:3px;margin-bottom:7px;background:var(--bg1)}
@@ -324,3 +324,33 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 :where(button,a,input,select,textarea,[role="button"]):focus-visible{outline:2px solid var(--cyan)!important;outline-offset:3px}
 [role="button"].kbd-action{cursor:pointer}
+/* 状態カード内のリンクバッジ: カード全体のクリック領域は疑似要素で広げ、ボタンの入れ子を作らない */
+.si-stretch{position:relative}
+.si-stretch .si-hit::after{content:'';position:absolute;inset:0}
+.si-stretch .link-badge{position:relative;z-index:1}
+/* v6.357: アクセシビリティの短い直し — モバイルでメニューが画面外に切れない／読む文は14px以上／押す場所は44px以上 */
+@media(max-width:640px){
+  .menu-dropdown{position:fixed;top:auto;left:10px;right:10px;min-width:0;max-height:70vh;overflow-y:auto}
+  .menu-item{min-height:44px;display:flex;align-items:center;white-space:normal;font-size:.8125rem}
+  /* 読む文章: 14px(.875rem)以上 */
+  .hdr p,.cs,.pd,.mbd,.am,.il-desc,.diag,.hist,.gs,.mlog,.p2log,.mfo,.foot,.disc-learn,.share-tpl,.sg-tbl,.sg-dont li,.deadlock-panel,.shock-result-panel,.reboot-indicator,.cpu-label,.cpu-nums,.audit-ta,.disc-toast,.pn,#discToast,[style*="font-size:.5"],[style*="font-size:.6"]{font-size:.875rem!important}
+  /* 見出し・ラベル類: 12px(.75rem)以上 */
+  .gi,.link-badge,.tag,.ag-st,.il-num,.il-arrow,.sl,.li,.pl,.rl,.mtag,.badge,.hdr-acts .badge,.heli-badge,.acc-tog .cr,.ct,.cpu-label{font-size:.75rem}
+  .ibtn,.tab-btn,.pbtn,.acc-tog,.sbtn,.gl,.recover-btn,.shock-btn,.share-tpl,.share-toast button{font-size:.8125rem}
+  /* 押す場所: 44px以上 */
+  .hdr-acts .ibtn,.ct .ibtn{min-width:44px;min-height:44px;padding:8px 12px}
+  .tab-btn,.pbtn,.acc-tog,.sbtn,.recover-btn,.shock-btn,.share-acts .sbtn{min-height:44px}
+  input[type=range]{height:44px;margin:0;background-size:100% 6px!important;background-repeat:no-repeat!important;background-position:center!important}
+  input[type=range]::-webkit-slider-thumb{width:28px;height:28px}
+  input[type=range]::-moz-range-thumb{width:28px;height:28px}
+  .gl.kbd-action,.si-hit{display:inline-block;padding:12px 0;margin:-12px 0}
+  .link-badge{min-height:24px}
+  input[type=text],input[type=email],input[type=url],textarea{min-height:44px}
+  .mb label{min-height:44px}
+  .mb input[type=radio],.mb input[type=checkbox]{width:22px;height:22px}
+  /* 下に出るトースト: ボタンを隠さないよう表示中は下に余白を足し、幅も画面内に収める */
+  body:has(.share-toast.on) .wrap,body:has(.disc-toast.on) .wrap{padding-bottom:84px}
+  .disc-toast{left:14px;right:auto;bottom:calc(14px + env(safe-area-inset-bottom))}
+  body:has(.share-toast.on) .disc-toast{bottom:calc(72px + env(safe-area-inset-bottom))}
+  .share-toast{max-width:calc(100vw - 28px);bottom:calc(14px + env(safe-area-inset-bottom))}
+}
