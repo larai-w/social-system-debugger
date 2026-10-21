@@ -435,7 +435,7 @@ function getModeCollapseLog(m){
   const normalHTML=logValues.map((v,i)=>{
     const f=Math.round(v/10),bar='█'.repeat(f)+'░'.repeat(10-f);
     const vc=v<30?'#ff2244':v<60?'#ff6b2b':logColors[i];
-    return`<span style="color:#3a4f6a">${makeLabel(logRowsJa[i],logRowsEn[i])}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
+    return`<span style="color:#7d92b8">${makeLabel(logRowsJa[i],logRowsEn[i])}</span><span style="color:${vc}"> ${bar} ${Math.round(v)}</span>`;
   });
 
   // Phase 1: 効率至上主義・既得権益攻撃スローガン（50%〜）
@@ -551,7 +551,7 @@ function updateAll(){
   document.getElementById('paranoiaNum').style.color=pc;
   document.getElementById('paranoiaBar').style.cssText=`width:${pp}%;background:${pc}`;
   document.getElementById('paranoiaStatus').textContent=pp<40?tt('LOW — ノイズ蓄積は正常範囲内','LOW — noise accumulation within normal range'):pp<60?tt('ELEVATED — 認知バイアスの増幅を検出','ELEVATED — cognitive bias amplification detected'):pp<80?tt('HIGH — 集団パラノイアの発生確率が上昇','HIGH — collective paranoia risk rising'):tt('CRITICAL — メンタルヘルス・インフラが臨界点に到達','CRITICAL — mental-health infrastructure at critical point');
-  document.getElementById('paranoiaStatus').style.color=pc;
+  document.getElementById('paranoiaStatus').style.color=pp<40?'#b07fff':pc; // 文字は暗背景で 4.5:1 を満たす明るい紫
 
   ['scVal','infVal'].forEach((id,i)=>{
     const v=i===0?m.socialCap:m.infra;
@@ -690,6 +690,7 @@ function applyI18n(){
     radarChart.update('none');
   }
   applyI18nAuto();
+  document.querySelectorAll('.mc').forEach(b=>b.setAttribute('aria-label',tt('閉じる','Close')));
   enhancePointerControls();
   syncDocLinks();
   syncTownPlaceholder();
@@ -824,6 +825,8 @@ function setPreset(id){
 
 function shareURL(){
   const url=buildShareURL();
+  // クリップボードが使えない（権限拒否・非セキュアコンテキスト等）場合は URL を表示して手動コピーできるようにする
+  const manualCopy=()=>{prompt(tt('このURLをコピーしてください:','Copy this URL:'),url)};
   try{
     navigator.clipboard.writeText(url).then(()=>{
       ['shareBtn','shareBtnFull'].forEach(id=>{
@@ -832,8 +835,8 @@ function shareURL(){
         el.textContent='✓ COPIED!';el.classList.add('ok');
         setTimeout(()=>{el.textContent=orig;el.classList.remove('ok')},2000);
       });
-    });
-  }catch(e){prompt('Copy this URL:',url)}
+    },manualCopy);
+  }catch(e){manualCopy()}
 }
 
 let modalReturnFocus=null;
@@ -1810,7 +1813,7 @@ function updateP3Monitor(avgDop,generals,attackEdges){
   fn.textContent=`${fooled}/32`;
   fn.style.color=fooled>12?'var(--red)':fooled>4?'var(--ora)':'var(--green)';
   const dbg=document.getElementById('p3DebugBadge');
-  if(dropoutActive){dbg.textContent='GROUNDING';dbg.style.color='var(--pur)';}
+  if(dropoutActive){dbg.textContent='GROUNDING';dbg.style.color='#b07fff';}
   else if(searchDepth>=7&&fooled===0){dbg.textContent='✓ DEBUGGED';dbg.style.color='var(--green)';}
   else if(fooled>12){dbg.textContent='OVERFITTED';dbg.style.color='var(--red)';}
   else{dbg.textContent='RUNNING';dbg.style.color='var(--muted)';}
@@ -3158,7 +3161,7 @@ function showShareToast(ctx){
   tst.dataset.ctx=JSON.stringify(ctx||{kind:'generic'});
   tst.classList.add('on');
   clearTimeout(shareToastTimer);
-  shareToastTimer=setTimeout(()=>tst.classList.remove('on'),6000);
+  shareToastTimer=setTimeout(()=>tst.classList.remove('on'),4000);
 }
 function shareFromToast(){
   const tst=document.getElementById('shareToast');
