@@ -333,10 +333,10 @@ input[type=range].yel-range::-moz-range-thumb{background:var(--yel);box-shadow:0
   .menu-dropdown{position:fixed;top:auto;left:10px;right:10px;min-width:0;max-height:70vh;overflow-y:auto}
   .menu-item{min-height:44px;display:flex;align-items:center;white-space:normal;font-size:.8125rem}
   /* 読む文章: 14px(.875rem)以上 */
-  .hdr p,.cs,.pd,.mbd,.am,.il-desc,.diag,.hist,.gs,.mlog,.p2log,.mfo,.foot,.disc-learn,.share-tpl,.sg-tbl,.sg-dont li,.deadlock-panel,.shock-result-panel,.reboot-indicator,.cpu-label,.cpu-nums,.audit-ta,.disc-toast,.pn,#discToast,[style*="font-size:.5"],[style*="font-size:.6"]{font-size:.875rem!important}
+  .hdr p,.cs,.pd,.mbd,.am,.il-desc,.diag,.hist,.gs,.mlog,.p2log,.mfo,.foot,.disc-learn,.share-tpl,.sg-tbl,.sg-dont li,.deadlock-panel,.shock-result-panel,.reboot-indicator,.cpu-label,.cpu-nums,.audit-ta,.disc-toast,.pn,#discToast,[style*="font-size:.5"],[style*="font-size:.6"],[style*="font-size: .5"],[style*="font-size: .6"],[style*="font-size: 0.5"],[style*="font-size: 0.6"]{font-size:.875rem!important}
   /* 見出し・ラベル類: 12px(.75rem)以上 */
   .gi,.link-badge,.tag,.ag-st,.il-num,.il-arrow,.sl,.li,.pl,.rl,.mtag,.badge,.hdr-acts .badge,.heli-badge,.acc-tog .cr,.ct,.cpu-label{font-size:.75rem}
-  .ibtn,.tab-btn,.pbtn,.acc-tog,.sbtn,.gl,.recover-btn,.shock-btn,.share-tpl,.share-toast button{font-size:.8125rem}
+  .hdr-acts .ibtn,.sg-tbl th,.ibtn,.tab-btn,.pbtn,.acc-tog,.sbtn,.gl,.recover-btn,.shock-btn,.share-tpl,.share-toast button{font-size:.8125rem}
   /* 押す場所: 44px以上 */
   .hdr-acts .ibtn,.ct .ibtn{min-width:44px;min-height:44px;padding:8px 12px}
   .tab-btn,.pbtn,.acc-tog,.sbtn,.recover-btn,.shock-btn,.share-acts .sbtn{min-height:44px}
