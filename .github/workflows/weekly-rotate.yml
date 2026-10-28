@@ -29,7 +29,7 @@ jobs:
   rotate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Check this week and the next three weeks are in stock (JST)
         run: |
@@ -53,7 +53,7 @@ jobs:
       # a comment instead of filing a new one, so this does not pile up weekly.
       - name: Open a "restock" issue with a ready-to-paste prompt
         if: failure()
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
         with:
           script: |
             const label = 'restock';
