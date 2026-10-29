@@ -123,6 +123,50 @@
         color: var(--txt);
         border-color: var(--bdr);
       }
+      /* Google Play の公式バッジ（Google の決まりどおり、配られた画像をそのまま使う・2026-10-29） */
+      .play-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        line-height: 0;
+        border-radius: 10px;
+      }
+      .play-badge img {
+        height: 72px;
+        width: auto;
+        border: 0;
+        border-radius: 0;
+      }
+      .play-badge:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 2px;
+      }
+      /* 動画の案内（Instagram・TikTok・YouTube・X）。文字だけの丸いリンク（2026-10-29） */
+      .sns-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: flex-start;
+        margin: 18px 0 28px;
+        padding: 0;
+        list-style: none;
+      }
+      .sns-row a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border: 1px solid var(--muted);
+        border-radius: 999px;
+        color: inherit;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9375rem;
+      }
+      .sns-row a:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 2px;
+      }
       .note {
         font-size: 0.875rem;
         color: var(--muted);
@@ -239,12 +283,38 @@
           <a class="btn btn-main" href="../">Try it</a>
           <a class="btn btn-sub" href="../classroom.en.html">Use it in class</a>
           <a
-            class="btn btn-sub"
+            class="play-badge"
             href="https://play.google.com/store/apps/details?id=jp.veai.socialdebugger&amp;hl=en"
-            >Android app (Google Play)</a
-          >
+            ><img
+              src="media/google-play-badge-en.png"
+              alt="Get it on Google Play"
+              width="646"
+              height="250"
+          /></a>
         </div>
         <p class="note">Free, no sign-up, runs in the browser. Nothing leaves your device.</p>
+        <p class="note">Weekly scenarios as short videos (in Japanese)</p>
+        <ul class="sns-row">
+          <li>
+            <a href="https://www.instagram.com/social_debugger/" target="_blank" rel="noopener"
+              >Instagram</a
+            >
+          </li>
+          <li>
+            <a href="https://www.tiktok.com/@social_debugger" target="_blank" rel="noopener"
+              >TikTok</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.youtube.com/playlist?list=PLcmLAM-DtK7c"
+              target="_blank"
+              rel="noopener"
+              >YouTube</a
+            >
+          </li>
+          <li><a href="https://x.com/veai_jp" target="_blank" rel="noopener">X</a></li>
+        </ul>
 
         <img
           src="hero-1600.webp"
@@ -364,6 +434,23 @@
         <p>
           A fictional educational simulation. Not related to any real organisation, region, or
           event.
+        </p>
+        <p>
+          Short videos (in Japanese):
+          <a href="https://www.instagram.com/social_debugger/" target="_blank" rel="me noopener"
+            >Instagram</a
+          >
+          ·
+          <a href="https://www.tiktok.com/@social_debugger" target="_blank" rel="me noopener"
+            >TikTok</a
+          >
+          ·
+          <a
+            href="https://www.youtube.com/playlist?list=PLcmLAM-DtK7c"
+            target="_blank"
+            rel="noopener"
+            >YouTube</a
+          >
         </p>
       </footer>
     </div>
