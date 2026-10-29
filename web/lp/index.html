@@ -206,6 +206,50 @@
         border: 1.5px solid var(--cyan);
         color: var(--cyan);
       }
+      /* Google Play の公式バッジ（Google の決まりどおり、配られた画像をそのまま使う・2026-10-29） */
+      .play-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        line-height: 0;
+        border-radius: 10px;
+      }
+      .play-badge img {
+        height: 72px;
+        width: auto;
+        border: 0;
+        border-radius: 0;
+      }
+      .play-badge:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 2px;
+      }
+      /* 動画の案内（Instagram・TikTok・YouTube・X）。文字だけの丸いリンク（2026-10-29） */
+      .sns-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin: 18px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+      .sns-row a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border: 1px solid var(--muted);
+        border-radius: 999px;
+        color: inherit;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9375rem;
+      }
+      .sns-row a:focus-visible {
+        outline: 3px solid var(--cyan);
+        outline-offset: 2px;
+      }
       .note {
         margin: 18px 0 0;
         font-size: 0.875rem;
@@ -745,10 +789,14 @@
           <a class="btn btn-main" href="../">▶ 壊して、直してみる</a>
           <a class="btn btn-sub" href="#cascade">どう壊れるのか</a>
           <a
-            class="btn btn-sub"
+            class="play-badge"
             href="https://play.google.com/store/apps/details?id=jp.veai.socialdebugger&amp;hl=ja"
-            >Android アプリ（Google Play）</a
-          >
+            ><img
+              src="media/google-play-badge-ja.png"
+              alt="Google Play で手に入れよう"
+              width="646"
+              height="250"
+          /></a>
         </div>
         <p class="note">無料・登録なし・ブラウザで約60秒。操作の記録は端末の外に出ません。</p>
       </div>
@@ -1041,12 +1089,38 @@
         <div class="cta-row">
           <a class="btn btn-main" href="../">▶ 壊して、直してみる</a>
           <a
-            class="btn btn-sub"
+            class="play-badge"
             href="https://play.google.com/store/apps/details?id=jp.veai.socialdebugger&amp;hl=ja"
-            >Android アプリ（Google Play）</a
-          >
+            ><img
+              src="media/google-play-badge-ja.png"
+              alt="Google Play で手に入れよう"
+              width="646"
+              height="250"
+          /></a>
         </div>
         <p class="note">無料・登録なし・広告なし。ブラウザで約60秒。</p>
+        <p class="note">毎週のシナリオは、動画でも見られます</p>
+        <ul class="sns-row">
+          <li>
+            <a href="https://www.instagram.com/social_debugger/" target="_blank" rel="noopener"
+              >Instagram</a
+            >
+          </li>
+          <li>
+            <a href="https://www.tiktok.com/@social_debugger" target="_blank" rel="noopener"
+              >TikTok</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://www.youtube.com/playlist?list=PLcmLAM-DtK7c"
+              target="_blank"
+              rel="noopener"
+              >YouTube</a
+            >
+          </li>
+          <li><a href="https://x.com/veai_jp" target="_blank" rel="noopener">X</a></li>
+        </ul>
       </section>
 
       <section>
@@ -1124,6 +1198,10 @@
           新しい動画のお知らせ:
           <a href="https://www.instagram.com/social_debugger/" target="_blank" rel="me noopener"
             >Instagram @social_debugger</a
+          >
+          ・
+          <a href="https://www.tiktok.com/@social_debugger" target="_blank" rel="me noopener"
+            >TikTok @social_debugger</a
           >
           ・
           <a href="https://x.com/veai_jp" target="_blank" rel="me noopener">X @veai_jp</a>
