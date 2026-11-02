@@ -46,7 +46,7 @@
   },
   "homepage": "https://github.com/larai-w/social-system-debugger#readme",
   "dependencies": {
-    "@capacitor/android": "^8.5.2",
+    "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
     "@capacitor/filesystem": "^8.1.5",
     "@capacitor/haptics": "^8.0.2",
