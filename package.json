@@ -59,7 +59,7 @@
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.5.3",
+    "@capacitor/cli": "^8.6.0",
     "@eslint/js": "^10.0.1",
     "@napi-rs/canvas": "^1.0.11",
     "eslint": "^10.13.0",
